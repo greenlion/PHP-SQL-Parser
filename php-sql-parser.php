@@ -1010,7 +1010,12 @@ EOREGEX
 					$local_expr = $token;
 				}
                                 $processed = $this->process_expr_list($this->split_sql($local_expr));
-
+				$type = 'expression';
+				if(count($processed) == 1) {
+					$type = $processed[0]['expr_type'];
+					$base_expr  = $processed[0]['base_expr'];
+					$processed = $processed[0]['sub_tree'];
+				}
 			}
 
 			$expr[] = array( 'expr_type' => $type, 'base_expr' => $token, 'sub_tree' => $processed);
