@@ -161,8 +161,6 @@ EOREGEX
 
 			$token=$trim;
 			if($token && $token[0] == '(') {
-				#echo "TOKEN:$token\n";
-				
 				$info = $this->count_paren($token);
 				if($info['balanced'] == 0) {
 					continue;
@@ -672,6 +670,7 @@ EOREGEX
 		$ref_expr="";
 		$base_expr="";
 		$sub_tree = false;
+		$subquery = "";
 		foreach($tokens as $token) {
 			$base_expr = false;
 			$upper = strtoupper(trim($token));
@@ -688,8 +687,8 @@ EOREGEX
 			if(preg_match("/^\\s*\\(\\s*select/i",$token)) {
 				$type = 'subquery';
 				$table = "DEPENDENT-SUBQUERY";
-				$base_expr = $token;
 				$sub_tree = $this->parse(trim($token,'() '));
+				$subquery = $token;
 			}
 	
 			if($upper != 'JOIN' && $token != ',') {
@@ -773,7 +772,9 @@ EOREGEX
 					/*if(!$base_expr) {
 						$expr[] = array('table'=>$table, 'alias'=>$alias,'join_type'=>$join_type,'ref_type'=> $ref_type,'ref_clause'=> $ref_expr);
 					} else {*/
+						if($subquery) $base_expr=$subquery;
 						$expr[] = array('table'=>$table, 'alias'=>$alias,'join_type'=>$join_type,'ref_type'=> $ref_type,'ref_clause'=> $ref_expr, 'base_expr' => $base_expr, 'sub_tree' => $sub_tree);
+						$subquery = "";
 		#			} 
 
 					if($save_join_type) {
