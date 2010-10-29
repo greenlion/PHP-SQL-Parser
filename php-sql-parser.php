@@ -681,8 +681,9 @@ EOREGEX
 		if(count($processed) == 1) {
 			$processed = $processed[0];
 			$processed['alias'] = $alias;
+			$processed['base_expr'] = $base_expr;
 		} else {
-			$processed = array('alias' => $alias, 'expr_type' => $type, 'sub_tree' => $processed);
+			$processed = array('alias' => $alias, 'expr_type' => $type, 'base_expr' => $base_expr, 'sub_tree' => $processed);
 		}
 
 		return $processed;
