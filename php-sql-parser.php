@@ -629,27 +629,35 @@ EOREGEX
 					++$pos;
 				}
 				break;
-			} elseif($i<count($tokens)-1 ) {
+			} elseif($i<count($tokens) -1 ) {
 			    $base_expr .= $tokens[$i];
 			} 
 	
 		}
-	
+
 		/* If the last two tokens are not reserved words, then the last word must be the alias*/
 	        /* TODO: profile this and determine if hash lookup would be faster */
-		if(count($tokens) > 1) {
-			if(!in_array(strtoupper($tokens[count($tokens)-1]), $this->reserved) &&
-			   !in_array(strtoupper($tokens[count($tokens)-2]), $this->reserved)) { 
-				$alias = $tokens[count($tokens)-1];
-				
-			} else {
-				$base_expr .= $tokens[count($tokens)-1];
+		if(count($tokens) > 1 && !$alias ) {
+			$base_expr .= $tokens[count($tokens)-1];
+			if(!in_array(strtoupper($tokens[count($tokens)-1]), $this->reserved)) {
+				#find the previous token
+				for($n=count($tokens)-2;$n>0;--$n) {
+					if(trim($tokens[$n])) break;
+				}
+	
+				if(!in_array(strtoupper($tokens[$n]), $this->reserved)) { 
+					$alias .= $tokens[count($tokens)-1];
+				} else {
+					$alias = $base_expr;
+				}
 			}
+
 		}
 	
 		/* If there is no alias, then make the alias the properly escaped contents of the entire expression */
 	        if (!$alias) {
 			$alias = $expression;
+			$base_expr = $expression;
 	        } 
 	
 		/* Properly escape the alias if it is not escaped */
