@@ -3,6 +3,7 @@ error_reporting(E_ALL);
 
 class PHPSQLParser {
 	var $reserved = array();
+	var $functions = array();
 	function __construct($sql = false) {
 		#LOAD THE LIST OF RESERVED WORDS
 		$this->load_reserved_words();
@@ -11,19 +12,33 @@ class PHPSQLParser {
 
 	function parse($sql) {
 		$sql = trim($sql);
-		
-		$in = $this->split_sql($sql);
 
-		$out = array();
+		#lex the SQL statement
+		$in = $this->split_sql($sql);
+	
+		#sometimes the parser needs to skip ahead until a particular 
+		#token is found
 		$skip_until = false;
+		
+		#this is the output tree which is being parsed
+		$out = array();
+
+		#This is the last type of union used (UNION or UNION ALL)
+		#indicates a) presence of at least one union in this query
+		#          b) the type of union if this is the first or last query
 		$union = false;
+
+		#Sometimes a "query" consists of more than one query (like a UNION query)
+		#this array holds all the queries
 		$queries=array();
 
+		#This is the highest level lexical analysis.  This is the part of the
+		#code which finds UNION and UNION ALL query parts
 		foreach($in as $key => $token) {
 			$token=trim($token);
-			
+		
 			if($skip_until) {
-				if(trim($token)) {
+				if($token) {
 					if(strtoupper($token) == $skip_until) {
 						$skip_until = false;
 						continue;
@@ -33,7 +48,7 @@ class PHPSQLParser {
 				}
 			}
 
-			if(trim(strtoupper($token)) == "UNION") {
+			if(strtoupper($token) == "UNION") {
 				$union = 'UNION';
 				for($i=$key+1;$i<count($in);++$i) {
 					if(trim($in[$i]) == '') continue;
@@ -50,8 +65,7 @@ class PHPSQLParser {
 				$out = array();
 				
 			} else { 
-				
-				if ($token != 'ALL') $out[]=$token;
+				$out[]=$token;
 			}
 
 		}
@@ -70,9 +84,9 @@ class PHPSQLParser {
 		union
 		(select ...)
 
-		This block finds any subqueries such as the following in a UNION statment.  Only one such subquery
-		is supported in each UNION block (select)union(select)union(select) is legal, but
-		(select)(select)union(select) is not.  The extra queries will be silently ignored.
+		This block handles this query syntax.  Only one such subquery
+		is supported in each UNION block.  (select)(select)union(select) is not legal.
+		The extra queries will be silently ignored.
 		*/
 		$union_types = array('UNION','UNION ALL');
 		foreach($union_types as $union_type) {
@@ -93,7 +107,10 @@ class PHPSQLParser {
 			}
 		}
 
-
+		
+		/* If there was no UNION or UNION ALL in the query, then the query is 
+		stored at $queries[0].
+		*/
 		if(!empty($queries[0])) {
 			$queries[0] = $this->process_sql($queries[0]);
 			
@@ -107,6 +124,8 @@ class PHPSQLParser {
 		return $this->parsed;
 	}
 
+	#This function counts open and close parenthesis and
+	#returns their location.  This might be faster as a regex
 	private function count_paren($token) {
 		$len = strlen($token);
 		$open=array();
@@ -122,6 +141,7 @@ class PHPSQLParser {
 		return array('open' => $open, 'close' => $close, 'balanced' =>( count($close) - count($open)));
 	}
 
+	#This is the lexer
 	#this function splits up a SQL statement into easy to "parse"
 	#tokens for the SQL processor
 	private function split_sql($sql) {
@@ -145,15 +165,20 @@ class PHPSQLParser {
 EOREGEX
 ;
 
-
 	        $tokens = preg_split($regex, $sql,-1, PREG_SPLIT_NO_EMPTY | PREG_SPLIT_DELIM_CAPTURE);
-		#print_r($tokens);
-
 		$token_count = count($tokens);
 
-		#we need to properly fix-up grouped expressions and subqueries
-		#if the parens are balanced (balanced == 0) then we don't need to do anything
-		#otherwise, we need to balance the expression.
+		/* The above regex has one problem, because the parenthetical match is not greedy.
+		   Thus, when matching grouped expresions such as ( (a and b) or c) the 
+		   tokenizer will produce "( (a and b)", " ", "or", " " , "c,")" 
+		
+
+		   This block detects the number of open/close parens in the given token.  If the parens are balanced
+		   (balanced == 0) then we don't need to do anything.
+		
+		   otherwise, we need to balance the expression.
+	        */
+		$reset = false;
 		for($i=0;$i<$token_count;++$i) {
 			if(empty($tokens[$i])) continue;
 			$trim = trim($tokens[$i]);
@@ -178,6 +203,7 @@ EOREGEX
 					if($closes != $needed) {
 						$tokens[$i] .= $tokens[$n];
 						unset($tokens[$n]);
+						$reset = true;
 						$info2 = $this->count_paren($tokens[$i]);
 						$needed = abs($info2['balanced']);
 					#	echo "CLOSES LESS THAN NEEDED (still need $needed)\n";
@@ -196,6 +222,7 @@ EOREGEX
 							$tokens[$n] = $str2;
 						} else {
 							unset($tokens[$n]);
+							$reset = true;
 						}
 						$tokens[$i] .= $str1;
 						$info2 = $this->count_paren($tokens[$i]);
@@ -205,7 +232,8 @@ EOREGEX
 				}
 			}
 		}
-	        return array_values($tokens);
+		/* reset the array if we deleted any tokens above */
+	        return  $reset ? array_values($tokens) : $tokens;
 	}
 	
 	/* This function breaks up the SQL statement into logical sections.
@@ -642,6 +670,12 @@ EOREGEX
 			$type = 'expression';
 			$processed = $this->process_expr_list($this->split_sql($base_expr));
 		}
+
+		if($type == 'reserved') {
+			if(in_array($base_expr, $this->functions)) {
+				$type = 'function';
+			}
+		}
 		
 
 		if(count($processed) == 1) {
@@ -999,8 +1033,34 @@ EOREGEX
 			}
 			/* is a reserved word? */
 			if(($type != 'operator' && $type != 'in-list' && $type != 'sub_expr') && in_array($upper, $this->reserved)) {
-				$type = 'reserved';	
 				$token = $upper;
+				if(!in_array($upper,$this->functions)) {
+					$type = 'reserved';	
+				} else {
+					switch($token) {
+						case 'AVG':
+						case 'SUM':
+						case 'COUNT':
+						case 'MIN':
+						case 'MAX':
+						case 'STDDEV':
+						case 'STDDEV_SAMP':
+						case 'STDDEV_POP':
+						case 'VARIANCE':
+						case 'VAR_SAMP':
+						case 'VAR_POP':
+						case 'GROUP_CONCAT':
+						case 'BIT_AND':
+						case 'BIT_OR':
+						case 'BIT_XOR':
+							$type = 'aggregate_function';
+						break;
+
+						default;
+							$type = 'function';
+						break;
+					}
+				}
 				$processed = false;
 			}
 
@@ -1085,434 +1145,638 @@ EOREGEX
 	
 
 	function load_reserved_words() {
-		$words = <<<EOWORDS
-ACCESSIBLE
-ADD
-ALL
-ALTER
-ANALYZE
-AND
-AS
-ASC
-ASENSITIVE
-BEFORE
-BETWEEN
-BIGINT
-BINARY
-BLOB
-BOTH
-BY
-CALL
-CASCADE
-CASE
-CHANGE
-CHAR
-CHARACTER
-CHECK
-COLLATE
-COLUMN
-CONDITION
-CONSTRAINT
-CONTINUE
-CONVERT
-CREATE
-CROSS
-CURRENT_DATE
-CURRENT_TIME
-CURRENT_TIMESTAMP
-CURRENT_USER
-CURSOR
-DATABASE
-DATABASES
-DAY_HOUR
-DAY_MICROSECOND
-DAY_MINUTE
-DAY_SECOND
-DEC
-DECIMAL
-DECLARE
-DEFAULT
-DELAYED
-DELETE
-DESC
-DESCRIBE
-DETERMINISTIC
-DISTINCT
-DISTINCTROW
-DIV
-DOUBLE
-DROP
-DUAL
-EACH
-ELSE
-ELSEIF
-ENCLOSED
-ESCAPED
-EXISTS
-EXIT
-EXPLAIN
-FALSE
-FETCH
-FLOAT
-FLOAT4
-FLOAT8
-FOR
-FORCE
-FOREIGN
-FROM
-FULLTEXT
-GRANT
-GROUP
-HAVING
-HIGH_PRIORITY
-HOUR_MICROSECOND
-HOUR_MINUTE
-HOUR_SECOND
-IF
-IGNORE
-IN
-INDEX
-INFILE
-INNER
-INOUT
-INSENSITIVE
-INSERT
-INT
-INT1
-INT2
-INT3
-INT4
-INT8
-INTEGER
-INTERVAL
-INTO
-IS
-ITERATE
-JOIN
-KEY
-KEYS
-KILL
-LEADING
-LEAVE
-LEFT
-LIKE
-LIMIT
-LINEAR
-LINES
-LOAD
-LOCALTIME
-LOCALTIMESTAMP
-LOCK
-LONG
-LONGBLOB
-LONGTEXT
-LOOP
-LOW_PRIORITY
-MASTER_SSL_VERIFY_SERVER_CERT
-MATCH
-MEDIUMBLOB
-MEDIUMINT
-MEDIUMTEXT
-MIDDLEINT
-MINUTE_MICROSECOND
-MINUTE_SECOND
-MOD
-MODIFIES
-NATURAL
-NOT
-NO_WRITE_TO_BINLOG
-NULL
-NUMERIC
-ON
-OPTIMIZE
-OPTION
-OPTIONALLY
-OR
-ORDER
-OUT
-OUTER
-OUTFILE
-PRECISION
-PRIMARY
-PROCEDURE
-PURGE
-RANGE
-READ
-READS
-READ_WRITE
-REAL
-REFERENCES
-REGEXP
-RELEASE
-RENAME
-REPEAT
-REPLACE
-REQUIRE
-RESTRICT
-RETURN
-REVOKE
-RIGHT
-RLIKE
-SCHEMA
-SCHEMAS
-SECOND_MICROSECOND
-SELECT
-SENSITIVE
-SEPARATOR
-SET
-SHOW
-SMALLINT
-SPATIAL
-SPECIFIC
-SQL
-SQLEXCEPTION
-SQLSTATE
-SQLWARNING
-SQL_BIG_RESULT
-SQL_CALC_FOUND_ROWS
-SQL_SMALL_RESULT
-SSL
-STARTING
-STRAIGHT_JOIN
-TABLE
-TERMINATED
-THEN
-TINYBLOB
-TINYINT
-TINYTEXT
-TO
-TRAILING
-TRIGGER
-TRUE
-UNDO
-UNION
-UNIQUE
-UNLOCK
-UNSIGNED
-UPDATE
-USAGE
-USE
-USING
-UTC_DATE
-UTC_TIME
-UTC_TIMESTAMP
-VALUES
-VARBINARY
-VARCHAR
-VARCHARACTER
-VARYING
-WHEN
-WHERE
-WHILE
-WITH
-WRITE
-XOR
-YEAR_MONTH
-ZEROFILL
-AVG
-BIT_AND
-BIT_OR
-BIT_XOR
-COUNT
-GROUP_CONCAT
-MAX
-MIN
-STD
-STDDEV_POP
-STDDEV_SAMP
-STDDEV
-SUM
-VAR_POP
-VAR_SAMP
-VARIANCE
-GET_LOCK
-INET_ATON
-INET_NTOA
-IS_FREE_LOCK
-IS_USED_LOCK
-MASTER_POS_WAIT
-NAME_CONST
-RAND
-RELEASE_LOCK
-SLEEP
-UUID_SHORT
-UUID
-SOUNDS
-NULLIF
-IFNULL
-STRCMP
-ASCII
-BIN
-BIT_LENGTH
-CHAR_LENGTH
-CHARACTER_LENGTH
-CONCAT_WS
-CONCAT
-ELT
-EXPORT_SET
-FIELD
-FIND_IN_SET
-FORMAT
-HEX
-INSTR
-LCASE
-LENGTH
-LOAD_FILE
-LOCATE
-LOWER
-LPAD
-LTRIM
-MAKE_SET
-MID
-OCTET_LENGTH
-ORD
-POSITION
-QUOTE
-REVERSE
-RPAD
-RTRIM
-SOUNDEX
-SPACE
-SUBSTR
-SUBSTRING_INDEX
-SUBSTRING
-TRIM
-UCASE
-UNHEX
-UPPER
-ABS
-ACOS
-ASIN
-ATAN2
-ATAN
-CEIL
-CEILING
-CONV
-COS
-COT
-CRC32
-DEGREES
-EXP
-FLOOR
-LN
-LOG10
-LOG2
-LOG
-OCT
-PI
-POW
-POWER
-RADIANS
-ROUND
-SIGN
-SIN
-SQRT
-TAN
-TRUNCATE
-ADDDATE
-ADDTIME
-CONVERT_TZ
-CURDATE
-CURTIME
-DATE_ADD
-DATE_FORMAT
-DATE_SUB
-DATE
-DATEDIFF
-DAY
-DAYNAME
-DAYOFMONTH
-DAYOFWEEK
-DAYOFYEAR
-EXTRACT
-FROM_DAYS
-FROM_UNIXTIME
-GET_FORMAT
-HOUR
-LAST_DAY
-LOCALTIMESTAMP,
-MAKEDATE
-MAKETIME
-MICROSECOND
-MINUTE
-MONTH
-MONTHNAME
-NOW
-PERIOD_ADD
-PERIOD_DIFF
-QUARTER
-SEC_TO_TIME
-SECOND
-STR_TO_DATE
-SUBDATE
-SUBTIME
-SYSDATE
-TIME_FORMAT
-TIME_TO_SEC
-TIME
-TIMEDIFF
-TIMESTAMP
-TIMESTAMPADD
-TIMESTAMPDIFF
-TO_DAYS
-UNIX_TIMESTAMP
-WEEK
-WEEKDAY
-WEEKOFYEAR
-YEAR
-YEARWEEK
-AGAINST
-CAST
-EXTRACTVALUE
-UPDATEXML
-BIT_COUNT
-AES_DECRYPT
-AES_ENCRYPT
-COMPRESS
-DECODE
-DES_DECRYPT
-DES_ENCRYPT
-ENCODE
-ENCRYPT
-MD5
-OLD_PASSWORD
-PASSWORD
-SHA1
-UNCOMPRESS
-UNCOMPRESSED_LENGTH
-BENCHMARK
-CHARSET
-COERCIBILITY
-COLLATION
-CONNECTION_ID
-FOUND_ROWS
-LAST_INSERT_ID
-ROW_COUNT
-SESSION_USER
-SYSTEM_USER
-USER
-VERSION
-END
-+
--
-=
->
->
-<>
-!=
-IN
-*
-%
-,
-||
-&&
-==
-^
-EOWORDS;
-
 	
-		$this->reserved = explode("\n", $words);
+	    $this->functions = array(
+	        'abs',
+	        'acos',
+	        'adddate',
+	        'addtime',
+	        'aes_encrypt',
+	        'aes_decrypt',
+	        'against',
+	        'ascii',
+	        'asin',
+	        'atan',
+	        'avg',
+	        'benchmark',
+	        'bin',
+	        'bit_and',
+	        'bit_or',
+	        'bitcount',
+	        'bitlength',
+	        'cast',
+	        'ceiling',
+	        'char',
+	        'char_length',
+	        'character_length',
+	        'charset',
+	        'coalesce',
+	        'coercibility',
+	        'collation',
+	        'compress',
+	        'concat',
+	        'concat_ws',
+	        'conection_id',
+	        'conv',
+	        'convert',
+	        'convert_tz',
+	        'cos',
+	        'cot',
+	        'count',
+	        'crc32',
+	        'curdate',
+	        'current_user',
+	        'currval',
+	        'curtime',
+	        'database',
+	        'date_add',
+	        'date_diff',
+	        'date_format',
+	        'date_sub',
+	        'day',
+	        'dayname',
+	        'dayofmonth',
+	        'dayofweek',
+	        'dayofyear',
+	        'decode',
+	        'default',
+	        'degrees',
+	        'des_decrypt',
+	        'des_encrypt',
+	        'elt',
+	        'encode',
+	        'encrypt',
+	        'exp',
+	        'export_set',
+	        'extract',
+	        'field',
+	        'find_in_set',
+	        'floor',
+	        'format',
+	        'found_rows',
+	        'from_days',
+	        'from_unixtime',
+	        'get_format',
+	        'get_lock',
+	        'group_concat',
+	        'greatest',
+	        'hex',
+	        'hour',
+	        'if',
+	        'ifnull',
+	        'in',
+	        'inet_aton',
+	        'inet_ntoa',
+	        'insert',
+	        'instr',
+	        'interval',
+	        'is_free_lock',
+	        'is_used_lock',
+	        'last_day',
+	        'last_insert_id',
+	        'lcase',
+	        'least',
+	        'left',
+	        'length',
+	        'ln',
+	        'load_file',
+	        'localtime',
+	        'localtimestamp',
+	        'locate',
+	        'log',
+	        'log2',
+	        'log10',
+	        'lower',
+	        'lpad',
+	        'ltrim',
+	        'make_set',
+	        'makedate',
+	        'maketime',
+	        'master_pos_wait',
+	        'match',
+	        'max',
+	        'md5',
+	        'microsecond',
+	        'mid',
+	        'min',
+	        'minute',
+	        'mod',
+	        'month',
+	        'monthname',
+	        'nextval',
+	        'now',
+	        'nullif',
+	        'oct',
+	        'octet_length',
+	        'old_password',
+	        'ord',
+	        'password',
+	        'period_add',
+	        'period_diff',
+	        'pi',
+	        'position',
+	        'pow',
+	        'power',
+	        'quarter',
+	        'quote',
+	        'radians',
+	        'rand',
+	        'release_lock',
+	        'repeat',
+	        'replace',
+	        'reverse',
+	        'right',
+	        'round',
+	        'row_count',
+	        'rpad',
+	        'rtrim',
+	        'sec_to_time',
+	        'second',
+	        'session_user',
+	        'sha',
+	        'sha1',
+	        'sign',
+	        'soundex',
+	        'space',
+	        'sqrt',
+	        'std',
+	        'stddev',
+	        'stddev_pop',
+	        'stddev_samp',
+	        'strcmp',
+	        'str_to_date',
+	        'subdate',
+	        'substring',
+	        'substring_index',
+	        'subtime',
+	        'sum',
+	        'sysdate',
+	        'system_user',
+	        'tan',
+	        'time',
+	        'timediff',
+	        'timestamp',
+	        'timestampadd',
+	        'timestampdiff',
+	        'time_format',
+	        'time_to_sec',
+	        'to_days',
+	        'trim',
+	        'truncate',
+	        'ucase',
+	        'uncompress',
+	        'uncompressed_length',
+	        'unhex',
+	        'unix_timestamp',
+	        'upper',
+	        'user',
+	        'utc_date',
+	        'utc_time',
+	        'utc_timestamp',
+	        'uuid',
+	        'var_pop',
+	        'var_samp',
+	        'variance',
+	        'version',
+	        'week',
+	        'weekday',
+	        'weekofyear',
+	        'year',
+	        'yearweek');
+
+	/* includes functions */
+	$this->reserved = array(
+		'abs',
+		'acos',
+		'adddate',
+		'addtime',
+		'aes_encrypt',
+		'aes_decrypt',
+		'against',
+		'ascii',
+		'asin',
+		'atan',
+		'avg',
+		'benchmark',
+		'bin',
+		'bit_and',
+		'bit_or',
+		'bitcount',
+		'bitlength',
+		'cast',
+		'ceiling',
+		'char',
+		'char_length',
+		'character_length',
+		'charset',
+		'coalesce',
+		'coercibility',
+		'collation',
+		'compress',
+		'concat',
+		'concat_ws',
+		'conection_id',
+		'conv',
+		'convert',
+		'convert_tz',
+		'cos',
+		'cot',
+		'count',
+		'crc32',
+		'curdate',
+		'current_user',
+		'currval',
+		'curtime',
+		'database',
+		'date_add',
+		'date_diff',
+		'date_format',
+		'date_sub',
+		'day',
+		'dayname',
+		'dayofmonth',
+		'dayofweek',
+		'dayofyear',
+		'decode',
+		'default',
+		'degrees',
+		'des_decrypt',
+		'des_encrypt',
+		'elt',
+		'encode',
+		'encrypt',
+		'exp',
+		'export_set',
+		'extract',
+		'field',
+		'find_in_set',
+		'floor',
+		'format',
+		'found_rows',
+		'from_days',
+		'from_unixtime',
+		'get_format',
+		'get_lock',
+		'group_concat',
+		'greatest',
+		'hex',
+		'hour',
+		'if',
+		'ifnull',
+		'in',
+		'inet_aton',
+		'inet_ntoa',
+		'insert',
+		'instr',
+		'interval',
+		'is_free_lock',
+		'is_used_lock',
+		'last_day',
+		'last_insert_id',
+		'lcase',
+		'least',
+		'left',
+		'length',
+		'ln',
+		'load_file',
+		'localtime',
+		'localtimestamp',
+		'locate',
+		'log',
+		'log2',
+		'log10',
+		'lower',
+		'lpad',
+		'ltrim',
+		'make_set',
+		'makedate',
+		'maketime',
+		'master_pos_wait',
+		'match',
+		'max',
+		'md5',
+		'microsecond',
+		'mid',
+		'min',
+		'minute',
+		'mod',
+		'month',
+		'monthname',
+		'nextval',
+		'now',
+		'nullif',
+		'oct',
+		'octet_length',
+		'old_password',
+		'ord',
+		'password',
+		'period_add',
+		'period_diff',
+		'pi',
+		'position',
+		'pow',
+		'power',
+		'quarter',
+		'quote',
+		'radians',
+		'rand',
+		'release_lock',
+		'repeat',
+		'replace',
+		'reverse',
+		'right',
+		'round',
+		'row_count',
+		'rpad',
+		'rtrim',
+		'sec_to_time',
+		'second',
+		'session_user',
+		'sha',
+		'sha1',
+		'sign',
+		'soundex',
+		'space',
+		'sqrt',
+		'std',
+		'stddev',
+		'stddev_pop',
+		'stddev_samp',
+		'strcmp',
+		'str_to_date',
+		'subdate',
+		'substring',
+		'substring_index',
+		'subtime',
+		'sum',
+		'sysdate',
+		'system_user',
+		'tan',
+		'time',
+		'timediff',
+		'timestamp',
+		'timestampadd',
+		'timestampdiff',
+		'time_format',
+		'time_to_sec',
+		'to_days',
+		'trim',
+		'truncate',
+		'ucase',
+		'uncompress',
+		'uncompressed_length',
+		'unhex',
+		'unix_timestamp',
+		'upper',
+		'user',
+		'utc_date',
+		'utc_time',
+		'utc_timestamp',
+		'uuid',
+		'var_pop',
+		'var_samp',
+		'variance',
+		'version',
+		'week',
+		'weekday',
+		'weekofyear',
+		'year',
+		'yearweek',
+		'add',
+		'all',
+		'alter',
+		'analyze',
+		'and',
+		'as',
+		'asc',
+		'asensitive',
+		'auto_increment',
+		'bdb',
+		'before',
+		'berkeleydb',
+		'between',
+		'bigint',
+		'binary',
+		'blob',
+		'both',
+		'by',
+		'call',
+		'cascade',
+		'case',
+		'change',
+		'char',
+		'character',
+		'check',
+		'collate',
+		'column',
+		'columns',
+		'condition',
+		'connection',
+		'constraint',
+		'continue',
+		'create',
+		'cross',
+		'current_date',
+		'current_time',
+		'current_timestamp',
+		'cursor',
+		'database',
+		'databases',
+		'day_hour',
+		'day_microsecond',
+		'day_minute',
+		'day_second',
+		'dec',
+		'decimal',
+		'declare',
+		'default',
+		'delayed',
+		'delete',
+		'desc',
+		'describe',
+		'deterministic',
+		'distinct',
+		'distinctrow',
+		'div',
+		'double',
+		'drop',
+		'else',
+		'elseif',
+		'enclosed',
+		'escaped',
+		'exists',
+		'exit',
+		'explain',
+		'false',
+		'fetch',
+		'fields',
+		'float',
+		'for',
+		'force',
+		'foreign',
+		'found',
+		'frac_second',
+		'from',
+		'fulltext',
+		'grant',
+		'group',
+		'having',
+		'high_priority',
+		'hour_microsecond',
+		'hour_minute',
+		'hour_second',
+		'if',
+		'ignore',
+		'in',
+		'index',
+		'infile',
+		'inner',
+		'innodb',
+		'inout',
+		'insensitive',
+		'insert',
+		'int',
+		'integer',
+		'interval',
+		'into',
+		'io_thread',
+		'is',
+		'iterate',
+		'join',
+		'key',
+		'keys',
+		'kill',
+		'leading',
+		'leave',
+		'left',
+		'like',
+		'limit',
+		'lines',
+		'load',
+		'localtime',
+		'localtimestamp',
+		'lock',
+		'long',
+		'longblob',
+		'longtext',
+		'loop',
+		'low_priority',
+		'master_server_id',
+		'match',
+		'mediumblob',
+		'mediumint',
+		'mediumtext',
+		'middleint',
+		'minute_microsecond',
+		'minute_second',
+		'mod',
+		'natural',
+		'not',
+		'no_write_to_binlog',
+		'null',
+		'numeric',
+		'on',
+		'optimize',
+		'option',
+		'optionally',
+		'or',
+		'order',
+		'out',
+		'outer',
+		'outfile',
+		'precision',
+		'primary',
+		'privileges',
+		'procedure',
+		'purge',
+		'read',
+		'real',
+		'references',
+		'regexp',
+		'rename',
+		'repeat',
+		'replace',
+		'require',
+		'restrict',
+		'return',
+		'revoke',
+		'right',
+		'rlike',
+		'second_microsecond',
+		'select',
+		'sensitive',
+		'separator',
+		'set',
+		'show',
+		'smallint',
+		'some',
+		'soname',
+		'spatial',
+		'specific',
+		'sql',
+		'sqlexception',
+		'sqlstate',
+		'sqlwarning',
+		'sql_big_result',
+		'sql_calc_found_rows',
+		'sql_small_result',
+		'sql_tsi_day',
+		'sql_tsi_frac_second',
+		'sql_tsi_hour',
+		'sql_tsi_minute',
+		'sql_tsi_month',
+		'sql_tsi_quarter',
+		'sql_tsi_second',
+		'sql_tsi_week',
+		'sql_tsi_year',
+		'ssl',
+		'starting',
+		'straight_join',
+		'striped',
+		'table',
+		'tables',
+		'terminated',
+		'then',
+		'timestampadd',
+		'timestampdiff',
+		'tinyblob',
+		'tinyint',
+		'tinytext',
+		'to',
+		'trailing',
+		'true',
+		'undo',
+		'union',
+		'unique',
+		'unlock',
+		'unsigned',
+		'update',
+		'usage',
+		'use',
+		'user_resources',
+		'using',
+		'utc_date',
+		'utc_time',
+		'utc_timestamp',
+		'values',
+		'varbinary',
+		'varchar',
+		'varcharacter',
+		'varying',
+		'when',
+		'where',
+		'while',
+		'with',
+		'write',
+		'xor',
+		'year_month',
+		'zerofill'
+		);
+
+		for($i=0;$i<count($this->reserved);++$i) {
+			$this->reserved[$i]=strtoupper($this->reserved[$i]);
+			if(!empty($this->functions[$i])) $this->functions[$i] = strtoupper($this->functions[$i]);
+		} 	
 	}
 
 } // END CLASS
-
