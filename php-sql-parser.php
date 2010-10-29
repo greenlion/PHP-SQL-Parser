@@ -669,6 +669,9 @@ EOREGEX
 		if(!$processed) {
 			$type = 'expression';
 			$processed = $this->process_expr_list($this->split_sql($base_expr));
+			if($processed[0]['expr_type'] == 'aggregate_function') {
+				$type = 'aggregate_expression';
+			}
 		}
 
 		if($type == 'reserved') {
