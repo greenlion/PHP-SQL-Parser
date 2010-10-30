@@ -616,88 +616,93 @@ EOREGEX
 	   is provided, and we set the type of expression.
 	*/
 	private function process_select_expr($expression) {
-		$tokens = $this->split_sql($expression);
-
-		$as_at = 0;
+		$capture = false;
 		$alias = "";
-		$base_expr = "";
-		for($i=0;$i<count($tokens);++$i) {
-			if(strtoupper($tokens[$i]) == 'AS') {
-				$pos = $i+1;
-				while($alias == "" && $pos <= count($tokens)) {
-					$alias = trim($tokens[$pos]);
-					++$pos;
-				}
-				break;
-			} elseif($i<count($tokens) -1 ) {
-			    $base_expr .= $tokens[$i];
-			} 
-	
+		$base_expression = $expression;
+		$upper = trim(strtoupper($expression));
+		#if necessary, unpack the expression
+		if($upper[0] == '(') {
+			$expression = substr($expression,1,-1);
+			$base_expression = $expression;
 		}
 
-		/* If the last two tokens are not reserved words, then the last word must be the alias*/
-	        /* TODO: profile this and determine if hash lookup would be faster */
-		if(count($tokens) > 1 && !$alias ) {
-			$base_expr .= $tokens[count($tokens)-1];
-			if(!in_array(strtoupper($tokens[count($tokens)-1]), $this->reserved)) {
-				#find the previous token
-				for($n=count($tokens)-2;$n>0;--$n) {
-					if(trim($tokens[$n])) break;
-				}
-	
-				if(!in_array(strtoupper($tokens[$n]), $this->reserved)) { 
-					$alias .= $tokens[count($tokens)-1];
-				} else {
-					$alias = $base_expr;
-				}
+		$tokens = $this->split_sql($expression);
+		$token_count = count($tokens);
+		
+		/* Determine if there is an explicit alias after the AS clause.
+		If AS is found, then the next non-whitespace token is captured as the alias.
+		The tokens after (and including) the AS are removed.
+		*/
+		$base_expr = "";
+		$stripped=array();
+		for($i=0;$i<$token_count;++$i) {
+			$token = strtoupper($tokens[$i]);
+			if(trim($token)) {
+				$stripped[] = $tokens[$i];
 			}
 
+			if($token == 'AS') {
+				unset($tokens[$i]);
+				$capture = true;
+				continue;
+			} 
+
+			if($capture) {
+				if(trim($token)) {
+					$alias .= $token[$i];
+				}
+				unset($tokens[$i]);
+				continue;
+			}
+			$base_expr .= $tokens[$i];
 		}
-	
-		/* If there is no alias, then make the alias the properly escaped contents of the entire expression */
-	        if (!$alias) {
-			$alias = $expression;
-			$base_expr = $expression;
-	        } 
+
+		$stripped = $this->process_expr_list($stripped);
+		$last = array_pop($stripped);
+		if(!$alias && $last['expr_type'] == 'colref') {
+			$prev = array_pop($stripped);			
+			if($prev['expr_type'] == 'operator' || 
+			   $prev['expr_type'] == 'function' ||
+			   $prev['expr_type'] == 'expression' ||
+			   $prev['expr_type'] == 'aggregate_function' || 
+			   $prev['expr_type'] == 'subquery') {
+				$alias = $last['base_expr'];
+
+				#remove the last token
+				array_pop($tokens);
+
+				$base_expr = join("", $tokens);
+			}
+		}
+		
+
+		if(!$alias) {
+			$base_expr=join("", $tokens);
+			$alias = $base_expr;
+		}
 	
 		/* Properly escape the alias if it is not escaped */
 	        if ($alias[0] != '`') {
 				$alias = '`' . str_replace('`','``',$alias) . '`';
 		}
 		$processed = false;
-		if(!$base_expr) $base_expr = trim($expression);
-		if($base_expr[0] == '(') {
-			$base_expr = substr($base_expr,1,-1);
+		$type='expression';
+		if(trim($base_expr) == '(') {
+			$base_expr = substr($expression,1,-1);
 			if(preg_match('/^sel/i', $base_expr)) {
 				$type='subquery';
 				$processed = $this->parse($base_expr);
 			}
 		}
-
 		if(!$processed) {
-			$type = 'expression';
-			$processed = $this->process_expr_list($this->split_sql($base_expr));
-			if($processed[0]['expr_type'] == 'aggregate_function') {
-				$type = 'aggregate_expression';
-			}
+			$processed = $this->process_expr_list($tokens);
 		}
-
-		if($type == 'reserved') {
-			if(in_array($base_expr, $this->functions)) {
-				$type = 'function';
-			}
-		}
-		
 
 		if(count($processed) == 1) {
-			$processed = $processed[0];
-			$processed['alias'] = $alias;
-			$processed['base_expr'] = $base_expr;
-		} else {
-			$processed = array('alias' => $alias, 'expr_type' => $type, 'base_expr' => $base_expr, 'sub_tree' => $processed);
+			$type = $processed[0]['expr_type'];
 		}
 
-		return $processed;
+		return array('expr_type'=>$type,'alias' => $alias, 'base_expr' => $base_expr, 'sub_tree' => $processed);
 	
 	}
 
@@ -1083,12 +1088,17 @@ EOREGEX
 					$local_expr = $token;
 				}
                                 $processed = $this->process_expr_list($this->split_sql($local_expr));
-				$type = 'expression';
+				if($processed && !empty($processed['sub_expr']) && $processed['sub_expr'][0]=='aggregate_function') {
+					$type = 'aggregate_expression';
+				} else { 
+					$type = 'expression';
+				}
 				if(count($processed) == 1) {
 					$type = $processed[0]['expr_type'];
 					$base_expr  = $processed[0]['base_expr'];
 					$processed = $processed[0]['sub_tree'];
-				}
+					if($type == 'aggregate_function') $type='aggregate_expression';
+				} 
 			}
 
 			$expr[] = array( 'expr_type' => $type, 'base_expr' => $token, 'sub_tree' => $processed);
