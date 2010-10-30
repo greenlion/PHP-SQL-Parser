@@ -1091,7 +1091,7 @@ EOREGEX
 						case 'BIT_OR':
 						case 'BIT_XOR':
 							$type = 'aggregate_function';
-							if(empty($tokens[$key+1])) $sub_expr = $tokens[$key+1];
+							if(!empty($tokens[$key+1])) $sub_expr = $tokens[$key+1];
 							#$skip_next=true;
 						break;
 
