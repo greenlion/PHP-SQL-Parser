@@ -635,6 +635,8 @@ EOREGEX
 		*/
 		$base_expr = "";
 		$stripped=array();
+		$capture=false;
+		$alias = "";
 		for($i=0;$i<$token_count;++$i) {
 			$token = strtoupper($tokens[$i]);
 			if(trim($token)) {
@@ -649,7 +651,7 @@ EOREGEX
 
 			if($capture) {
 				if(trim($token)) {
-					$alias .= $token[$i];
+					$alias .= $tokens[$i];
 				}
 				unset($tokens[$i]);
 				continue;
@@ -665,7 +667,8 @@ EOREGEX
 			   $prev['expr_type'] == 'function' ||
 			   $prev['expr_type'] == 'expression' ||
 			   $prev['expr_type'] == 'aggregate_function' || 
-			   $prev['expr_type'] == 'subquery') {
+			   $prev['expr_type'] == 'subquery' ||	
+			   $prev['expr_type'] == 'colref') {
 				$alias = $last['base_expr'];
 
 				#remove the last token
@@ -700,6 +703,7 @@ EOREGEX
 
 		if(count($processed) == 1) {
 			$type = $processed[0]['expr_type'];
+			$processed = false;
 		}
 
 		return array('expr_type'=>$type,'alias' => $alias, 'base_expr' => $base_expr, 'sub_tree' => $processed);
@@ -943,7 +947,7 @@ EOREGEX
 					if(!$type) $type = "expression";
 				}
 			
-				$out[]=array('type'=>$type,'expression'=>$expression,'direction'=>$direction);
+				$out[]=array('type'=>$type,'base_expr'=>$expression,'direction'=>$direction);
 		}
 	
 		return $out;
@@ -956,9 +960,17 @@ EOREGEX
 		$expr = "";
 		$type = "";
 		$prev_token = "";
+		$skip_next = false;
+		$sub_expr = "";
+
+		$in_lists = array();
 		foreach($tokens as $key => $token) {
 	
 			if(!trim($token)) continue;
+			if($skip_next) {
+				$skip_next = false;
+				continue;
+			}
 			
 			$processed = false;
 			$upper = strtoupper(trim($token));
@@ -976,8 +988,16 @@ EOREGEX
 			} elseif( $upper[0] == '(' && substr($upper,-1) == ')' ) {
 				if($prev_token == 'IN') {
 					$type = "in-list";
-					$processed = $token;
+					$processed = $this->split_sql(substr($token,1,-1));
+					$list = array();
+					foreach($processed as $v) {
+						if($v == ',') continue;
+						$list[]=$v;
+					}
+					$processed = $list;
+					unset($list);
 					$prev_token = "";
+					
 				} 
 			/* it is either an operator, a colref or a constant */
 			} else {
@@ -1071,14 +1091,19 @@ EOREGEX
 						case 'BIT_OR':
 						case 'BIT_XOR':
 							$type = 'aggregate_function';
+							if(empty($tokens[$key+1])) $sub_expr = $tokens[$key+1];
+							#$skip_next=true;
 						break;
 
-						default;
+						default:
 							$type = 'function';
+							$sub_expr = $tokens[$key+1];
+							#$skip_next=true;
+
+				
 						break;
 					}
 				}
-				$processed = false;
 			}
 
 			if(!$type) {
@@ -1088,29 +1113,53 @@ EOREGEX
 					$local_expr = $token;
 				}
                                 $processed = $this->process_expr_list($this->split_sql($local_expr));
-				if($processed && !empty($processed['sub_expr']) && $processed['sub_expr'][0]=='aggregate_function') {
-					$type = 'aggregate_expression';
-				} else { 
-					$type = 'expression';
-				}
+				$type = 'expression';
+				
 				if(count($processed) == 1) {
 					$type = $processed[0]['expr_type'];
 					$base_expr  = $processed[0]['base_expr'];
 					$processed = $processed[0]['sub_tree'];
-					if($type == 'aggregate_function') $type='aggregate_expression';
 				} 
+
 			}
+
+			$sub_expr=trim($sub_expr);
+			$sub_expr = "";
 
 			$expr[] = array( 'expr_type' => $type, 'base_expr' => $token, 'sub_tree' => $processed);
 			$prev_token = $upper;
 			$expr_type = "";
 			$type = "";
 		}
+		if($sub_expr) {
+			$processed['sub_tree'] = $this->process_expr_list($this->split_sql(substr($sub_expr,1,-1)));
+		}
+		
 		if(!is_array($processed)) $processed = false;
 
 		if($expr_type) {
 			$expr[] = array( 'expr_type' => $type, 'base_expr' => $token, 'sub_tree' => $processed);
 		}
+		$mod = false;
+
+/*
+
+		for($i=0;$i<count($expr);++$i){
+			if($expr[$i]['expr_type'] == 'function' ||
+			   $expr[$i]['expr_type'] == 'aggregate_function') {
+				if(!empty($expr[$i+1])) {
+					$expr[$i]['sub_tree']=$expr[$i+1]['sub_tree'];
+					unset($expr[$i+1]);
+					$mod = 1;
+					++$i;  // BAD FORM TO MODIFY THE LOOP COUNTER
+				}
+			} 
+				
+		}
+
+*/
+
+		if($mod) $expr=array_values($expr);
 
 		return $expr;
 	} 
