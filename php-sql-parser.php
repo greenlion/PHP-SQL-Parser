@@ -385,6 +385,7 @@ EOREGEX
 				break;
 	
 				case 'USING':
+				case 'ON':
 					/* USING in FROM clause is different from USING w/ prepared statement*/
 					if($token_category == 'EXECUTE') {
 						$token_category=$upper;
@@ -435,7 +436,6 @@ EOREGEX
 				case 'ALL':
 				case 'SHARE':
 				case 'MODE':
-				case 'ON':
 				case 'TO':
 					
 				case ';':
@@ -662,7 +662,7 @@ EOREGEX
 		$stripped = $this->process_expr_list($stripped);
 		$last = array_pop($stripped);
 
-		if(!$alias && $last['expr_type'] == 'colref' && $stripped[count($stripped)-1] == 'colref') {
+		if(!$alias && $last['expr_type'] == 'colref' && @$stripped[count($stripped)-1] == 'colref') {
 			$prev = array_pop($stripped);			
 			if($prev['expr_type'] == 'operator' || 
 			   $prev['expr_type'] == 'function' ||
@@ -712,6 +712,7 @@ EOREGEX
 
 		
 	private function process_from(&$tokens) {
+
 		$expression = "";
 		$expr = array();
 		$token_count=0;
