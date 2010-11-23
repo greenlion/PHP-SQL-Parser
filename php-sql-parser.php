@@ -622,7 +622,7 @@ EOREGEX
 		$upper = trim(strtoupper($expression));
 		#if necessary, unpack the expression
 		if($upper[0] == '(') {
-			$expression = substr($expression,1,-1);
+			#$expression = substr($expression,1,-1);
 			$base_expression = $expression;
 		}
 
@@ -661,13 +661,13 @@ EOREGEX
 
 		$stripped = $this->process_expr_list($stripped);
 		$last = array_pop($stripped);
-
-		if(!$alias && $last['expr_type'] == 'colref' && @$stripped[count($stripped)-1] == 'colref') {
+		if(!$alias && $last['expr_type'] == 'colref') {
 			$prev = array_pop($stripped);			
 			if($prev['expr_type'] == 'operator' || 
+			   $prev['expr_type'] == 'const' ||
 			   $prev['expr_type'] == 'function' ||
 			   $prev['expr_type'] == 'expression' ||
-			   $prev['expr_type'] == 'aggregate_function' || 
+			   #$prev['expr_type'] == 'aggregate_function' || 
 			   $prev['expr_type'] == 'subquery' ||	
 			   $prev['expr_type'] == 'colref') {
 				$alias = $last['base_expr'];
@@ -676,6 +676,8 @@ EOREGEX
 				array_pop($tokens);
 
 				$base_expr = join("", $tokens);
+
+				
 			}
 		}
 
@@ -1014,6 +1016,7 @@ EOREGEX
 				case '^':
 				case 'CASE':
 				case 'WHEN':
+				case 'END':
 				case 'DIV':
 				case '/':
 				case '<=>':
@@ -1161,6 +1164,7 @@ EOREGEX
 */
 
 		if($mod) $expr=array_values($expr);
+
 
 		return $expr;
 	} 
