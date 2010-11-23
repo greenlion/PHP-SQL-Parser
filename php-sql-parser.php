@@ -385,7 +385,7 @@ EOREGEX
 				break;
 	
 				case 'USING':
-				case 'ON':
+				#case 'ON':
 					/* USING in FROM clause is different from USING w/ prepared statement*/
 					if($token_category == 'EXECUTE') {
 						$token_category=$upper;
@@ -754,10 +754,9 @@ EOREGEX
 				if($ref_type) {
 					$ref_expr .= $token == '' ? " " : $token;
 				}
+	
 	                }
 	
-			$is_keyword = false;
-		
 			switch($upper) {
 				case 'AS':
 					$token_count++;
@@ -779,11 +778,10 @@ EOREGEX
 					}
 	
 				break;
-	
+
 				case 'USING':
 				case 'ON':
-				case 'NATURAL':
-					$ref_type = strtoupper($token);
+					$ref_type = $upper;
 					$ref_expr = "";
 	
 				case 'CROSS':
@@ -792,6 +790,7 @@ EOREGEX
 				case 'IGNORE':
 				case 'INNER':
 				case 'OUTER':
+					echo "ARARAFAFAFAFAFAFA\n";
 				#	$expression .= $token;
 					$token_count++;
 					continue;
