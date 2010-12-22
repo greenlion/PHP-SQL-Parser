@@ -790,7 +790,6 @@ EOREGEX
 				case 'IGNORE':
 				case 'INNER':
 				case 'OUTER':
-					echo "ARARAFAFAFAFAFAFA\n";
 				#	$expression .= $token;
 					$token_count++;
 					continue;
@@ -968,7 +967,7 @@ EOREGEX
 		$in_lists = array();
 		foreach($tokens as $key => $token) {
 	
-			if(!trim($token)) continue;
+			if(strlen(trim($token))==0) continue;
 			if($skip_next) {
 				$skip_next = false;
 				continue;
