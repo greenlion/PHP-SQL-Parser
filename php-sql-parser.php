@@ -155,7 +155,7 @@ class PHPSQLParser {
 			$sql = str_replace(array('\\\'','\\"'),array("''",'""'), $sql);
                         $regex=<<<EOREGEX
 /([@A-Za-z0-9._*]+)
-|(\+|-|\*|\/|!=|&&|\|\||=|\^)
+|(\+|-|\*|\/|!=|<>|&&|\|\||=|\^)
 |(\(.*?\))   # Match FUNCTION(...) OR BAREWORDS
 |('(?:[^']|'')*'+)
 |("(?:[^"]|"")*"+)

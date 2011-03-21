@@ -33,6 +33,5 @@ ok($p['SELECT'][4]['alias'] == '`case_statement`');
 ok($p['SELECT'][5]['alias'] == '`t4.c1`');
 ok($p['SELECT'][6]['alias'] == '`subquery`');
 
-print_r($p);
 
 
