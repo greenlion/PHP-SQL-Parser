@@ -163,7 +163,7 @@ class PHPSQLParser {
 				exit;
 			}
 
-			$sql = str_replace(array('\\\'','\\"'),array("''",'""'), $sql);
+			$sql = str_replace(array('\\\'','\\"',"\r\n","\n"),array("''",'""'," "," "), $sql);
                         $regex=<<<EOREGEX
 /(`(?:[^`]|``)`|[@A-Za-z0-9_.`]+)
 |(\+|-|\*|\/|!=|<>|&&|\|\||=|\^)
@@ -1043,7 +1043,19 @@ EOREGEX
 					unset($list);
 					$prev_token = "";
 					
-				} 
+                               }
+                               elseif($prev_token == 'AGAINST') {
+                                       $type = "match-arguments";
+                                       $list = $this->split_sql(substr($token,1,-1));
+                                       if(count($list) > 1){
+                                               $match_mode = implode('',array_slice($list,1));
+                                               $processed = array($list[0], $match_mode);
+                                       }
+                                       else
+                                               $processed = $list[0];
+                                       $prev_token = "";
+				}
+
 			/* it is either an operator, a colref or a constant */
 			} else {
 				switch($upper) {
