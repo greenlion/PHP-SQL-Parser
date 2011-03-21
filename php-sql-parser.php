@@ -1,5 +1,5 @@
 <?php
-error_reporting(E_ALL);
+error_reporting(E_ALL); 
 
 class PHPSQLParser {
 	var $reserved = array();
@@ -163,9 +163,9 @@ class PHPSQLParser {
 				exit;
 			}
 
-			$sql = str_replace(array('\\\'','\\"',"\r\n","\n"),array("''",'""'," "," "), $sql);
+			$sql = str_replace(array('\\\'','\\"',"\r\n","\n","()"),array("''",'""'," "," "," "), $sql);
                         $regex=<<<EOREGEX
-/(`(?:[^`]|``)`|[@A-Za-z0-9_.`]+)
+/(`(?:[^`]|``)`|[@A-Za-z0-9_.`]+(?:\(\s*\)){0,1})
 |(\+|-|\*|\/|!=|<>|&&|\|\||=|\^)
 |(\(.*?\))   # Match FUNCTION(...) OR BAREWORDS
 |('(?:[^']|'')*'+)
@@ -189,11 +189,20 @@ EOREGEX
 	        */
 		$reset = false;
 		for($i=0;$i<$token_count;++$i) {
+
 			if(empty($tokens[$i])) continue;
 			$trim = trim($tokens[$i]);
-			if($trim) $tokens[$i] = $trim;
-
+			if($trim) {
+				if($trim[0] != '(' 
+					&& substr($trim,-1) == ')') {
+					$trim=trim(substr($trim,0,
+							strpos($trim,'(')));
+				}
+				$tokens[$i]=$trim;
+			}
 			$token=$trim;
+			$tokens[$i] = $token;
+
 			if($token && $token[0] == '(') {
 				$info = $this->count_paren($token);
 				if($info['balanced'] == 0) {
@@ -1193,7 +1202,11 @@ EOREGEX
 			$processed['sub_tree'] = $this->process_expr_list($this->split_sql(substr($sub_expr,1,-1)));
 		}
 		
-		if(!is_array($processed)) $processed = false;
+		if(!is_array($processed)) {
+
+			print_r($processed);
+			$processed = false;
+		}
 
 		if($expr_type) {
 			$expr[] = array( 'expr_type' => $type, 'base_expr' => $token, 'sub_tree' => $processed);
