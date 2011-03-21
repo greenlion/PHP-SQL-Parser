@@ -126,19 +126,30 @@ class PHPSQLParser {
 
 	#This function counts open and close parenthesis and
 	#returns their location.  This might be faster as a regex
-	private function count_paren($token) {
+	private function count_paren($token,$chars=array('(',')')) {
 		$len = strlen($token);
 		$open=array();
 		$close=array();
 		for($i=0;$i<$len;++$i){
-			if($token[$i] == '(') {
+			if($token[$i] == $chars[0]) {
 				$open[] = $i;
-			} elseif($token[$i] == ')') {
+			} elseif($token[$i] == $chars[1]) {
 				$close[] = $i;
 			}
 			
 		}
 		return array('open' => $open, 'close' => $close, 'balanced' =>( count($close) - count($open)));
+	}
+
+	#This function counts open and close parenthesis and
+	#returns their location.  This might be faster as a regex
+	private function count_backtick($token) {
+		$len = strlen($token);
+		$cnt=0;
+		for($i=0;$i<$len;++$i){
+			if($token[$i] == '`') ++$cnt;
+		}
+		return $cnt;
 	}
 
 	#This is the lexer
@@ -154,12 +165,11 @@ class PHPSQLParser {
 
 			$sql = str_replace(array('\\\'','\\"'),array("''",'""'), $sql);
                         $regex=<<<EOREGEX
-/([@A-Za-z0-9._*]+)
+/(`(?:[^`]|``)`|[@A-Za-z0-9_.`]+)
 |(\+|-|\*|\/|!=|<>|&&|\|\||=|\^)
 |(\(.*?\))   # Match FUNCTION(...) OR BAREWORDS
 |('(?:[^']|'')*'+)
 |("(?:[^"]|"")*"+)
-|(`(?:[^`]|``)*`+)
 |([^ ,]+)
 /ix
 EOREGEX
@@ -171,8 +181,7 @@ EOREGEX
 		/* The above regex has one problem, because the parenthetical match is not greedy.
 		   Thus, when matching grouped expresions such as ( (a and b) or c) the 
 		   tokenizer will produce "( (a and b)", " ", "or", " " , "c,")" 
-		
-
+	
 		   This block detects the number of open/close parens in the given token.  If the parens are balanced
 		   (balanced == 0) then we don't need to do anything.
 		
@@ -232,8 +241,43 @@ EOREGEX
 				}
 			}
 		}
+
+		#the same problem appears with backticks :(
+
 		/* reset the array if we deleted any tokens above */
-	        return  $reset ? array_values($tokens) : $tokens;
+	        if ($reset) $tokens = array_values($tokens);
+
+		$token_count=count($tokens);
+		for($i=0;$i<$token_count;++$i) {
+			if(empty($tokens[$i])) continue;
+			$token=$tokens[$i];
+			$needed=true;
+			$reset=false;
+			if($needed && $token && strpos($token,'`') !== false) {
+				$info = $this->count_backtick($token);
+				if($info %2 == 0) { #even number of backticks means we are balanced
+					continue;
+				}
+				$needed=1;
+
+				$n = $i;
+				while($needed && $n <$token_count-1) {
+					$reset=true;
+					#echo "BACKTICK COUNT[$i]: $info old: {$tokens[$i]}, new: ($token)\n";
+					++$n;
+					$token .= $tokens[$n];
+					unset($tokens[$n]);
+					$needed = $this->count_backtick($token) % 2;
+				}
+			}
+			if($reset) $tokens[$i] = $token;
+			
+		}
+		/* reset the array if we deleted any tokens above */
+		$tokens = array_values($tokens);
+
+		return $tokens;
+
 	}
 	
 	/* This function breaks up the SQL statement into logical sections.
