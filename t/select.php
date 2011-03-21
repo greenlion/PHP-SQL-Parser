@@ -3,8 +3,10 @@ require_once('../php-sql-parser.php');
 require_once('../test-more.php');
 $parser = new PHPSQLParser();
 
-$sql = 'SELECT 1';
+$sql = 'SELECT
+1';
 $p=$parser->parse($sql);
+
 ok(count($p) == 1 && count($p['SELECT']) == 1);
 ok($p['SELECT'][0]['expr_type'] == 'const');
 ok($p['SELECT'][0]['base_expr'] == '1');
