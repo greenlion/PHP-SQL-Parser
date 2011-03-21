@@ -1155,7 +1155,7 @@ EOREGEX
 
 						default:
 							$type = 'function';
-							$sub_expr = $tokens[$key+1];
+							if(!empty($tokens[$key+1])) $sub_expr = $tokens[$key+1]; else $sub_expr="()";
 							#$skip_next=true;
 
 				
