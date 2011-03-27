@@ -1,5 +1,6 @@
 <?php
 error_reporting(E_ALL); 
+define('HAVE_PHP_SQL_PARSER',1);
 
 class PHPSQLParser {
 	var $reserved = array();
@@ -191,7 +192,9 @@ EOREGEX
 		for($i=0;$i<$token_count;++$i) {
 
 			if(empty($tokens[$i])) continue;
-			$trim = trim($tokens[$i]);
+			
+			$token = $tokens[$i];
+			$trim = trim($token);
 			if($trim) {
 				if($trim[0] != '(' 
 					&& substr($trim,-1) == ')') {
@@ -199,9 +202,8 @@ EOREGEX
 							strpos($trim,'(')));
 				}
 				$tokens[$i]=$trim;
+				$token=$trim;
 			}
-			$token=$trim;
-			$tokens[$i] = $token;
 
 			if($token && $token[0] == '(') {
 				$info = $this->count_paren($token);
@@ -690,6 +692,7 @@ EOREGEX
 		$stripped=array();
 		$capture=false;
 		$alias = "";
+		$processed=false;
 		for($i=0;$i<$token_count;++$i) {
 			$token = strtoupper($tokens[$i]);
 			if(trim($token)) {

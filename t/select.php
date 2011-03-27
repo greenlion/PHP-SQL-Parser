@@ -26,4 +26,4 @@ ok(count($p) == 3 && count($p['WHERE']) == 3);
 
 $parser->parse('SELECT NOW( ),now(),sysdate( ),sysdate () as now');
 #print_r($parser->parsed['SELECT'][3]);
-ok($parser->parsed['SELECT'][3]['base_expr'] == 'sysdate');
+ok($parser->parsed['SELECT'][3]['base_expr'] == 'sysdate ');
