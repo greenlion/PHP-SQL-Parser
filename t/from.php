@@ -22,7 +22,6 @@ $sql = 'select DISTINCT 1+2   c1, 1+ 2 as
 
 $parser = new PHPSQLParser($sql);
 $p=$parser->parsed;
-#print_r($p);
 
 ok(count($p['SELECT']) == 7);
 ok($p['SELECT'][0]['alias'] == '`c1`');
