@@ -883,6 +883,8 @@ EOREGEX
 
 					
 					case ',':
+						$modifier = 'CROSS';
+
 					case 'JOIN':
 
 						if($first_join) {
@@ -895,9 +897,6 @@ EOREGEX
 							unset($new_join_type);
 						}
 
-
-						
-
 						$first_join = false;
 						
 						if(!trim($alias)) $alias = $table;
@@ -907,6 +906,15 @@ EOREGEX
 							$base_expr=$subquery;
 						}
 
+						if(substr(trim($table),0,1) == '(') {
+							$base_expr=trim($table,'() ');
+							$join_type = 'JOIN';
+							$sub_tree = $this->process_from($this->split_sql($base_expr));
+							$alias="";
+						} 
+
+
+						if($join_type == "") $join_type='JOIN';
 						$expr[] = array('table'=>$table, 'alias'=>$alias,'join_type'=>$join_type,'ref_type'=> $ref_type,'ref_clause'=>trim($ref_expr,'() '), 'base_expr' => $base_expr, 'sub_tree' => $sub_tree);
 						$modifier = "";
 						#$join_type=$saved_join_type;
@@ -935,8 +943,16 @@ EOREGEX
 				}
 				++$i;
 		  	}
-				
-			if(!trim($alias)) $alias = $table;
+			if(substr(trim($table),0,1) == '(') {
+				$base_expr=trim($table,'() ');
+				$join_type = 'JOIN';
+				$sub_tree = $this->process_from($this->split_sql($base_expr));
+				$alias = "";
+			} else {
+				if(!trim($alias)) $alias = $table;
+			}
+			if($join_type == "") $saved_join_type='JOIN';
+
 			$expr[] = array('table'=>$table, 'alias'=>$alias,'join_type'=>$saved_join_type,'ref_type'=> $ref_type,'ref_clause'=> trim($ref_expr,'() '), 'base_expr' => $base_expr, 'sub_tree' => $sub_tree);
 	
 	
