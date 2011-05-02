@@ -380,7 +380,7 @@ EOREGEX
 						} 
 						
 						$token_category = $upper;
-						$join_type = 'JOIN';
+						#$join_type = 'JOIN';
 						if($upper == 'FROM' && $token_category == 'FROM') {
 							/* DO NOTHING*/
 						} else {
@@ -786,6 +786,8 @@ EOREGEX
 			$subquery = "";
 
 			$first_join=true;
+			$modifier="";
+			$saved_join_type="";
 			
 			foreach($tokens as $token) {
 				$base_expr = false;
@@ -810,30 +812,12 @@ EOREGEX
 		
 				switch($upper) {
 					case 'OUTER':
-						continue;
-					break;
-					
 					case 'LEFT':
 					case 'RIGHT':
 					case 'NATURAL':
 					case 'CROSS':						
-						//if($join_type == "") {
-							if($first_join) {
-								$first_join = false;
-								$join_type = 'JOIN';
-							} else {
-								$join_type = " " . $upper . " ";		
-							}
-						//} else {
-						//	$join_type = " " . $upper . " ";		
-						//}
-					
-						break;
-					
 					case ',':
 					case 'JOIN':
-						$first_join=false;
-						if($join_type == "") $join_type = "JOIN ";		
 						break;
 								
 					default:
@@ -882,27 +866,51 @@ EOREGEX
 					break;
 		
 						
-					case 'LEFT':
-					case 'RIGHT':
-					case 'STRAIGHT_JOIN':
-						continue;
-					break;
 					
 					case 'FOR':
 						$token_count++;
 						$skip_next = true;
 						continue;
 					break;
+
+					case 'LEFT':
+					case 'RIGHT':
+					case 'STRAIGHT_JOIN':
+						$join_type=$saved_join_type;
+						
+						$modifier = $upper . " ";
+						break;
+
 					
 					case ',':
 					case 'JOIN':
+
+						if($first_join) {
+							$join_type = 'JOIN';
+							$saved_join_type = ($modifier ? $modifier : 'JOIN');
+						}  else {
+							$new_join_type = ($modifier ? $modifier : 'JOIN');
+							$join_type = $saved_join_type;
+							$saved_join_type = $new_join_type;
+							unset($new_join_type);
+						}
+
+
+						
+
+						$first_join = false;
 						
 						if(!trim($alias)) $alias = $table;
+
 						if($subquery) {
 							$sub_tree = $this->parse(trim($subquery,'()'));
 							$base_expr=$subquery;
 						}
-						$expr[] = array('table'=>$table, 'alias'=>$alias,'join_type'=>$join_type,'ref_type'=> $ref_type,'ref_clause'=> $ref_expr, 'base_expr' => $base_expr, 'sub_tree' => $sub_tree);
+
+						$expr[] = array('table'=>$table, 'alias'=>$alias,'join_type'=>$join_type,'ref_type'=> $ref_type,'ref_clause'=>trim($ref_expr,'() '), 'base_expr' => $base_expr, 'sub_tree' => $sub_tree);
+						$modifier = "";
+						#$join_type=$saved_join_type;
+
 
 						$token_count = 0;
 						$table = $alias = $expression = $base_expr = $ref_type = $ref_expr = "";
@@ -910,6 +918,7 @@ EOREGEX
 						$subquery = "";
 	
 					break;
+
 		
 					default:
 						if($token === false || empty($token) || $token === "") continue;
@@ -926,10 +935,9 @@ EOREGEX
 				}
 				++$i;
 		  	}
-			if($join_type == '') $join_type = 'JOIN';
 				
 			if(!trim($alias)) $alias = $table;
-			$expr[] = array('table'=>$table, 'alias'=>$alias,'join_type'=>$join_type,'ref_type'=> $ref_type,'ref_clause'=> $ref_expr, 'base_expr' => $base_expr, 'sub_tree' => $sub_tree);
+			$expr[] = array('table'=>$table, 'alias'=>$alias,'join_type'=>$saved_join_type,'ref_type'=> $ref_type,'ref_clause'=> trim($ref_expr,'() '), 'base_expr' => $base_expr, 'sub_tree' => $sub_tree);
 	
 	
 			return $expr;
