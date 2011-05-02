@@ -5,31 +5,27 @@ require_once('../test-more.php');
 $parser = new PHPSQLParser();
 
 
-$sql = 'SELECT a.field1, b.field1, c.field1
-  FROM tablea a 
-  LEFT JOIN tableb b ON b.ida = a.id
-  LEFT JOIN tablec c ON c.idb = b.id;';
+$sql = 'SELECT *
+    FROM (t1 LEFT JOIN t2 ON t1.a=t2.a)
+         LEFT JOIN t3
+         ON t2.b=t3.b OR t2.b IS NULL';
+
 
 $parser->parse($sql);
 $p = $parser->parsed;
+#echo $sql . "\n";
+#print_r($p);
 
 $result = serialize($p);
 #file_put_contents('../r/left1.serialized',$result);
 $good = file_get_contents('../r/left1.serialized');
 ok($result == $good);
 
-$sql = 'SELECT a.field1, b.field1, c.field1
-  FROM tablea a 
-  LEFT OUTER JOIN tableb b ON b.ida = a.id
-  RIGHT JOIN tablec c ON c.idb = b.id
-  JOIN tabled d USING (d_id)
-  right outer join e on e.id = a.e_id;
-  left join e e2 using (e_id)
-  join e e3 on (e3.e_id = e2.e_id)';
+$sql = "SELECT * FROM t1 LEFT JOIN (t2, t3, t4)
+                 ON (t2.a=t1.a AND t3.b=t1.b AND t4.c=t1.c)";
 
 $parser->parse($sql);
 $p = $parser->parsed;
-#print_r($p);
 #file_put_contents('../r/left2.serialized',$result);
 $good = file_get_contents('../r/left2.serialized');
 ok($result == $good);
