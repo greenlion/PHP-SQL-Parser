@@ -36,3 +36,11 @@ $parser->parse($sql);
 $p = $parser->parsed;
 $expected = getExpectedValue('select1.serialized');
 eq_array($p, $expected, 'a test for ref_clauses');
+
+# not solved
+$sql = "SELECT pl_namespace,pl_title FROM `pagelinks` WHERE pl_from = '1' FOR UPDATE";
+$parser->parse($sql);
+$p = $parser->parsed;
+$expected = getExpectedValue('select2.serialized');
+eq_array($p, $expected, 'select for update');
+
