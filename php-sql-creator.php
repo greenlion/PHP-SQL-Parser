@@ -177,13 +177,33 @@ if (!defined('HAVE_PHP_SQL_CREATOR')) {
             return "GROUP BY " . $sql;
         }
 
-        protected function processVALUES($parsed) {
+        protected function processRecord($parsed) {
+            if ($parsed['expr_type'] !== 'record') {
+                return "";
+            }
             $sql = "";
-            foreach ($parsed as $k => $v) {
+            foreach ($parsed['data'] as $k => $v) {
                 $len = strlen($sql);
                 $sql .= $this->processConstant($v);
                 $sql .= $this->processFunction($v);
                 $sql .= $this->processOperator($v);
+
+                if ($len == strlen($sql)) {
+                    $this->stop('record', $k, $v, 'expr_type');
+                }
+
+                $sql .= ",";
+            }
+            $sql = substr($sql, 0, -1);
+            return "(" . $sql . ")";
+            
+        }
+        
+        protected function processVALUES($parsed) {
+            $sql = "";
+            foreach ($parsed as $k => $v) {
+                $len = strlen($sql);
+                $sql .= $this->processRecord($v);
 
                 if ($len == strlen($sql)) {
                     $this->stop('VALUES', $k, $v, 'expr_type');
@@ -192,7 +212,7 @@ if (!defined('HAVE_PHP_SQL_CREATOR')) {
                 $sql .= ",";
             }
             $sql = substr($sql, 0, -1);
-            return "VALUES (" . $sql . ")";
+            return "VALUES " . $sql;
         }
 
         protected function processINSERT($parsed) {

@@ -46,4 +46,14 @@ $created = process($sql);
 $expected = getExpectedValue('create6.sql', false);
 ok($created === $expected, 'explicit ASC statement');
 
+$sql = "INSERT INTO test (`name`, `test`) VALUES ('\'Superman\'', ''), ('\'Superman\'', '')";
+$created = process($sql);
+$expected = getExpectedValue('create7.sql', false);
+ok($created === $expected, 'multiple records within INSERT');
+
+$sql = "INSERT INTO test (`name`, `test`) VALUES ('\'Superman\'', '')";
+$created = process($sql);
+$expected = getExpectedValue('create8.sql', false);
+ok($created === $expected, 'a simple INSERT statement');
+
 
