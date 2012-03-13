@@ -927,13 +927,12 @@ EOREGEX
             $alias['base_expr'] = trim($alias['base_expr']);
          }
 
-         $type = 'expression';
-
          # this is always done with $stripped, how we do it twice?
          $processed = $this->process_expr_list($tokens);
 
          # if there is only one part, we copy the expr_type
          # in all other cases we use "expression" as global type
+         $type = 'expression';
          if (count($processed) == 1) {
             if ($processed[0]['expr_type'] != 'subquery') {
                $type = $processed[0]['expr_type'];
@@ -1280,7 +1279,7 @@ EOREGEX
                   $tmptokens = $this->split_sql($this->removeParenthesisFromStart($token));
 
                   foreach ($tmptokens as $k => $v) {
-                     if ($v == ',') {
+                     if (trim($v) == ',') {
                         unset($tmptokens[$k]);
                      }
                   }
