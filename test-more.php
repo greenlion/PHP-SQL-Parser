@@ -103,15 +103,19 @@ function ok($pass, $test_name = '')
         $_num_failures++;
         $caller = debug_backtrace();
 
-        if (strstr($caller['0']['file'], $_SERVER['PHP_SELF'])) {
-            $file = $caller['0']['file'];
-            $line = $caller['0']['line'];
-        } else {
-            $file = $caller['1']['file'];
-            $line = $caller['1']['line'];
+        $thisFile = __FILE__;
+
+        $i = 0;
+        while (strstr($caller[$i]['file'], $thisFile)) {
+                $i++;
         }
 
-        @$file = str_replace($_SERVER['SERVER_ROOT'], 't', $file);
+        $file = $caller[$i]['file'];
+        $line = $caller[$i]['line'];
+
+        if (isset($_SERVER['SERVER_ROOT'])){
+            $file = str_replace($_SERVER['SERVER_ROOT'], 't', $file);
+        }
 
         diag("    Failed test ($file at line $line)");
     }
@@ -285,6 +289,16 @@ function skip($message, $num)
     }
 
     $_num_skips = $num;
+}
+
+function eq_array($arrA, $arrB, $testName)
+{
+    $result = serialize($arrA) === serialize($arrB);
+    if ($result) {
+        pass($testName);
+    } else {
+        fail($testName);
+    }
 }
 
 /*
