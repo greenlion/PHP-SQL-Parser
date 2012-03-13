@@ -1420,11 +1420,10 @@ EOREGEX
             /* is a reserved word? */
             if (($type != 'operator' && $type != 'in-list' && $type != 'sub_expr' && $type != 'function')
             && in_array($upper, $this->reserved)) {
-               $token = $upper;
                if (!in_array($upper, $this->functions)) {
                   $type = 'reserved';
                } else {
-                  switch ($token) {
+                  switch ($upper) {
                      case 'AVG':
                      case 'SUM':
                      case 'COUNT':
