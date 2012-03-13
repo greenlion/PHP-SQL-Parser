@@ -293,8 +293,7 @@ if (!defined('HAVE_PHP_SQL_PARSER')) {
                         || ($key === 'expr_type' && $parsed === 'expression')
                         || ($key === 'expr_type' && $parsed === 'subquery')
                         || ($key === 'expr_type' && $parsed === 'table_expression')
-                        || ($key === 'expr_type' && $parsed === 'record')
-                        || ($key === 'alias' && $parsed !== false)) {
+                        || ($key === 'expr_type' && $parsed === 'record') || ($key === 'alias' && $parsed !== false)) {
                     $backtracking[] = $charPos; # on the next base_expr we set the pointer back to this value
 
                 } elseif (($key === 'ref_clause' || $key === 'columns') && $parsed !== false) {
@@ -346,7 +345,6 @@ if (!defined('HAVE_PHP_SQL_PARSER')) {
 
             # issue 21: replace tabs within the query string
             # TODO: this removes special characters also from inside of Strings (is that a problem?)
-            //return str_replace(array('\\\'', '\\"', "\r\n", "\n", "\t", "()"), array("''", '""', "  ", " ", " ", "  "), $sql);
             return str_replace(array("\r\n", "\n", "\t", "()"), array("  ", " ", " ", "  "), $sql);
         }
 
@@ -1619,8 +1617,7 @@ EOREGEX
             return $tokens;
         }
 
-        private 
-        private function process_record($unparsed) {
+        private private function process_record($unparsed) {
 
             $unparsed = $this->removeParenthesisFromStart($unparsed);
             $values = $this->split_sql($unparsed);
