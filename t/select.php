@@ -27,7 +27,7 @@ ok(count($p) == 3 && count($p['WHERE']) == 3);
 
 
 $parser->parse('SELECT NOW( ),now(),sysdate( ),sysdate () as now');
-ok($parser->parsed['SELECT'][3]['base_expr'] == 'SYSDATE');
+ok($parser->parsed['SELECT'][3]['base_expr'] == 'sysdate');
 
 
 $sql = " SELECT a.*, surveyls_title, surveyls_description, surveyls_welcometext, surveyls_url  FROM SURVEYS AS a INNER JOIN SURVEYS_LANGUAGESETTINGS on (surveyls_survey_id=a.sid and surveyls_language=a.language)  order by active DESC, surveyls_title";
