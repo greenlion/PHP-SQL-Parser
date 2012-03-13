@@ -4,6 +4,7 @@ require_once(dirname(__FILE__) . '/../php-sql-parser.php');
 require_once(dirname(__FILE__) . '/../test-more.php');
 
 // TODO: should we use "expression" instead of "table" for the parenthesis?
+// TODO: the base_expr are not set on joins
 
 $parser = new PHPSQLParser();
 
