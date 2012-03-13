@@ -31,302 +31,303 @@
  */
 require_once('php-sql-parser.php');
 require_once('php-sql-creator.php');
-//include_once($rootdir . '/classes/adodb/adodb.inc.php');
+include_once($rootdir . '/classes/adodb/adodb.inc.php');
 
 $_ENV['DEBUG'] = 1;
 
 class OracleSQLTranslator extends PHPSQLCreator {
 
-   private $con; # this is the database connection from LimeSurvey
-   private $preventColumnRefs = array();
-   private $allTables = array();
+    private $con; # this is the database connection from LimeSurvey
+    private $preventColumnRefs = array();
+    private $allTables = array();
 
-   public function __construct($con) {
-      parent::__construct();
-      $this->con = $con;
-      $this->initGlobalVariables();
-   }
+    public function __construct($con) {
+        parent::__construct();
+        $this->con = $con;
+        $this->initGlobalVariables();
+    }
 
-   private function initGlobalVariables() {
-      global $preventColumnRefs;
-      global $allTables;
+    private function initGlobalVariables() {
+        $this->preventColumnRefs = false;
+        $this->allTables = array();
+    }
 
-      $preventColumnRefs = false;
-      $allTables = array();
-   }
+    public static function dbgprint($txt) {
+        if (isset($_ENV['DEBUG'])) {
+            print $txt;
+        }
+    }
 
-   public static function dbgprint($txt) {
-      if (isset($_ENV['DEBUG'])) {
-         print $txt;
-      }
-   }
+    public static function preprint($s, $return = false) {
+        $x = "<pre>";
+        $x .= print_r($s, 1);
+        $x .= "</pre>";
+        if ($return) {
+            return $x;
+        }
+        self::dbgprint($x . "<br/>\n");
+    }
 
-   public static function preprint($s, $return = false) {
-      $x = "<pre>";
-      $x .= print_r($s, 1);
-      $x .= "</pre>";
-      if ($return) {
-         return $x;
-      }
-      self::dbgprint($x . "<br/>\n");
-   }
+    protected function processAlias($parsed) {
+        if ($parsed === false) {
+            return "";
+        }
+        # we don't need an AS between expression and alias
+        $sql = " " . $parsed['name'];
+        return $sql;
+    }
 
-   protected function processAlias($parsed) {
-      if ($parsed === false) {
-         return "";
-      }
-      # we don't need an AS between expression and alias
-      $sql = " " . $parsed['name'];
-      return $sql;
-   }
+    protected function processDELETE($parsed) {
+        if (count($parsed['TABLES']) > 1) {
+            die("cannot translate delete statement into Oracle dialect, multiple tables are not allowed.");
+        }
+        return "DELETE";
+    }
 
-   protected function processDELETE($parsed) {
-      if (count($parsed['TABLES']) > 1) {
-         die("cannot translate delete statement into Oracle dialect, multiple tables are not allowed.");
-      }
-      return "DELETE";
-   }
+    public static function getColumnNameFor($column) {
+        if (strtolower($column) === 'uid') {
+            $column = "uid_";
+        }
+        // TODO: add more here, if necessary
+        return $column;
+    }
 
-   public static function getColumnNameFor($column) {
-      if (strtolower($column) === 'uid') {
-         $column = "uid_";
-      }
-      return $column;
-   }
+    public static function getShortTableNameFor($table) {
+        if (strtolower($table) === 'surveys_languagesettings') {
+            $table = 'surveys_lngsettings';
+        }
+        // TODO: add more here, if necessary     
+        return $table;
+    }
 
-   public static function getShortTableNameFor($table) {
-      if (strtolower($table) === 'surveys_languagesettings') {
-         $table = 'surveys_lngsettings';
-      }
-      return $table;
-   }
+    protected function processTable($parsed, $index) {
+        if ($parsed['expr_type'] !== 'table') {
+            return "";
+        }
 
-   protected function processTable($parsed, $index) {
-      global $allTables;
+        $sql = $this->getShortTableNameFor($parsed['table']);
+        $alias = $this->processAlias($parsed['alias']);
+        $sql .= $alias;
 
-      if ($parsed['expr_type'] !== 'table') {
-         return "";
-      }
+        if ($index !== 0) {
+            $sql = $this->processJoin($parsed['join_type']) . " " . $sql;
+            $sql .= $this->processRefType($parsed['ref_type']);
+            $sql .= $this->processRefClause($parsed['ref_clause']);
+        }
 
-      $sql = $this->getShortTableNameFor($parsed['table']);
-      $alias = $this->processAlias($parsed['alias']);
-      $sql .= $alias;
+        # store the table and its alias for later use
+        $last = array_pop($this->allTables);
+        $last['tables'][] = array('table' => $this->getShortTableNameFor($parsed['table']), 'alias' => trim($alias));
+        $this->allTables[] = $last;
 
-      if ($index !== 0) {
-         $sql = $this->processJoin($parsed['join_type']) . " " . $sql;
-         $sql .= $this->processRefType($parsed['ref_type']);
-         $sql .= $this->processRefClause($parsed['ref_clause']);
-      }
+        return $sql;
+    }
 
-      # store the table and its alias for later use
-      $last = array_pop($allTables);
-      $last['tables'][] = array('table' => $this->getShortTableNameFor($parsed['table']), 'alias' => trim($alias));
-      $allTables[] = $last;
-      
-      return $sql;
-   }
+    protected function processFROM($parsed) {
+        $this->allTables[] = array('tables' => array(), 'alias' => '');
+        return parent::processFROM($parsed);
+    }
 
-   protected function processFROM($parsed) {
-      global $allTables;
-      $allTables[] = array('tables' => array(), 'alias' => '');
-      return parent::processFROM($parsed);
-   }
+    protected function processTableExpression($parsed, $index) {
+        if ($parsed['expr_type'] !== 'table_expression') {
+            return "";
+        }
+        $sql = substr($this->processFROM($parsed['sub_tree']), 5); // remove FROM keyword
+        $sql = "(" . $sql . ")";
 
-   protected function processTableExpression($parsed, $index) {
-      global $allTables;
-       
-      if ($parsed['expr_type'] !== 'table_expression') {
-         return "";
-      }
-      $sql = substr($this->processFROM($parsed['sub_tree']), 5); // remove FROM keyword
-      $sql = "(" . $sql . ")";
+        $alias .= $this->processAlias($parsed['alias']);
+        $sql .= $alias;
 
-      $alias .= $this->processAlias($parsed['alias']);
-      $sql .= $alias;
-      
-      # store the tables-expression-alias for later use
-      $last = array_pop($allTables);
-      $last['alias'] = trim($alias);
-      $allTables[] = $last;
+        # store the tables-expression-alias for later use
+        $last = array_pop($this->allTables);
+        $last['alias'] = trim($alias);
+        $this->allTables[] = $last;
 
-      if ($index !== 0) {
-         $sql = $this->processJoin($parsed['join_type']) . " " . $sql;
-         $sql .= $this->processRefType($parsed['ref_type']);
-         $sql .= $this->processRefClause($parsed['ref_clause']);
-      }
-      return $sql;
-   }
+        if ($index !== 0) {
+            $sql = $this->processJoin($parsed['join_type']) . " " . $sql;
+            $sql .= $this->processRefType($parsed['ref_type']);
+            $sql .= $this->processRefClause($parsed['ref_clause']);
+        }
+        return $sql;
+    }
 
+    private function getTableNameFromExpression($expr) {
+        $pos = strpos($expr, ".");
+        if ($pos === false) {
+            $pos = -1;
+        }
+        return trim(substr($expr, 0, $pos + 1), ".");
+    }
 
-   private function getTableNameFromExpression($expr) {
-      $pos = strpos($expr, ".");
-      if ($pos === false) {
-         $pos = -1;
-      }
-      return trim(substr($expr, 0, $pos + 1), ".");
-   }
+    private function getColumnNameFromExpression($expr) {
+        $pos = strpos($expr, ".");
+        if ($pos === false) {
+            $pos = -1;
+        }
+        return substr($expr, $pos + 1);
+    }
 
-   private function getColumnNameFromExpression($expr) {
-      $pos = strpos($expr, ".");
-      if ($pos === false) {
-         $pos = -1;
-      }
-      return substr($expr, $pos + 1);
-   }
-
-   private function isCLOBColumn($table, $column) {
-      global $allTables;
-
-      if ($table === "") {
-         foreach ($allTables as $k => $v) {
-            if ($this->isCLOBColumn($v['table'], $column)) {
-               return true;
-            }
-         }
-         return false;
-      }
-
-      foreach ($allTables as $k => $v) {
-         if (strtolower($v['alias']) === strtolower($table)) {
-            if ($this->isCLOBColumn($v['table'], $column)) {
-               return true;
-            }
-         }
-      }
-
-      $res = $this->con->GetOne(
+    private function isCLOBColumnInDB($table, $column) {
+        $res = $this->con->GetOne(
                 "SELECT count(*) FROM user_lobs WHERE table_name='" . strtoupper($table) . "' AND column_name='"
-                . strtoupper($column) . "'");
-                return ($res >= 1);
-   }
+                        . strtoupper($column) . "'");
+        return ($res >= 1);
+    }
 
-   protected function processOrderByExpression($parsed) {
-      if ($parsed['type'] !== 'expression') {
-         return "";
-      }
+    protected function isCLOBColumn($table, $column) {
+        $tables = end($this->allTables);
 
-      $table = $this->getTableNameFromExpression($parsed['base_expr']);
-      $col = $this->getColumnNameFromExpression($parsed['base_expr']);
-
-      $sql = ($table !== "" ? $table . "." : "") . $col;
-
-      # check, if the column is a CLOB
-      if ($this->isCLOBColumn($table, $col)) {
-         $sql = "cast(substr(" . $sql . ",1,200) as varchar2(200))";
-      }
-
-      return $sql . " " . $parsed['direction'];
-   }
-
-   protected function processColRef($parsed) {
-      global $preventColumnRefs;
-
-      if ($parsed['expr_type'] !== 'colref') {
-         return "";
-      }
-
-      $table = $this->getTableNameFromExpression($parsed['base_expr']);
-      $col = $this->getColumnNameFromexpression($parsed['base_expr']);
-
-      # we have to change the column name, if the column is uid
-      # we have to change the tablereference, if the tablename is too long
-      $col = $this->getColumnNameFor($col);
-      $table = $this->getShortTableNameFor($table);
-
-      # if we have * as colref, we cannot use other columns
-      # we have to add alias.* if we know all table aliases
-      if (($table === "") && ($col === "*")) {
-         array_pop($preventColumnRefs);
-         $preventColumnRefs[] = true;
-         return "[#REPL#]"; # this is the position, we have to replace later
-      }
-
-      $alias = "";
-      if (isset($parsed['alias'])) {
-         $alias = $this->processAlias($parsed['alias']);
-      }
-
-      return (($table !== "") ? ($table . "." . $col) : $col) . $alias;
-   }
-
-   protected function processSELECT($parsed) {
-      global $preventColumnRefs;
-      $preventColumnRefs[] = false;
-      return parent::processSELECT($parsed);
-   }
-
-   private function correctColRefStatement($sql) {
-      global $preventColumnRefs;
-      global $allTables;
-
-      $alias = "";
-      $tables = array_pop($allTables);
-      
-      # should we correct the selection list?
-      if (array_pop($preventColumnRefs)) {
-         
-         # do we have a table-expression alias?
-         if ($tables['alias'] !== "") {
-            $alias = $tables['alias'] . ".*";
-         } else {
+        if ($table === "") {
             foreach ($tables['tables'] as $k => $v) {
-               $alias .= ($v['alias'] === "" ? $v['table'] : $v['alias']) . ".*,";
+                if ($this->isCLOBColumn($v['table'], $column)) {
+                    return true;
+                }
             }
-            $alias = substr($alias, 0, -1);
-         }
-         $sql = str_replace("[#REPL#]", $alias, $sql);
-      }
-      return $sql;      
-   }
-   
-   protected function processSelectStatement($parsed) {
-      $sql = $this->processSELECT($parsed['SELECT']);
-      $from = $this->processFROM($parsed['FROM']);
+            return false;
+        }
 
-      # correct * references with tablealias.*
-      # this must be called after processFROM(), because we need the table information
-      $sql = $this->correctColRefStatement($sql) . " " . $from;
+        # check the aliases, $table cannot be empty
+        foreach ($tables['tables'] as $k => $v) {
+            if ((strtolower($v['alias']) === strtolower($table))
+                    || (strtolower($tables['alias']) === strtolower($table))) {
+                if ($this->isCLOBColumnInDB($v['table'], $column)) {
+                    return true;
+                }
+            }
+        }
 
-      if (isset($parsed['WHERE'])) {
-         $sql .= " " . $this->processWHERE($parsed['WHERE']);
-      }
-      if (isset($parsed['GROUP'])) {
-         $sql .= " " . $this->processGROUP($parsed['GROUP']);
-      }
-      if (isset($parsed['ORDER'])) {
-         $sql .= " " . $this->processORDER($parsed['ORDER']);
-      }
-      return $sql;
-   }
+        # it must be a valid table name
+        return $this->isCLOBColumnInDB($table, $column);
+    }
 
-   public function create($parsed) {
-      $k = key($parsed);
-      switch ($k) {
-         case "USE":
+    protected function processOrderByExpression($parsed) {
+        if ($parsed['type'] !== 'expression') {
+            return "";
+        }
+
+        $table = $this->getTableNameFromExpression($parsed['base_expr']);
+        $col = $this->getColumnNameFromExpression($parsed['base_expr']);
+
+        $sql = ($table !== "" ? $table . "." : "") . $col;
+
+        # check, if the column is a CLOB
+        if ($this->isCLOBColumn($table, $col)) {
+            $sql = "cast(substr(" . $sql . ",1,200) as varchar2(200))";
+        }
+
+        return $sql . " " . $parsed['direction'];
+    }
+
+    protected function processColRef($parsed) {
+        if ($parsed['expr_type'] !== 'colref') {
+            return "";
+        }
+
+        $table = $this->getTableNameFromExpression($parsed['base_expr']);
+        $col = $this->getColumnNameFromexpression($parsed['base_expr']);
+
+        # we have to change the column name, if the column is uid
+        # we have to change the tablereference, if the tablename is too long
+        $col = $this->getColumnNameFor($col);
+        $table = $this->getShortTableNameFor($table);
+
+        # if we have * as colref, we cannot use other columns
+        # we have to add alias.* if we know all table aliases
+        # FIXME: this goes wrong for count(*)
+        if (($table === "") && ($col === "*")) {
+            array_pop($this->preventColumnRefs);
+            $this->preventColumnRefs[] = true;
+            return "[#REPL#]"; # this is the position, we have to replace later
+        }
+
+        $alias = "";
+        if (isset($parsed['alias'])) {
+            $alias = $this->processAlias($parsed['alias']);
+        }
+
+        return (($table !== "") ? ($table . "." . $col) : $col) . $alias;
+    }
+
+    protected function processSELECT($parsed) {
+        $this->preventColumnRefs[] = false;
+        return parent::processSELECT($parsed);
+    }
+
+    private function correctColRefStatement($sql) {
+        $alias = "";
+        $tables = end($this->allTables);
+
+        # should we correct the selection list?
+        if (array_pop($this->preventColumnRefs)) {
+
+            # do we have a table-expression alias?
+            if ($tables['alias'] !== "") {
+                $alias = $tables['alias'] . ".*";
+            } else {
+                foreach ($tables['tables'] as $k => $v) {
+                    $alias .= ($v['alias'] === "" ? $v['table'] : $v['alias']) . ".*,";
+                }
+                $alias = substr($alias, 0, -1);
+            }
+            $sql = str_replace("[#REPL#]", $alias, $sql);
+        }
+        return $sql;
+    }
+
+    protected function processSelectStatement($parsed) {
+        $sql = $this->processSELECT($parsed['SELECT']);
+        $from = $this->processFROM($parsed['FROM']);
+
+        # correct * references with tablealias.*
+        # this must be called after processFROM(), because we need the table information
+        $sql = $this->correctColRefStatement($sql) . " " . $from;
+
+        if (isset($parsed['WHERE'])) {
+            $sql .= " " . $this->processWHERE($parsed['WHERE']);
+        }
+        if (isset($parsed['GROUP'])) {
+            $sql .= " " . $this->processGROUP($parsed['GROUP']);
+        }
+        if (isset($parsed['ORDER'])) {
+            $sql .= " " . $this->processORDER($parsed['ORDER']);
+        }
+
+        # select finished, we remove its tables
+        #  FIXME: we should add it to the previous tablelist with the
+        #  global alias, if such one exists
+        array_pop($this->allTables);
+
+        return $sql;
+    }
+
+    public function create($parsed) {
+        $k = key($parsed);
+        switch ($k) {
+        case "USE":
             $this->created = "";
             break;
 
-         default:
+        default:
             $this->created = parent::create($parsed);
             break;
-      }
-      return $this->created;
-   }
+        }
+        return $this->created;
+    }
 
-   public function process($sql) {
-      self::dbgprint($sql . "<br/>");
+    public function process($sql) {
+        self::dbgprint($sql . "<br/>");
 
-      $this->initGlobalVariables();
-      $parser = new PHPSQLParser($sql);
-      self::preprint($parser->parsed);
+        $this->initGlobalVariables();
+        $parser = new PHPSQLParser($sql);
+        self::preprint($parser->parsed);
 
-      $sql = $this->create($parser->parsed);
-      self::dbgprint($sql . "<br/>");
+        $sql = $this->create($parser->parsed);
+        self::dbgprint($sql . "<br/>");
 
-      return $sql;
-   }
+        return $sql;
+    }
 }
 /*
 $translator = new OracleSQLTranslator(false);
 $translator->process("SELECT *, (SELECT a from xyz WHERE b>1) haha, (SELECT *, b from zks,abc WHERE d=1) hoho FROM blubb d, blibb c WHERE d.col = c.col");
-*/
+ */
