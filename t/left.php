@@ -5,14 +5,12 @@ require_once(dirname(__FILE__) . '/../test-more.php');
 
 $parser = new PHPSQLParser();
 
-# TODO: split ref_clause and parse as where?
-
 $sql = 'SELECT a.field1, b.field1, c.field1
   FROM tablea a 
   LEFT JOIN tableb b ON b.ida = a.id
   LEFT JOIN tablec c ON c.idb = b.id;';
 
-$parser->parse($sql);
+$parser->parse($sql, true);
 $p = $parser->parsed;
 $expected = getExpectedValue('left1.serialized');
 eq_array($p, $expected, 'left join with alias');

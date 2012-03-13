@@ -48,7 +48,7 @@ if (!defined('HAVE_PHP_SQL_PARSER')) {
                 return $x;
             } else {
                 if (isset($_ENV['DEBUG'])) {
-                    print $x;
+                    print $x . "\n";
                 }
             }
         }
@@ -172,12 +172,54 @@ if (!defined('HAVE_PHP_SQL_PARSER')) {
 
         private function calculatePositionsWithinSQL($sql, $parsed) {
             $charPos = 0;
-            $this->lookForBaseExpression($sql, $charPos, $parsed);
+            $backtracking = array();
+            $this->lookForBaseExpression($sql, $charPos, $parsed, 0, $backtracking);
             return $parsed;
         }
 
-        private function lookForBaseExpression($sql, &$charPos, &$parsed) {
-            $oldPos = false;
+        # helper method to debug lookForBaseExpression
+        private function printPos($text, $sql, $charPos, $key, $parsed, $backtracking) {
+            if (!isset($_ENV['DEBUG'])) {
+                return;
+            }
+
+            $spaces = "";
+            $caller = debug_backtrace();
+            $i = 1;
+            while ($caller[$i]['function'] === 'lookForBaseExpression') {
+                $spaces .= "   ";
+                $i++;
+            }
+            $holdem = substr($sql, 0, $charPos) . "^" . substr($sql, $charPos);
+            echo $spaces . $text . " key:" . $key . "  parsed:" . $parsed . " back:" . serialize($backtracking) . " "
+                    . $holdem . "\n";
+        }
+
+        private function lookForBaseExpression($sql, &$charPos, &$parsed, $key, &$backtracking) {
+            //$this->printPos("1.", $sql, $charPos, $key, $parsed, $backtracking);
+
+            if (!is_numeric($key)) {
+                if (in_array($key, array('UNION', 'UNION ALL', 'columns'), true)
+                        || ($key === 'expr_type' && $parsed === 'expression')
+                        || ($key === 'expr_type' && $parsed === 'subquery') || ($key === 'alias' && $parsed !== false)) {
+                    $backtracking[] = $charPos; # on the next base_expr we set the pointer back to this value
+
+                } elseif (($key === 'ref_clause' && $parsed !== false)) {
+                    $backtracking[] = $charPos;
+                    for ($i = 1; $i < count($parsed); $i++) {
+                        $backtracking[] = false; # backtracking only after n base_expr!  
+                    }
+                } else {
+                    # SELECT, WHERE, INSERT etc.
+                    if (in_array($key, $this->reserved)) {
+                        $charPos = stripos($sql, $key, $charPos);
+                        $charPos += strlen($key);
+                    }
+                }
+            }
+
+            //$this->printPos("2.", $sql, $charPos, $key, $parsed, $backtracking);
+
             if (!is_array($parsed)) {
                 return;
             }
@@ -185,39 +227,37 @@ if (!defined('HAVE_PHP_SQL_PARSER')) {
             foreach ($parsed as $key => $value) {
                 if ($key === 'base_expr') {
 
-                    $pattern = "/" . str_replace(" ", "\\s+", $value . "[^a-zA-Z0-9]") . "/";
+                    $pattern = "/" . str_replace(" ", "\\s+", "(^|\\s|\\(|,)" . preg_quote($value) . "(\\)|,|;|\\s|$)")
+                            . "/";
                     $subject = substr($sql, $charPos);
                     $search = preg_split($pattern, $subject, -1, PREG_SPLIT_OFFSET_CAPTURE);
 
-                    echo $pattern."\n";
-                    echo $subject."\n"; # here are problems within positions.php
-                    print_r($search);
-                    
-                    $before = $search[0];
-                    $after = $search[1];
+                    $before = array_shift($search);
+                    $after = array_shift($search);
+                    if (!isset($after)) {
+                        echo "error during position calculating\n";
+                        echo $pattern . "\n";
+                        echo $subject . "\n";
+                        exit;
+                    }
 
-                    $parsed['position'] = $charPos + $before[1] + strlen($before[0]);
+                    $parsed['position'] = $charPos + $before[1] + strlen($before[0]) + 1;
                     $charPos += $after[1];
 
+                    //$this->printPos("3.", $sql, $charPos, $key, $parsed, $backtracking);
+
+                    $oldPos = array_pop($backtracking);
+                    if (isset($oldPos) && $oldPos !== false) {
+                        $charPos = $oldPos;
+                    }
+
+                    //$this->printPos("4.", $sql, $charPos, $key, $parsed, $backtracking);
+
                 } else {
-                    if (!is_numeric($key)) {
-                        if (in_array($key, array('alias', 'UNION', 'UNION ALL', 'columns', 'ref_clause'), true)) {
-                            $oldPos = $charPos;
-                        } else {
-                            # SELECT, WHERE, INSERT etc.
-                            if (is_array($value) && (in_array($key, $this->reserved))) {
-                                $charPos = stripos($sql, $key, $charPos);
-                                $charPos += strlen($key);
-                            }
-                        }
-                    }
-                    $this->lookForBaseExpression($sql, $charPos, $parsed[$key]);
-                    if ($oldPos !== false) {
-                        $charPos = $oldPos; # backtracking
-                        $oldPos = false;
-                    }
+                    $this->lookForBaseExpression($sql, $charPos, $parsed[$key], $key, $backtracking);
                 }
             }
+
         }
 
         #This function counts open and close parenthesis and
@@ -433,7 +473,7 @@ EOREGEX
                     }
 
                     #to skip the token we replace it with whitespace
-                    $new_token = "";
+                    $token = "";
                     $skip_next = false;
                 }
 
@@ -489,9 +529,6 @@ EOREGEX
                     }
 
                     $token_category = $upper;
-                    //                    if ($upper !== 'FROM' || $token_category !== 'FROM') {
-                    //                        continue 2; // switch and the enclosed for construct
-                    //                    }
                     break;
 
                 /* These tokens get their own section, but have no subclauses.
@@ -579,7 +616,6 @@ EOREGEX
                     if ($token_category == 'DUPLICATE') {
                         continue 2;
                     }
-                    break;
                     break;
 
                 case 'START':
@@ -863,7 +899,8 @@ EOREGEX
                                 || $prev['expr_type'] == 'function' || $prev['expr_type'] == 'expression'
                                 || $prev['expr_type'] == 'subquery' || $prev['expr_type'] == 'colref')) {
 
-                    $alias = array('as' => false, 'name' => trim($last['base_expr']), 'base_expr' => trim($last['base_expr']));
+                    $alias = array('as' => false, 'name' => trim($last['base_expr']),
+                                   'base_expr' => trim($last['base_expr']));
                     #remove the last token
                     array_pop($tokens);
                     $base_expr = join("", $tokens);
@@ -896,7 +933,8 @@ EOREGEX
                 }
             }
 
-            return array('expr_type' => $type, 'alias' => $alias, 'base_expr' => trim($base_expr), 'sub_tree' => $processed);
+            return array('expr_type' => $type, 'alias' => $alias, 'base_expr' => trim($base_expr),
+                         'sub_tree' => $processed);
         }
 
         private function process_from(&$tokens) {
