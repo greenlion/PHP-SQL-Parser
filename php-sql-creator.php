@@ -75,11 +75,11 @@ if (!defined('HAVE_PHP_SQL_CREATOR')) {
             if (isset($parsed['WHERE'])) {
                 $sql .= " " . $this->processWHERE($parsed['WHERE']);
             }
-            if (isset($parsed['ORDER'])) {
-                $sql .= " " . $this->processORDER($parsed['ORDER']);
-            }
             if (isset($parsed['GROUP'])) {
                 $sql .= " " . $this->processGROUP($parsed['GROUP']);
+            }
+            if (isset($parsed['ORDER'])) {
+                $sql .= " " . $this->processORDER($parsed['ORDER']);
             }
             return $sql;
         }
@@ -149,7 +149,7 @@ if (!defined('HAVE_PHP_SQL_CREATOR')) {
             $sql = "";
             foreach ($parsed as $k => $v) {
                 $len = strlen($sql);
-                $sql .= $this->processExpression($v);
+                $sql .= $this->processOrderByExpression($v);
 
                 if ($len == strlen($sql)) {
                     $this->stop('ORDER', $k, $v, 'type');
@@ -162,7 +162,19 @@ if (!defined('HAVE_PHP_SQL_CREATOR')) {
         }
 
         protected function processGROUP($parsed) {
-            die("GROUP BY not implemented yet");
+            $sql = "";
+            foreach ($parsed as $k => $v) {
+                $len = strlen($sql);
+                $sql .= $this->processGroupByExpression($v);
+
+                if ($len == strlen($sql)) {
+                    $this->stop('GROUP', $k, $v, 'type');
+                }
+
+                $sql .= ",";
+            }
+            $sql = substr($sql, 0, -1);
+            return "GROUP BY " . $sql;
         }
 
         protected function processVALUES($parsed) {
@@ -233,11 +245,12 @@ if (!defined('HAVE_PHP_SQL_CREATOR')) {
                 $sql .= $this->processColRef($v);
                 $sql .= $this->processSubquery($v);
                 $sql .= $this->processInList($v);
+                $sql .= $this->processWhereExpression($v);
 
-                # expressions, functions?
+                # functions?
                                 
                 if (strlen($sql) == $len) {
-                    $this->stop('FROM', $k, $v, 'expr_type');
+                    $this->stop('WHERE', $k, $v, 'expr_type');
                 }
 
                 $sql .= " ";
@@ -245,13 +258,42 @@ if (!defined('HAVE_PHP_SQL_CREATOR')) {
             return $sql;
         }
 
-        protected function processExpression($parsed) {
+        protected function processWhereExpression($parsed) {
+            if ($parsed['expr_type'] !== 'expression') {
+                return "";
+            }
+            $sql = "";
+            foreach ($parsed['sub_tree'] as $k => $v) {
+                $len = strlen($sql);
+                $sql .= $this->processColRef($v);
+                $sql .= $this->processConstant($v);
+                $sql .= $this->processOperator($v);
+
+                if ($len == strlen($sql)) {
+                    $this->stop('WHERE expression subtree', $k, $v, 'expr_type');
+                }
+
+                $sql .= " ";
+            }
+
+            $sql = "(" . substr($sql, 0, -1) . ")";
+            return $sql;
+        }
+        
+        protected function processOrderByExpression($parsed) {
             if ($parsed['type'] !== 'expression') {
                 return "";
             }
             return $parsed['base_expr'] . " " . $parsed['direction'];
         }
 
+        protected function processGroupByExpression($parsed) {
+            if ($parsed['type'] !== 'expression') {
+                return "";
+            }
+            return $parsed['base_expr'];
+        }
+        
         protected function processFunction($parsed) {
             if (($parsed['expr_type'] !== 'aggregate_function') && ($parsed['expr_type'] !== 'function')) {
                 return "";
@@ -286,6 +328,7 @@ if (!defined('HAVE_PHP_SQL_CREATOR')) {
                 $len = strlen($sql);
                 $sql .= $this->processFunction($v);
                 $sql .= $this->processConstant($v);
+                $sql .= $this->processSubQuery($v);
 
                 if ($len == strlen($sql)) {
                     $this->stop('expression subtree', $k, $v, 'expr_type');
