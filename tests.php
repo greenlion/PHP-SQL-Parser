@@ -1,18 +1,6 @@
 <?php
 
 /**
- * Helper function for getting the expected array
- * from a file as serialized string.
- * Returns an unserialized value from the given file.
- *
- * @param unknown_type $filename
- */
-function getExpectedValue($filename) {
-	$content = file_get_contents(dirname(__FILE__) . "/r/".$filename);
-	return unserialize($content);
-}
-
-/**
  * execute all tests
  */
 require_once(dirname(__FILE__) . '/t/aliases.php');
