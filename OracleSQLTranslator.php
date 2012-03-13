@@ -6,6 +6,7 @@ require_once('php-sql-creator.php');
 class OracleSQLParser extends PHPSQLCreator {
 
     var $con;
+    var $preventColumnRefs = false;
 
     public function __construct($con) {
         parent::__construct();
@@ -31,15 +32,72 @@ class OracleSQLParser extends PHPSQLCreator {
         return $sql;
     }
 
+    private function getColumnNameFor($column) {
+        if (strtolower($column) === 'uid') {
+            $column = "uid_";
+        }
+        return $column;
+    }
+
+    private function getShortTableNameFor($table) {
+        if (strtolower($table) === 'surveys_languagesettings') {
+            $table = 'surveys_lngsettings';
+        }
+        return $table;
+    }
+
+    protected function processTable($parsed, $index) {
+        if ($parsed['expr_type'] !== 'table') {
+            return "";
+        }
+
+        $sql = $table = $this->getShortTableNameFor($parsed['table']);
+        $sql .= " " . $this->processAlias($parsed['alias']);
+
+        if ($index !== 0) {
+            $sql = " " . $this->processJoin($parsed['join_type']) . " " . $sql;
+            $sql .= $this->processRefType($parsed['ref_type']);
+            $sql .= $this->processRefClause($parsed['ref_clause']);
+        }
+        return $sql;
+    }
+
     protected function processColRef($parsed) {
+        global $preventColumnRefs;
+
         if ($parsed['expr_type'] !== 'colref') {
             return "";
         }
-        
-        # we have to change the tablereference, if the tablename is too long
+
+        $colref = $parsed['base_expr'];
+        $pos = strpos($colref, ".");
+        if ($pos === false) {
+            $pos = -1;
+        }
+        $table = trim(substr($colref, 0, $pos + 1), ".");
+        $col = substr($colref, $pos + 1);
+
         # we have to change the column name, if the column is uid
+        $col = $this->getColumnNameFor($col);
+
+        # we have to change the tablereference, if the tablename is too long
+        $table = $this->getShortTableNameFor($table);
+
+        # if we have * as colref, we cannot use other columns
+        $preventColumnRefs = $preventColumnRefs || (($table === "") && ($col === "*"));
+
+        return (($table !== "") ? ($table . "." . $col) : $col);
+    }
+
+    protected function processSELECT($parsed) {
+        global $preventColumnRefs;
         
-        return $parsed['base_expr'];
+        $sql = parent::processSELECT($parsed);
+        if ($preventColumnRefs) {
+            $sql = "SELECT *";
+            $preventColumnRefs = false;
+        }
+        return $sql;
     }
 
     # prevents parsing of create-oracle.php statements
@@ -75,8 +133,10 @@ class OracleSQLParser extends PHPSQLCreator {
 }
 
 $parser = new OracleSQLParser(false);
-$parser->process("SELECT a.*, c.*, u.users_name FROM SURVEYS as a  INNER JOIN SURVEYS_LANGUAGESETTINGS as c ON ( surveyls_survey_id = a.sid AND surveyls_language = a.language ) AND surveyls_survey_id=a.sid and surveyls_language=a.language  INNER JOIN USERS as u ON (u.uid=a.owner_id)  ORDER BY surveyls_title");
-//$parser->process(" SELECT a.*, surveyls_title, surveyls_description, surveyls_welcometext, surveyls_url  FROM SURVEYS AS a INNER JOIN SURVEYS_LANGUAGESETTINGS on (surveyls_survey_id=a.sid and surveyls_language=a.language)  order by active DESC, surveyls_title");
+$parser->process(
+        "SELECT a.*, c.*, u.users_name FROM SURVEYS as a  INNER JOIN SURVEYS_LANGUAGESETTINGS as c ON ( surveyls_survey_id = a.sid AND surveyls_language = a.language ) AND surveyls_survey_id=a.sid and surveyls_language=a.language  INNER JOIN USERS as u ON (u.uid=a.owner_id)  ORDER BY surveyls_title");
+$parser->process(
+        " SELECT *, surveyls_title, surveyls_description, surveyls_welcometext, surveyls_url  FROM SURVEYS AS a INNER JOIN SURVEYS_LANGUAGESETTINGS on (surveyls_survey_id=a.sid and surveyls_language=a.language)  order by active DESC, surveyls_title");
 //$parser->process(" INSERT INTO settings_global VALUES ('DBVersion', '146')");
 //$parser->process("CREATE TABLE answers ( qid number(11) default '0' NOT NULL, code varchar2(5) default '' NOT NULL, answer CLOB NOT NULL, assessment_value number(11) default '0' NOT NULL, sortorder number(11) NOT NULL, language varchar2(20) default 'en', scale_id number(3) default '0' NOT NULL, PRIMARY KEY (qid,code,language,scale_id) )");
 //$parser->process("USE DATABASE `sdbprod`");
