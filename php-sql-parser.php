@@ -513,7 +513,6 @@ EOREGEX
                case 'GROUP':
                case 'ORDER':
                case 'HAVING':
-               case 'INTO':
                case 'WHERE':
                case 'RENAME':
                case 'CALL':
@@ -552,6 +551,15 @@ EOREGEX
                   $token_category = $upper;
                   break;
 
+               case 'INTO':
+                  # prevent wrong handling of CACHE within LOAD INDEX INTO CACHE...
+                  if ($prev_category === 'LOAD') {
+                     $out[$prev_category][] = $upper;
+                     continue 2;
+                  }
+                  $token_category = $upper;
+                  break;
+                  
                case 'USER':
                   # prevent wrong processing as keyword
                   if (in_array($prev_category, array('CREATE', 'RENAME', 'DROP'), true)) {
@@ -603,9 +611,8 @@ EOREGEX
                   break;
 
                case 'CACHE':
-                  if (($prev_category === "") || (in_array($prev_category, array('RESET', 'FLUSH')))) {
+                  if (($prev_category === "") || (in_array($prev_category, array('RESET', 'FLUSH', 'LOAD')))) {
                      $token_category = $upper;
-                     $out[$upper][0] = $upper;
                      continue 2;
                   }                  
                   break;

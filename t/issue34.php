@@ -6,5 +6,11 @@ $parser = new PHPSQLParser();
 $sql = "SELECT * FROM cache as t";
 $parser->parse($sql);
 $p = $parser->parsed;
-$expected = getExpectedValue('issue34.serialized');
-eq_array($p, $expected, 'keyword CACHE as tablename');
+$expected = getExpectedValue('issue34a.serialized');
+eq_array($p, $expected, 'SELECT statement with keyword CACHE as tablename');
+
+$sql = "INSERT INTO CACHE VALUES (1);";
+$parser->parse($sql);
+$p = $parser->parsed;
+$expected = getExpectedValue('issue34b.serialized');
+eq_array($p, $expected, 'INSERT statement with keyword CACHE as tablename');
