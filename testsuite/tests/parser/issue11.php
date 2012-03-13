@@ -1,6 +1,6 @@
 <?php
-require_once(dirname(__FILE__) . "/../../php-sql-parser.php");
-require_once(dirname(__FILE__) . "/../test-more.php");
+require_once(dirname(__FILE__) . "/../../../php-sql-parser.php");
+require_once(dirname(__FILE__) . "/../../test-more.php");
 
 $test    = str_repeat('0', 18000);
 $query  = "UPDATE club SET logo='$test' WHERE id=1";
