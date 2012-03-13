@@ -354,9 +354,17 @@ if (!defined('HAVE_PHP_SQL_PARSER')) {
       private function count_backtick($token, $char) {
          $len = strlen($token);
          $cnt = 0;
+         $escaped = false;
+         
          for ($i = 0; $i < $len; ++$i) {
-            if ($token[$i] == $char)
-            ++$cnt;
+            if ($token[$i] === '\\')  {
+               $escaped = true;
+               continue;
+            }
+            if (!$escaped && $token[$i] == $char) {
+               ++$cnt;
+            }
+            $escaped = false;
          }
          return $cnt;
       }
@@ -410,8 +418,8 @@ if (!defined('HAVE_PHP_SQL_PARSER')) {
          $regex = <<<EOREGEX
 /(`(?:[^`]|``)`|[@A-Za-z0-9_.`-]+)
 |(\+|-|\*|\/|!=|>=|<=|<>|>|<|&&|\|\||=|\^|\(|\))
-|('(?:[^']+|''|\\')*'+)
-|("(?:[^"]+|""|\\")*"+)
+|('(?:[^']+|'')*'+)
+|("(?:[^"]+|"")*"+)
 |([^ ,]+)
 /ix
 EOREGEX
