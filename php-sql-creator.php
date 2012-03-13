@@ -323,6 +323,15 @@ if (!defined('HAVE_PHP_SQL_CREATOR')) {
             if ($parsed['expr_type'] !== 'expression') {
                 return "";
             }
+            $sql = $this->processSubTree($parsed, " ");
+            $sql .= $this->processAlias($parsed['alias']);
+            return $sql;
+        }
+
+        protected function processSubTree($parsed, $delim=" ") {
+            if ($parsed['sub_tree'] === '') {
+                return "";
+            }
             $sql = "";
             foreach ($parsed['sub_tree'] as $k => $v) {
                 $len = strlen($sql);
@@ -334,13 +343,11 @@ if (!defined('HAVE_PHP_SQL_CREATOR')) {
                     $this->stop('expression subtree', $k, $v, 'expr_type');
                 }
 
-                $sql .= " ";
+                $sql .= $delim;
             }
-
-            $sql = substr($sql, 0, -1) . $this->processAlias($parsed['alias']);
-            return $sql;
+            return substr($sql, 0, -1);
         }
-
+        
         protected function processRefClause($parsed) {
             if ($parsed === false) {
                 return "";
@@ -485,11 +492,8 @@ if (!defined('HAVE_PHP_SQL_CREATOR')) {
             if ($parsed['expr_type'] !== 'in-list') {
                 return "";
             }
-            $sql = "";
-            foreach ($parsed['sub_tree'] as $k => $v) {
-                $sql .= $v . ",";
-            }
-            return "(" . substr($sql, 0, -1) . ")";
+            $sql = $this->processSubTree($parsed, ",");
+            return "(" . $sql . ")";
         }
 
     } // END CLASS
