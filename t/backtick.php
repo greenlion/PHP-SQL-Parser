@@ -10,3 +10,10 @@ $p = $parser->parsed;
 ok($parser->parsed['SELECT'][0]['alias']['name'] == 'an alias');
 ok($parser->parsed['SELECT'][0]['sub_tree'][4]['base_expr'] == 'c1.`some column`');
 ok($parser->parsed['GROUP'][0]['type'] == 'alias');
+
+
+$sql = "INSERT INTO test (`name`) VALUES ('ben\\'s test containing an escaped quote')";
+$parser->parse($sql);
+$p = $parser->parsed;
+$expected = getExpectedValue('backtick1.serialized');
+eq_array($p, $expected, 'issue 35: ben\'s test');
