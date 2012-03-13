@@ -31,133 +31,197 @@
  */
 require_once('php-sql-parser.php');
 require_once('php-sql-creator.php');
+require_once($rootdir . '/classes/adodb/adodb.inc.php');
 
 class OracleSQLTranslator extends PHPSQLCreator {
 
-   var $con;
-   var $preventColumnRefs = false;
+    private $con; # this is the database connection from LimeSurvey
+    private $preventColumnRefs = false;
+    private $allTables = array();
 
-   public function __construct($con) {
-      parent::__construct();
-      $this->con = $con;
-   }
+    public function __construct($con) {
+        parent::__construct();
+        $this->con = $con;
+        $this->initGlobalVariables();
+    }
 
-   private function preprint($s, $return = false) {
-      $x = "<pre>";
-      $x .= print_r($s, 1);
-      $x .= "</pre>";
-      if ($return)
-      return $x;
-      else
-      print $x;
-   }
+    private function preprint($s, $return = false) {
+        $x = "<pre>";
+        $x .= print_r($s, 1);
+        $x .= "</pre>";
+        if ($return)
+            return $x;
+        else if (isset($_ENV['DEBUG'])) {
+            print $x;
+        }
+    }
 
-   protected function processAlias($parsed) {
-      if ($parsed === false) {
-         return "";
-      }
-      # we don't need an AS between expression and alias
-      $sql = " " . $parsed['name'];
-      return $sql;
-   }
-   
-   protected function processDELETE($parsed) {
-      if (count($parsed('TABLES')) > 1) {
-         die("cannot translate delete statement into Oracle dialect, multiple tables are not allowed.");
-      }
-      return "DELETE";
-   }
+    protected function processAlias($parsed) {
+        if ($parsed === false) {
+            return "";
+        }
+        # we don't need an AS between expression and alias
+        $sql = " " . $parsed['name'];
+        return $sql;
+    }
 
-   private function getColumnNameFor($column) {
-      if (strtolower($column) === 'uid') {
-         $column = "uid_";
-      }
-      return $column;
-   }
+    protected function processDELETE($parsed) {
+        if (count($parsed('TABLES')) > 1) {
+            die("cannot translate delete statement into Oracle dialect, multiple tables are not allowed.");
+        }
+        return "DELETE";
+    }
 
-   private function getShortTableNameFor($table) {
-      if (strtolower($table) === 'surveys_languagesettings') {
-         $table = 'surveys_lngsettings';
-      }
-      return $table;
-   }
+    private function getColumnNameFor($column) {
+        if (strtolower($column) === 'uid') {
+            $column = "uid_";
+        }
+        return $column;
+    }
 
-   protected function processTable($parsed, $index) {
-      if ($parsed['expr_type'] !== 'table') {
-         return "";
-      }
+    private function getShortTableNameFor($table) {
+        if (strtolower($table) === 'surveys_languagesettings') {
+            $table = 'surveys_lngsettings';
+        }
+        return $table;
+    }
 
-      $sql = $table = $this->getShortTableNameFor($parsed['table']);
-      $sql .= " " . $this->processAlias($parsed['alias']);
+    protected function processTable($parsed, $index) {
+        global $allTables;
 
-      if ($index !== 0) {
-         $sql = " " . $this->processJoin($parsed['join_type']) . " " . $sql;
-         $sql .= $this->processRefType($parsed['ref_type']);
-         $sql .= $this->processRefClause($parsed['ref_clause']);
-      }
-      return $sql;
-   }
+        if ($parsed['expr_type'] !== 'table') {
+            return "";
+        }
 
-   protected function processColRef($parsed) {
-      global $preventColumnRefs;
+        $sql = $table = $this->getShortTableNameFor($parsed['table']);
+        $sql .= " " . $this->processAlias($parsed['alias']);
 
-      if ($parsed['expr_type'] !== 'colref') {
-         return "";
-      }
+        if ($index !== 0) {
+            $sql = " " . $this->processJoin($parsed['join_type']) . " " . $sql;
+            $sql .= $this->processRefType($parsed['ref_type']);
+            $sql .= $this->processRefClause($parsed['ref_clause']);
+        }
 
-      $colref = $parsed['base_expr'];
-      $pos = strpos($colref, ".");
-      if ($pos === false) {
-         $pos = -1;
-      }
-      $table = trim(substr($colref, 0, $pos + 1), ".");
-      $col = substr($colref, $pos + 1);
+        if ($sql !== "") {
+            // TODO: the alias can be wrong, if the table is part of a table-expression with its own alias
+            $allTables[] = array('table' => $parsed['table'], 'alias' => $this->processAlias($parsed['alias']));
+        }
+        return $sql;
+    }
 
-      # we have to change the column name, if the column is uid
-      $col = $this->getColumnNameFor($col);
+    private function getTableNameFromExpression($expr) {
+        $pos = strpos($expr, ".");
+        if ($pos === false) {
+            $pos = -1;
+        }
+        return trim(substr($expr, 0, $pos + 1), ".");
+    }
 
-      # we have to change the tablereference, if the tablename is too long
-      $table = $this->getShortTableNameFor($table);
+    private function getColumnNameFromExpression($expr) {
+        $pos = strpos($expr, ".");
+        if ($pos === false) {
+            $pos = -1;
+        }
+        return substr($expr, $pos + 1);
+    }
 
-      # if we have * as colref, we cannot use other columns
-      $preventColumnRefs = $preventColumnRefs || (($table === "") && ($col === "*"));
+    private function isCLOBColumn($table, $column) {
+        global $allTables;
 
-      $alias = "";
-      if (isset($parsed['alias'])) {
-         $alias = $this->processAlias($parsed['alias']);
-      }
+        if ($table === "") {
+            foreach ($allTables as $k => $v) {
+                echo "check for table " . $v['table'];
+                if ($this->isCLOBColumn($v['table'], $column)) {
+                    return true;
+                }
+            }
+            return false;
+        }
 
-      return (($table !== "") ? ($table . "." . $col) : $col) . $alias;
-   }
+        foreach ($allTables as $k => $v) {
+            if (strtolower($v['alias']) === strtolower($table)) {
+                echo "check for table " . $v['table'] . " because of alias " . $v['alias'];
+                if ($this->isCLOBColumn($v['table'], $column)) {
+                    return true;
+                }
+            }
+        }
 
-   protected function processSELECT($parsed) {
-      global $preventColumnRefs;
+        $res = $this->con->GetOne(
+                "SELECT count(*) FROM user_lobs WHERE table_name='" . strtoupper($table) . "' AND column_name='"
+                        . strtoupper($column) . "'");
+        return ($res >= 1);
+    }
 
-      $sql = parent::processSELECT($parsed);
-      if ($preventColumnRefs) {
-         $sql = "SELECT *";
-         $preventColumnRefs = false;
-      }
-      return $sql;
-   }
+    protected function processExpression($parsed) {
+        if ($parsed['type'] !== 'expression') {
+            return "";
+        }
 
-   public function process($sql) {
-      $parser = new PHPSQLParser($sql);
-      print_r($parser->parsed);
-      $sql = $this->create($parser->parsed);
+        $table = $this->getTableNameFromExpression($parsed['base_expr']);
+        $col = $this->getColumnNameFromExpression($parsed['base_expr']);
 
-      echo $sql . "\n";
-      return $sql;
-   }
+        $sql = ($table !== "" ? $table . "." : "") . $col;
+
+        # check, if the column is a CLOB
+        if ($this->isCLOBColumn($table, $col)) {
+            $sql = "cast(substr(" . $sql . ",1,200) as varchar2(200))";
+        }
+
+        return $sql . " " . $parsed['direction'];
+    }
+
+    protected function processColRef($parsed) {
+        global $preventColumnRefs;
+
+        if ($parsed['expr_type'] !== 'colref') {
+            return "";
+        }
+
+        $table = $this->getTableNameFromExpression($parsed['base_expr']);
+        $col = $this->getColumnNameFromexpression($parsed['base_expr']);
+
+        # we have to change the column name, if the column is uid
+        $col = $this->getColumnNameFor($col);
+
+        # we have to change the tablereference, if the tablename is too long
+        $table = $this->getShortTableNameFor($table);
+
+        # if we have * as colref, we cannot use other columns
+        $preventColumnRefs = $preventColumnRefs || (($table === "") && ($col === "*"));
+
+        $alias = "";
+        if (isset($parsed['alias'])) {
+            $alias = $this->processAlias($parsed['alias']);
+        }
+
+        return (($table !== "") ? ($table . "." . $col) : $col) . $alias;
+    }
+
+    protected function processSELECT($parsed) {
+        global $preventColumnRefs;
+
+        $sql = parent::processSELECT($parsed);
+        if ($preventColumnRefs) {
+            $sql = "SELECT *";
+            $preventColumnRefs = false;
+        }
+        return $sql;
+    }
+
+    private function initGlobalVariables() {
+        global $preventColumnRefs;
+        global $allTables;
+
+        $preventColumnRefs = false;
+        $allTables = array();
+    }
+
+    public function process($sql) {
+        $this->initGlobalVariables();
+
+        $parser = new PHPSQLParser($sql);
+        $this->preprint($parser->parsed);
+        return $this->create($parser->parsed);
+    }
 }
-
-/*
- * $sql = substr($sql, 0, $start) . "cast(substr(" . $columnInfo
- . ",1,200) as varchar2(200))"
- . substr($sql, $start + strlen($columnInfo));
- */
-
-$parser = new OracleSQLTranslator(false);
-
-$sql = "SELECT qid FROM QUESTIONS WHERE gid='1' and language='de-informal' ORDER BY question_order, title ASC";
-$parser->process($sql);
