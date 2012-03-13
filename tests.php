@@ -17,5 +17,6 @@ require_once(dirname(__FILE__) . '/t/nested.php');
 require_once(dirname(__FILE__) . '/t/select.php');
 require_once(dirname(__FILE__) . '/t/update.php');
 require_once(dirname(__FILE__) . '/t/zero.php');
+require_once(dirname(__FILE__) . '/t/insert.php');
 
 exit;
