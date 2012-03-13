@@ -8,6 +8,7 @@ function process($sql) {
     $parser = new PHPSQLParser($sql);
     //echo print_r($parser->parsed, true)."\n";
     $creator = new PHPSQLCreator($parser->parsed);
+    //echo $creator->created;
     return $creator->created;
 }
 
