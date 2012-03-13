@@ -1018,14 +1018,6 @@ EOREGEX
                     }
                 }
 
-                # do we have a subquery within the from clause?
-                if (preg_match("/^\\s*\\(\\s*select/i", $token)) {
-                    $data['type'] = 'subquery';
-                    $data['table'] = "DEPENDENT-SUBQUERY";
-                    $data['sub_tree'] = $this->parse($this->removeParenthesisFromStart($token));
-                    $data['subquery'] = $token;
-                }
-
                 switch ($upper) {
                 case 'OUTER':
                 case 'LEFT':
@@ -1145,7 +1137,7 @@ EOREGEX
 
             $res = array();
 
-            # exchange the join types (join_type is saved now, saved_join_type holds the next one)
+            # exchange the join types (join_type is save now, saved_join_type holds the next one)
             $data['join_type'] = $data['saved_join_type']; # initialized with JOIN
             $data['saved_join_type'] = ($data['next_join_type'] ? $data['next_join_type'] : 'JOIN');
 
@@ -1158,10 +1150,15 @@ EOREGEX
             # there is an expression, we have to parse it
             if (substr(trim($data['table']), 0, 1) == '(') {
                 $data['expression'] = $this->removeParenthesisFromStart($data['table']);
-                $tmp = $this->split_sql($data['expression']);
-                $data['sub_tree'] = $this->process_from($tmp);
-
-                $res['expr_type'] = 'table_expression';
+                
+                if (preg_match("/^\\s*select/i", $data['expression'])) {
+                    $data['sub_tree'] = $this->parse($data['expression']);
+                    $res['expr_type'] = 'subquery';
+                } else {
+                    $tmp = $this->split_sql($data['expression']);
+                    $data['sub_tree'] = $this->process_from($tmp);
+                    $res['expr_type'] = 'table_expression';
+                }
             } else {
                 $res['expr_type'] = 'table';
                 $res['table'] = $data['table'];
