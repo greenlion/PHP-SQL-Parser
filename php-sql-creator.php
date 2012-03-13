@@ -268,6 +268,7 @@ if (!defined('HAVE_PHP_SQL_CREATOR')) {
                 $len = strlen($sql);
                 $sql .= $this->processFunction($v);
                 $sql .= $this->processConstant($v);
+                $sql .= $this->processColRef($v);
 
                 if ($len == strlen($sql)) {
                     $this->stop('function subtree', $k, $v, 'expr_type');
