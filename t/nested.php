@@ -15,15 +15,19 @@ $sql = 'SELECT *
 $parser->parse($sql);
 $p = $parser->parsed;
 
+print_r($p);
+echo serialize($p);
+
 $expected = getExpectedValue('nested1.serialized');
 eq_array($p, $expected, 'nested left joins');
-
-
 
 $sql = "SELECT * FROM t1 LEFT JOIN (t2, t3, t4)
                  ON (t2.a=t1.a AND t3.b=t1.b AND t4.c=t1.c)";
 $parser->parse($sql);
 $p = $parser->parsed;
+
+print_r($p);
+echo serialize($p);
 
 $expected = getExpectedValue('nested2.serialized');
 eq_array($p, $expected, 'left joins with multiple tables');
