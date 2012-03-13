@@ -4,7 +4,7 @@ require_once('php-sql-parser.php');
 $sql = 'SELECT 1';
 echo $sql . "\n";
 $start = microtime(true);
-$parser = new PHPSQLParser($sql);
+$parser = new PHPSQLParser($sql, true);
 
 print_r($parser->parsed);
 echo "parse time simplest query:" .( microtime(true) - $start) . "\n";
@@ -24,14 +24,14 @@ $sql = 'SELECT a,b,c
           from some_table an_alias
 	where d > 5;';
 echo $sql . "\n";
-print_r($parser->parse($sql));
+print_r($parser->parse($sql, true));
 
 $sql = 'SELECT a,b,c 
           from some_table an_alias
 	  join `another` as `another table` using(id)
 	where d > 5;';
 echo $sql . "\n";
-$parser = new PHPSQLParser($sql);
+$parser = new PHPSQLParser($sql, true);
 print_r($parser->parsed);
 
 $sql = 'SELECT a,b,c 
