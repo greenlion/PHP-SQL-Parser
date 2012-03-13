@@ -559,7 +559,7 @@ EOREGEX
                     break;
 
                 case 'INTO':
-                # prevent wrong handling of CACHE within LOAD INDEX INTO CACHE...
+                    # prevent wrong handling of CACHE within LOAD INDEX INTO CACHE...
                     if ($prev_category === 'LOAD') {
                         $out[$prev_category][] = $upper;
                         continue 2;
@@ -1154,8 +1154,15 @@ EOREGEX
 
             # we have a reg_expr, so we have to parse it
             if ($parseInfo['ref_expr'] !== false) {
-                $parseInfo['ref_expr'] = $this->process_expr_list(
-                        $this->split_sql($this->removeParenthesisFromStart($parseInfo['ref_expr'])));
+                $unparsed = $this->split_sql($this->removeParenthesisFromStart($parseInfo['ref_expr']));
+                
+                // here we can get a comma separated list
+                foreach ($unparsed as $k => $v) {
+                    if (trim($v) === ',') {
+                        $unparsed[$k] = "";
+                    }
+                }
+                $parseInfo['ref_expr'] = $this->process_expr_list($unparsed);
             }
 
             # there is an expression, we have to parse it
