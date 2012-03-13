@@ -109,8 +109,6 @@ class OracleSQLParser {
 
         // the base_expr starts with regex("\s+as\s+")
         // the AS will be replaced with two space characters to hold a stable position within $sql
-        //preg_replace("#\\s*AS\\s+#i", " ", $sql);
-
         for ($i = 0; $i < strlen($alias['base_expr']); $i++) {
             if (strtoupper($alias['base_expr'][$i]) !== "A") {
                 continue;
@@ -128,8 +126,8 @@ class OracleSQLParser {
             for ($i = 0; $i < strlen($needle) - strlen($replacement); $i++) {
                 $spaces .= " ";
             }
-            $sql = substr($sql, 0, $start + 1) . $replacement . $spaces
-                    . substr($sql, $start + 1 + strlen($needle));
+            $sql = substr($sql, 0, $start) . $replacement . $spaces
+                    . substr($sql, $start + strlen($needle));
         }
     }
 
@@ -151,6 +149,18 @@ class OracleSQLParser {
         }
     }
 
+    
+    private function handleRefClause(&$sql, &$parsed) {
+        if ($parsed === false) {
+            return;
+        }
+        foreach ($parsed as $k => $v) {
+            if ($v['expr_type'] === 'colref') {
+                $this->replaceKeyword($sql, $v['base_expr'], $v['position'], "uid", "diu");            
+            }
+        }
+    }
+    
     private function handleFrom(&$sql, &$parsed) {
         foreach ($parsed as $k => $v) {
 
@@ -158,7 +168,8 @@ class OracleSQLParser {
             $this->replaceLongTableName($sql, $v['position'], $v['table'],
                     'surveys_languagesettings', 'surveys_lngsettings');
 
-            // 'ref_clause' look for uid !!!
+            $this->handleRefClause($sql, $v['ref_clause']);
+            
             // subquery?
         }
 
@@ -192,7 +203,7 @@ class OracleSQLParser {
         foreach ($parsed as $k => $v) {
             if ($v['type'] == 'expression') {
                 $this->replaceKeyword($sql, $v['base_expr'], $v['position'], "uid", "diu");
-                $this->replaceLOBColumn($sql, $v['base_expr'], $v['position']);
+                //$this->replaceLOBColumn($sql, $v['base_expr'], $v['position']);
             }
         }
     }
@@ -341,6 +352,7 @@ class OracleSQLParser {
         $parsed = $parser->parsed;
 
         echo "before: " . $this->preprint($sql, true) . "\n";
+        print_r($parsed);
         $this->processSQLStatement($sql, $parsed);
         echo "after: " . $this->preprint($sql, true) . "\n";
 
@@ -355,8 +367,8 @@ class OracleSQLParser {
 }
 
 $parser = new OracleSQLParser(false);
-$parser->process(" SELECT a.*, surveyls_title, surveyls_description, surveyls_welcometext, surveyls_url  FROM SURVEYS AS a INNER JOIN SURVEYS_LANGUAGESETTINGS on (surveyls_survey_id=a.sid and surveyls_language=a.language)  order by active DESC, surveyls_title");
-
+$parser->process("SELECT a.*, c.*, u.users_name FROM SURVEYS as a  INNER JOIN SURVEYS_LANGUAGESETTINGS as c ON ( surveyls_survey_id = a.sid AND surveyls_language = a.language ) AND surveyls_survey_id=a.sid and surveyls_language=a.language  INNER JOIN USERS as u ON (u.uid=a.owner_id)  ORDER BY surveyls_title");
+//$parser->process(" SELECT a.*, surveyls_title, surveyls_description, surveyls_welcometext, surveyls_url  FROM SURVEYS AS a INNER JOIN SURVEYS_LANGUAGESETTINGS on (surveyls_survey_id=a.sid and surveyls_language=a.language)  order by active DESC, surveyls_title");
 //$parser->process(" INSERT INTO settings_global VALUES ('DBVersion', '146')");
 //$parser->process("CREATE TABLE answers ( qid number(11) default '0' NOT NULL, code varchar2(5) default '' NOT NULL, answer CLOB NOT NULL, assessment_value number(11) default '0' NOT NULL, sortorder number(11) NOT NULL, language varchar2(20) default 'en', scale_id number(3) default '0' NOT NULL, PRIMARY KEY (qid,code,language,scale_id) )");
 //$parser->process("USE DATABASE `sdbprod`");
