@@ -61,3 +61,8 @@ $created = process($sql);
 $expected = getExpectedValue('create9.sql', false);
 ok($created === $expected, 'multiple records within INSERT (2)');
 
+$sql = "SELECT * FROM `table` `t` WHERE ( ( UNIX_TIMESTAMP() + 3600 ) > `t`.`expires` ) ";
+$created = process($sql);
+$expected = getExpectedValue('create10.sql', false);
+ok($created === $expected, 'expressions with function within WHERE clause');
+
