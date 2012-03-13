@@ -1,9 +1,9 @@
 <?php
 
-require_once('../php-sql-parser.php');
-require_once('../test-more.php');
-$parser = new PHPSQLParser();
+require_once(dirname(__FILE__) . '/../php-sql-parser.php');
+require_once(dirname(__FILE__) . '/../test-more.php');
 
+$parser = new PHPSQLParser();
 
 $sql = 'SELECT a.field1, b.field1, c.field1
   FROM tablea a 
@@ -13,10 +13,9 @@ $sql = 'SELECT a.field1, b.field1, c.field1
 $parser->parse($sql);
 $p = $parser->parsed;
 
-$result = serialize($p);
-#file_put_contents('../r/left1.serialized',$result);
-$good = file_get_contents('../r/left1.serialized');
-ok($result == $good);
+$expected = getExpected('left1.serialized');
+eq_array($p, $expected, 'left join with alias');
+
 
 $sql = 'SELECT a.field1, b.field1, c.field1
   FROM tablea a 
@@ -29,10 +28,7 @@ $sql = 'SELECT a.field1, b.field1, c.field1
 
 $parser->parse($sql);
 $p = $parser->parsed;
-#print_r($p);
-#file_put_contents('../r/left2.serialized',$result);
-$good = file_get_contents('../r/left2.serialized');
-ok($result == $good);
-
-
-
+print_r($p);
+echo serialize($p);
+$expected = getExpected('left2.serialized');
+eq_array($p, $expected, 'right and left outer joins');
