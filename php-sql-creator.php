@@ -224,7 +224,15 @@ if (!defined('HAVE_PHP_SQL_CREATOR')) {
 
             $sql = "";
             foreach ($parsed as $k => $v) {
-                $sql .= $v['base_expr'] . " ";
+                $len = strlen($sql);
+                $sql .= $this->processColRef($v);
+                $sql .= $this->processOperator($v);
+                
+                if ($len == strlen($sql)) {
+                    die("unknown expr_type in expression ref_clause[" . $k . "] " . $v['expr_type']);
+                }
+                
+                $sql .= " ";
             }
             return "(" . $sql . ")";
         }
