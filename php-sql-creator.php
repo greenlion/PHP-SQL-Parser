@@ -29,8 +29,6 @@
  * DAMAGE.
  */
 
-error_reporting(E_ALL);
-
 if (!defined('HAVE_PHP_SQL_CREATOR')) {
 
     class PHPSQLCreator {
@@ -118,6 +116,7 @@ if (!defined('HAVE_PHP_SQL_CREATOR')) {
                 $sql .= $this->processColRef($v);
                 $sql .= $this->processSelectExpression($v);
                 $sql .= $this->processFunction($v);
+                $sql .= $this->processConstant($v);
                 
                 if ($len == strlen($sql)) {
                     $this->stop('SELECT', $k, $v, 'expr_type');
@@ -163,9 +162,7 @@ if (!defined('HAVE_PHP_SQL_CREATOR')) {
         }
 
         protected function processGROUP($parsed) {
-            $sql = "GROUP BY ";
-            // TODO: implement this
-            return $sql;
+            die("GROUP BY not implemented yet");
         }
 
         protected function processVALUES($parsed) {
@@ -237,13 +234,14 @@ if (!defined('HAVE_PHP_SQL_CREATOR')) {
                 $sql .= $this->processSubquery($v);
                 $sql .= $this->processInList($v);
 
+                # expressions, functions?
+                                
                 if (strlen($sql) == $len) {
                     $this->stop('FROM', $k, $v, 'expr_type');
                 }
 
                 $sql .= " ";
             }
-            # expressions, functions?
             return $sql;
         }
 
