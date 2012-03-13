@@ -117,7 +117,8 @@ if (!defined('HAVE_PHP_SQL_CREATOR')) {
                 $len = strlen($sql);
                 $sql .= $this->processColRef($v);
                 $sql .= $this->processSelectExpression($v);
-
+                $sql .= $this->processFunction($v);
+                
                 if ($len == strlen($sql)) {
                     $this->stop('SELECT', $k, $v, 'expr_type');
                 }
@@ -315,7 +316,7 @@ if (!defined('HAVE_PHP_SQL_CREATOR')) {
 
                 $sql .= " ";
             }
-            return "(" . $sql . ")";
+            return "(" . substr($sql, 0, -1) . ")";
         }
 
         protected function processAlias($parsed) {
@@ -366,7 +367,7 @@ if (!defined('HAVE_PHP_SQL_CREATOR')) {
             $sql .= $this->processAlias($parsed['alias']);
 
             if ($index !== 0) {
-                $sql = " " . $this->processJoin($parsed['join_type']) . " " . $sql;
+                $sql = $this->processJoin($parsed['join_type']) . " " . $sql;
                 $sql .= $this->processRefType($parsed['ref_type']);
                 $sql .= $this->processRefClause($parsed['ref_clause']);
             }
@@ -396,7 +397,10 @@ if (!defined('HAVE_PHP_SQL_CREATOR')) {
 
             $sql = $this->processSelectStatement($parsed['sub_tree']);
             $sql = "(" . $sql . ")";
-            $sql .= $this->processAlias($parsed['alias']);
+            
+            if (isset($parsed['alias'])) {
+                $sql .= $this->processAlias($parsed['alias']);  
+            }
 
             if ($index !== 0) {
                 $sql = $this->processJoin($parsed['join_type']) . " " . $sql;
