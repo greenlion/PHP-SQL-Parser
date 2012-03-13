@@ -383,6 +383,9 @@ if (!defined('HAVE_PHP_SQL_CREATOR')) {
             if ($parsed === 'LEFT') {
                 return "LEFT JOIN";
             }
+            if ($parsed === 'RIGHT') {
+                return "RIGHT JOIN";
+            }
             // TODO: add more
             die("unknown join type " . $parsed);
         }
@@ -397,6 +400,7 @@ if (!defined('HAVE_PHP_SQL_CREATOR')) {
             if ($parsed === 'USING') {
                 return " USING ";
             }
+            // TODO: add more
             die("unknown ref type " . $parsed);
         }
 
