@@ -15,7 +15,7 @@ if (!defined('HAVE_PHP_SQL_PARSER')) {
         }
 
         public function parse($sql, $calcPositions = false) {
-            $original = $sql;
+            $original = $this->replaceSpecialCharacters($sql);
 
             #lex the SQL statement
             $inputArray = $this->split_sql(trim($original));
@@ -173,7 +173,7 @@ if (!defined('HAVE_PHP_SQL_PARSER')) {
 
         private function calculatePositionsWithinSQL($sql, $parsed) {
             $charPos = 0;
-            $this->lookForBaseExpression($this->replaceSpecialCharacters($sql), $charPos, $parsed);
+            $this->lookForBaseExpression($sql, $charPos, $parsed);
             return $parsed;
         }
 
@@ -185,22 +185,31 @@ if (!defined('HAVE_PHP_SQL_PARSER')) {
 
             foreach ($parsed as $key => $value) {
                 if ($key === 'base_expr') {
-                    $charPos = strpos($sql, $parsed[$key], $charPos);
-                    $parsed['position'] = $charPos;
-                    $charPos += strlen($parsed[$key]);
+
+                    $pattern = "/" . str_replace(" ", "\\s+", $value) . "/";
+                    $subject = substr($sql, $charPos);
+                    $search = preg_split($pattern, $subject, -1, PREG_SPLIT_OFFSET_CAPTURE);
+
+                    $before = $search[0];
+                    $after = $search[1];
+
+                    $parsed['position'] = $charPos + $before[1] + strlen($before[0]);
+                    $charPos += $after[1];
+
                 } else {
                     if (!is_numeric($key)) {
-                        if (in_array($key, array('alias','UNION','UNION ALL','columns'), true)) {
+                        if (in_array($key, array('alias', 'UNION', 'UNION ALL', 'columns'), true)) {
                             $oldPos = $charPos;
-                        }
-                        # SELECT, WHERE, INSERT etc.
-                        if (is_array($value) && (in_array($key, $this->reserved))) {
-                            $charPos = stripos($sql, $key, $charPos);
-                            $charPos += strlen($key);
+                        } else {
+                            # SELECT, WHERE, INSERT etc.
+                            if (is_array($value) && (in_array($key, $this->reserved))) {
+                                $charPos = stripos($sql, $key, $charPos);
+                                $charPos += strlen($key);
+                            }
                         }
                     }
                     $this->lookForBaseExpression($sql, $charPos, $parsed[$key]);
-                    if ($oldPos) {
+                    if ($oldPos !== false) {
                         $charPos = $oldPos; # backtracking
                         $oldPos = false;
                     }
@@ -258,8 +267,6 @@ if (!defined('HAVE_PHP_SQL_PARSER')) {
                 print_r($sql);
                 exit;
             }
-
-            $sql = $this->replaceSpecialCharacters($sql);
 
             # added some code from issue 11 comment 3
             $regex = <<<EOREGEX
@@ -480,9 +487,9 @@ EOREGEX
                     }
 
                     $token_category = $upper;
-//                    if ($upper !== 'FROM' || $token_category !== 'FROM') {
-//                        continue 2; // switch and the enclosed for construct
-//                    }
+                    //                    if ($upper !== 'FROM' || $token_category !== 'FROM') {
+                    //                        continue 2; // switch and the enclosed for construct
+                    //                    }
                     break;
 
                 /* These tokens get their own section, but have no subclauses.
@@ -1124,7 +1131,7 @@ EOREGEX
                     } else {
 
                         // TODO: check this, it is now an array!!
-                        
+
                         #search to see if the expression matches an alias
                         foreach ($select as $clause) {
                             if (!$clause['alias']) {
@@ -1511,14 +1518,15 @@ EOREGEX
                     $cols[] = array('expr_type' => 'colref', 'base_expr' => trim($v));
                 }
             }
-            
+
             unset($tokens['INTO']);
-            $tokens[$token_category] = array('table' => $table, 'columns' => $cols, 'base_expr' => $table);
+            $tokens[$token_category] = array('table' => $table, 'columns' => $cols,
+                                             'base_expr' => $table);
             return $tokens;
         }
 
         private function process_values($tokens) {
-            
+
             $unparsed = "";
             foreach ($tokens['VALUES'] as $k => $v) {
                 if (trim($v) === "") {
@@ -1526,19 +1534,19 @@ EOREGEX
                 }
                 $unparsed .= $v;
             }
-            
+
             $unparsed = $this->removeParenthesisFromStart($unparsed);
             $values = $this->split_sql($unparsed);
-            
+
             foreach ($values as $k => $v) {
                 if (trim($v) === ",") {
                     $values[$k] = "";
                 }
             }
-            $tokens['VALUES'] = $this->process_expr_list($values); 
-            return $tokens; 
+            $tokens['VALUES'] = $this->process_expr_list($values);
+            return $tokens;
         }
-        
+
         private function load_reserved_words() {
 
             $this->functions = array('abs', 'acos', 'adddate', 'addtime', 'aes_encrypt',
