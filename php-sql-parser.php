@@ -379,7 +379,7 @@ if (!defined('HAVE_PHP_SQL_PARSER')) {
 
          # added some code from issue 11 comment 3
          $regex = <<<EOREGEX
-/(`(?:[^`]|``)`|[@A-Za-z0-9_.`-]+(?:\(\s*\)){0,1})
+/(`(?:[^`]|``)`|[@A-Za-z0-9_.`-]+)
 |(\+|-|\*|\/|!=|>=|<=|<>|>|<|&&|\|\||=|\^|\(|\))
 |('(?:[^']|'')*'+)
 |("(?:[^"]|"")*"+)
@@ -1279,7 +1279,7 @@ EOREGEX
                   $tmptokens = $this->split_sql($this->removeParenthesisFromStart($token));
 
                   foreach ($tmptokens as $k => $v) {
-                     if (trim($v) == ',') {
+                     if (trim($v) == ',') {  # TODO: check tabs or newlines next to the comma
                         unset($tmptokens[$k]);
                      }
                   }
