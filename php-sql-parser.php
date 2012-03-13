@@ -254,12 +254,12 @@ if (!defined('HAVE_PHP_SQL_PARSER')) {
          
         private function lookForBaseExpression($sql, &$charPos, &$parsed, $key, &$backtracking) {
             if (!is_numeric($key)) {
-                if (in_array($key, array('UNION', 'UNION ALL', 'columns'), true)
+                if (in_array($key, array('UNION', 'UNION ALL'), true)
                         || ($key === 'expr_type' && $parsed === 'expression')
                         || ($key === 'expr_type' && $parsed === 'subquery') || ($key === 'alias' && $parsed !== false)) {
                     $backtracking[] = $charPos; # on the next base_expr we set the pointer back to this value
 
-                } elseif (($key === 'ref_clause' && $parsed !== false)) {
+                } elseif (($key === 'ref_clause' || $key === 'columns') && $parsed !== false) {
                     $backtracking[] = $charPos;
                     for ($i = 1; $i < count($parsed); $i++) {
                         $backtracking[] = false; # backtracking only after n base_expr!  
