@@ -806,6 +806,9 @@ EOREGEX
             if (!empty($out['VALUES'])) {
                 $out = $this->process_values($out);
             }
+            if (!empty($out['INTO'])) {
+                $out = $this->process_into($out);
+            }
             return $out;
         }
 
@@ -1659,6 +1662,21 @@ EOREGEX
             }
 
             $tokens['VALUES'] = array_values($values);
+            return $tokens;
+        }
+        
+        /**
+         * TODO: This is a dummy function, we cannot parse INTO as part of SELECT
+         * at the moment
+         */
+        private function process_into($tokens) {
+            $unparsed = $tokens['INTO'];
+            foreach ($unparsed as $k => $token) {
+                if ((trim($token) === "") || (trim($token) === ",")) {
+                    unset($unparsed[$k]);
+                }
+            }
+            $tokens['INTO'] = array_values($unparsed);            
             return $tokens;
         }
 
