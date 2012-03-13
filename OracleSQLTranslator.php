@@ -31,12 +31,14 @@
  */
 require_once('php-sql-parser.php');
 require_once('php-sql-creator.php');
-require_once($rootdir . '/classes/adodb/adodb.inc.php');
+//include_once($rootdir . '/classes/adodb/adodb.inc.php');
+
+$_ENV['DEBUG'] = 1;
 
 class OracleSQLTranslator extends PHPSQLCreator {
 
     private $con; # this is the database connection from LimeSurvey
-    private $preventColumnRefs = false;
+    private $preventColumnRefs = array();
     private $allTables = array();
 
     public function __construct($con) {
@@ -45,15 +47,28 @@ class OracleSQLTranslator extends PHPSQLCreator {
         $this->initGlobalVariables();
     }
 
-    private function preprint($s, $return = false) {
+    private function initGlobalVariables() {
+        global $preventColumnRefs;
+        global $allTables;
+
+        $preventColumnRefs = false;
+        $allTables = array();
+    }
+
+    public static function dbgprint($txt) {
+        if (isset($_ENV['DEBUG'])) {
+            print $txt;
+        }
+    }
+
+    public static function preprint($s, $return = false) {
         $x = "<pre>";
         $x .= print_r($s, 1);
         $x .= "</pre>";
-        if ($return)
+        if ($return) {
             return $x;
-        else if (isset($_ENV['DEBUG'])) {
-            print $x;
         }
+        self::dbgprint($x . "<br/>\n");
     }
 
     protected function processAlias($parsed) {
@@ -66,20 +81,20 @@ class OracleSQLTranslator extends PHPSQLCreator {
     }
 
     protected function processDELETE($parsed) {
-        if (count($parsed('TABLES')) > 1) {
+        if (count($parsed['TABLES']) > 1) {
             die("cannot translate delete statement into Oracle dialect, multiple tables are not allowed.");
         }
         return "DELETE";
     }
 
-    private function getColumnNameFor($column) {
+    public static function getColumnNameFor($column) {
         if (strtolower($column) === 'uid') {
             $column = "uid_";
         }
         return $column;
     }
 
-    private function getShortTableNameFor($table) {
+    public static function getShortTableNameFor($table) {
         if (strtolower($table) === 'surveys_languagesettings') {
             $table = 'surveys_lngsettings';
         }
@@ -153,7 +168,7 @@ class OracleSQLTranslator extends PHPSQLCreator {
         return ($res >= 1);
     }
 
-    protected function processExpression($parsed) {
+    protected function processOrderByExpression($parsed) {
         if ($parsed['type'] !== 'expression') {
             return "";
         }
@@ -188,7 +203,11 @@ class OracleSQLTranslator extends PHPSQLCreator {
         $table = $this->getShortTableNameFor($table);
 
         # if we have * as colref, we cannot use other columns
-        $preventColumnRefs = $preventColumnRefs || (($table === "") && ($col === "*"));
+        if (($table === "") && ($col === "*")) {
+            array_pop($preventColumnRefs);
+            $preventColumnRefs[] = true; # we add this column-ref later
+            return " ";
+        }
 
         $alias = "";
         if (isset($parsed['alias'])) {
@@ -200,28 +219,62 @@ class OracleSQLTranslator extends PHPSQLCreator {
 
     protected function processSELECT($parsed) {
         global $preventColumnRefs;
+        $preventColumnRefs[] = false;
+        return parent::processSELECT($parsed);
+    }
 
-        $sql = parent::processSELECT($parsed);
-        if ($preventColumnRefs) {
-            $sql = "SELECT *";
-            $preventColumnRefs = false;
+    protected function processSelectStatement($parsed) {
+        global $preventColumnRefs;
+
+        $sql = $this->processSELECT($parsed['SELECT']);
+        $from = $this->processFROM($parsed['FROM']);
+
+        if (array_pop($preventColumnRefs)) {
+            # FIXME: add table/table-expression alias.* to $sql    
+        }
+
+        $sql .= $from;
+        if (isset($parsed['WHERE'])) {
+            $sql .= " " . $this->processWHERE($parsed['WHERE']);
+        }
+        if (isset($parsed['GROUP'])) {
+            $sql .= " " . $this->processGROUP($parsed['GROUP']);
+        }
+        if (isset($parsed['ORDER'])) {
+            $sql .= " " . $this->processORDER($parsed['ORDER']);
         }
         return $sql;
     }
 
-    private function initGlobalVariables() {
-        global $preventColumnRefs;
-        global $allTables;
+    public function create($parsed) {
+        $k = key($parsed);
+        switch ($k) {
+        case "USE":
+            $this->created = "";
+            break;
 
-        $preventColumnRefs = false;
-        $allTables = array();
+        default:
+            $this->created = parent::create($parsed);
+            break;
+        }
+        return $this->created;
     }
-
+    
     public function process($sql) {
-        $this->initGlobalVariables();
+        self::dbgprint($sql . "<br/>");
 
+        $this->initGlobalVariables();
         $parser = new PHPSQLParser($sql);
-        $this->preprint($parser->parsed);
-        return $this->create($parser->parsed);
+        self::preprint($parser->parsed);
+
+        $sql = $this->create($parser->parsed);
+        self::dbgprint($sql . "<br/>");
+
+        return $sql;
     }
 }
+
+$sql = "SELECT *, (SELECT count(1) FROM CONDITIONS c WHERE questions.qid = c.qid) AS hasconditions, (SELECT count(1) FROM CONDITIONS c WHERE questions.qid = c.cqid) AS usedinconditions FROM QUESTIONS as questions, GROUPS as groups WHERE questions.gid=groups.gid AND questions.sid=1295 AND questions.language='en' AND questions.parent_qid=0 AND groups.language='en' ORDER BY group_order, question_order";
+$translator = new OracleSQLTranslator(false);
+$translator->process($sql);
+echo $translator->created;
