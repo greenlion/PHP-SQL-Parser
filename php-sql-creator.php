@@ -96,7 +96,7 @@ if (!defined('HAVE_PHP_SQL_CREATOR')) {
                 if ($len == strlen($sql)) {
                     die("unknown expr_type in FROM[" . $k . "] " . $v['expr_type']);
                 }
-                
+
                 $sql .= " ";
             }
             return "FROM " . $sql;
@@ -192,7 +192,7 @@ if (!defined('HAVE_PHP_SQL_CREATOR')) {
             if ($parsed['expr_type'] !== 'aggregate_function') {
                 return "";
             }
-            return $parsed['base_expr']; 
+            return $parsed['base_expr'];
             // TODO: should we remove the parenthesis from the argument
         }
 
@@ -255,6 +255,16 @@ if (!defined('HAVE_PHP_SQL_CREATOR')) {
             die("unknown join type " . $parsed);
         }
 
+        private function processRefType($parsed) {
+            if ($parsed === 'ON') {
+                return " ON ";
+            }
+            if ($parsed === 'USING') {
+                return " USING ";
+            }
+            die("unknown ref type " . $parsed);
+        }
+
         private function processTable($parsed, $index) {
             if ($parsed['expr_type'] !== 'table') {
                 return "";
@@ -265,31 +275,28 @@ if (!defined('HAVE_PHP_SQL_CREATOR')) {
 
             if ($index !== 0) {
                 $sql = $this->processJoin($parsed['join_type']) . " " . $sql;
-                if ($parsed['ref_type'] === 'ON') {
-                    $sql .= " ON ";
-                }
+                $sql .= $this->processRefType($parsed['ref_type']);
                 $sql .= $this->processRefClause($parsed['ref_clause']);
             }
             return $sql;
         }
 
         private function processTableExpression($parsed, $index) {
-        if ($parsed['expr_type'] !== 'table-expression') {
+            if ($parsed['expr_type'] !== 'table-expression') {
                 return "";
             }
             $sql = substr($this->processFROM($parsed['sub_tree']), 5); // remove FROM keyword
+			$sql = "(" . $sql . ")";
             $sql .= $this->processAlias($parsed['alias']);
-
+			
             if ($index !== 0) {
                 $sql = $this->processJoin($parsed['join_type']) . " " . $sql;
-                if ($parsed['ref_type'] === 'ON') {
-                    $sql .= " ON ";
-                }
+                $sql .= $this->processRefType($parsed['ref_type']);
                 $sql .= $this->processRefClause($parsed['ref_clause']);
             }
-            return "(" . $sql . ")";
+            return $sql;
         }
-        
+
         private function processOperator($parsed) {
             if ($parsed['expr_type'] !== 'operator') {
                 return "";
