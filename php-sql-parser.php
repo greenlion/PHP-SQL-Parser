@@ -30,8 +30,6 @@
  * DAMAGE.
  */
 
-error_reporting(E_ALL);
-
 if (!defined('HAVE_PHP_SQL_PARSER')) {
 
     class PHPSQLParser {
