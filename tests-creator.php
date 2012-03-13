@@ -6,7 +6,7 @@ require_once(dirname(__FILE__) . '/test-more.php');
 
 function process($sql) {
     $parser = new PHPSQLParser($sql);
-    echo print_r($parser->parsed, true)."\n";
+    //echo print_r($parser->parsed, true)."\n";
     $creator = new PHPSQLCreator($parser->parsed);
     return $creator->created;
 }
@@ -37,4 +37,5 @@ ok($created === $expected, 'left joins and table-expression');
 $sql = "SELECT * FROM t1 LEFT JOIN (t2, t3, t4)
                  ON (t2.a=t1.a AND t3.b=t1.b AND t4.c=t1.c)";
 $created = process($sql);
-echo $created;
+$expected = getExpectedValue('create5.sql', false);
+ok($created === $expected, 'table-expression on second position');

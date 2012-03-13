@@ -1163,7 +1163,7 @@ EOREGEX
 
                 $res['expr_type'] = 'table_expression';
             } else {
-                $res['expr-type'] = 'table';
+                $res['expr_type'] = 'table';
                 $res['table'] = $data['table'];
             }
 
