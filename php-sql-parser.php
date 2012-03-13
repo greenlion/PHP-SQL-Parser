@@ -1140,9 +1140,6 @@ EOREGEX
                   if (is_numeric(trim($expression))) {
                      $type = 'pos';
                   } else {
-
-                     // TODO: check the aliass, it is now an array!!
-
                      #search to see if the expression matches an alias
                      foreach ($select as $clause) {
                         if (!$clause['alias']) {
