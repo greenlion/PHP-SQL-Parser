@@ -3,7 +3,7 @@
 require_once('php-sql-parser.php');
 require_once('php-sql-creator.php');
 
-class OracleSQLParser extends PHPSQLCreator {
+class OracleSQLTranslator extends PHPSQLCreator {
 
     var $con;
     var $preventColumnRefs = false;
@@ -131,6 +131,12 @@ class OracleSQLParser extends PHPSQLCreator {
         return $sql;
     }
 }
+
+/*
+ * $sql = substr($sql, 0, $start) . "cast(substr(" . $columnInfo
+                            . ",1,200) as varchar2(200))"
+                            . substr($sql, $start + strlen($columnInfo));
+ */
 
 $parser = new OracleSQLParser(false);
 $parser->process(
