@@ -363,18 +363,19 @@ if (!defined('HAVE_PHP_SQL_PARSER')) {
             # added some code from issue 11 comment 3
             $regex = <<<EOREGEX
 /(`(?:[^`]|``)`|[@A-Za-z0-9_.`-]+(?:\(\s*\)){0,1})
-|(\+|-|\*|\/|!=|>=|<=|<>|>|<|&&|\|\||=|\^)
-|(\(.*?\))   # Match FUNCTION(...) OR BAREWORDS
-|('(?:[^']+|'')*'+)
-|("(?:[^"]+|"")*"+)
+|(\+|-|\*|\/|!=|>=|<=|<>|>|<|&&|\|\||=|\^|\(|\))
+|('(?:[^']|'')*'+)
+|("(?:[^"]|"")*"+)
 |([^ ,]+)
 /ix
 EOREGEX
             ;
+            
             $tokens = preg_split($regex, $sql, -1, PREG_SPLIT_NO_EMPTY | PREG_SPLIT_DELIM_CAPTURE);
 
-            $tokens = $this->balanceBackticks($tokens, '`');
-            $tokens = $this->balanceBackticks($tokens, '\'');
+            # this should concat  strings and function parameter lists between parenthesis
+            #$tokens = $this->balanceBackticks($tokens, '`');
+            #$tokens = $this->balanceBackticks($tokens, '\'');
             $tokens = $this->balanceParenthesis($tokens);
 
             return $tokens;
@@ -989,7 +990,6 @@ EOREGEX
                 $alias['base_expr'] = trim($alias['base_expr']);
             }
 
-            $processed = false;
             $type = 'expression';
 
             # this is always done with $stripped, how we do it twice?
@@ -1000,7 +1000,8 @@ EOREGEX
             if (count($processed) == 1) {
                 if ($processed[0]['expr_type'] != 'subquery') {
                     $type = $processed[0]['expr_type'];
-                    $processed = false;
+                    $base_expr = $processed[0]['base_expr'];
+                    $processed = $processed[0]['sub_tree']; // it can be FALSE
                 }
             }
 
@@ -1341,7 +1342,7 @@ EOREGEX
 
                     # if we have a colref followed by a parenthesis pair,
                     # it isn't a colref, it is a user-function
-                    if ($prev_token_type === 'colref') {
+                    if (in_array($prev_token_type, array('colref', 'function', 'aggregate_function'))) {
                         $tmptokens = $this->split_sql($this->removeParenthesisFromStart($token));
 
                         foreach ($tmptokens as $k => $v) {
