@@ -10,6 +10,7 @@ require_once(dirname(__FILE__) . '/t/subselect.php');
 require_once(dirname(__FILE__) . '/t/issue12.php');
 require_once(dirname(__FILE__) . '/t/issue15.php');
 require_once(dirname(__FILE__) . '/t/issue21.php');
+require_once(dirname(__FILE__) . '/t/issue25.php');
 require_once(dirname(__FILE__) . '/t/aliases.php');
 require_once(dirname(__FILE__) . '/t/backtick.php');
 require_once(dirname(__FILE__) . '/t/from.php');
