@@ -56,4 +56,8 @@ $created = process($sql);
 $expected = getExpectedValue('create8.sql', false);
 ok($created === $expected, 'a simple INSERT statement');
 
+$sql = "INSERT INTO test (`name`, `test`) VALUES ('\'Superman\'', ''), ('\'sdfsd\'', '')";
+$created = process($sql);
+$expected = getExpectedValue('create9.sql', false);
+ok($created === $expected, 'multiple records within INSERT (2)');
 
