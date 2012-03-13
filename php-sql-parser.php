@@ -223,6 +223,8 @@ if (!defined('HAVE_PHP_SQL_PARSER')) {
             foreach ($parsed as $key => $value) {
                 if ($key === 'base_expr') {
 
+                    #if the value is an operator, we need another regex-pattern as the one below
+                    #dawn!                    
                     $pattern = "/" . str_replace(" ", "\\s+", "(^|\\s|\\(|,|=|\||<|>|&|\+|-|\*|\/)" . preg_quote($value) . "(\\)|,|>|<|\||!|=|\+|\*|-|\/|&|;|\\s|$)")
                             . "/";
                     $subject = substr($sql, $charPos);
@@ -280,7 +282,7 @@ if (!defined('HAVE_PHP_SQL_PARSER')) {
             # within the original string
 
             # issue 21: replace tabs within the query string
-            # TODO: this removes special characters also from inside of Strings
+            # TODO: this removes special characters also from inside of Strings (is that a problem?)
             return str_replace(array('\\\'', '\\"', "\r\n", "\n", "\t", "()"), array("''", '""', "  ", " ", " ", "  "),
                     $sql);
         }
@@ -1120,8 +1122,8 @@ EOREGEX
                         $type = 'pos';
                     } else {
 
-                        // TODO: check this, it is now an array!!
-
+                        // TODO: check the aliass, it is now an array!!
+                        
                         #search to see if the expression matches an alias
                         foreach ($select as $clause) {
                             if (!$clause['alias']) {
@@ -1451,8 +1453,8 @@ EOREGEX
 
             if (!is_array($processed)) {
                 # fixed issue 12.1
-                # it seems that we reach that point it the $tokens is empty
-                $this->preprint($processed); # why we do that?
+                # it seems that we will reach that point if the $tokens is empty
+                $this->preprint($processed); # TODO: why we do that?
                 $processed = false;
             }
 
