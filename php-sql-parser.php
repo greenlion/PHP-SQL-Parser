@@ -1309,6 +1309,7 @@ EOREGEX
             $expr_type = false;
             $type = "";
             $prev_token = "";
+            $prev_token_type = "";
             $skip_next = false;
             $sub_expr = "";
 
@@ -1339,6 +1340,27 @@ EOREGEX
 
                     /* is it an inlist */
                 } elseif ($upper[0] == '(' && substr($upper, -1) == ')') {
+                    
+                    # if we have a colref followed by a parenthesis pair,
+                    # it isn't a colref, it is a user-function
+                    if ($prev_token_type === 'colref') {
+                        $tmptokens = $this->split_sql($this->removeParenthesisFromStart($token));
+
+                        foreach ($tmptokens as $k => $v) {
+                            if ($v == ',') {
+                                unset($tmptokens[$k]);
+                            }
+                        }
+                        $processed = $this->process_expr_list($tmptokens);
+                        
+                        $prev_token = "";            
+                        $prev_token_type = "";
+                        
+                        $last = array_pop($expr);
+                        $token = $last['base_expr'];
+                        $type = 'function';
+                    }
+                    
                     if ($prev_token == 'IN') {
                         $type = "in-list";
                         $processed = $this->split_sql($this->removeParenthesisFromStart($token));
@@ -1351,8 +1373,10 @@ EOREGEX
                         $processed = $list;
                         unset($list);
                         $prev_token = "";
-
-                    } elseif ($prev_token == 'AGAINST') {
+                        $prev_token_type = "";
+                    } 
+                    
+                    if ($prev_token == 'AGAINST') {
                         $type = "match-arguments";
                         $list = $this->split_sql($this->removeParenthesisFromStart($token));
                         if (count($list) > 1) {
@@ -1362,6 +1386,7 @@ EOREGEX
                             $processed = $list[0];
                         }
                         $prev_token = "";
+                        $prev_token_type = "";
                     }
 
                     /* it is either an operator, a colref or a constant */
@@ -1459,8 +1484,9 @@ EOREGEX
                         $processed = false;
                     }
                 }
+                
                 /* is a reserved word? */
-                if (($type != 'operator' && $type != 'in-list' && $type != 'sub_expr')
+                if (($type != 'operator' && $type != 'in-list' && $type != 'sub_expr' && $type != 'function')
                         && in_array($upper, $this->reserved)) {
                     $token = $upper;
                     if (!in_array($upper, $this->functions)) {
@@ -1517,13 +1543,18 @@ EOREGEX
 
                 }
 
+                // TODO: here we loose the parameters of the reserved keywords (like aggregate functions)?
                 $sub_expr = "";
 
                 $expr[] = array('expr_type' => $type, 'base_expr' => $token, 'sub_tree' => $processed);
+                
                 $prev_token = $upper;
+                $prev_token_type = $type;
+                
                 $expr_type = "";
                 $type = "";
-            }
+            } // end of for-loop
+
             if ($sub_expr !== "") {
                 $processed['sub_tree'] = $this->process_expr_list(
                         $this->split_sql($this->removeParenthesisFromStart($sub_expr)));
