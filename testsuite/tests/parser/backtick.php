@@ -1,6 +1,6 @@
 <?php
-require_once(dirname(__FILE__) . '/../../php-sql-parser.php');
-require_once(dirname(__FILE__) . '/../test-more.php');
+require_once(dirname(__FILE__) . '/../../../php-sql-parser.php');
+require_once(dirname(__FILE__) . '/../../test-more.php');
 
 $parser = new PHPSQLParser();
 $sql = 'SELECT c1.`some_column` or `c1`.`another_column` or c1.`some column` as `an alias`
