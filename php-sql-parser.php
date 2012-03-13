@@ -8,7 +8,6 @@ if(!defined('HAVE_PHP_SQL_PARSER')) {
 		var $functions = array();
 
 		function __construct($sql = false, $calcPositions = false) {
-			#LOAD THE LIST OF RESERVED WORDS
 			$this->load_reserved_words();
 			if($sql) {
 				$this->parse($sql, $calcPositions);
@@ -117,7 +116,7 @@ if(!defined('HAVE_PHP_SQL_PARSER')) {
 								continue;
 							}
 							if(preg_match('/^\\(\\s*select\\s*/i', $tok)) {
-								$queries[$union_type][$i] = $this->parse(substr($tok,1,-1));
+								$queries[$union_type][$i] = $this->parse(removeParenthesisFromStart($tok));
 								break;
 							} else {
 								$queries[$union_type][$i] = $this->process_sql($queries[$union_type][$i]);
@@ -279,7 +278,6 @@ EOREGEX
 					$n = $i;
 					while($needed > 0 && $n <$token_count-1) {
 						++$n;
-						#echo "LOOKING FORWARD TO $n [ " . $tokens[$n] . "]\n";
 						$token2 = $tokens[$n];
 						$info2 = $this->count_paren($token2);
 						$closes = count($info2['close']);
@@ -289,7 +287,6 @@ EOREGEX
 							$reset = true;
 							$info2 = $this->count_paren($tokens[$i]);
 							$needed = abs($info2['balanced']);
-							#	echo "CLOSES LESS THAN NEEDED (still need $needed)\n";
 						} else {
 							/*get the string pos of the last close paren we need*/
 							$pos = $info2['close'][count($info2['close'])-1];
@@ -300,7 +297,6 @@ EOREGEX
 								$str1 = substr($tokens[$n],0,$pos) . ')';
 								$str2 = substr($tokens[$n],$pos+1);
 							}
-							#echo "CLOSES FOUND AT $n, offset:$pos  [$str1] [$str2]\n";
 							if(strlen($str2) > 0) {
 								$tokens[$n] = $str2;
 							} else {
@@ -339,7 +335,6 @@ EOREGEX
 					$n = $i;
 					while($needed && $n < $token_count-1) {
 						$reset=true;
-						#echo "BACKTICK COUNT[$i]: $info old: {$tokens[$i]}, new: ($token)\n";
 						++$n;
 						$token .= $tokens[$n];
 						$tokens[$n] = "";
@@ -774,12 +769,7 @@ EOREGEX
 				$base_expr .= $tokens[$i];
 			}
 
-			$this->preprint("base_expr:\n".$this->preprint($base_expr, true));
-			$this->preprint("stripped before:\n".$this->preprint($stripped, true));
-
 			$stripped = $this->process_expr_list($stripped);
-
-			$this->preprint("stripped after:\n".$this->preprint($stripped, true));
 
 			# we remove the last token, if it is a colref,
 			# it can be an alias without an AS
@@ -789,11 +779,10 @@ EOREGEX
 				# check the token before the colref
 				$prev = array_pop($stripped);
 
-				if ($prev['expr_type'] == 'reserved' ||  // select colA * colB from test goes wrong with "operator", we use now "reserved"
+				if ($prev['expr_type'] == 'reserved' ||
 				$prev['expr_type'] == 'const' ||
 				$prev['expr_type'] == 'function' ||
 				$prev['expr_type'] == 'expression' ||
-				#$prev['expr_type'] == 'aggregate_function' ||
 				$prev['expr_type'] == 'subquery' ||
 				$prev['expr_type'] == 'colref') {
 
@@ -806,7 +795,6 @@ EOREGEX
 
 			if(!$alias) {
 				$base_expr=join("", $tokens);
-				//$alias = $base_expr;    #removed, we don't have an explicit alias
 			} else {
 				/* Properly escape the alias if it is not escaped */
 				if ($alias[0] != '`') {
@@ -1169,7 +1157,7 @@ EOREGEX
 				} elseif( $upper[0] == '(' && substr($upper,-1) == ')' ) {
 					if($prev_token == 'IN') {
 						$type = "in-list";
-						$processed = $this->split_sql(substr($token,1,-1));
+						$processed = $this->split_sql($this->removeParenthesisFromStart($token));
 						$list = array();
 						foreach($processed as $v) {
 							if($v == ',') continue;
@@ -1182,13 +1170,13 @@ EOREGEX
 					}
 					elseif($prev_token == 'AGAINST') {
 						$type = "match-arguments";
-						$list = $this->split_sql(substr($token,1,-1));
+						$list = $this->split_sql($this->removeParenthesisFromStart($token));
 						if(count($list) > 1){
 							$match_mode = implode('',array_slice($list,1));
 							$processed = array($list[0], $match_mode);
+						} else {
+							$processed = $list[0];
 						}
-						else
-						$processed = $list[0];
 						$prev_token = "";
 					}
 
@@ -1204,9 +1192,6 @@ EOREGEX
 						case '~':
 						case '|':
 						case '^':
-							//case 'CASE':	// removed AR, so we have the chance to set it as keyword
-							//case 'WHEN':
-							//case 'END':
 						case 'DIV':
 						case '/':
 						case '<=>':
@@ -1258,7 +1243,6 @@ EOREGEX
 									break;
 
 							}
-							#$processed = $token;
 							$processed = false;
 					}
 				}
@@ -1288,7 +1272,6 @@ EOREGEX
 								if(isset($tokens[$key+1]) && $tokens[$key+1] !== "") {
 									$sub_expr = $tokens[$key+1];
 								}
-								#$skip_next=true;
 								break;
 
 							default:
@@ -1298,7 +1281,6 @@ EOREGEX
 								} else {
 									$sub_expr="()";
 								}
-								#$skip_next=true;
 								break;
 						}
 					}
@@ -1306,7 +1288,7 @@ EOREGEX
 
 				if(!$type) {
 					if($upper[0] == '(') {
-						$local_expr = substr(trim($token),1,-1);
+						$local_expr = $this->removeParenthesisFromStart($token);
 					} else {
 						$local_expr = $token;
 					}
@@ -1321,7 +1303,6 @@ EOREGEX
 
 				}
 
-				//remove AR			$sub_expr=trim($sub_expr);
 				$sub_expr = "";
 
 				$expr[] = array( 'expr_type' => $type, 'base_expr' => $token, 'sub_tree' => $processed);
@@ -1330,7 +1311,7 @@ EOREGEX
 				$type = "";
 			}
 			if($sub_expr !== "") {
-				$processed['sub_tree'] = $this->process_expr_list($this->split_sql(substr($sub_expr,1,-1)));
+				$processed['sub_tree'] = $this->process_expr_list($this->split_sql($this->removeParenthesisFromStart($sub_expr)));
 			}
 
 			if(!is_array($processed)) {
@@ -1342,26 +1323,6 @@ EOREGEX
 			if($expr_type) {
 				$expr[] = array( 'expr_type' => $type, 'base_expr' => $token, 'sub_tree' => $processed);
 			}
-			$mod = false;
-
-			/*
-
-			for($i=0;$i<count($expr);++$i){
-			if($expr[$i]['expr_type'] == 'function' ||
-			$expr[$i]['expr_type'] == 'aggregate_function') {
-			if(!empty($expr[$i+1])) {
-			$expr[$i]['sub_tree']=$expr[$i+1]['sub_tree'];
-			unset($expr[$i+1]);
-			$mod = 1;
-			++$i;  // BAD FORM TO MODIFY THE LOOP COUNTER
-			}
-			}
-
-			}
-
-			*/
-
-			if($mod) $expr=array_values($expr);
 			return $expr;
 		}
 
@@ -1408,7 +1369,7 @@ EOREGEX
 			} else {
 				$cols = explode(",", $this->removeParenthesisFromStart($cols));
 			}
-			unset($tokens['INTO']);  // TODO: check this, is it better to set ""
+			unset($tokens['INTO']);  // TODO: check this, is it better to set "" ?
 			$tokens[$token_category] =  array('table'=>$table, 'cols'=>$cols);
 			return $tokens;
 
