@@ -120,7 +120,7 @@ class OracleSQLTranslator extends PHPSQLCreator {
 
       # store the table and its alias for later use
       $last = array_pop($allTables);
-      $last['tables'][] = array('table' => $parsed['table'], 'alias' => trim($alias));
+      $last['tables'][] = array('table' => $this->getShortTableNameFor($parsed['table']), 'alias' => trim($alias));
       $allTables[] = $last;
       
       return $sql;
