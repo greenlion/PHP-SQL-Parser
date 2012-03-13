@@ -256,6 +256,9 @@ if (!defined('HAVE_PHP_SQL_CREATOR')) {
         }
 
         private function processRefType($parsed) {
+            if ($parsed === false) {
+                return "";
+            }
             if ($parsed === 'ON') {
                 return " ON ";
             }
@@ -282,7 +285,7 @@ if (!defined('HAVE_PHP_SQL_CREATOR')) {
         }
 
         private function processTableExpression($parsed, $index) {
-            if ($parsed['expr_type'] !== 'table-expression') {
+            if ($parsed['expr_type'] !== 'table_expression') {
                 return "";
             }
             $sql = substr($this->processFROM($parsed['sub_tree']), 5); // remove FROM keyword
