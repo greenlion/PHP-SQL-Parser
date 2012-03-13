@@ -62,7 +62,7 @@ if (!defined('HAVE_PHP_SQL_CREATOR')) {
         }
 
         protected function processDeleteStatement($parsed) {
-            die("DELETE not implemented");
+           return $this->processDELETE($parsed['DELETE']) . " " . $this->processFROM($parsed['FROM']) . " " . $this->processWHERE($parsed['WHERE']);
         }
 
         protected function processUpdateStatement($parsed) {
@@ -73,6 +73,14 @@ if (!defined('HAVE_PHP_SQL_CREATOR')) {
             return $sql;
         }
 
+        protected function processDELETE($parsed) {
+           $sql = "DELETE";
+           foreach ($parsed['TABLES'] as $k => $v) {
+              $sql .= $v . ",";
+           }
+           return substr($sql, 0, -1);
+        }
+        
         protected function processSELECT($parsed) {
             $sql = "";
             foreach ($parsed as $k => $v) {

@@ -5,126 +5,133 @@ require_once('php-sql-creator.php');
 
 class OracleSQLTranslator extends PHPSQLCreator {
 
-    var $con;
-    var $preventColumnRefs = false;
+   var $con;
+   var $preventColumnRefs = false;
 
-    public function __construct($con) {
-        parent::__construct();
-        $this->con = $con;
-    }
+   public function __construct($con) {
+      parent::__construct();
+      $this->con = $con;
+   }
 
-    private function preprint($s, $return = false) {
-        $x = "<pre>";
-        $x .= print_r($s, 1);
-        $x .= "</pre>";
-        if ($return)
-            return $x;
-        else
-            print $x;
-    }
+   private function preprint($s, $return = false) {
+      $x = "<pre>";
+      $x .= print_r($s, 1);
+      $x .= "</pre>";
+      if ($return)
+      return $x;
+      else
+      print $x;
+   }
 
-    protected function processAlias($parsed) {
-        if ($parsed === false) {
-            return "";
-        }
-        # we don't need an AS between expression and alias
-        $sql = " " . $parsed['name'];
-        return $sql;
-    }
+   protected function processAlias($parsed) {
+      if ($parsed === false) {
+         return "";
+      }
+      # we don't need an AS between expression and alias
+      $sql = " " . $parsed['name'];
+      return $sql;
+   }
+   
+   protected function processDELETE($parsed) {
+      if (count($parsed('TABLES')) > 1) {
+         die("cannot translate delete statement into Oracle dialect, multiple tables are not allowed.");
+      }
+      return "DELETE";
+   }
 
-    private function getColumnNameFor($column) {
-        if (strtolower($column) === 'uid') {
-            $column = "uid_";
-        }
-        return $column;
-    }
+   private function getColumnNameFor($column) {
+      if (strtolower($column) === 'uid') {
+         $column = "uid_";
+      }
+      return $column;
+   }
 
-    private function getShortTableNameFor($table) {
-        if (strtolower($table) === 'surveys_languagesettings') {
-            $table = 'surveys_lngsettings';
-        }
-        return $table;
-    }
+   private function getShortTableNameFor($table) {
+      if (strtolower($table) === 'surveys_languagesettings') {
+         $table = 'surveys_lngsettings';
+      }
+      return $table;
+   }
 
-    protected function processTable($parsed, $index) {
-        if ($parsed['expr_type'] !== 'table') {
-            return "";
-        }
+   protected function processTable($parsed, $index) {
+      if ($parsed['expr_type'] !== 'table') {
+         return "";
+      }
 
-        $sql = $table = $this->getShortTableNameFor($parsed['table']);
-        $sql .= " " . $this->processAlias($parsed['alias']);
+      $sql = $table = $this->getShortTableNameFor($parsed['table']);
+      $sql .= " " . $this->processAlias($parsed['alias']);
 
-        if ($index !== 0) {
-            $sql = " " . $this->processJoin($parsed['join_type']) . " " . $sql;
-            $sql .= $this->processRefType($parsed['ref_type']);
-            $sql .= $this->processRefClause($parsed['ref_clause']);
-        }
-        return $sql;
-    }
+      if ($index !== 0) {
+         $sql = " " . $this->processJoin($parsed['join_type']) . " " . $sql;
+         $sql .= $this->processRefType($parsed['ref_type']);
+         $sql .= $this->processRefClause($parsed['ref_clause']);
+      }
+      return $sql;
+   }
 
-    protected function processColRef($parsed) {
-        global $preventColumnRefs;
+   protected function processColRef($parsed) {
+      global $preventColumnRefs;
 
-        if ($parsed['expr_type'] !== 'colref') {
-            return "";
-        }
+      if ($parsed['expr_type'] !== 'colref') {
+         return "";
+      }
 
-        $colref = $parsed['base_expr'];
-        $pos = strpos($colref, ".");
-        if ($pos === false) {
-            $pos = -1;
-        }
-        $table = trim(substr($colref, 0, $pos + 1), ".");
-        $col = substr($colref, $pos + 1);
+      $colref = $parsed['base_expr'];
+      $pos = strpos($colref, ".");
+      if ($pos === false) {
+         $pos = -1;
+      }
+      $table = trim(substr($colref, 0, $pos + 1), ".");
+      $col = substr($colref, $pos + 1);
 
-        # we have to change the column name, if the column is uid
-        $col = $this->getColumnNameFor($col);
+      # we have to change the column name, if the column is uid
+      $col = $this->getColumnNameFor($col);
 
-        # we have to change the tablereference, if the tablename is too long
-        $table = $this->getShortTableNameFor($table);
+      # we have to change the tablereference, if the tablename is too long
+      $table = $this->getShortTableNameFor($table);
 
-        # if we have * as colref, we cannot use other columns
-        $preventColumnRefs = $preventColumnRefs || (($table === "") && ($col === "*"));
+      # if we have * as colref, we cannot use other columns
+      $preventColumnRefs = $preventColumnRefs || (($table === "") && ($col === "*"));
 
-        $alias = "";
-        if (isset($parsed['alias'])) {
-            $alias = $this->processAlias($parsed['alias']);
-        }
+      $alias = "";
+      if (isset($parsed['alias'])) {
+         $alias = $this->processAlias($parsed['alias']);
+      }
 
-        return (($table !== "") ? ($table . "." . $col) : $col) . $alias;
-    }
+      return (($table !== "") ? ($table . "." . $col) : $col) . $alias;
+   }
 
-    protected function processSELECT($parsed) {
-        global $preventColumnRefs;
+   protected function processSELECT($parsed) {
+      global $preventColumnRefs;
 
-        $sql = parent::processSELECT($parsed);
-        if ($preventColumnRefs) {
-            $sql = "SELECT *";
-            $preventColumnRefs = false;
-        }
-        return $sql;
-    }
+      $sql = parent::processSELECT($parsed);
+      if ($preventColumnRefs) {
+         $sql = "SELECT *";
+         $preventColumnRefs = false;
+      }
+      return $sql;
+   }
 
-    public function process($sql) {
-        $parser = new PHPSQLParser($sql);
-        print_r($parser->parsed);
-        $sql = $this->create($parser->parsed);
+   public function process($sql) {
+      $parser = new PHPSQLParser($sql);
+      print_r($parser->parsed);
+      $sql = $this->create($parser->parsed);
 
-        echo $sql . "\n";
-        return $sql;
-    }
+      echo $sql . "\n";
+      return $sql;
+   }
 }
 
 /*
  * $sql = substr($sql, 0, $start) . "cast(substr(" . $columnInfo
-                            . ",1,200) as varchar2(200))"
-                            . substr($sql, $start + strlen($columnInfo));
+ . ",1,200) as varchar2(200))"
+ . substr($sql, $start + strlen($columnInfo));
  */
 
 $parser = new OracleSQLTranslator(false);
 
 
-$sql = "INSERT INTO surveys_lngsettings ( SURVEYLS_SURVEY_ID, SURVEYLS_LANGUAGE, SURVEYLS_TITLE, SURVEYLS_DESCRIPTION, SURVEYLS_WELCOMETEXT, SURVEYLS_ENDTEXT, SURVEYLS_URL, SURVEYLS_URLDESCRIPTION, SURVEYLS_EMAIL_INVITE_SUBJ, SURVEYLS_EMAIL_INVITE, SURVEYLS_EMAIL_REMIND_SUBJ, SURVEYLS_EMAIL_REMIND, SURVEYLS_EMAIL_REGISTER_SUBJ, SURVEYLS_EMAIL_REGISTER, SURVEYLS_EMAIL_CONFIRM_SUBJ, SURVEYLS_EMAIL_CONFIRM, SURVEYLS_DATEFORMAT, EMAIL_ADMIN_NOTIFICATION_SUBJ, EMAIL_ADMIN_NOTIFICATION, EMAIL_ADMIN_RESPONSES_SUBJ, EMAIL_ADMIN_RESPONSES, SURVEYLS_NUMBERFORMAT ) 
+$sql = "INSERT INTO surveys_lngsettings ( SURVEYLS_SURVEY_ID, SURVEYLS_LANGUAGE, SURVEYLS_TITLE, SURVEYLS_DESCRIPTION, SURVEYLS_WELCOMETEXT, SURVEYLS_ENDTEXT, SURVEYLS_URL, SURVEYLS_URLDESCRIPTION, SURVEYLS_EMAIL_INVITE_SUBJ, SURVEYLS_EMAIL_INVITE, SURVEYLS_EMAIL_REMIND_SUBJ, SURVEYLS_EMAIL_REMIND, SURVEYLS_EMAIL_REGISTER_SUBJ, SURVEYLS_EMAIL_REGISTER, SURVEYLS_EMAIL_CONFIRM_SUBJ, SURVEYLS_EMAIL_CONFIRM, SURVEYLS_DATEFORMAT, EMAIL_ADMIN_NOTIFICATION_SUBJ, EMAIL_ADMIN_NOTIFICATION, EMAIL_ADMIN_RESPONSES_SUBJ, EMAIL_ADMIN_RESPONSES, SURVEYLS_NUMBERFORMAT )
 VALUES ( 53313, 'de-informal', 'Mappensurvey', 'Hier antworten nur Mappen!', 'Hallo Du Mappe', 'Geh heim du Mappe!', '', '', 'Einladung zur einer Umfrage', 'Hallo {FIRSTNAME},
 
 Hiermit möchten wir dich zu einer Umfrage einladen.
@@ -221,7 +228,7 @@ $parser->process($sql);
 //$sql = "SELECT a.uid, a.users_name FROM USERS AS a LEFT JOIN (SELECT uid AS id FROM USER_IN_GROUPS WHERE ugid = 1) AS b ON a.uid = b.id WHERE id IS NULL ORDER BY a.users_name";
 //$parser->process($sql);
 
-//$sql = "INSERT INTO surveys ( SID, OWNER_ID, ADMIN, ACTIVE, EXPIRES, STARTDATE, ADMINEMAIL, ANONYMIZED, FAXTO, FORMAT, SAVETIMINGS, TEMPLATE, LANGUAGE, DATESTAMP, USECOOKIE, ALLOWREGISTER, ALLOWSAVE, AUTOREDIRECT, ALLOWPREV, PRINTANSWERS, IPADDR, REFURL, DATECREATED, PUBLICSTATISTICS, PUBLICGRAPHS, LISTPUBLIC, HTMLEMAIL, TOKENANSWERSPERSISTENCE, ASSESSMENTS, USECAPTCHA, BOUNCE_EMAIL, EMAILRESPONSETO, EMAILNOTIFICATIONTO, TOKENLENGTH, SHOWXQUESTIONS, SHOWGROUPINFO, SHOWNOANSWER, SHOWQNUMCODE, SHOWWELCOME, SHOWPROGRESS, ALLOWJUMPS, NAVIGATIONDELAY, NOKEYBOARD, ALLOWEDITAFTERCOMPLETION ) 
+//$sql = "INSERT INTO surveys ( SID, OWNER_ID, ADMIN, ACTIVE, EXPIRES, STARTDATE, ADMINEMAIL, ANONYMIZED, FAXTO, FORMAT, SAVETIMINGS, TEMPLATE, LANGUAGE, DATESTAMP, USECOOKIE, ALLOWREGISTER, ALLOWSAVE, AUTOREDIRECT, ALLOWPREV, PRINTANSWERS, IPADDR, REFURL, DATECREATED, PUBLICSTATISTICS, PUBLICGRAPHS, LISTPUBLIC, HTMLEMAIL, TOKENANSWERSPERSISTENCE, ASSESSMENTS, USECAPTCHA, BOUNCE_EMAIL, EMAILRESPONSETO, EMAILNOTIFICATIONTO, TOKENLENGTH, SHOWXQUESTIONS, SHOWGROUPINFO, SHOWNOANSWER, SHOWQNUMCODE, SHOWWELCOME, SHOWPROGRESS, ALLOWJUMPS, NAVIGATIONDELAY, NOKEYBOARD, ALLOWEDITAFTERCOMPLETION )
 //VALUES ( 32225, 1, 'André', 'N', null, null, 'hello@zks.uni-leipzig.de', 'N', '', 'G', 'N', 'default', 'de-informal', 'N', 'N', 'N', 'Y', 'N', 'N', 'N', 'N', 'N', a_function('2012-02-16','YYYY-MM-DD'), 'N', 'N', 'Y', 'Y', 'N', 'N', 'D', 'hello@zks.uni-leipzig.de', '', '', 15, 'Y', 'B', 'Y', 'X', 'Y', 'Y', 'N', 0, 'N', 'N' )";
 //$parser->process($sql);
 
