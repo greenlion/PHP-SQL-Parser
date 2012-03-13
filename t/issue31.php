@@ -34,6 +34,5 @@ GROUP BY st.id
 ORDER BY sp.alt_en asc, sp.alt_pl asc";
 $parser->parse($sql);
 $p = $parser->parsed;
-print_r($p);
 $expected = getExpectedValue('issue31.serialized');
-eq_array($p, $expected, 'very complex statement');
+eq_array($p, $expected, 'very complex statement with keyword view as alias');
