@@ -329,11 +329,11 @@ if (!defined('HAVE_PHP_SQL_PARSER')) {
 
         #This function counts open and close backticks and
         #returns their location.  This might be faster as a regex
-        private function count_backtick($token) {
+        private function count_backtick($token, $char) {
             $len = strlen($token);
             $cnt = 0;
             for ($i = 0; $i < $len; ++$i) {
-                if ($token[$i] == '`')
+                if ($token[$i] == $char)
                     ++$cnt;
             }
             return $cnt;
@@ -373,8 +373,9 @@ EOREGEX
             ;
             $tokens = preg_split($regex, $sql, -1, PREG_SPLIT_NO_EMPTY | PREG_SPLIT_DELIM_CAPTURE);
 
+            $tokens = $this->balanceBackticks($tokens, '`');
+            $tokens = $this->balanceBackticks($tokens, '\'');
             $tokens = $this->balanceParenthesis($tokens);
-            $tokens = $this->balanceBackticks($tokens);
 
             return $tokens;
         }
@@ -401,6 +402,8 @@ EOREGEX
                 $trim = trim($token);
                 if ($trim !== "") {
                     if ($trim[0] != '(' && substr($trim, -1) == ')') {
+                        # this stores the characters in front of the first "("
+                        # but where is the rest? xyz (a or b) -> $trim = xyz
                         $trim = trim(substr($trim, 0, strpos($trim, '(')));
                     }
                     $tokens[$i] = $trim;
@@ -417,44 +420,47 @@ EOREGEX
                     $needed = abs($info['balanced']);
                     $n = $i;
                     while ($needed > 0 && $n < $token_count - 1) {
+                        
                         ++$n;
                         $token2 = $tokens[$n];
                         $info2 = $this->count_paren($token2);
                         $closes = count($info2['close']);
+                        
                         if ($closes != $needed) {
                             $tokens[$i] .= $tokens[$n];
                             $tokens[$n] = "";
                             $reset = true;
-                            $info2 = $this->count_paren($tokens[$i]);
+                            $info2 = $this->count_paren($tokens[$i]); # recalc the new string on index $i
                             $needed = abs($info2['balanced']);
-                        } else {
-                            /*get the string pos of the last close paren we need*/
-                            $pos = $info2['close'][count($info2['close']) - 1];
-                            $str1 = $str2 = "";
-                            if ($pos == 0) {
-                                $str1 = ')';
-                            } else {
-                                $str1 = substr($tokens[$n], 0, $pos) . ')';
-                                $str2 = substr($tokens[$n], $pos + 1);
-                            }
-                            if (strlen($str2) > 0) {
-                                $tokens[$n] = $str2;
-                            } else {
-                                $tokens[$n] = "";
-                                $reset = true;
-                            }
-                            $tokens[$i] .= $str1;
-                            $info2 = $this->count_paren($tokens[$i]);
-                            $needed = abs($info2['balanced']);
-
+                            continue;
                         }
+                        
+                        /*get the string pos of the last close paren we need*/
+                        $pos = $info2['close'][count($info2['close']) - 1];
+                        $str1 = $str2 = "";
+                        if ($pos == 0) {
+                            $str1 = ')';
+                        } else {
+                            $str1 = substr($tokens[$n], 0, $pos) . ')';
+                            $str2 = substr($tokens[$n], $pos + 1);
+                        }
+                        if (strlen($str2) > 0) {
+                            $tokens[$n] = $str2;
+                            $n--; # backtracking, if we have a non-empty str2
+                        } else {
+                            $tokens[$n] = "";
+                            $reset = true;
+                        }
+                        $tokens[$i] .= $str1;
+                        $info2 = $this->count_paren($tokens[$i]);
+                        $needed = abs($info2['balanced']);
                     }
                 }
             }
             return array_values($tokens);
         }
 
-        private function balanceBackticks($tokens) {
+        private function balanceBackticks($tokens, $char) {
             #the same problem appears with backticks :(
 
             $token_count = count($tokens);
@@ -465,8 +471,8 @@ EOREGEX
                 $token = $tokens[$i];
                 $needed = true;
                 $reset = false;
-                if ($needed && $token !== "" && strpos($token, '`') !== false) {
-                    $info = $this->count_backtick($token);
+                if ($needed && $token !== "" && strpos($token, $char) !== false) {
+                    $info = $this->count_backtick($token, $char);
                     if ($info % 2 == 0) { #even number of backticks means we are balanced
                         continue;
                     }
@@ -478,7 +484,7 @@ EOREGEX
                         ++$n;
                         $token .= $tokens[$n];
                         $tokens[$n] = "";
-                        $needed = $this->count_backtick($token) % 2;
+                        $needed = $this->count_backtick($token, $char) % 2;
                     }
                 }
                 if ($reset) {
