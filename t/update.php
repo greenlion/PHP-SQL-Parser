@@ -8,5 +8,6 @@ $sql = "UPDATE table1 SET field1='foo' WHERE field2='bar' AND id=(SELECT id FROM
 $parser->parse($sql);
 $p = $parser->parsed;
 
+# we miss a trailing ")" on the last subquery
 $expected = getExpectedValue('update.serialized');
 eq_array($p, $expected, 'update with a sub-select');

@@ -14,7 +14,7 @@ $p = $parser->parse($sql);
 $expected = getExpectedValue('alias2.serialized');
 eq_array($p, $expected, 'alias named like the column');
 
-$sql = 'SELECT (select colA AS a from test t) colA From example b';
+$sql = 'SELECT (select colA AS a from test t) colA From example as b';
 $p = $parser->parse($sql);
 $expected = getExpectedValue('alias3.serialized');
 eq_array($p, $expected, 'sub-query within selection with alias');
