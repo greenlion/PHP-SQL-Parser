@@ -3,7 +3,7 @@
 /**
  * execute all tests
  */
-
+require_once(dirname(__FILE__) . '/t/union.php');
 require_once(dirname(__FILE__) . '/t/positions.php');
 require_once(dirname(__FILE__) . '/t/subselect.php');
 require_once(dirname(__FILE__) . '/t/issue12.php');
