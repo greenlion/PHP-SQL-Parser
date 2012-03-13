@@ -1,5 +1,11 @@
 <?php
 
+/**
+ * you cannot execute this script within Eclipse PHP
+ * because of the limited output buffer. Try to run it
+ * directly within a shell.
+ */
+
 require_once('php-sql-parser.php');
 $sql = 'SELECT 1';
 echo $sql . "\n";
