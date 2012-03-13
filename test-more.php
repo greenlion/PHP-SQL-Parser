@@ -372,7 +372,7 @@ function _test_end()
  * @param String $filename
  */
 function getExpectedValue($filename, $unserialize = true) {
-	$content = file_get_contents(dirname(__FILE__) . "/r/".$filename);
+	$content = file_get_contents(dirname(__FILE__) . "/expected/".$filename);
 	return ($unserialize ? unserialize($content) : $content);
 }
 
