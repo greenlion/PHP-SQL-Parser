@@ -592,7 +592,6 @@ EOREGEX
                case 'CHECKSUM':
                case 'REPAIR':
                case 'RESTORE':
-               case 'CACHE':
                case 'DESCRIBE':
                case 'EXPLAIN':
                case 'USE':
@@ -603,6 +602,14 @@ EOREGEX
                   continue 2;
                   break;
 
+               case 'CACHE':
+                  if (($prev_category === "") || (in_array($prev_category, array('RESET', 'FLUSH')))) {
+                     $token_category = $upper;
+                     $out[$upper][0] = $upper;
+                     continue 2;
+                  }                  
+                  break;
+                  
                   /* This is either LOCK TABLES or SELECT ... LOCK IN SHARE MODE*/
                case 'LOCK':
                   if ($token_category == "") {
