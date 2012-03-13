@@ -10,6 +10,7 @@ require_once(dirname(__FILE__) . '/t/delete.php');
 require_once(dirname(__FILE__) . '/t/from.php');
 require_once(dirname(__FILE__) . '/t/gtltop.php');
 require_once(dirname(__FILE__) . '/t/insert.php');
+require_once(dirname(__FILE__) . '/t/issue11.php');
 require_once(dirname(__FILE__) . '/t/issue12.php');
 require_once(dirname(__FILE__) . '/t/issue15.php');
 require_once(dirname(__FILE__) . '/t/issue21.php');
