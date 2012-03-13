@@ -1228,17 +1228,31 @@ EOREGEX
             }
 
             $parenthesis = $parenthesisRemoved;
-            for ($i = 0; $i < strlen($trim); $i++) {
-                if ($trim[$i] === "(") {
+            $i = 0;
+            $string = 0;
+            while ($i < strlen($trim)) {
+               
+                if ($trim[$i] === '\\') {
+                   $i += 2; # an escape character, the next character is irrelevant
+                   continue;
+                } 
+                
+                if (in_array($trim[$i], array('\'','"'))) {
+                   $string++;
+                }
+               
+                if (($string % 2 === 0) && ($trim[$i] === "(")) {
                     $parenthesis++;
                 }
-                if ($trim[$i] === ")") {
+                
+                if (($string % 2 === 0) && ($trim[$i] === ")")) {
                     if ($parenthesis == $parenthesisRemoved) {
                         $trim[$i] = " ";
                         $parenthesisRemoved--;
                     }
                     $parenthesis--;
                 }
+                $i++;
             }
             return trim($trim);
         }

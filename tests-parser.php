@@ -16,6 +16,7 @@ require_once(dirname(__FILE__) . '/t/issue12.php');
 require_once(dirname(__FILE__) . '/t/issue15.php');
 require_once(dirname(__FILE__) . '/t/issue21.php');
 require_once(dirname(__FILE__) . '/t/issue25.php');
+require_once(dirname(__FILE__) . '/t/issue30.php');
 require_once(dirname(__FILE__) . '/t/left.php');
 require_once(dirname(__FILE__) . '/t/nested.php');
 require_once(dirname(__FILE__) . '/t/positions.php');
