@@ -195,68 +195,76 @@ if (!defined('HAVE_PHP_SQL_PARSER')) {
                     . $holdem . "\n";
         }
 
-   private function findPositionWithinString($sql, $value, $expr_type){
-      
-      $allowedOnOperator = array('\t', '\n', '\r', ' ', ',', '(', ')', '_', '\'');
-      $allowedOnOthers = array('\t', '\n', '\r', ' ', ',', '(', ')', '<', '>', '*', '+', '-', '/', '|', '&', '=', '!', ';');
-      
-      $offset = 0;
-      $ok = false;
-      while (true) {
-         
-         $pos = strpos($sql, $value, $offset);
-         if ($pos === false) {
-            break;
-         }
-         
-         $before = "";
-         if ($pos > 0) {
-            $before = $sql[$pos - 1];
-         }
-         
-         $after = "";
-         if (isset($sql[$pos + strlen($value)])) {
-            $after = $sql[$pos + strlen($value)];
-         }
-         
-         # if we have an operator, it should be surrounded by
-         # whitespace, comma, parenthesis, digit or letter, end_of_string
-         # an operator should not be surrounded by another operator
-         
-         if ($expr_type === 'operator') {
-            
-            $ok = ($before === "" || in_array($before, $allowedOnOperator)) || (strtolower($before) >= 'a' && strtolower($before) <= 'z') || ($before >= '0' && $before <= '9');
-            $ok = $ok && ($after === "" || in_array($after, $allowedOnOperator) || (strtolower($after) >= 'a' && strtolower($after) <= 'z') || ($after >= '0' && $after <= '9'));
-            
-            if (!$ok) {
-               $offset = $pos + 1;
-               continue;
+        private function findPositionWithinString($sql, $value, $expr_type) {
+
+            $allowedOnOperator = array('\t', '\n', '\r', ' ', ',', '(', ')', '_', '\'');
+            $allowedOnOthers = array('\t', '\n', '\r', ' ', ',', '(', ')', '<', '>', '*', '+', '-', '/', '|', '&', '=',
+                                     '!', ';');
+
+            $offset = 0;
+            $ok = false;
+            while (true) {
+
+                $pos = strpos($sql, $value, $offset);
+                if ($pos === false) {
+                    break;
+                }
+
+                $before = "";
+                if ($pos > 0) {
+                    $before = $sql[$pos - 1];
+                }
+
+                $after = "";
+                if (isset($sql[$pos + strlen($value)])) {
+                    $after = $sql[$pos + strlen($value)];
+                }
+
+                # if we have an operator, it should be surrounded by
+                # whitespace, comma, parenthesis, digit or letter, end_of_string
+                # an operator should not be surrounded by another operator
+
+                if ($expr_type === 'operator') {
+
+                    $ok = ($before === "" || in_array($before, $allowedOnOperator))
+                            || (strtolower($before) >= 'a' && strtolower($before) <= 'z')
+                            || ($before >= '0' && $before <= '9');
+                    $ok = $ok
+                            && ($after === "" || in_array($after, $allowedOnOperator)
+                                    || (strtolower($after) >= 'a' && strtolower($after) <= 'z')
+                                    || ($after >= '0' && $after <= '9'));
+
+                    if (!$ok) {
+                        $offset = $pos + 1;
+                        continue;
+                    }
+
+                    break;
+                }
+
+                # in all other cases we accept
+                # whitespace, comma, operators, parenthesis and end_of_string
+
+                $ok = ($before === "" || in_array($before, $allowedOnOthers));
+                $ok = $ok && ($after === "" || in_array($after, $allowedOnOthers));
+
+                if ($ok) {
+                    break;
+                }
+
+                $offset = $pos + 1;
             }
-            
-            break;
-         }
-         
-         # in all other cases we accept
-         # whitespace, comma, operators, parenthesis and end_of_string
-         
-         $ok = ($before ==="" || in_array($before, $allowedOnOthers));
-         $ok = $ok && ($after ==="" || in_array($after, $allowedOnOthers));
-         
-         if ($ok) {
-            break;
-         }        
-          
-         $offset = $pos + 1;
-      }
-      
-      return $pos;
-   }  
-         
+
+            return $pos;
+        }
+
         private function lookForBaseExpression($sql, &$charPos, &$parsed, $key, &$backtracking) {
             if (!is_numeric($key)) {
                 if (in_array($key, array('UNION', 'UNION ALL'), true)
                         || ($key === 'expr_type' && $parsed === 'expression')
-                        || ($key === 'expr_type' && $parsed === 'subquery') || ($key === 'alias' && $parsed !== false)) {
+                        || ($key === 'expr_type' && $parsed === 'subquery') 
+                        || ($key === 'expr_type' && $parsed === 'table_expression') 
+                        || ($key === 'alias' && $parsed !== false)) {
                     $backtracking[] = $charPos; # on the next base_expr we set the pointer back to this value
 
                 } elseif (($key === 'ref_clause' || $key === 'columns') && $parsed !== false) {
@@ -281,11 +289,12 @@ if (!defined('HAVE_PHP_SQL_PARSER')) {
                 if ($key === 'base_expr') {
 
                     $subject = substr($sql, $charPos);
-                   $pos = $this->findPositionWithinString($subject, $value, isset($parsed['expr_type']) ? $parsed['expr_type'] : 'alias');
-                   if ($pos === false) {
-                      die ("cannot calculate position of " . $value . " within " . $subject);
-                   }
-                   
+                    $pos = $this->findPositionWithinString($subject, $value,
+                            isset($parsed['expr_type']) ? $parsed['expr_type'] : 'alias');
+                    if ($pos === false) {
+                        die("cannot calculate position of " . $value . " within " . $subject);
+                    }
+
                     $parsed['position'] = $charPos + $pos;
                     $charPos += $pos + strlen($value);
 
@@ -725,16 +734,16 @@ EOREGEX
                 # remove obsolete category after union (empty category because of
                 # empty token before select)
                 if ($token_category && ($prev_category == $token_category)) {
-                   
-                   # if we have more than one whitespace within a token
-                   # we add a token for every character
-                   # this prevents wrong base_expr within process_from()
-                   # TODO: may it is better to leave the original whitespace as token
-                   if ($token === "" && trim($tokens[$token_number]) === "") {
-                      for ($i=0; $i<strlen($tokens[$token_number]) -1; $i++) {
-                         $out[$token_category][] = $token;
-                      }
-                   }
+
+                    # if we have more than one whitespace within a token
+                    # we add a token for every character
+                    # this prevents wrong base_expr within process_from()
+                    # TODO: may it is better to leave the original whitespace as token
+                    if ($token === "" && trim($tokens[$token_number]) === "") {
+                        for ($i = 0; $i < strlen($tokens[$token_number]) - 1; $i++) {
+                            $out[$token_category][] = $token;
+                        }
+                    }
                     $out[$token_category][] = $token;
                 }
 
@@ -1083,7 +1092,7 @@ EOREGEX
                 case 'LEFT':
                 case 'RIGHT':
                 case 'STRAIGHT_JOIN':
-                    $data['next_join_type'] = $upper; // . " " removed!;
+                    $data['next_join_type'] = $upper;
                     break;
 
                 case ',':
@@ -1134,6 +1143,8 @@ EOREGEX
 
         private function saveTableExpression(&$data) {
 
+            $res = array();
+
             # exchange the join types (join_type is saved now, saved_join_type holds the next one)
             $data['join_type'] = $data['saved_join_type']; # initialized with JOIN
             $data['saved_join_type'] = ($data['next_join_type'] ? $data['next_join_type'] : 'JOIN');
@@ -1150,15 +1161,19 @@ EOREGEX
                 $tmp = $this->split_sql($data['expression']);
                 $data['sub_tree'] = $this->process_from($tmp);
 
-                return array('expr_type' => 'table-expression', 'alias' => false, 'join_type' => $data['join_type'],
-                             'ref_type' => "", 'ref_clause' => "", 'base_expr' => trim($data['expression']),
-                             'sub_tree' => $data['sub_tree']);
+                $res['expr_type'] = 'table_expression';
+            } else {
+                $res['expr-type'] = 'table';
+                $res['table'] = $data['table'];
             }
 
-            return array('expr_type' => 'table', 'table' => $data['table'], 'alias' => $data['alias'],
-                         'join_type' => $data['join_type'], 'ref_type' => $data['ref_type'],
-                         'ref_clause' => $data['ref_expr'], 'base_expr' => trim($data['expression']),
-                         'sub_tree' => $data['sub_tree']);
+            $res['alias'] = $data['alias'];
+            $res['join_type'] = $data['join_type'];
+            $res['ref_type'] = $data['ref_type'];
+            $res['ref_clause'] = $data['ref_expr'];
+            $res['base_expr'] = trim($data['expression']);
+            $res['sub_tree'] = $data['sub_tree'];
+            return $res;
         }
 
         private function process_group(&$tokens, &$select) {
@@ -1186,7 +1201,7 @@ EOREGEX
                     } else {
 
                         // TODO: check the aliass, it is now an array!!
-                        
+
                         #search to see if the expression matches an alias
                         foreach ($select as $clause) {
                             if (!$clause['alias']) {
