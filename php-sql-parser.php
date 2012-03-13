@@ -195,6 +195,11 @@ if (!defined('HAVE_PHP_SQL_PARSER')) {
                     . $holdem . "\n";
         }
 
+        private function getPositionPattern($start, $value) {
+            return  "/" . str_replace(" ", "\\s+", $start . preg_quote($value) . "(\\)|,|>|<|\||!|=|\+|\*|-|\/|&|;|\\s)")
+                            . "/";
+        }
+        
         private function lookForBaseExpression($sql, &$charPos, &$parsed, $key, &$backtracking) {
             if (!is_numeric($key)) {
                 if (in_array($key, array('UNION', 'UNION ALL', 'columns'), true)
@@ -223,18 +228,35 @@ if (!defined('HAVE_PHP_SQL_PARSER')) {
             foreach ($parsed as $key => $value) {
                 if ($key === 'base_expr') {
 
-                    #if the value is an operator, we need another regex-pattern as the one below
-                    #dawn!                    
-                    $pattern = "/" . str_replace(" ", "\\s+", "(^|\\s|\\(|,|=|\||<|>|&|\+|-|\*|\/)" . preg_quote($value) . "(\\)|,|>|<|\||!|=|\+|\*|-|\/|&|;|\\s|$)")
-                            . "/";
-                    $subject = substr($sql, $charPos);
-                    $search = preg_split($pattern, $subject, -1, PREG_SPLIT_OFFSET_CAPTURE);
+                    # there is a difference between the pattern ^ and the other characters in front of value
+                    # in the latter case we have to add 1 to position (because the regex matches one character before
+                    # the value, in the first case we don't have to add 1, because we start with the first character
 
+                    # we prevent the pattern $ with an additional space character, so we can always
+                    # subtract 1 from the end of the match
+                    
+                    # such a padding character is not possible with pattern ^, it would
+                    # change the position
+                    
+                    # TODO: if the value starts or ends with one of the characters of the pattern,
+                    # the matching goes wrong
+                    $subject = substr($sql, $charPos) . " ";
+                     
+                    $pattern = $this->getPositionPattern("(^)", $value);
+                    $offset = 0;
+                    $search = preg_split($pattern, $subject, -1, PREG_SPLIT_OFFSET_CAPTURE);
+                    
+                    if (count($search) < 2) {
+                       $pattern = $this->getPositionPattern("(\\s|\\(|,|=|\||<|>|&|\+|-|\*|\/)", $value);
+                       $offset = 1;
+                       $search = preg_split($pattern, $subject, -1, PREG_SPLIT_OFFSET_CAPTURE);
+                    }
+                    
                     $before = array_shift($search);
                     $after = array_shift($search);
 
-                    $parsed['position'] = $charPos + $before[1] + strlen($before[0]) + 1;
-                    $charPos += $after[1];
+                    $parsed['position'] = $charPos + $before[1] + strlen($before[0]) + $offset;
+                    $charPos += $after[1] - 1;
 
                     $oldPos = array_pop($backtracking);
                     if (isset($oldPos) && $oldPos !== false) {
