@@ -40,3 +40,10 @@ $sql = "SELECT * FROM t1 LEFT JOIN (t2, t3, t4)
 $created = process($sql);
 $expected = getExpectedValue('create5.sql', false);
 ok($created === $expected, 'table-expression on second position');
+
+$sql = "SELECT qid FROM QUESTIONS WHERE gid='1' and language='de-informal' ORDER BY question_order, title ASC";
+$created = process($sql);
+$expected = getExpectedValue('create6.sql', false);
+ok($created === $expected, 'explicit ASC statement');
+
+
