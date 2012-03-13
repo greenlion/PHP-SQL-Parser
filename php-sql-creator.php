@@ -66,7 +66,7 @@ if (!defined('HAVE_PHP_SQL_CREATOR')) {
             return $this->created;
         }
 
-        private function stop($part, $partkey, $entry, $entrykey) {
+        protected function stop($part, $partkey, $entry, $entrykey) {
             die("unknown " . $entrykey . " in " . $part . "[" . $partkey . "] " . $entry[$entrykey]);
         }
 
