@@ -530,7 +530,6 @@ EOREGEX
                case 'DATA':
                case 'DO':
                case 'PASSWORD':
-               case 'USER':
                case 'PLUGIN':
                case 'FROM':
                case 'FLUSH':
@@ -553,6 +552,13 @@ EOREGEX
                   $token_category = $upper;
                   break;
 
+               case 'USER':
+                  # prevent wrong processing as keyword
+                  if (in_array($prev_category, array('CREATE', 'RENAME', 'DROP'), true)) {
+                     $token_category = $upper;
+                  }
+                  break;
+                                    
                case 'VIEW':
                   # prevent wrong processing as keyword
                   if (in_array($prev_category, array('CREATE', 'ALTER', 'DROP'), true)) {
