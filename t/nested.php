@@ -3,15 +3,13 @@
 require_once(dirname(__FILE__) . '/../php-sql-parser.php');
 require_once(dirname(__FILE__) . '/../test-more.php');
 
-// TODO: we should parse the ref_clause!
-
 $parser = new PHPSQLParser();
 
 $sql = 'SELECT *
     FROM (t1 LEFT JOIN t2 ON t1.a=t2.a)
          LEFT JOIN t3
          ON t2.b=t3.b OR t2.b IS NULL';
-$parser->parse($sql);
+$parser->parse($sql, true);
 $p = $parser->parsed;
 $expected = getExpectedValue('nested1.serialized');
 eq_array($p, $expected, 'nested left joins');
