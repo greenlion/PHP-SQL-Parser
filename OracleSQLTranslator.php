@@ -5,7 +5,7 @@
  * A translator from MySQL dialect into Oracle dialect for Limesurvey
  * (http://www.limesurvey.org/)
  *
- * Copyright (c) 2012, André Rothe <arothe@phosco.info>
+ * Copyright (c) 2012, André Rothe <arothe@phosco.info, phosco@gmx.de>
  *
  * All rights reserved.
  *

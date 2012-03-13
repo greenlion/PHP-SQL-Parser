@@ -4,7 +4,7 @@
  * 
  * A pure PHP SQL creator, which generates SQL from the output of PLSQLParser.
  * 
- * Copyright (c) 2012, André Rothe <arothe@phosco.info>
+ * Copyright (c) 2012, André Rothe <arothe@phosco.info, phosco@gmx.de>
  * 
  * All rights reserved.
  *

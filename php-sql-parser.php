@@ -5,7 +5,7 @@
  * A pure PHP SQL (non validating) parser w/ focus on MySQL dialect of SQL
  *
  * Copyright (c) 2010-2012, Justin Swanhart
- * with contributions by André Rothe <arothe@phosco.info>
+ * with contributions by André Rothe <arothe@phosco.info, phosco@gmx.de>
  *
  * All rights reserved.
  *
