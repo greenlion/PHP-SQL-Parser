@@ -45,6 +45,7 @@ $_no_plan = FALSE;
 $_num_failures = 0;
 $_num_skips = 0;
 $_test_num = 0;
+$_currTestScript = "";
 
 function plan($plan)
 {
@@ -79,11 +80,14 @@ function plan($plan)
 }
 
 function get_origin() {
+    
+    global $_currTestScript;
+    
 	$res = array();
 	$caller = debug_backtrace();
 
 	$thisFile = __FILE__;
-
+	
 	$i = 0;
 	while (strstr($caller[$i]['file'], $thisFile)) {
 		$i++;
@@ -95,6 +99,12 @@ function get_origin() {
 	if (isset($_SERVER['SERVER_ROOT'])){
 		$res['file'] = str_replace($_SERVER['SERVER_ROOT'], 't', $res['file']);
 	}
+
+    if ($res['file'] !== $_currTestScript) {
+        $_currTestScript = $res['file'];
+        echo "\nexecuting tests within ".$_currTestScript."\n\n";
+    }
+	
 	return $res;
 }
 
@@ -122,7 +132,7 @@ function ok($pass, $test_name = '')
 	if ($pass) {
 		echo "ok $_test_num $test_name\n";
 	} else {
-		diag("    Failed test ($file at line $line)");
+		diag("    Failed test (at line $line)");
 		echo "not ok $_test_num $test_name\n";
 		$_num_failures++;
 	}
@@ -349,6 +359,7 @@ function _test_end()
 	}
 
 	if ($_num_failures) {
+	    echo "\n";
 		diag("Looks like you failed $_num_failures tests of $_test_num.");
 	}
 }
