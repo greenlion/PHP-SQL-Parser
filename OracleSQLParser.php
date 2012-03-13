@@ -1,6 +1,7 @@
 <?php
 
 require_once('php-sql-parser.php');
+require_once('php-sql-creator.php');
 
 class OracleSQLParser {
 
@@ -94,96 +95,80 @@ class OracleSQLParser {
         return $column + 1;
     }
 
-    private function replaceKeyword(&$sql, $colref, $pos, $search, $replace) {
+    private function replaceKeyword($colref, $search, $replace, &$out) {
         $colpos = $this->getColumnNamePos($colref, $search);
-        if ($colpos !== false) {
-            $sql = substr($sql, 0, $pos + $colpos) . $replace
-                    . substr($sql, $pos + $colpos + strlen($search));
+        if ($colpos === false) {
+            return $colref;
         }
+        $out = substr($colref, 0, $colpos) . $replace . substr($colref, $colpos + strlen($search));
     }
 
-    private function replaceASWithinAlias(&$sql, &$alias) {
+    private function replaceASWithinAlias($alias, &$out) {
         if ($alias === false || $alias['as'] === false) {
             return;
         }
-
-        // the base_expr starts with regex("\s+as\s+")
-        // the AS will be replaced with two space characters to hold a stable position within $sql
-        for ($i = 0; $i < strlen($alias['base_expr']); $i++) {
-            if (strtoupper($alias['base_expr'][$i]) !== "A") {
-                continue;
-            }
-            $sql = substr($sql, 0, $alias['position'] + $i) . "  "
-                    . substr($sql, $alias['position'] + $i + 2);
-            break;
-        }
+        $out['base_expr'] = preg_replace('/as/i', '', $alias['base_expr'], 1);
     }
 
-    private function replaceLongTableName(&$sql, $start, $table, $needle, $replacement) {
+    private function replaceLongTableName($table, $needle, $replacement, &$out) {
         if (strcasecmp($table, $needle) == 0) {
-            # hold a stable position within $sql
-            $spaces = "";
-            for ($i = 0; $i < strlen($needle) - strlen($replacement); $i++) {
-                $spaces .= " ";
-            }
-            $sql = substr($sql, 0, $start) . $replacement . $spaces
-                    . substr($sql, $start + strlen($needle));
+            $out = $replacement;
         }
     }
 
-    private function handleSelect(&$sql, &$parsed) {
+    private function handleSelect($parsed, &$out) {
         foreach ($parsed as $k => $v) {
 
             switch ($v['expr_type']) {
-            case 'colref':
-                $this->replaceKeyword($sql, $v['base_expr'], $v['position'], "uid", "diu");
+            case 'colref': # add alias.* if we have only *!
+                $this->replaceKeyword($v['base_expr'], "uid", "uid_", $out[$k]['base_expr']);
                 break;
             case 'subquery':
-                $this->replaceASWithinAlias($sql, $v['alias']);
-                $this->processSQL($sql, $parsed[$k]['sub_tree']);
+                $this->replaceASWithinAlias($v['alias'], $out[$k]['alias']);
+                $this->processSQL($parsed[$k]['sub_tree'], $out[$k]['sub_tree']);
                 break;
             default:
             }
 
-            // replace the colref * in some cases
+            
+            // remove all other columns, if we have 
+            // a colref * without table alias
         }
     }
 
     
-    private function handleRefClause(&$sql, &$parsed) {
+    private function handleRefClause($parsed, &$out) {
         if ($parsed === false) {
             return;
         }
         foreach ($parsed as $k => $v) {
             if ($v['expr_type'] === 'colref') {
-                $this->replaceKeyword($sql, $v['base_expr'], $v['position'], "uid", "diu");            
+                $this->replaceKeyword($v['base_expr'], "uid", "uid_", $out[$k]['base_expr']);            
             }
         }
     }
     
-    private function handleFrom(&$sql, &$parsed) {
+    private function handleFrom($parsed, &$out) {
         foreach ($parsed as $k => $v) {
 
-            $this->replaceASWithinAlias($sql, $v['alias']);
-            $this->replaceLongTableName($sql, $v['position'], $v['table'],
-                    'surveys_languagesettings', 'surveys_lngsettings');
-
-            $this->handleRefClause($sql, $v['ref_clause']);
+            $this->replaceASWithinAlias($v['alias'], $out[$k]['alias']);
+            $this->replaceLongTableName($v['table'], 'surveys_languagesettings', 'surveys_lngsettings', $out[$k]['table']);
+            $this->handleRefClause($v['ref_clause'], $out[$k]['ref_clause']);
             
             // subquery?
         }
 
     }
 
-    private function handleWhere(&$sql, &$parsed) {
+    private function handleWhere($parsed, &$out) {
         foreach ($parsed as $k => $v) {
 
             switch ($v['expr_type']) {
             case 'subquery':
-                $this->processSQL($sql, $v['base_expr'], $parsed[$k]['sub_tree']);
+                $this->processSQL($v['base_expr'], $parsed[$k]['sub_tree'], $out[$k]['sub_tree']);
                 break;
             case 'colref':
-                $this->replaceKeyword($sql, $v['base_expr'], $v['position'], "uid", "diu");
+                $this->replaceKeyword($v['base_expr'], "uid", "uid_", $out[$k]['base_expr']);
                 break;
             default:
             }
@@ -191,41 +176,41 @@ class OracleSQLParser {
         }
     }
 
-    private function handleGroupBy(&$sql, &$parsed) {
+    private function handleGroupBy($parsed, &$out) {
         foreach ($parsed as $k => $v) {
             if ($v['expr_type'] == 'colref') {
-                $this->replaceKeyword($sql, $v['base_expr'], $v['position'], "uid", "diu");
+                $this->replaceKeyword($v['base_expr'], "uid", "uid_", $out[$k]['base_expr']);
             }
         }
     }
 
-    private function handleOrderBy(&$sql, &$parsed) {
+    private function handleOrderBy($parsed, &$out) {
         foreach ($parsed as $k => $v) {
             if ($v['type'] == 'expression') {
-                $this->replaceKeyword($sql, $v['base_expr'], $v['position'], "uid", "diu");
+                $this->replaceKeyword($v['base_expr'], "uid", "uid_", $out[$k]['base_expr']);
                 //$this->replaceLOBColumn($sql, $v['base_expr'], $v['position']);
             }
         }
     }
 
-    private function handleSelectStatement(&$sql, &$parsed) {
+    private function handleSelectStatement($parsed, &$out) {
 
         foreach ($parsed as $k => $v) {
             switch ($k) {
             case 'SELECT':
-                $this->handleSelect($sql, $parsed[$k]);
+                $this->handleSelect($parsed[$k], $out[$k]);
                 break;
             case 'FROM':
-                $this->handleFrom($sql, $parsed[$k]);
+                $this->handleFrom($parsed[$k], $out[$k]);
                 break;
             case 'WHERE':
-                $this->handleWhere($sql, $parsed[$k]);
+                $this->handleWhere($parsed[$k], $out[$k]);
                 break;
             case 'GROUP':
-                $this->handleGroupBy($sql, $parsed[$k]);
+                $this->handleGroupBy($parsed[$k], $out[$k]);
                 break;
             case 'ORDER':
-                $this->handleOrderBy($sql, $parsed[$k]);
+                $this->handleOrderBy($parsed[$k], $out[$k]);
                 break;
             default:
                 safe_die("unknown SELECT statement part " . $k);
@@ -233,28 +218,28 @@ class OracleSQLParser {
         }
     }
 
-    private function handleUpdating(&$sql, &$parsed) {
+    private function handleUpdating($parsed, &$out) {
         foreach ($parsed as $k => $v) {
-            $this->replaceLongTableName($sql, $v['position'], $v['table'],
-                    'surveys_languagesettings', 'surveys_lngsettings');
+            $this->replaceLongTableName($v['table'],
+                    "surveys_languagesettings", "surveys_lngsettings", $out[$k]['table']);
         }
     }
 
-    private function handleInsert(&$sql, &$parsed) {
+    private function handleInsert($parsed, &$out) {
 
-        $this->replaceLongTableName($sql, $parsed['position'], $parsed['table'],
-                'surveys_languagesettings', 'surveys_lngsettings');
+        $this->replaceLongTableName($parsed['table'],
+                "surveys_languagesettings", "surveys_lngsettings", $out['table']);
 
-        if ($parsed['columns']) { # all column statement
+        if ($parsed['columns']) { # all columns part
             foreach ($parsed['columns'] as $k => $v) {
-                $this->replaceKeyword($sql, $v['base_expr'], $v['position'], "uid", "diu");
+                $this->replaceKeyword($v['base_expr'], "uid", "uid_", $out['columns'][$k]['base_expr']);
             }
         }
     }
 
-    private function handleSet(&$sql, &$parsed) {
+    private function handleSet($parsed, &$out) {
         foreach ($parsed as $k => $v) {
-            $this->replaceKeyword($sql, $v['column'], $v['position'], "uid", "diu");
+            $this->replaceKeyword($v['column'], "uid", "uid_", $out[$k]['column']);
 
             // colref = alias.clob ?
             // subquery?
@@ -262,19 +247,19 @@ class OracleSQLParser {
 
     }
 
-    private function handleValues(&$sql, &$parsed) {
+    private function handleValues($parsed, &$out) {
         // ignore it at the moment
         // some subqueries?
     }
 
-    private function handleInsertStatement($sql, $parsed) {
+    private function handleInsertStatement($parsed, &$out) {
         foreach ($parsed as $k => $v) {
             switch ($k) {
             case 'INSERT':
-                $this->handleInsert($sql, $parsed[$k]);
+                $this->handleInsert($parsed[$k], $out[$k]);
                 break;
             case 'VALUES':
-                $this->handleValues($sql, $parsed[$k]);
+                $this->handleValues($parsed[$k], $out[$k]);
                 break;
             default:
                 safe_die("unknown INSERT statement part " . $k);
@@ -282,21 +267,21 @@ class OracleSQLParser {
         }
     }
 
-    private function handleDeleteStatement($sql, $parsed) {
-        safe_die($sql);
+    private function handleDeleteStatement($parsed, &$out) {
+        safe_die($this->preprint($parsed, true));
     }
 
-    private function handleUpdateStatement($sql, $parsed) {
+    private function handleUpdateStatement($parsed, &$out) {
         foreach ($parsed as $k => $v) {
             switch ($k) {
             case 'UPDATE':
-                $this->handleUpdating($sql, $parsed[$k]);
+                $this->handleUpdating($parsed[$k], $out[$k]);
                 break;
             case 'SET':
-                $this->handleSet($sql, $parsed[$k]);
+                $this->handleSet($parsed[$k], $out[$k]);
                 break;
             case 'WHERE':
-                $this->handleWhere($sql, $parsed[$k]);
+                $this->handleWhere($parsed[$k], $out[$k]);
                 break;
             default:
                 safe_die("unknown UPDATE statement part " . $k);
@@ -304,23 +289,20 @@ class OracleSQLParser {
         }
     }
 
-    private function processSQLStatement(&$sql, &$parsed) {
+    private function processSQLStatement($parsed, &$out) {
         $k = key($parsed);
         switch ($k) {
         case 'SELECT':
-            $this->handleSelectStatement($sql, $parsed);
+            $this->handleSelectStatement($parsed, $out);
             break;
         case 'INSERT':
-            $this->handleInsertStatement($sql, $parsed);
+            $this->handleInsertStatement($parsed, $out);
             break;
         case 'UPDATE':
-            $this->handleUpdateStatement($sql, $parsed);
+            $this->handleUpdateStatement($parsed, $out);
             break;
         case 'DELETE':
-            $this->handleDeleteStatement($sql, $parsed);
-            break;
-        case 'USE': # use database, it is not necessary
-            $sql = "";
+            $this->handleDeleteStatement($parsed, $out);
             break;
         default:
             safe_die("invalid SQL type " . key($parsed));
@@ -329,22 +311,25 @@ class OracleSQLParser {
 
     # prevents parsing of create-oracle.php statements
     # maybe we run into problems with Limesurvey internal creation statements
-    private function isOracleStatement($sql) {
+    private function isNativeStatement($sql) {
         $sql = trim($sql);
-        if (stripos($sql, "CREATE") !== false) {
+        if (stripos($sql, "CREATE") === 0) {
             return true;
         }
-        if (stripos($sql, "ALTER") !== false) {
+        if (stripos($sql, "ALTER") === 0) {
             return true;
         }
-        if (stripos($sql, "COMMENT") !== false) {
+        if (stripos($sql, "COMMENT") === 0) {
+            return true;
+        }
+        if (stripos($sql, "USE") === 0) {
             return true;
         }
         return false;
     }
 
     public function process($sql) {
-        if ($this->isOracleStatement($sql)) {
+        if ($this->isNativeStatement($sql)) {
             return $sql;
         }
 
@@ -353,10 +338,13 @@ class OracleSQLParser {
 
         echo "before: " . $this->preprint($sql, true) . "\n";
         print_r($parsed);
-        $this->processSQLStatement($sql, $parsed);
-        echo "after: " . $this->preprint($sql, true) . "\n";
+        $this->processSQLStatement($parser->parsed, $parsed);
+        print_r($parsed);
 
-        return rtrim(trim($sql), ';');
+        $creator = new PHPSQLCreator($parsed);
+        $sql = $creator->created;
+        echo "after: " . $this->preprint($sql, true) . "\n";
+        return $sql;
     }
 
     public function getAllTables($sql) {
@@ -367,7 +355,7 @@ class OracleSQLParser {
 }
 
 $parser = new OracleSQLParser(false);
-$parser->process("SELECT a.*, c.*, u.users_name FROM SURVEYS as a  INNER JOIN SURVEYS_LANGUAGESETTINGS as c ON ( surveyls_survey_id = a.sid AND surveyls_language = a.language ) AND surveyls_survey_id=a.sid and surveyls_language=a.language  INNER JOIN USERS as u ON (u.uid=a.owner_id)  ORDER BY surveyls_title");
+//$parser->process("SELECT a.*, c.*, u.users_name FROM SURVEYS as a  INNER JOIN SURVEYS_LANGUAGESETTINGS as c ON ( surveyls_survey_id = a.sid AND surveyls_language = a.language ) AND surveyls_survey_id=a.sid and surveyls_language=a.language  INNER JOIN USERS as u ON (u.uid=a.owner_id)  ORDER BY surveyls_title");
 //$parser->process(" SELECT a.*, surveyls_title, surveyls_description, surveyls_welcometext, surveyls_url  FROM SURVEYS AS a INNER JOIN SURVEYS_LANGUAGESETTINGS on (surveyls_survey_id=a.sid and surveyls_language=a.language)  order by active DESC, surveyls_title");
 //$parser->process(" INSERT INTO settings_global VALUES ('DBVersion', '146')");
 //$parser->process("CREATE TABLE answers ( qid number(11) default '0' NOT NULL, code varchar2(5) default '' NOT NULL, answer CLOB NOT NULL, assessment_value number(11) default '0' NOT NULL, sortorder number(11) NOT NULL, language varchar2(20) default 'en', scale_id number(3) default '0' NOT NULL, PRIMARY KEY (qid,code,language,scale_id) )");
@@ -375,5 +363,5 @@ $parser->process("SELECT a.*, c.*, u.users_name FROM SURVEYS as a  INNER JOIN SU
 //$parser->process("insert into SETTINGS_GLOBAL (stg_value,stg_name) values('','force_ssl')");
 //$parser->process("SELECT * FROM SETTINGS_GLOBAL");
 //$parser->process("SELECT stg_value FROM SETTINGS_GLOBAL where stg_name='force_ssl'");
-//$parser->process("update SETTINGS_GLOBAL set stg_value='' where stg_name='force_ssl'");
+$parser->process("update SETTINGS_GLOBAL set stg_value='' where stg_name='force_ssl'");
 //$parser->process("SELECT * FROM FAILED_LOGIN_ATTEMPTS WHERE ip='172.18.47.211'");
