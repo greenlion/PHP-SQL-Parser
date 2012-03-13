@@ -12,6 +12,8 @@ $sql = 'SELECT a.field1, b.field1, c.field1
 
 $parser->parse($sql);
 $p = $parser->parsed;
+
+print_r($p);
 $expected = getExpectedValue('left1.serialized');
 eq_array($p, $expected, 'left join with alias');
 

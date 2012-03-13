@@ -973,20 +973,19 @@ EOREGEX
 
                   if($subquery) {
                      $sub_tree = $this->parse($this->removeParenthesisFromStart($subquery));
-                     $base_expr=$subquery;
+                     $expression=$subquery;
                   }
 
                   if(substr(trim($table),0,1) == '(') {
-                     $base_expr=$this->removeParenthesisFromStart($table);
+                     $expression=$this->removeParenthesisFromStart($table);
                      $join_type = 'JOIN';
-                     $sub_tree = $this->split_sql($base_expr);
+                     $sub_tree = $this->split_sql($expression);
                      $sub_tree = $this->process_from($sub_tree);
                      $alias="";
                   }
 
-
                   if($join_type == "") $join_type='JOIN';
-                  $expr[] = array('table'=>$table, 'alias'=>$alias,'join_type'=>$join_type,'ref_type'=> $ref_type,'ref_clause'=>$this->removeParenthesisFromStart($ref_expr), 'base_expr' => $base_expr, 'sub_tree' => $sub_tree);
+                  $expr[] = array('table'=>$table, 'alias'=>$alias,'join_type'=>$join_type,'ref_type'=> $ref_type,'ref_clause'=>$this->removeParenthesisFromStart($ref_expr), 'base_expr' => $expression, 'sub_tree' => $sub_tree);
                   $modifier = "";
 
                   $token_count = 0;
