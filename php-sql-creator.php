@@ -274,10 +274,10 @@ if (!defined('HAVE_PHP_SQL_CREATOR')) {
             }
 
             $sql = $parsed['table'];
-            $sql .= $this->processAlias($parsed['alias']);
+            $sql .= " " . $this->processAlias($parsed['alias']);
 
             if ($index !== 0) {
-                $sql = $this->processJoin($parsed['join_type']) . " " . $sql;
+                $sql = " " . $this->processJoin($parsed['join_type']) . " " . $sql;
                 $sql .= $this->processRefType($parsed['ref_type']);
                 $sql .= $this->processRefClause($parsed['ref_clause']);
             }
