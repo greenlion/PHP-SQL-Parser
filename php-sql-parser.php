@@ -223,7 +223,7 @@ if (!defined('HAVE_PHP_SQL_PARSER')) {
             foreach ($parsed as $key => $value) {
                 if ($key === 'base_expr') {
 
-                    $pattern = "/" . str_replace(" ", "\\s+", "(^|\\s|\\(|,)" . preg_quote($value) . "(\\)|,|;|\\s|$)")
+                    $pattern = "/" . str_replace(" ", "\\s+", "(^|\\s|\\(|,|=|\||<|>|&|\+|-|\*|\/)" . preg_quote($value) . "(\\)|,|>|<|\||!|=|\+|\*|-|\/|&|;|\\s|$)")
                             . "/";
                     $subject = substr($sql, $charPos);
                     $search = preg_split($pattern, $subject, -1, PREG_SPLIT_OFFSET_CAPTURE);
