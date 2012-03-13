@@ -233,7 +233,6 @@ class OracleSQLTranslator extends PHPSQLCreator {
 
         # if we have * as colref, we cannot use other columns
         # we have to add alias.* if we know all table aliases
-        # FIXME: this goes wrong for count(*)
         if (($table === "") && ($col === "*")) {
             array_pop($this->preventColumnRefs);
             $this->preventColumnRefs[] = true;
@@ -248,9 +247,38 @@ class OracleSQLTranslator extends PHPSQLCreator {
         return (($table !== "") ? ($table . "." . $col) : $col) . $alias;
     }
 
+    protected function processFunctionOnSelect($parsed) {
+        $old = end($this->preventColumnRefs);
+        $sql = $this->processFunction($v);
+
+        if ($old === end($this->preventColumnRefs)) {
+            return $sql;
+        }
+        
+        # prevents wrong handling of count(*)
+        array_pop($this->preventColumnRefs);
+        $this->preventColumnRefs[] = old;
+    }
+
     protected function processSELECT($parsed) {
         $this->preventColumnRefs[] = false;
-        return parent::processSELECT($parsed);
+
+        $sql = "";
+        foreach ($parsed as $k => $v) {
+            $len = strlen($sql);
+            $sql .= $this->processColRef($v);
+            $sql .= $this->processSelectExpression($v);
+            $sql .= $this->processFunctionOnSelect($v);
+            $sql .= $this->processConstant($v);
+
+            if ($len == strlen($sql)) {
+                $this->stop('SELECT', $k, $v, 'expr_type');
+            }
+
+            $sql .= ",";
+        }
+        $sql = substr($sql, 0, -1);
+        return "SELECT " . $sql;
     }
 
     private function correctColRefStatement($sql) {
