@@ -147,8 +147,7 @@ if (!defined('HAVE_PHP_SQL_PARSER')) {
 
                         # starts with "(select"
                         if (preg_match('/^\\(\\s*select\\s*/i', $token)) {
-                            $queries[$unionType][$key] = $this->parse(
-                                    $this->removeParenthesisFromStart($token));
+                            $queries[$unionType][$key] = $this->parse($this->removeParenthesisFromStart($token));
                             break;
                         }
 
@@ -186,10 +185,14 @@ if (!defined('HAVE_PHP_SQL_PARSER')) {
             foreach ($parsed as $key => $value) {
                 if ($key === 'base_expr') {
 
-                    $pattern = "/" . str_replace(" ", "\\s+", $value) . "/";
+                    $pattern = "/" . str_replace(" ", "\\s+", $value . "[^a-zA-Z0-9]") . "/";
                     $subject = substr($sql, $charPos);
                     $search = preg_split($pattern, $subject, -1, PREG_SPLIT_OFFSET_CAPTURE);
 
+                    echo $pattern."\n";
+                    echo $subject."\n"; # here are problems within positions.php
+                    print_r($search);
+                    
                     $before = $search[0];
                     $after = $search[1];
 
@@ -198,7 +201,7 @@ if (!defined('HAVE_PHP_SQL_PARSER')) {
 
                 } else {
                     if (!is_numeric($key)) {
-                        if (in_array($key, array('alias', 'UNION', 'UNION ALL', 'columns'), true)) {
+                        if (in_array($key, array('alias', 'UNION', 'UNION ALL', 'columns', 'ref_clause'), true)) {
                             $oldPos = $charPos;
                         } else {
                             # SELECT, WHERE, INSERT etc.
@@ -231,8 +234,7 @@ if (!defined('HAVE_PHP_SQL_PARSER')) {
                 }
 
             }
-            return array('open' => $open, 'close' => $close,
-                         'balanced' => (count($close) - count($open)));
+            return array('open' => $open, 'close' => $close, 'balanced' => (count($close) - count($open)));
         }
 
         #This function counts open and close backticks and
@@ -253,8 +255,8 @@ if (!defined('HAVE_PHP_SQL_PARSER')) {
 
             # issue 21: replace tabs within the query string
             # TODO: this removes special characters also from inside of Strings
-            return str_replace(array('\\\'', '\\"', "\r\n", "\n", "\t", "()"),
-                    array("''", '""', "  ", " ", " ", "  "), $sql);
+            return str_replace(array('\\\'', '\\"', "\r\n", "\n", "\t", "()"), array("''", '""', "  ", " ", " ", "  "),
+                    $sql);
         }
 
         #This is the lexer
@@ -709,8 +711,7 @@ EOREGEX
          This function produces a list of the key/value expressions.
          */
         private function getColumn($column, $expression, $base_expr) {
-            return array('column' => trim($column), 'expr' => trim($expression),
-                         'base_expr' => trim($base_expr));
+            return array('column' => trim($column), 'expr' => trim($expression), 'base_expr' => trim($base_expr));
         }
 
         private function process_set_list($tokens) {
@@ -859,13 +860,10 @@ EOREGEX
 
                 if (isset($prev)
                         && ($prev['expr_type'] == 'reserved' || $prev['expr_type'] == 'const'
-                                || $prev['expr_type'] == 'function'
-                                || $prev['expr_type'] == 'expression'
-                                || $prev['expr_type'] == 'subquery'
-                                || $prev['expr_type'] == 'colref')) {
+                                || $prev['expr_type'] == 'function' || $prev['expr_type'] == 'expression'
+                                || $prev['expr_type'] == 'subquery' || $prev['expr_type'] == 'colref')) {
 
-                    $alias = array('as' => false, 'name' => $last['base_expr'],
-                                   'base_expr' => $last['base_expr']);
+                    $alias = array('as' => false, 'name' => trim($last['base_expr']), 'base_expr' => trim($last['base_expr']));
                     #remove the last token
                     array_pop($tokens);
                     $base_expr = join("", $tokens);
@@ -876,10 +874,13 @@ EOREGEX
                 $base_expr = join("", $tokens);
             } else {
                 /* Properly escape the alias if it is not escaped */
+                $alias['name'] = trim($alias['name']);
+                $alias['base_expr'] = trim($alias['base_expr']);
                 if ($alias['name'][0] != '`') {
                     $alias['name'] = '`' . str_replace('`', '``', $alias['name']) . '`';
                 }
             }
+
             $processed = false;
             $type = 'expression';
 
@@ -895,37 +896,22 @@ EOREGEX
                 }
             }
 
-            return array('expr_type' => $type, 'alias' => $alias, 'base_expr' => $base_expr,
-                         'sub_tree' => $processed);
+            return array('expr_type' => $type, 'alias' => $alias, 'base_expr' => trim($base_expr), 'sub_tree' => $processed);
         }
 
         private function process_from(&$tokens) {
 
-            $expression = "";
+            $data = $this->initializeTableExpression();
             $expr = array();
-            $token_count = 0;
-            $table = "";
-            $alias = false;
 
             $skip_next = false;
             $i = 0;
-            $join_type = '';
-            $ref_type = "";
-            $ref_expr = "";
-            $base_expr = "";
-            $sub_tree = false;
-            $subquery = "";
-
-            $first_join = true;
-            $modifier = "";
-            $saved_join_type = "";
 
             foreach ($tokens as $token) {
-                $base_expr = false; # why we set this to false on every loop?
                 $upper = strtoupper(trim($token));
 
                 if ($skip_next && $token !== "") {
-                    $token_count++;
+                    $data['token_count']++;
                     $skip_next = false;
                     continue;
                 } else {
@@ -936,10 +922,10 @@ EOREGEX
 
                 # do we have a subquery within the from clause?
                 if (preg_match("/^\\s*\\(\\s*select/i", $token)) {
-                    $type = 'subquery';
-                    $table = "DEPENDENT-SUBQUERY";
-                    $sub_tree = $this->parse(removeParenthesisFromStart($token));
-                    $subquery = $token;
+                    $data['type'] = 'subquery';
+                    $data['table'] = "DEPENDENT-SUBQUERY";
+                    $data['sub_tree'] = $this->parse(removeParenthesisFromStart($token));
+                    $data['subquery'] = $token;
                 }
 
                 switch ($upper) {
@@ -950,28 +936,30 @@ EOREGEX
                 case 'CROSS':
                 case ',':
                 case 'JOIN':
+                case 'INNER':
                     break;
 
                 default:
-                    $expression .= $token == '' ? " " : $token;
-                    if ($ref_type !== "") { # ON / USING
-                        $ref_expr .= $token == '' ? " " : $token;
+                    $data['expression'] .= $token == '' ? " " : $token;
+                    if ($data['ref_type'] !== false) { # all after ON / USING
+                        $data['ref_expr'] .= $token == '' ? " " : $token;
                     }
                     break;
                 }
 
                 switch ($upper) {
                 case 'AS':
-                    $alias = array('as' => true, 'name' => "", 'base_expr' => $token);
-                    $token_count++;
+                    $data['alias'] = array('as' => true, 'name' => "", 'base_expr' => $token);
+                    $data['token_count']++;
                     $n = 1;
                     $str = "";
                     while ($str == "") {
-                        $alias['base_expr'] .= ($tokens[$i + $n] === "" ? " " : $tokens[$i + $n]);
+                        $data['alias']['base_expr'] .= ($tokens[$i + $n] === "" ? " " : $tokens[$i + $n]);
                         $str = trim($tokens[$i + $n]);
                         ++$n;
                     }
-                    $alias['name'] = $str;
+                    $data['alias']['name'] = $str;
+                    $data['alias']['base_expr'] = trim($data['alias']['base_expr']);
                     continue;
 
                 case 'INDEX':
@@ -984,8 +972,8 @@ EOREGEX
 
                 case 'USING':
                 case 'ON':
-                    $ref_type = $upper;
-                    $ref_expr = "";
+                    $data['ref_type'] = $upper;
+                    $data['ref_expr'] = "";
 
                 case 'CROSS':
                 case 'USE':
@@ -993,12 +981,12 @@ EOREGEX
                 case 'IGNORE':
                 case 'INNER':
                 case 'OUTER':
-                    $token_count++;
+                    $data['token_count']++;
                     continue;
                     break;
 
                 case 'FOR':
-                    $token_count++;
+                    $data['token_count']++;
                     $skip_next = true;
                     continue;
                     break;
@@ -1006,104 +994,82 @@ EOREGEX
                 case 'LEFT':
                 case 'RIGHT':
                 case 'STRAIGHT_JOIN':
-                    $join_type = $saved_join_type;
-
-                    $modifier = $upper . " ";
+                    $data['next_join_type'] = $upper . " ";
                     break;
 
                 case ',':
-                    $modifier = 'CROSS';
+                    $data['next_join_type'] = 'CROSS';
 
                 case 'JOIN':
-                    if ($first_join) {
-                        $join_type = 'JOIN';
-                        $saved_join_type = ($modifier ? $modifier : 'JOIN');
-                    } else {
-                        $new_join_type = ($modifier ? $modifier : 'JOIN');
-                        $join_type = $saved_join_type; # this is already made on the join types, do we need it?
-                        $saved_join_type = $new_join_type;
-                        unset($new_join_type);
+                    if ($data['subquery']) {
+                        $data['sub_tree'] = $this->parse($this->removeParenthesisFromStart($data['subquery']));
+                        $data['expression'] = $data['subquery'];
                     }
 
-                    $first_join = false;
-
-                    if ($subquery) {
-                        $sub_tree = $this->parse($this->removeParenthesisFromStart($subquery));
-                        $expression = $subquery;
-                    }
-
-                    if (substr(trim($table), 0, 1) == '(') {
-                        $expression = $this->removeParenthesisFromStart($table);
-                        $join_type = 'JOIN';
-                        $sub_tree = $this->split_sql($expression);
-                        $sub_tree = $this->process_from($sub_tree);
-                        $alias = false;
-
-                        $expr[] = array('expr_type' => 'table-expression', 'alias' => $alias,
-                                        'join_type' => $saved_join_type, 'ref_type' => $ref_type,
-                                        'ref_clause' => $this->removeParenthesisFromStart($ref_expr),
-                                        'base_expr' => $expression, 'sub_tree' => $sub_tree);
-
-                    } else {
-
-                        $expr[] = array('expr_type' => 'table', 'table' => $table,
-                                        'alias' => $alias, 'join_type' => $join_type,
-                                        'ref_type' => $ref_type,
-                                        'ref_clause' => $this->removeParenthesisFromStart($ref_expr),
-                                        'base_expr' => $expression, 'sub_tree' => $sub_tree);
-                    }
-
-                    $modifier = ""; #it is stored into saved_join_type
-
-                    $token_count = 0; # we start a new part of the expression
-                    $table = $expression = $base_expr = $ref_type = $ref_expr = $subquery = "";
-                    $sub_tree = $alias = false;
+                    $expr[] = $this->saveTableExpression($data);
+                    $data = $this->initializeTableExpression($data);
                     break;
 
                 default:
-                # this "continue" moves to the end of the "default" statement
                     if ($upper === "") {
-                        continue;
+                        continue; # ends the switch statement!
                     }
 
-                    if ($token_count == 0) {
-                        if ($table === "") {
-                            $table = $token;
+                    if ($data['token_count'] == 0) {
+                        if ($data['table'] === "") {
+                            $data['table'] = $token;
                         }
-                    } else if ($token_count == 1) {
-                        $alias = array('as' => false, 'name' => $token, 'base_expr' => $token);
+                    } else if ($data['token_count'] == 1) {
+                        $data['alias'] = array('as' => false, 'name' => trim($token), 'base_expr' => trim($token));
                     }
-                    $token_count++;
+                    $data['token_count']++;
                     break;
                 }
                 ++$i;
             }
 
-            # this occurs, if we have a single table
-            if ($join_type == "") {
-                $saved_join_type = 'JOIN';
-            }
-
-            if (substr(trim($table), 0, 1) == '(') {
-                $expression = $this->removeParenthesisFromStart($table);
-                $join_type = 'JOIN';
-                $sub_tree = $this->split_sql($expression);
-                $sub_tree = $this->process_from($sub_tree);
-                $alias = false;
-
-                $expr[] = array('expr_type' => 'table-expression', 'alias' => $alias,
-                                'join_type' => $saved_join_type, 'ref_type' => $ref_type,
-                                'ref_clause' => $this->removeParenthesisFromStart($ref_expr),
-                                'base_expr' => $expression, 'sub_tree' => $sub_tree);
-            } else {
-
-                $expr[] = array('expr_type' => 'table', 'table' => $table, 'alias' => $alias,
-                                'join_type' => $saved_join_type, 'ref_type' => $ref_type,
-                                'ref_clause' => $this->removeParenthesisFromStart($ref_expr),
-                                'base_expr' => $expression, 'sub_tree' => $sub_tree);
-            }
-
+            $expr[] = $this->saveTableExpression($data);
             return $expr;
+        }
+
+        private function initializeTableExpression($data = false) {
+            # first init
+            if ($data === false) {
+                $data = array('join_type' => "", 'saved_join_type' => "JOIN");
+            }
+            # loop init
+            return array('expression' => "", 'token_count' => 0, 'table' => "", 'alias' => false, 'join_type' => "",
+                         'next_join_type' => "", 'saved_join_type' => $data['saved_join_type'], 'ref_type' => false,
+                         'ref_expr' => false, 'base_expr' => false, 'sub_tree' => false, 'subquery' => "");
+        }
+
+        private function saveTableExpression(&$data) {
+
+            # exchange the join types (join_type is saved now, saved_join_type holds the next one)
+            $data['join_type'] = $data['saved_join_type']; # initialized with JOIN
+            $data['saved_join_type'] = ($data['next_join_type'] ? $data['next_join_type'] : 'JOIN');
+
+            # we have a reg_expr, so we have to parse it
+            if ($data['ref_expr'] !== false) {
+                $data['ref_expr'] = $this->process_expr_list(
+                        $this->split_sql($this->removeParenthesisFromStart($data['ref_expr'])));
+            }
+
+            # there is an expression, we have to parse it
+            if (substr(trim($data['table']), 0, 1) == '(') {
+                $data['expression'] = $this->removeParenthesisFromStart($data['table']);
+                $tmp = $this->split_sql($data['expression']);
+                $data['sub_tree'] = $this->process_from($tmp);
+
+                return array('expr_type' => 'table-expression', 'alias' => false, 'join_type' => $data['join_type'],
+                             'ref_type' => "", 'ref_clause' => "", 'base_expr' => trim($data['expression']),
+                             'sub_tree' => $data['sub_tree']);
+            }
+
+            return array('expr_type' => 'table', 'table' => $data['table'], 'alias' => $data['alias'],
+                         'join_type' => $data['join_type'], 'ref_type' => $data['ref_type'],
+                         'ref_clause' => $data['ref_expr'], 'base_expr' => trim($data['expression']),
+                         'sub_tree' => $data['sub_tree']);
         }
 
         private function process_group(&$tokens, &$select) {
@@ -1147,8 +1113,7 @@ EOREGEX
                         }
                     }
 
-                    $out[] = array('type' => $type, 'base_expr' => $expression,
-                                   'direction' => $direction);
+                    $out[] = array('type' => $type, 'base_expr' => $expression, 'direction' => $direction);
                     $escaped = "";
                     $expression = "";
                     $direction = "ASC";
@@ -1197,8 +1162,7 @@ EOREGEX
                         $type = "expression";
                 }
 
-                $out[] = array('type' => $type, 'base_expr' => $expression,
-                               'direction' => $direction);
+                $out[] = array('type' => $type, 'base_expr' => $expression, 'direction' => $direction);
             }
 
             return $out;
@@ -1235,7 +1199,10 @@ EOREGEX
          processes these sections.  Recursive.
          */
         private function process_expr_list($tokens) {
+
+            $processed = false;
             $expr = "";
+            $expr_type = false;
             $type = "";
             $prev_token = "";
             $skip_next = false;
@@ -1244,8 +1211,9 @@ EOREGEX
             $in_lists = array();
             foreach ($tokens as $key => $token) {
 
-                if (trim($token) === "")
+                if (trim($token) === "") {
                     continue;
+                }
                 if ($skip_next) {
                     $skip_next = false;
                     continue;
@@ -1253,8 +1221,10 @@ EOREGEX
 
                 $processed = false;
                 $upper = strtoupper(trim($token));
-                if (trim($token) !== "")
+
+                if (trim($token) !== "") {
                     $token = trim($token);
+                }
 
                 /* is it a subquery?*/
                 if (preg_match("/^\\s*\\(\\s*SELECT/i", $token)) {
@@ -1312,8 +1282,7 @@ EOREGEX
                             break;
                         }
 
-                        if ($last['expr_type'] === 'colref'
-                                && substr($last['base_expr'], -1, 1) === ".") {
+                        if ($last['expr_type'] === 'colref' && substr($last['base_expr'], -1, 1) === ".") {
                             $last['base_expr'] .= '*'; # tablealias dot *
                             $expr[] = $last;
                             continue 2;
@@ -1446,8 +1415,7 @@ EOREGEX
 
                 $sub_expr = "";
 
-                $expr[] = array('expr_type' => $type, 'base_expr' => $token,
-                                'sub_tree' => $processed);
+                $expr[] = array('expr_type' => $type, 'base_expr' => $token, 'sub_tree' => $processed);
                 $prev_token = $upper;
                 $expr_type = "";
                 $type = "";
@@ -1459,13 +1427,13 @@ EOREGEX
 
             if (!is_array($processed)) {
                 # fixed issue 12.1
+                # it seems that we reach that point it the $tokens is empty
                 $this->preprint($processed); # why we do that?
                 $processed = false;
             }
 
             if ($expr_type) {
-                $expr[] = array('expr_type' => $type, 'base_expr' => $token,
-                                'sub_tree' => $processed);
+                $expr[] = array('expr_type' => $type, 'base_expr' => $token, 'sub_tree' => $processed);
             }
             return $expr;
         }
@@ -1520,8 +1488,7 @@ EOREGEX
             }
 
             unset($tokens['INTO']);
-            $tokens[$token_category] = array('table' => $table, 'columns' => $cols,
-                                             'base_expr' => $table);
+            $tokens[$token_category] = array('table' => $table, 'columns' => $cols, 'base_expr' => $table);
             return $tokens;
         }
 
@@ -1549,130 +1516,99 @@ EOREGEX
 
         private function load_reserved_words() {
 
-            $this->functions = array('abs', 'acos', 'adddate', 'addtime', 'aes_encrypt',
-                                     'aes_decrypt', 'against', 'ascii', 'asin', 'atan', 'avg',
-                                     'benchmark', 'bin', 'bit_and', 'bit_or', 'bitcount',
-                                     'bitlength', 'cast', 'ceiling', 'char', 'char_length',
-                                     'character_length', 'charset', 'coalesce', 'coercibility',
-                                     'collation', 'compress', 'concat', 'concat_ws',
-                                     'conection_id', 'conv', 'convert', 'convert_tz', 'cos', 'cot',
-                                     'count', 'crc32', 'curdate', 'current_user', 'currval',
-                                     'curtime', 'database', 'date_add', 'date_diff', 'date_format',
-                                     'date_sub', 'day', 'dayname', 'dayofmonth', 'dayofweek',
-                                     'dayofyear', 'decode', 'default', 'degrees', 'des_decrypt',
-                                     'des_encrypt', 'elt', 'encode', 'encrypt', 'exp',
-                                     'export_set', 'extract', 'field', 'find_in_set', 'floor',
-                                     'format', 'found_rows', 'from_days', 'from_unixtime',
-                                     'get_format', 'get_lock', 'group_concat', 'greatest', 'hex',
-                                     'hour', 'if', 'ifnull', 'in', 'inet_aton', 'inet_ntoa',
-                                     'insert', 'instr', 'interval', 'is_free_lock', 'is_used_lock',
-                                     'last_day', 'last_insert_id', 'lcase', 'least', 'left',
-                                     'length', 'ln', 'load_file', 'localtime', 'localtimestamp',
-                                     'locate', 'log', 'log2', 'log10', 'lower', 'lpad', 'ltrim',
-                                     'make_set', 'makedate', 'maketime', 'master_pos_wait',
-                                     'match', 'max', 'md5', 'microsecond', 'mid', 'min', 'minute',
-                                     'mod', 'month', 'monthname', 'nextval', 'now', 'nullif',
-                                     'oct', 'octet_length', 'old_password', 'ord', 'password',
-                                     'period_add', 'period_diff', 'pi', 'position', 'pow', 'power',
-                                     'quarter', 'quote', 'radians', 'rand', 'release_lock',
-                                     'repeat', 'replace', 'reverse', 'right', 'round', 'row_count',
-                                     'rpad', 'rtrim', 'sec_to_time', 'second', 'session_user',
-                                     'sha', 'sha1', 'sign', 'soundex', 'space', 'sqrt', 'std',
-                                     'stddev', 'stddev_pop', 'stddev_samp', 'strcmp',
-                                     'str_to_date', 'subdate', 'substring', 'substring_index',
-                                     'subtime', 'sum', 'sysdate', 'system_user', 'tan', 'time',
-                                     'timediff', 'timestamp', 'timestampadd', 'timestampdiff',
-                                     'time_format', 'time_to_sec', 'to_days', 'trim', 'truncate',
-                                     'ucase', 'uncompress', 'uncompressed_length', 'unhex',
-                                     'unix_timestamp', 'upper', 'user', 'utc_date', 'utc_time',
-                                     'utc_timestamp', 'uuid', 'var_pop', 'var_samp', 'variance',
-                                     'version', 'week', 'weekday', 'weekofyear', 'year',
-                                     'yearweek');
+            $this->functions = array('abs', 'acos', 'adddate', 'addtime', 'aes_encrypt', 'aes_decrypt', 'against',
+                                     'ascii', 'asin', 'atan', 'avg', 'benchmark', 'bin', 'bit_and', 'bit_or',
+                                     'bitcount', 'bitlength', 'cast', 'ceiling', 'char', 'char_length',
+                                     'character_length', 'charset', 'coalesce', 'coercibility', 'collation',
+                                     'compress', 'concat', 'concat_ws', 'conection_id', 'conv', 'convert',
+                                     'convert_tz', 'cos', 'cot', 'count', 'crc32', 'curdate', 'current_user',
+                                     'currval', 'curtime', 'database', 'date_add', 'date_diff', 'date_format',
+                                     'date_sub', 'day', 'dayname', 'dayofmonth', 'dayofweek', 'dayofyear', 'decode',
+                                     'default', 'degrees', 'des_decrypt', 'des_encrypt', 'elt', 'encode', 'encrypt',
+                                     'exp', 'export_set', 'extract', 'field', 'find_in_set', 'floor', 'format',
+                                     'found_rows', 'from_days', 'from_unixtime', 'get_format', 'get_lock',
+                                     'group_concat', 'greatest', 'hex', 'hour', 'if', 'ifnull', 'in', 'inet_aton',
+                                     'inet_ntoa', 'insert', 'instr', 'interval', 'is_free_lock', 'is_used_lock',
+                                     'last_day', 'last_insert_id', 'lcase', 'least', 'left', 'length', 'ln',
+                                     'load_file', 'localtime', 'localtimestamp', 'locate', 'log', 'log2', 'log10',
+                                     'lower', 'lpad', 'ltrim', 'make_set', 'makedate', 'maketime', 'master_pos_wait',
+                                     'match', 'max', 'md5', 'microsecond', 'mid', 'min', 'minute', 'mod', 'month',
+                                     'monthname', 'nextval', 'now', 'nullif', 'oct', 'octet_length', 'old_password',
+                                     'ord', 'password', 'period_add', 'period_diff', 'pi', 'position', 'pow', 'power',
+                                     'quarter', 'quote', 'radians', 'rand', 'release_lock', 'repeat', 'replace',
+                                     'reverse', 'right', 'round', 'row_count', 'rpad', 'rtrim', 'sec_to_time',
+                                     'second', 'session_user', 'sha', 'sha1', 'sign', 'soundex', 'space', 'sqrt',
+                                     'std', 'stddev', 'stddev_pop', 'stddev_samp', 'strcmp', 'str_to_date', 'subdate',
+                                     'substring', 'substring_index', 'subtime', 'sum', 'sysdate', 'system_user', 'tan',
+                                     'time', 'timediff', 'timestamp', 'timestampadd', 'timestampdiff', 'time_format',
+                                     'time_to_sec', 'to_days', 'trim', 'truncate', 'ucase', 'uncompress',
+                                     'uncompressed_length', 'unhex', 'unix_timestamp', 'upper', 'user', 'utc_date',
+                                     'utc_time', 'utc_timestamp', 'uuid', 'var_pop', 'var_samp', 'variance', 'version',
+                                     'week', 'weekday', 'weekofyear', 'year', 'yearweek');
 
             /* includes functions */
-            $this->reserved = array('abs', 'acos', 'adddate', 'addtime', 'aes_encrypt',
-                                    'aes_decrypt', 'against', 'ascii', 'asin', 'atan', 'avg',
-                                    'benchmark', 'bin', 'bit_and', 'bit_or', 'bitcount',
-                                    'bitlength', 'cast', 'ceiling', 'char', 'char_length',
-                                    'character_length', 'charset', 'coalesce', 'coercibility',
-                                    'collation', 'compress', 'concat', 'concat_ws', 'conection_id',
-                                    'conv', 'convert', 'convert_tz', 'cos', 'cot', 'count',
-                                    'crc32', 'curdate', 'current_user', 'currval', 'curtime',
-                                    'database', 'date_add', 'date_diff', 'date_format', 'date_sub',
-                                    'day', 'dayname', 'dayofmonth', 'dayofweek', 'dayofyear',
-                                    'decode', 'default', 'degrees', 'des_decrypt', 'des_encrypt',
-                                    'elt', 'encode', 'encrypt', 'exp', 'export_set', 'extract',
-                                    'field', 'find_in_set', 'floor', 'format', 'found_rows',
-                                    'from_days', 'from_unixtime', 'get_format', 'get_lock',
-                                    'group_concat', 'greatest', 'hex', 'hour', 'if', 'ifnull',
-                                    'in', 'inet_aton', 'inet_ntoa', 'insert', 'instr', 'interval',
-                                    'is_free_lock', 'is_used_lock', 'last_day', 'last_insert_id',
-                                    'lcase', 'least', 'left', 'length', 'ln', 'load_file',
-                                    'localtime', 'localtimestamp', 'locate', 'log', 'log2',
-                                    'log10', 'lower', 'lpad', 'ltrim', 'make_set', 'makedate',
-                                    'maketime', 'master_pos_wait', 'match', 'max', 'md5',
-                                    'microsecond', 'mid', 'min', 'minute', 'mod', 'month',
-                                    'monthname', 'nextval', 'now', 'nullif', 'oct', 'octet_length',
-                                    'old_password', 'ord', 'password', 'period_add', 'period_diff',
-                                    'pi', 'position', 'pow', 'power', 'quarter', 'quote',
-                                    'radians', 'rand', 'release_lock', 'repeat', 'replace',
-                                    'reverse', 'right', 'round', 'row_count', 'rpad', 'rtrim',
-                                    'sec_to_time', 'second', 'session_user', 'sha', 'sha1', 'sign',
-                                    'soundex', 'space', 'sqrt', 'std', 'stddev', 'stddev_pop',
-                                    'stddev_samp', 'strcmp', 'str_to_date', 'subdate', 'substring',
-                                    'substring_index', 'subtime', 'sum', 'sysdate', 'system_user',
-                                    'tan', 'time', 'timediff', 'timestamp', 'timestampadd',
-                                    'timestampdiff', 'time_format', 'time_to_sec', 'to_days',
-                                    'trim', 'truncate', 'ucase', 'uncompress',
-                                    'uncompressed_length', 'unhex', 'unix_timestamp', 'upper',
-                                    'user', 'utc_date', 'utc_time', 'utc_timestamp', 'uuid',
-                                    'var_pop', 'var_samp', 'variance', 'version', 'week',
-                                    'weekday', 'weekofyear', 'year', 'yearweek', 'add', 'all',
-                                    'alter', 'analyze', 'and', 'as', 'asc', 'asensitive',
-                                    'auto_increment', 'bdb', 'before', 'berkeleydb', 'between',
-                                    'bigint', 'binary', 'blob', 'both', 'by', 'call', 'cascade',
-                                    'case', 'change', 'char', 'character', 'check', 'collate',
-                                    'column', 'columns', 'condition', 'connection', 'constraint',
-                                    'continue', 'create', 'cross', 'current_date', 'current_time',
-                                    'current_timestamp', 'cursor', 'database', 'databases',
-                                    'day_hour', 'day_microsecond', 'day_minute', 'day_second',
-                                    'dec', 'decimal', 'declare', 'default', 'delayed', 'delete',
-                                    'desc', 'describe', 'deterministic', 'distinct', 'distinctrow',
-                                    'div', 'double', 'drop', 'else', 'elseif', 'end', 'enclosed',
-                                    'escaped', 'exists', 'exit', 'explain', 'false', 'fetch',
-                                    'fields', 'float', 'for', 'force', 'foreign', 'found',
-                                    'frac_second', 'from', 'fulltext', 'grant', 'group', 'having',
-                                    'high_priority', 'hour_microsecond', 'hour_minute',
-                                    'hour_second', 'if', 'ignore', 'in', 'index', 'infile',
-                                    'inner', 'innodb', 'inout', 'insensitive', 'insert', 'int',
-                                    'integer', 'interval', 'into', 'io_thread', 'is', 'iterate',
-                                    'join', 'key', 'keys', 'kill', 'leading', 'leave', 'left',
-                                    'like', 'limit', 'lines', 'load', 'localtime',
-                                    'localtimestamp', 'lock', 'long', 'longblob', 'longtext',
-                                    'loop', 'low_priority', 'master_server_id', 'match',
-                                    'mediumblob', 'mediumint', 'mediumtext', 'middleint',
+            $this->reserved = array('abs', 'acos', 'adddate', 'addtime', 'aes_encrypt', 'aes_decrypt', 'against',
+                                    'ascii', 'asin', 'atan', 'avg', 'benchmark', 'bin', 'bit_and', 'bit_or',
+                                    'bitcount', 'bitlength', 'cast', 'ceiling', 'char', 'char_length',
+                                    'character_length', 'charset', 'coalesce', 'coercibility', 'collation', 'compress',
+                                    'concat', 'concat_ws', 'conection_id', 'conv', 'convert', 'convert_tz', 'cos',
+                                    'cot', 'count', 'crc32', 'curdate', 'current_user', 'currval', 'curtime',
+                                    'database', 'date_add', 'date_diff', 'date_format', 'date_sub', 'day', 'dayname',
+                                    'dayofmonth', 'dayofweek', 'dayofyear', 'decode', 'default', 'degrees',
+                                    'des_decrypt', 'des_encrypt', 'elt', 'encode', 'encrypt', 'exp', 'export_set',
+                                    'extract', 'field', 'find_in_set', 'floor', 'format', 'found_rows', 'from_days',
+                                    'from_unixtime', 'get_format', 'get_lock', 'group_concat', 'greatest', 'hex',
+                                    'hour', 'if', 'ifnull', 'in', 'inet_aton', 'inet_ntoa', 'insert', 'instr',
+                                    'interval', 'is_free_lock', 'is_used_lock', 'last_day', 'last_insert_id', 'lcase',
+                                    'least', 'left', 'length', 'ln', 'load_file', 'localtime', 'localtimestamp',
+                                    'locate', 'log', 'log2', 'log10', 'lower', 'lpad', 'ltrim', 'make_set', 'makedate',
+                                    'maketime', 'master_pos_wait', 'match', 'max', 'md5', 'microsecond', 'mid', 'min',
+                                    'minute', 'mod', 'month', 'monthname', 'nextval', 'now', 'nullif', 'oct',
+                                    'octet_length', 'old_password', 'ord', 'password', 'period_add', 'period_diff',
+                                    'pi', 'position', 'pow', 'power', 'quarter', 'quote', 'radians', 'rand',
+                                    'release_lock', 'repeat', 'replace', 'reverse', 'right', 'round', 'row_count',
+                                    'rpad', 'rtrim', 'sec_to_time', 'second', 'session_user', 'sha', 'sha1', 'sign',
+                                    'soundex', 'space', 'sqrt', 'std', 'stddev', 'stddev_pop', 'stddev_samp', 'strcmp',
+                                    'str_to_date', 'subdate', 'substring', 'substring_index', 'subtime', 'sum',
+                                    'sysdate', 'system_user', 'tan', 'time', 'timediff', 'timestamp', 'timestampadd',
+                                    'timestampdiff', 'time_format', 'time_to_sec', 'to_days', 'trim', 'truncate',
+                                    'ucase', 'uncompress', 'uncompressed_length', 'unhex', 'unix_timestamp', 'upper',
+                                    'user', 'utc_date', 'utc_time', 'utc_timestamp', 'uuid', 'var_pop', 'var_samp',
+                                    'variance', 'version', 'week', 'weekday', 'weekofyear', 'year', 'yearweek', 'add',
+                                    'all', 'alter', 'analyze', 'and', 'as', 'asc', 'asensitive', 'auto_increment',
+                                    'bdb', 'before', 'berkeleydb', 'between', 'bigint', 'binary', 'blob', 'both', 'by',
+                                    'call', 'cascade', 'case', 'change', 'char', 'character', 'check', 'collate',
+                                    'column', 'columns', 'condition', 'connection', 'constraint', 'continue', 'create',
+                                    'cross', 'current_date', 'current_time', 'current_timestamp', 'cursor', 'database',
+                                    'databases', 'day_hour', 'day_microsecond', 'day_minute', 'day_second', 'dec',
+                                    'decimal', 'declare', 'default', 'delayed', 'delete', 'desc', 'describe',
+                                    'deterministic', 'distinct', 'distinctrow', 'div', 'double', 'drop', 'else',
+                                    'elseif', 'end', 'enclosed', 'escaped', 'exists', 'exit', 'explain', 'false',
+                                    'fetch', 'fields', 'float', 'for', 'force', 'foreign', 'found', 'frac_second',
+                                    'from', 'fulltext', 'grant', 'group', 'having', 'high_priority',
+                                    'hour_microsecond', 'hour_minute', 'hour_second', 'if', 'ignore', 'in', 'index',
+                                    'infile', 'inner', 'innodb', 'inout', 'insensitive', 'insert', 'int', 'integer',
+                                    'interval', 'into', 'io_thread', 'is', 'iterate', 'join', 'key', 'keys', 'kill',
+                                    'leading', 'leave', 'left', 'like', 'limit', 'lines', 'load', 'localtime',
+                                    'localtimestamp', 'lock', 'long', 'longblob', 'longtext', 'loop', 'low_priority',
+                                    'master_server_id', 'match', 'mediumblob', 'mediumint', 'mediumtext', 'middleint',
                                     'minute_microsecond', 'minute_second', 'mod', 'natural', 'not',
-                                    'no_write_to_binlog', 'null', 'numeric', 'on', 'optimize',
-                                    'option', 'optionally', 'or', 'order', 'out', 'outer',
-                                    'outfile', 'precision', 'primary', 'privileges', 'procedure',
-                                    'purge', 'read', 'real', 'references', 'regexp', 'rename',
-                                    'repeat', 'replace', 'require', 'restrict', 'return', 'revoke',
-                                    'right', 'rlike', 'second_microsecond', 'select', 'sensitive',
-                                    'separator', 'set', 'show', 'smallint', 'some', 'soname',
-                                    'spatial', 'specific', 'sql', 'sqlexception', 'sqlstate',
-                                    'sqlwarning', 'sql_big_result', 'sql_calc_found_rows',
-                                    'sql_small_result', 'sql_tsi_day', 'sql_tsi_frac_second',
-                                    'sql_tsi_hour', 'sql_tsi_minute', 'sql_tsi_month',
-                                    'sql_tsi_quarter', 'sql_tsi_second', 'sql_tsi_week',
-                                    'sql_tsi_year', 'ssl', 'starting', 'straight_join', 'striped',
-                                    'table', 'tables', 'terminated', 'then', 'timestampadd',
-                                    'timestampdiff', 'tinyblob', 'tinyint', 'tinytext', 'to',
-                                    'trailing', 'true', 'undo', 'union', 'unique', 'unlock',
-                                    'unsigned', 'update', 'usage', 'use', 'user_resources',
-                                    'using', 'utc_date', 'utc_time', 'utc_timestamp', 'values',
-                                    'varbinary', 'varchar', 'varcharacter', 'varying', 'when',
-                                    'where', 'while', 'with', 'write', 'xor', 'year_month',
-                                    'zerofill');
+                                    'no_write_to_binlog', 'null', 'numeric', 'on', 'optimize', 'option', 'optionally',
+                                    'or', 'order', 'out', 'outer', 'outfile', 'precision', 'primary', 'privileges',
+                                    'procedure', 'purge', 'read', 'real', 'references', 'regexp', 'rename', 'repeat',
+                                    'replace', 'require', 'restrict', 'return', 'revoke', 'right', 'rlike',
+                                    'second_microsecond', 'select', 'sensitive', 'separator', 'set', 'show',
+                                    'smallint', 'some', 'soname', 'spatial', 'specific', 'sql', 'sqlexception',
+                                    'sqlstate', 'sqlwarning', 'sql_big_result', 'sql_calc_found_rows',
+                                    'sql_small_result', 'sql_tsi_day', 'sql_tsi_frac_second', 'sql_tsi_hour',
+                                    'sql_tsi_minute', 'sql_tsi_month', 'sql_tsi_quarter', 'sql_tsi_second',
+                                    'sql_tsi_week', 'sql_tsi_year', 'ssl', 'starting', 'straight_join', 'striped',
+                                    'table', 'tables', 'terminated', 'then', 'timestampadd', 'timestampdiff',
+                                    'tinyblob', 'tinyint', 'tinytext', 'to', 'trailing', 'true', 'undo', 'union',
+                                    'unique', 'unlock', 'unsigned', 'update', 'usage', 'use', 'user_resources',
+                                    'using', 'utc_date', 'utc_time', 'utc_timestamp', 'values', 'varbinary', 'varchar',
+                                    'varcharacter', 'varying', 'when', 'where', 'while', 'with', 'write', 'xor',
+                                    'year_month', 'zerofill');
 
             for ($i = 0; $i < count($this->reserved); ++$i) {
                 $this->reserved[$i] = strtoupper($this->reserved[$i]);
