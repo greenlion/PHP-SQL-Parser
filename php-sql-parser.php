@@ -262,8 +262,8 @@ if (!defined('HAVE_PHP_SQL_PARSER')) {
             if (!is_numeric($key)) {
                 if (in_array($key, array('UNION', 'UNION ALL'), true)
                         || ($key === 'expr_type' && $parsed === 'expression')
-                        || ($key === 'expr_type' && $parsed === 'subquery') 
-                        || ($key === 'expr_type' && $parsed === 'table_expression') 
+                        || ($key === 'expr_type' && $parsed === 'subquery')
+                        || ($key === 'expr_type' && $parsed === 'table_expression')
                         || ($key === 'alias' && $parsed !== false)) {
                     $backtracking[] = $charPos; # on the next base_expr we set the pointer back to this value
 
@@ -901,6 +901,14 @@ EOREGEX
             return $expr;
         }
 
+        private function revokeEscaping($sql) {
+            $sql = trim($sql);
+            if (($sql[0] === '`') && ($sql[strlen($sql) - 1] === '`')) {
+                $sql = substr($sql, 1, -1);
+            }
+            return str_replace('``', '`', $sql);
+        }
+
         /* This fuction processes each SELECT clause.  We determine what (if any) alias
          is provided, and we set the type of expression.
          */
@@ -970,12 +978,9 @@ EOREGEX
             if (!$alias) {
                 $base_expr = join("", $tokens);
             } else {
-                /* Properly escape the alias if it is not escaped */
-                $alias['name'] = trim($alias['name']);
+                /* remove escape from the alias */
+                $alias['name'] = $this->revokeEscaping(trim($alias['name']));
                 $alias['base_expr'] = trim($alias['base_expr']);
-                if ($alias['name'][0] != '`') {
-                    $alias['name'] = '`' . str_replace('`', '``', $alias['name']) . '`';
-                }
             }
 
             $processed = false;
@@ -1150,7 +1155,7 @@ EOREGEX
             # there is an expression, we have to parse it
             if (substr(trim($data['table']), 0, 1) == '(') {
                 $data['expression'] = $this->removeParenthesisFromStart($data['table']);
-                
+
                 if (preg_match("/^\\s*select/i", $data['expression'])) {
                     $data['sub_tree'] = $this->parse($data['expression']);
                     $res['expr_type'] = 'subquery';
@@ -1185,13 +1190,8 @@ EOREGEX
             foreach ($tokens as $token) {
                 switch (strtoupper($token)) {
                 case ',':
-                    $expression = trim($expression);
-                    if ($expression[0] != '`' || substr($expression, -1) != '`') {
-                        $escaped = str_replace('`', '``', $expression);
-                    } else {
-                        $escaped = $expression;
-                    }
-                    $escaped = '`' . $escaped . '`';
+                    $expression = trim($this->revokeEscaping($expression));
+                    $escaped = $this->revokeEscaping($expression);
 
                     if (is_numeric(trim($expression))) {
                         $type = 'pos';
@@ -1215,8 +1215,8 @@ EOREGEX
                     }
 
                     $out[] = array('type' => $type, 'base_expr' => $expression, 'direction' => $direction);
-                    $escaped = "";
                     $expression = "";
+                    $escaped = "";
                     $direction = "ASC";
                     $type = "";
                     break;
@@ -1232,12 +1232,7 @@ EOREGEX
             }
             if ($expression) {
                 $expression = trim($expression);
-                if ($expression[0] != '`' || substr($expression, -1) != '`') {
-                    $escaped = str_replace('`', '``', $expression);
-                } else {
-                    $escaped = $expression;
-                }
-                $escaped = '`' . $escaped . '`';
+                $escaped = $this->revokeEscaping($expression);
 
                 if (is_numeric(trim($expression))) {
                     $type = 'pos';
@@ -1337,7 +1332,7 @@ EOREGEX
 
                     /* is it an inlist */
                 } elseif ($upper[0] == '(' && substr($upper, -1) == ')') {
-                    
+
                     # if we have a colref followed by a parenthesis pair,
                     # it isn't a colref, it is a user-function
                     if ($prev_token_type === 'colref') {
@@ -1349,15 +1344,15 @@ EOREGEX
                             }
                         }
                         $processed = $this->process_expr_list($tmptokens);
-                        
-                        $prev_token = "";            
+
+                        $prev_token = "";
                         $prev_token_type = "";
-                        
+
                         $last = array_pop($expr);
                         $token = $last['base_expr'];
                         $type = 'function';
                     }
-                    
+
                     if ($prev_token == 'IN') {
                         $type = "in-list";
                         $processed = $this->split_sql($this->removeParenthesisFromStart($token));
@@ -1371,8 +1366,8 @@ EOREGEX
                         unset($list);
                         $prev_token = "";
                         $prev_token_type = "";
-                    } 
-                    
+                    }
+
                     if ($prev_token == 'AGAINST') {
                         $type = "match-arguments";
                         $list = $this->split_sql($this->removeParenthesisFromStart($token));
@@ -1481,7 +1476,7 @@ EOREGEX
                         $processed = false;
                     }
                 }
-                
+
                 /* is a reserved word? */
                 if (($type != 'operator' && $type != 'in-list' && $type != 'sub_expr' && $type != 'function')
                         && in_array($upper, $this->reserved)) {
@@ -1544,10 +1539,10 @@ EOREGEX
                 $sub_expr = "";
 
                 $expr[] = array('expr_type' => $type, 'base_expr' => $token, 'sub_tree' => $processed);
-                
+
                 $prev_token = $upper;
                 $prev_token_type = $type;
-                
+
                 $expr_type = "";
                 $type = "";
             } // end of for-loop
