@@ -40,6 +40,7 @@ class OracleSQLTranslator extends PHPSQLCreator {
     private $con; # this is the database connection from LimeSurvey
     private $preventColumnRefs = array();
     private $allTables = array();
+    const ASTERISK_ALIAS = "[#RePl#]";
 
     public function __construct($con) {
         parent::__construct();
@@ -236,7 +237,7 @@ class OracleSQLTranslator extends PHPSQLCreator {
         if (($table === "") && ($col === "*")) {
             array_pop($this->preventColumnRefs);
             $this->preventColumnRefs[] = true;
-            return "[#REPL#]"; # this is the position, we have to replace later
+            return ASTERISK_ALIAS; # this is the position, we have to replace later
         }
 
         $alias = "";
@@ -249,15 +250,15 @@ class OracleSQLTranslator extends PHPSQLCreator {
 
     protected function processFunctionOnSelect($parsed) {
         $old = end($this->preventColumnRefs);
-        $sql = $this->processFunction($v);
+        $sql = $this->processFunction($parsed);
 
-        if ($old === end($this->preventColumnRefs)) {
-            return $sql;
+        if ($old !== end($this->preventColumnRefs)) {
+            # prevents wrong handling of count(*)
+            array_pop($this->preventColumnRefs);
+            $this->preventColumnRefs[] = $old;
+            $sql = str_replace(ASTERISK_ALIAS, "*", $sql);
         }
-        
-        # prevents wrong handling of count(*)
-        array_pop($this->preventColumnRefs);
-        $this->preventColumnRefs[] = old;
+        return $sql;
     }
 
     protected function processSELECT($parsed) {
@@ -297,7 +298,7 @@ class OracleSQLTranslator extends PHPSQLCreator {
                 }
                 $alias = substr($alias, 0, -1);
             }
-            $sql = str_replace("[#REPL#]", $alias, $sql);
+            $sql = str_replace(ASTERISK_ALIAS, $alias, $sql);
         }
         return $sql;
     }
@@ -332,6 +333,7 @@ class OracleSQLTranslator extends PHPSQLCreator {
         $k = key($parsed);
         switch ($k) {
         case "USE":
+            # this statement is not an Oracle statement
             $this->created = "";
             break;
 
@@ -355,7 +357,7 @@ class OracleSQLTranslator extends PHPSQLCreator {
         return $sql;
     }
 }
-/*
-$translator = new OracleSQLTranslator(false);
-$translator->process("SELECT *, (SELECT a from xyz WHERE b>1) haha, (SELECT *, b from zks,abc WHERE d=1) hoho FROM blubb d, blibb c WHERE d.col = c.col");
- */
+
+//$translator = new OracleSQLTranslator(false);
+//$translator->process("SELECT q.qid, question, gid FROM questions as q WHERE (select count(*) from answers as a where a.qid=q.qid and scale_id=0)=0 and sid=11929 AND type IN ('F', 'H', 'W', 'Z', '1') and q.parent_qid=0");
+//$translator->process("SELECT *, (SELECT a from xyz WHERE b>1) haha, (SELECT *, b from zks,abc WHERE d=1) hoho FROM blubb d, blibb c WHERE d.col = c.col");
