@@ -1617,7 +1617,7 @@ EOREGEX
             return $tokens;
         }
 
-        private private function process_record($unparsed) {
+        private function process_record($unparsed) {
 
             $unparsed = $this->removeParenthesisFromStart($unparsed);
             $values = $this->split_sql($unparsed);
