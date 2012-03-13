@@ -267,7 +267,7 @@ if (!defined('HAVE_PHP_SQL_CREATOR')) {
                 $sql .= $this->processInList($v);
                 $sql .= $this->processWhereExpression($v);
 
-                # functions?
+                # TODO: functions?
                                 
                 if (strlen($sql) == $len) {
                     $this->stop('WHERE', $k, $v, 'expr_type');
@@ -288,7 +288,9 @@ if (!defined('HAVE_PHP_SQL_CREATOR')) {
                 $sql .= $this->processColRef($v);
                 $sql .= $this->processConstant($v);
                 $sql .= $this->processOperator($v);
-
+                $sql .= $this->processFunction($v);
+                $sql .= $this->processWhereExpression($v);
+                
                 if ($len == strlen($sql)) {
                     $this->stop('WHERE expression subtree', $k, $v, 'expr_type');
                 }
