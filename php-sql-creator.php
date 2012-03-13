@@ -153,7 +153,7 @@ if (!defined('HAVE_PHP_SQL_CREATOR')) {
 
         protected function processSET($parsed) {
             $sql = "";
-            foreach ($sql as $k => $v) {
+            foreach ($parsed as $k => $v) {
                 $sql .= $v['column'] . "=" . $v['expr'] . ",";
             }
             $sql = substr($sql, 0, strlen($sql) - 1);
