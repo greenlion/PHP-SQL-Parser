@@ -58,7 +58,7 @@ if (!defined('HAVE_PHP_SQL_CREATOR')) {
         }
 
         protected function processDeleteStatement($parsed) {
-
+            die("DELETE not implemented");
         }
 
         protected function processUpdateStatement($parsed) {
@@ -120,14 +120,23 @@ if (!defined('HAVE_PHP_SQL_CREATOR')) {
 
         protected function processGROUP($parsed) {
             $sql = "GROUP BY ";
-
+            // TODO: implement this
             return $sql;
         }
 
         protected function processVALUES($parsed) {
             $sql = "";
             foreach ($parsed as $k => $v) {
-                $sql .= $v['base_expr'] . ",";
+                $len = strlen($sql);
+                $sql .= $this->processConstant($v);
+                $sql .= $this->processFunction($v);
+                $sql .= $this->processOperator($v);
+
+                if ($len == strlen($sql)) {
+                    die("unknown expr_type in VALUES[" . $k . "] " . $v['expr_type']);
+                }
+
+                $sql .= ",";
             }
             $sql = substr($sql, 0, strlen($sql) - 1);
             return "VALUES (" . $sql . ")";
@@ -136,13 +145,26 @@ if (!defined('HAVE_PHP_SQL_CREATOR')) {
         protected function processINSERT($parsed) {
             $sql = "INSERT INTO " . $parsed['table'];
 
+            if ($parsed['columns'] === false) {
+                return $sql;
+            }
+
             $columns = "";
             foreach ($parsed['columns'] as $k => $v) {
-                $columns .= $v['base_expr'] . ",";
+                $len = strlen($sql);
+                $sql .= $this->processColRef($v);
+
+                if ($len == strlen($sql)) {
+                    die("unknown expr_type in INSERT[columns][" . $k . "] " . $v['expr_type']);
+                }
+
+                $sql .= ",";
             }
+
             if ($columns !== "") {
                 $columns = " (" . substr($columns, 0, strlen($columns) - 1) . ")";
             }
+
             $sql .= $columns;
             return $sql;
         }
@@ -189,11 +211,27 @@ if (!defined('HAVE_PHP_SQL_CREATOR')) {
         }
 
         protected function processFunction($parsed) {
-            if ($parsed['expr_type'] !== 'aggregate_function') {
+            if (($parsed['expr_type'] !== 'aggregate_function') && ($parsed['expr_type'] !== 'function')) {
                 return "";
             }
-            return $parsed['base_expr'];
-            // TODO: should we remove the parenthesis from the argument
+
+            if ($parsed['sub_tree'] === false) {
+                return $parsed['base_expr']; // TODO: maybe we need ()!
+            }
+
+            $sql = "";
+            foreach ($parsed['sub_tree'] as $k => $v) {
+                $len = strlen($sql);
+                $sql .= $this->processFunction($v);
+                $sql .= $this->processConstant($v);
+
+                if ($len == strlen($sql)) {
+                    die("unknown expr_type in function subtree[" . $k . "] " . $v['expr_type']);
+                }
+
+                $sql .= ",";
+            }
+            return $parsed['base_expr'] . "(" . $sql . ")";
         }
 
         protected function processSelectExpression($parsed) {
@@ -227,11 +265,11 @@ if (!defined('HAVE_PHP_SQL_CREATOR')) {
                 $len = strlen($sql);
                 $sql .= $this->processColRef($v);
                 $sql .= $this->processOperator($v);
-                
+
                 if ($len == strlen($sql)) {
                     die("unknown expr_type in expression ref_clause[" . $k . "] " . $v['expr_type']);
                 }
-                
+
                 $sql .= " ";
             }
             return "(" . $sql . ")";
@@ -297,9 +335,9 @@ if (!defined('HAVE_PHP_SQL_CREATOR')) {
                 return "";
             }
             $sql = substr($this->processFROM($parsed['sub_tree']), 5); // remove FROM keyword
-			$sql = "(" . $sql . ")";
+            $sql = "(" . $sql . ")";
             $sql .= $this->processAlias($parsed['alias']);
-			
+
             if ($index !== 0) {
                 $sql = $this->processJoin($parsed['join_type']) . " " . $sql;
                 $sql .= $this->processRefType($parsed['ref_type']);
