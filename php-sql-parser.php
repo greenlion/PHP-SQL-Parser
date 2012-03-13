@@ -1083,7 +1083,7 @@ EOREGEX
                 case 'LEFT':
                 case 'RIGHT':
                 case 'STRAIGHT_JOIN':
-                    $data['next_join_type'] = $upper . " ";
+                    $data['next_join_type'] = $upper; // . " " removed!;
                     break;
 
                 case ',':
