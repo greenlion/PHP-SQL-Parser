@@ -47,7 +47,7 @@ if (!defined('HAVE_PHP_SQL_CREATOR')) {
 
             case "UNION":
             case "UNION ALL":
-                die("UNIONS");
+                die("UNIONS not implemented");
                 break;
             case "SELECT":
                 $this->created = $this->processSelectStatement($parsed);
