@@ -196,8 +196,6 @@ if (!defined('HAVE_PHP_SQL_PARSER')) {
         }
 
         private function lookForBaseExpression($sql, &$charPos, &$parsed, $key, &$backtracking) {
-            //$this->printPos("1.", $sql, $charPos, $key, $parsed, $backtracking);
-
             if (!is_numeric($key)) {
                 if (in_array($key, array('UNION', 'UNION ALL', 'columns'), true)
                         || ($key === 'expr_type' && $parsed === 'expression')
@@ -218,8 +216,6 @@ if (!defined('HAVE_PHP_SQL_PARSER')) {
                 }
             }
 
-            //$this->printPos("2.", $sql, $charPos, $key, $parsed, $backtracking);
-
             if (!is_array($parsed)) {
                 return;
             }
@@ -234,24 +230,14 @@ if (!defined('HAVE_PHP_SQL_PARSER')) {
 
                     $before = array_shift($search);
                     $after = array_shift($search);
-                    if (!isset($after)) {
-                        echo "error during position calculating\n";
-                        echo $pattern . "\n";
-                        echo $subject . "\n";
-                        exit;
-                    }
 
                     $parsed['position'] = $charPos + $before[1] + strlen($before[0]) + 1;
                     $charPos += $after[1];
-
-                    //$this->printPos("3.", $sql, $charPos, $key, $parsed, $backtracking);
 
                     $oldPos = array_pop($backtracking);
                     if (isset($oldPos) && $oldPos !== false) {
                         $charPos = $oldPos;
                     }
-
-                    //$this->printPos("4.", $sql, $charPos, $key, $parsed, $backtracking);
 
                 } else {
                     $this->lookForBaseExpression($sql, $charPos, $parsed[$key], $key, $backtracking);
@@ -962,7 +948,7 @@ EOREGEX
                 if (preg_match("/^\\s*\\(\\s*select/i", $token)) {
                     $data['type'] = 'subquery';
                     $data['table'] = "DEPENDENT-SUBQUERY";
-                    $data['sub_tree'] = $this->parse(removeParenthesisFromStart($token));
+                    $data['sub_tree'] = $this->parse($this->removeParenthesisFromStart($token));
                     $data['subquery'] = $token;
                 }
 
