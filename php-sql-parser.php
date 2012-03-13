@@ -70,20 +70,20 @@ if (!defined('HAVE_PHP_SQL_PARSER')) {
             $queries = array();
 
             foreach ($inputArray as $key => $token) {
-                $token = trim($token);
+                $trim = trim($token);
 
                 # overread all tokens till that given token
                 if ($skipUntilToken) {
-                    if ($token === "") {
+                    if ($trim === "") {
                         continue; # read the next token
                     }
-                    if (strtoupper($token) === $skipUntilToken) {
+                    if (strtoupper($trim) === $skipUntilToken) {
                         $skipUntilToken = false;
                         continue; # read the next token
                     }
                 }
 
-                if (strtoupper($token) !== "UNION") {
+                if (strtoupper($trim) !== "UNION") {
                     $outputArray[] = $token; # here we get empty tokens, if we remove these, we get problems in parse_sql()
                     continue;
                 }
@@ -195,11 +195,63 @@ if (!defined('HAVE_PHP_SQL_PARSER')) {
                     . $holdem . "\n";
         }
 
-        private function getPositionPattern($start, $value) {
-            return  "/" . str_replace(" ", "\\s+", $start . preg_quote($value) . "(\\)|,|>|<|\||!|=|\+|\*|-|\/|&|;|\\s)")
-                            . "/";
-        }
-        
+   private function findPositionWithinString($sql, $value, $expr_type){
+      
+      $allowedOnOperator = array('\t', '\n', '\r', ' ', ',', '(', ')', '_', '\'');
+      $allowedOnOthers = array('\t', '\n', '\r', ' ', ',', '(', ')', '<', '>', '*', '+', '-', '/', '|', '&', '=', '!', ';');
+      
+      $offset = 0;
+      $ok = false;
+      while (true) {
+         
+         $pos = strpos($sql, $value, $offset);
+         if ($pos === false) {
+            break;
+         }
+         
+         $before = "";
+         if ($pos > 0) {
+            $before = $sql[$pos - 1];
+         }
+         
+         $after = "";
+         if (isset($sql[$pos + strlen($value)])) {
+            $after = $sql[$pos + strlen($value)];
+         }
+         
+         # if we have an operator, it should be surrounded by
+         # whitespace, comma, parenthesis, digit or letter, end_of_string
+         # an operator should not be surrounded by another operator
+         
+         if ($expr_type === 'operator') {
+            
+            $ok = ($before === "" || in_array($before, $allowedOnOperator)) || (strtolower($before) >= 'a' && strtolower($before) <= 'z') || ($before >= '0' && $before <= '9');
+            $ok = $ok && ($after === "" || in_array($after, $allowedOnOperator) || (strtolower($after) >= 'a' && strtolower($after) <= 'z') || ($after >= '0' && $after <= '9'));
+            
+            if (!$ok) {
+               $offset = $pos + 1;
+               continue;
+            }
+            
+            break;
+         }
+         
+         # in all other cases we accept
+         # whitespace, comma, operators, parenthesis and end_of_string
+         
+         $ok = ($before ==="" || in_array($before, $allowedOnOthers));
+         $ok = $ok && ($after ==="" || in_array($after, $allowedOnOthers));
+         
+         if ($ok) {
+            break;
+         }        
+          
+         $offset = $pos + 1;
+      }
+      
+      return $pos;
+   }  
+         
         private function lookForBaseExpression($sql, &$charPos, &$parsed, $key, &$backtracking) {
             if (!is_numeric($key)) {
                 if (in_array($key, array('UNION', 'UNION ALL', 'columns'), true)
@@ -228,35 +280,14 @@ if (!defined('HAVE_PHP_SQL_PARSER')) {
             foreach ($parsed as $key => $value) {
                 if ($key === 'base_expr') {
 
-                    # there is a difference between the pattern ^ and the other characters in front of value
-                    # in the latter case we have to add 1 to position (because the regex matches one character before
-                    # the value, in the first case we don't have to add 1, because we start with the first character
-
-                    # we prevent the pattern $ with an additional space character, so we can always
-                    # subtract 1 from the end of the match
-                    
-                    # such a padding character is not possible with pattern ^, it would
-                    # change the position
-                    
-                    # TODO: if the value starts or ends with one of the characters of the pattern,
-                    # the matching goes wrong
-                    $subject = substr($sql, $charPos) . " ";
-                     
-                    $pattern = $this->getPositionPattern("(^)", $value);
-                    $offset = 0;
-                    $search = preg_split($pattern, $subject, -1, PREG_SPLIT_OFFSET_CAPTURE);
-                    
-                    if (count($search) < 2) {
-                       $pattern = $this->getPositionPattern("(\\s|\\(|,|=|\||<|>|&|\+|-|\*|\/)", $value);
-                       $offset = 1;
-                       $search = preg_split($pattern, $subject, -1, PREG_SPLIT_OFFSET_CAPTURE);
-                    }
-                    
-                    $before = array_shift($search);
-                    $after = array_shift($search);
-
-                    $parsed['position'] = $charPos + $before[1] + strlen($before[0]) + $offset;
-                    $charPos += $after[1] - 1;
+                    $subject = substr($sql, $charPos);
+                   $pos = $this->findPositionWithinString($subject, $value, isset($parsed['expr_type']) ? $parsed['expr_type'] : 'alias');
+                   if ($pos === false) {
+                      die ("cannot calculate position of " . $value . " within " . $subject);
+                   }
+                   
+                    $parsed['position'] = $charPos + $pos;
+                    $charPos += $pos + strlen($value);
 
                     $oldPos = array_pop($backtracking);
                     if (isset($oldPos) && $oldPos !== false) {
@@ -694,6 +725,16 @@ EOREGEX
                 # remove obsolete category after union (empty category because of
                 # empty token before select)
                 if ($token_category && ($prev_category == $token_category)) {
+                   
+                   # if we have more than one whitespace within a token
+                   # we add a token for every character
+                   # this prevents wrong base_expr within process_from()
+                   # TODO: may it is better to leave the original whitespace as token
+                   if ($token === "" && trim($tokens[$token_number]) === "") {
+                      for ($i=0; $i<strlen($tokens[$token_number]) -1; $i++) {
+                         $out[$token_category][] = $token;
+                      }
+                   }
                     $out[$token_category][] = $token;
                 }
 
