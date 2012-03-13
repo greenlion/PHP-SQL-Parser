@@ -12,7 +12,7 @@ $parser->parse($sql);
 $p = $parser->parsed;
 
 ok(count($p) == 3 && count($p['FROM']) == 1);
-ok($p['FROM'][0]['alias']=='an_alias');
+ok($p['FROM'][0]['alias']['name']=='an_alias');
 
 
 
@@ -27,10 +27,10 @@ $parser = new PHPSQLParser($sql);
 $p=$parser->parsed;
 
 ok(count($p['SELECT']) == 7, 'seven selects');
-ok($p['SELECT'][0]['alias'] == '`c1`');
-ok($p['SELECT'][1]['alias'] == '`c2`');
-ok($p['SELECT'][2]['alias'] == '', 'no alias on sum(c2)');
-ok($p['SELECT'][3]['alias'] == '`sum_c3`');
-ok($p['SELECT'][4]['alias'] == '`case_statement`', 'case statement');
-ok($p['SELECT'][5]['alias'] == '', 'no alias on t4.c1');
-ok($p['SELECT'][6]['alias'] == '`subquery`');
+ok($p['SELECT'][0]['alias']['name'] == '`c1`');
+ok($p['SELECT'][1]['alias']['name'] == '`c2`');
+ok($p['SELECT'][2]['alias']['name'] == '', 'no alias on sum(c2)');
+ok($p['SELECT'][3]['alias']['name'] == '`sum_c3`');
+ok($p['SELECT'][4]['alias']['name'] == '`case_statement`', 'case statement');
+ok($p['SELECT'][5]['alias']['name'] == '', 'no alias on t4.c1');
+ok($p['SELECT'][6]['alias']['name'] == '`subquery`');
