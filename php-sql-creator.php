@@ -38,7 +38,7 @@ if (!defined('HAVE_PHP_SQL_CREATOR')) {
             return $this->created;
         }
 
-        private function processSelectStatement($parsed) {
+        protected function processSelectStatement($parsed) {
             $sql = $this->processSELECT($parsed['SELECT']) . " " . $this->processFROM($parsed['FROM']);
             if (isset($parsed['WHERE'])) {
                 $sql .= " " . $this->processWHERE($parsed['WHERE']);
@@ -52,16 +52,16 @@ if (!defined('HAVE_PHP_SQL_CREATOR')) {
             return $sql;
         }
 
-        private function processInsertStatement($parsed) {
+        protected function processInsertStatement($parsed) {
             return $this->processINSERT($parsed['INSERT']) . " " . $this->processVALUES($parsed['VALUES']);
             # TODO: subquery?
         }
 
-        private function processDeleteStatement($parsed) {
+        protected function processDeleteStatement($parsed) {
 
         }
 
-        private function processUpdateStatement($parsed) {
+        protected function processUpdateStatement($parsed) {
             $sql = $this->processUPDATE($parsed['UPDATE']) . " " . $this->processSET($parsed['SET']);
             if (isset($parsed['WHERE'])) {
                 $sql .= " " . $this->processWHERE($parsed['WHERE']);
@@ -69,7 +69,7 @@ if (!defined('HAVE_PHP_SQL_CREATOR')) {
             return $sql;
         }
 
-        private function processSELECT($parsed) {
+        protected function processSELECT($parsed) {
             $sql = "";
             foreach ($parsed as $k => $v) {
                 $len = strlen($sql);
@@ -86,7 +86,7 @@ if (!defined('HAVE_PHP_SQL_CREATOR')) {
             return "SELECT " . $sql;
         }
 
-        private function processFROM($parsed) {
+        protected function processFROM($parsed) {
             $sql = "";
             foreach ($parsed as $k => $v) {
                 $len = strlen($sql);
@@ -102,7 +102,7 @@ if (!defined('HAVE_PHP_SQL_CREATOR')) {
             return "FROM " . $sql;
         }
 
-        private function processORDER($parsed) {
+        protected function processORDER($parsed) {
             $sql = "";
             foreach ($parsed as $k => $v) {
                 $len = strlen($sql);
@@ -118,13 +118,13 @@ if (!defined('HAVE_PHP_SQL_CREATOR')) {
             return "ORDER BY " . $sql;
         }
 
-        private function processGROUP($parsed) {
+        protected function processGROUP($parsed) {
             $sql = "GROUP BY ";
 
             return $sql;
         }
 
-        private function processVALUES($parsed) {
+        protected function processVALUES($parsed) {
             $sql = "";
             foreach ($parsed as $k => $v) {
                 $sql .= $v['base_expr'] . ",";
@@ -133,7 +133,7 @@ if (!defined('HAVE_PHP_SQL_CREATOR')) {
             return "VALUES (" . $sql . ")";
         }
 
-        private function processINSERT($parsed) {
+        protected function processINSERT($parsed) {
             $sql = "INSERT INTO " . $parsed['table'];
 
             $columns = "";
@@ -147,11 +147,11 @@ if (!defined('HAVE_PHP_SQL_CREATOR')) {
             return $sql;
         }
 
-        private function processUPDATE($parsed) {
+        protected function processUPDATE($parsed) {
             return "UPDATE " . $parsed[0]['table'];
         }
 
-        private function processSET($parsed) {
+        protected function processSET($parsed) {
             $sql = "";
             foreach ($sql as $k => $v) {
                 $sql .= $v['column'] . "=" . $v['expr'] . ",";
@@ -160,7 +160,7 @@ if (!defined('HAVE_PHP_SQL_CREATOR')) {
             return "SET " . $sql;
         }
 
-        private function processWHERE($parsed) {
+        protected function processWHERE($parsed) {
             $sql = "WHERE ";
             foreach ($parsed as $k => $v) {
                 $len = strlen($sql);
@@ -181,14 +181,14 @@ if (!defined('HAVE_PHP_SQL_CREATOR')) {
             return $sql;
         }
 
-        private function processExpression($parsed) {
+        protected function processExpression($parsed) {
             if ($parsed['type'] !== 'expression') {
                 return "";
             }
             return $parsed['base_expr'] . " " . $parsed['direction'];
         }
 
-        private function processFunction($parsed) {
+        protected function processFunction($parsed) {
             if ($parsed['expr_type'] !== 'aggregate_function') {
                 return "";
             }
@@ -196,7 +196,7 @@ if (!defined('HAVE_PHP_SQL_CREATOR')) {
             // TODO: should we remove the parenthesis from the argument
         }
 
-        private function processSelectExpression($parsed) {
+        protected function processSelectExpression($parsed) {
             if ($parsed['expr_type'] !== 'expression') {
                 return "";
             }
@@ -217,7 +217,7 @@ if (!defined('HAVE_PHP_SQL_CREATOR')) {
             return $sql;
         }
 
-        private function processRefClause($parsed) {
+        protected function processRefClause($parsed) {
             if ($parsed === false) {
                 return "";
             }
@@ -229,7 +229,7 @@ if (!defined('HAVE_PHP_SQL_CREATOR')) {
             return "(" . $sql . ")";
         }
 
-        private function processAlias($parsed) {
+        protected function processAlias($parsed) {
             if ($parsed === false) {
                 return "";
             }
@@ -241,7 +241,7 @@ if (!defined('HAVE_PHP_SQL_CREATOR')) {
             return $sql;
         }
 
-        private function processJoin($parsed) {
+        protected function processJoin($parsed) {
             if ($parsed === 'CROSS') {
                 return ",";
             }
@@ -255,7 +255,7 @@ if (!defined('HAVE_PHP_SQL_CREATOR')) {
             die("unknown join type " . $parsed);
         }
 
-        private function processRefType($parsed) {
+        protected function processRefType($parsed) {
             if ($parsed === false) {
                 return "";
             }
@@ -268,7 +268,7 @@ if (!defined('HAVE_PHP_SQL_CREATOR')) {
             die("unknown ref type " . $parsed);
         }
 
-        private function processTable($parsed, $index) {
+        protected function processTable($parsed, $index) {
             if ($parsed['expr_type'] !== 'table') {
                 return "";
             }
@@ -284,7 +284,7 @@ if (!defined('HAVE_PHP_SQL_CREATOR')) {
             return $sql;
         }
 
-        private function processTableExpression($parsed, $index) {
+        protected function processTableExpression($parsed, $index) {
             if ($parsed['expr_type'] !== 'table_expression') {
                 return "";
             }
@@ -300,28 +300,28 @@ if (!defined('HAVE_PHP_SQL_CREATOR')) {
             return $sql;
         }
 
-        private function processOperator($parsed) {
+        protected function processOperator($parsed) {
             if ($parsed['expr_type'] !== 'operator') {
                 return "";
             }
             return $parsed['base_expr'];
         }
 
-        private function processColRef($parsed) {
+        protected function processColRef($parsed) {
             if ($parsed['expr_type'] !== 'colref') {
                 return "";
             }
             return $parsed['base_expr'];
         }
 
-        private function processConstant($parsed) {
+        protected function processConstant($parsed) {
             if ($parsed['expr_type'] !== 'const') {
                 return "";
             }
             return $parsed['base_expr'];
         }
 
-        private function processInList($parsed) {
+        protected function processInList($parsed) {
             if ($parsed['expr_type'] !== 'in-list') {
                 return "";
             }
@@ -332,7 +332,7 @@ if (!defined('HAVE_PHP_SQL_CREATOR')) {
             return "(" . substr($sql, 0, strlen($sql) - 1) . ")";
         }
 
-        private function processSubquery($parsed) {
+        protected function processSubquery($parsed) {
             if ($parsed['expr_type'] !== 'subquery') {
                 return "";
             }
