@@ -346,5 +346,17 @@ function _test_end()
     }
 }
 
+/**
+ * Helper function for getting the expected array
+ * from a file as serialized string.
+ * Returns an unserialized value from the given file.
+ *
+ * @param String $filename
+ */
+function getExpectedValue($filename) {
+	$content = file_get_contents(dirname(__FILE__) . "/r/".$filename);
+	return unserialize($content);
+}
+
 ?>
 
