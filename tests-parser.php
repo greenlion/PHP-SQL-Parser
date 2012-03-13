@@ -9,6 +9,7 @@ require_once(dirname(__FILE__) . '/t/backtick.php');
 require_once(dirname(__FILE__) . '/t/delete.php');
 require_once(dirname(__FILE__) . '/t/from.php');
 require_once(dirname(__FILE__) . '/t/gtltop.php');
+require_once(dirname(__FILE__) . '/t/inlist.php');
 require_once(dirname(__FILE__) . '/t/insert.php');
 require_once(dirname(__FILE__) . '/t/issue11.php');
 require_once(dirname(__FILE__) . '/t/issue12.php');

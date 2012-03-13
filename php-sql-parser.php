@@ -1307,15 +1307,14 @@ EOREGEX
 
                     if ($prev_token == 'IN') {
                         $type = "in-list";
-                        $processed = $this->split_sql($this->removeParenthesisFromStart($token));
-                        $list = array();
-                        foreach ($processed as $v) {
-                            if ($v == ',')
-                                continue;
-                            $list[] = $v;
+                        $tmptokens = $this->split_sql($this->removeParenthesisFromStart($token));
+                        foreach ($tmptokens as $k => $v) {
+                            if (trim($v) == ',') {
+                                unset($tmptokens[$k]);
+                            }
                         }
-                        $processed = $list;
-                        unset($list);
+                        $processed = $this->process_expr_list($tmptokens);
+
                         $prev_token = "";
                         $prev_token_type = "";
                     }
