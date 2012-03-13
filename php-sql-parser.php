@@ -776,7 +776,7 @@ EOREGEX
                 $out['GROUP'] = $this->process_group($out['GROUP'], $out['SELECT']);
             }
             if (!empty($out['ORDER'])) {
-                $out['ORDER'] = $this->process_group($out['ORDER'], $out['SELECT']);
+                $out['ORDER'] = $this->process_order($out['ORDER'], $out['SELECT']);
             }
             if (!empty($out['LIMIT'])) {
                 $out['LIMIT'] = $this->process_limit($out['LIMIT']);
@@ -1194,7 +1194,7 @@ EOREGEX
             return $res;
         }
 
-        private function processGroupExpression(&$parseInfo, $select) {
+        private function processOrderExpression(&$parseInfo, $select) {
             if ($parseInfo['expr'] === "") {
                 return false;
             }
@@ -1223,13 +1223,13 @@ EOREGEX
                          'direction' => $parseInfo['dir']);
         }
 
-        private function initParseInfoForGroup() {
+        private function initParseInfoForOrder() {
             return array('expr' => "", 'dir' => "ASC", 'type' => 'expression');
         }
 
-        private function process_group(&$tokens, &$select) {
+        private function process_order(&$tokens, &$select) {
             $out = array();
-            $parseInfo = $this->initParseInfoForGroup();
+            $parseInfo = $this->initParseInfoForOrder();
 
             if (!$tokens) {
                 return false;
@@ -1238,8 +1238,8 @@ EOREGEX
             foreach ($tokens as $token) {
                 switch (strtoupper($token)) {
                 case ',':
-                    $out[] = $this->processGroupExpression($parseInfo, $select);
-                    $parseInfo = $this->initParseInfoForGroup();
+                    $out[] = $this->processOrderExpression($parseInfo, $select);
+                    $parseInfo = $this->initParseInfoForOrder();
                     break;
 
                 case 'DESC':
@@ -1256,10 +1256,44 @@ EOREGEX
                 }
             }
 
-            $out[] = $this->processGroupExpression($parseInfo, $select);
+            $out[] = $this->processOrderExpression($parseInfo, $select);
             return $out;
         }
 
+        private function initParseInfoForGroup() {
+            return array('expr' => "", 'type' => 'expression');
+        }
+        
+        private function process_group(&$tokens, &$select) {
+            $out = array();
+            $parseInfo = $this->initParseInfoForGroup();
+
+            if (!$tokens) {
+                return false;
+            }
+
+            foreach ($tokens as $token) {
+                switch (strtoupper($token)) {
+                case ',':
+                    $parsed = $this->processOrderExpression($parseInfo, $select);
+                    unset($parsed['direction']);
+                    
+                    $out[] = $parsed;                    
+                    $parseInfo = $this->initParseInfoForGroup();
+                    break;
+                default:
+                    $parseInfo['expr'] .= $token == '' ? ' ' : $token;
+
+                }
+            }
+
+            $parsed = $this->processOrderExpression($parseInfo, $select);
+            unset($parsed['direction']);
+            $out[] = $parsed;
+            
+            return $out;
+        }
+        
         private function removeParenthesisFromStart($token) {
 
             $parenthesisRemoved = 0;
