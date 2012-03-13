@@ -38,6 +38,10 @@ if (!defined('HAVE_PHP_SQL_CREATOR')) {
             return $this->created;
         }
 
+        private function stop($part, $partkey, $entry, $entrykey) {
+            die("unknown " .$entrykey ." in " .$part ."[" . $partkey . "] " . $entry[$entrykey]);
+        }
+        
         protected function processSelectStatement($parsed) {
             $sql = $this->processSELECT($parsed['SELECT']) . " " . $this->processFROM($parsed['FROM']);
             if (isset($parsed['WHERE'])) {
@@ -77,7 +81,7 @@ if (!defined('HAVE_PHP_SQL_CREATOR')) {
                 $sql .= $this->processSelectExpression($v);
 
                 if ($len == strlen($sql)) {
-                    die("unknown expr_type in SELECT[" . $k . "] " . $v['expr_type']);
+                    stop('SELECT', $k, $v, 'expr_type');
                 }
 
                 $sql .= ",";
@@ -94,7 +98,7 @@ if (!defined('HAVE_PHP_SQL_CREATOR')) {
                 $sql .= $this->processTableExpression($v, $k);
 
                 if ($len == strlen($sql)) {
-                    die("unknown expr_type in FROM[" . $k . "] " . $v['expr_type']);
+                    stop('FROM', $k, $v, 'expr_type');
                 }
 
                 $sql .= " ";
@@ -109,7 +113,7 @@ if (!defined('HAVE_PHP_SQL_CREATOR')) {
                 $sql .= $this->processExpression($v);
 
                 if ($len == strlen($sql)) {
-                    die("unknown type in ORDER[" . $k . "] " . $v['type']);
+                    stop('ORDER', $k, $v, 'type');
                 }
 
                 $sql .= ",";
@@ -133,7 +137,7 @@ if (!defined('HAVE_PHP_SQL_CREATOR')) {
                 $sql .= $this->processOperator($v);
 
                 if ($len == strlen($sql)) {
-                    die("unknown expr_type in VALUES[" . $k . "] " . $v['expr_type']);
+                    stop('VALUES', $k, $v, 'expr_type');
                 }
 
                 $sql .= ",";
@@ -155,7 +159,7 @@ if (!defined('HAVE_PHP_SQL_CREATOR')) {
                 $sql .= $this->processColRef($v);
 
                 if ($len == strlen($sql)) {
-                    die("unknown expr_type in INSERT[columns][" . $k . "] " . $v['expr_type']);
+                    stop('INSERT[columns]', $k, $v, 'expr_type');
                 }
 
                 $sql .= ",";
@@ -194,7 +198,7 @@ if (!defined('HAVE_PHP_SQL_CREATOR')) {
                 $sql .= $this->processInList($v);
 
                 if (strlen($sql) == $len) {
-                    die("unknown expr_type in FROM[" . $k . "] " . $v['expr_type']);
+                    stop('FROM', $k, $v, 'expr_type');
                 }
 
                 $sql .= " ";
@@ -226,7 +230,7 @@ if (!defined('HAVE_PHP_SQL_CREATOR')) {
                 $sql .= $this->processConstant($v);
 
                 if ($len == strlen($sql)) {
-                    die("unknown expr_type in function subtree[" . $k . "] " . $v['expr_type']);
+                    stop('function subtree', $k, $v, 'expr_type');
                 }
 
                 $sql .= ",";
@@ -245,7 +249,7 @@ if (!defined('HAVE_PHP_SQL_CREATOR')) {
                 $sql .= $this->processConstant($v);
 
                 if ($len == strlen($sql)) {
-                    die("unknown expr_type in expression subtree[" . $k . "] " . $v['expr_type']);
+                    stop('expression subtree', $k, $v, 'expr_type');
                 }
 
                 $sql .= " ";
@@ -267,7 +271,7 @@ if (!defined('HAVE_PHP_SQL_CREATOR')) {
                 $sql .= $this->processOperator($v);
 
                 if ($len == strlen($sql)) {
-                    die("unknown expr_type in expression ref_clause[" . $k . "] " . $v['expr_type']);
+                    stop('expression ref_clause', $k, $v, 'expr_type');
                 }
 
                 $sql .= " ";
