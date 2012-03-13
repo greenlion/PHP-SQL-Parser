@@ -231,7 +231,7 @@ if (!defined('HAVE_PHP_SQL_CREATOR')) {
             foreach ($parsed as $k => $v) {
                 $sql .= $v['column'] . "=" . $v['expr'] . ",";
             }
-            $sql = substr($sql, 0, strlen($sql) - 1);
+            $sql = substr($sql, 0, -1);
             return "SET " . $sql;
         }
 
@@ -255,7 +255,7 @@ if (!defined('HAVE_PHP_SQL_CREATOR')) {
 
                 $sql .= " ";
             }
-            return $sql;
+            return substr($sql, 0, -1);
         }
 
         protected function processWhereExpression($parsed) {
