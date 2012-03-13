@@ -21,14 +21,13 @@ $parser->parse($sql);
 $p = $parser->parsed;
 
 ok(count($p) == 3 && count($p['SELECT']) == 8);
-
 ok($p['SELECT'][count($p['SELECT'])-1]['base_expr'] == 'terminate');
 ok(count($p) == 3 && count($p['FROM']) == 1);
 ok(count($p) == 3 && count($p['WHERE']) == 3);
 
 
 $parser->parse('SELECT NOW( ),now(),sysdate( ),sysdate () as now');
-ok($parser->parsed['SELECT'][3]['base_expr'] == 'sysdate ');
+ok($parser->parsed['SELECT'][3]['base_expr'] == 'sysdate');
 
 
 $sql = " SELECT a.*, surveyls_title, surveyls_description, surveyls_welcometext, surveyls_url  FROM SURVEYS AS a INNER JOIN SURVEYS_LANGUAGESETTINGS on (surveyls_survey_id=a.sid and surveyls_language=a.language)  order by active DESC, surveyls_title";
@@ -37,7 +36,7 @@ $p = $parser->parsed;
 $expected = getExpectedValue('select1.serialized');
 eq_array($p, $expected, 'a test for ref_clauses');
 
-# not solved
+
 $sql = "SELECT pl_namespace,pl_title FROM `pagelinks` WHERE pl_from = '1' FOR UPDATE";
 $parser->parse($sql);
 $p = $parser->parsed;

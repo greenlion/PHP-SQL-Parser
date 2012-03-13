@@ -20,6 +20,6 @@ $expected = getExpectedValue('alias3.serialized');
 eq_array($p, $expected, 'sub-query within selection with alias');
 
 $sql = 'SELECT (select colA AS a from testA) + (select colB b from testB) From tableC x';
-$p = $parser->parse($sql);
+$p = $parser->parse($sql, true);
 $expected = getExpectedValue('alias4.serialized');
 eq_array($p, $expected, 'add two sub-query results');
