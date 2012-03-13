@@ -7,4 +7,5 @@ $parser = new PHPSQLParser();
 $sql = "insert into SETTINGS_GLOBAL (stg_value,stg_name) values('','force_ssl')";
 $p = $parser->parse($sql);
 
-print_r($p);
+$expected = getExpectedValue('insert1.serialized');
+eq_array($p, $expected, 'insert some data into table');

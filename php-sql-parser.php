@@ -14,6 +14,32 @@ if (!defined('HAVE_PHP_SQL_PARSER')) {
             }
         }
 
+        public function parse($sql, $calcPositions = false) {
+            $original = $sql;
+
+            #lex the SQL statement
+            $inputArray = $this->split_sql(trim($original));
+
+            #This is the highest level lexical analysis.  This is the part of the
+            #code which finds UNION and UNION ALL query parts
+            $queries = $this->processUnion($inputArray);
+
+            # If there was no UNION or UNION ALL in the query, then the query is
+            # stored at $queries[0].
+            if (!$this->isUnion($queries)) {
+                $queries = $this->process_sql($queries[0]);
+            }
+
+            # calc the positions of some important tokens
+            if ($calcPositions) {
+                $queries = $this->calculatePositionsWithinSQL($original, $queries);
+            }
+
+            # store the parsed queries
+            $this->parsed = $queries;
+            return $this->parsed;
+        }
+
         private function preprint($s, $return = false) {
             $x = "<pre>";
             $x .= print_r($s, 1);
@@ -121,13 +147,12 @@ if (!defined('HAVE_PHP_SQL_PARSER')) {
 
                         # starts with "(select"
                         if (preg_match('/^\\(\\s*select\\s*/i', $token)) {
-                            $queries[$unionType][$key] = $this
-                                    ->parse(
-                                            $this->removeParenthesisFromStart($token));
+                            $queries[$unionType][$key] = $this->parse(
+                                    $this->removeParenthesisFromStart($token));
                             break;
                         } else {
-                            $queries[$unionType][$key] = $this
-                                    ->process_sql($queries[$unionType][$key]);
+                            $queries[$unionType][$key] = $this->process_sql(
+                                    $queries[$unionType][$key]);
                             break;
                         }
                     }
@@ -147,37 +172,9 @@ if (!defined('HAVE_PHP_SQL_PARSER')) {
             return false;
         }
 
-        public function parse($sql, $calcPositions = false) {
-            $original = $sql;
-
-            #lex the SQL statement
-            $inputArray = $this->split_sql(trim($original));
-
-            #This is the highest level lexical analysis.  This is the part of the
-            #code which finds UNION and UNION ALL query parts
-            $queries = $this->processUnion($inputArray);
-
-            # If there was no UNION or UNION ALL in the query, then the query is
-            # stored at $queries[0].
-            if (!$this->isUnion($queries)) {
-                $queries = $this->process_sql($queries[0]);
-            }
-
-            # calc the positions of some important tokens
-            if ($calcPositions) {
-                $queries = $this->calculatePositionsWithinSQL($original, $queries);
-            }
-
-            # store the parsed queries
-            $this->parsed = $queries;
-            return $this->parsed;
-        }
-
         private function calculatePositionsWithinSQL($sql, $parsed) {
             $charPos = 0;
-            $this
-                    ->lookForBaseExpression($this->replaceSpecialCharacters($sql), $charPos,
-                            $parsed);
+            $this->lookForBaseExpression($this->replaceSpecialCharacters($sql), $charPos, $parsed);
             return $parsed;
         }
 
@@ -990,9 +987,7 @@ EOREGEX
                     $first_join = false;
 
                     if ($subquery) {
-                        $sub_tree = $this
-                                ->parse(
-                                        $this->removeParenthesisFromStart($subquery));
+                        $sub_tree = $this->parse($this->removeParenthesisFromStart($subquery));
                         $expression = $subquery;
                     }
 
@@ -1002,12 +997,20 @@ EOREGEX
                         $sub_tree = $this->split_sql($expression);
                         $sub_tree = $this->process_from($sub_tree);
                         $alias = "";
+
+                        $expr[] = array('expr_type' => 'table-expression', 'alias' => $alias,
+                                        'join_type' => $saved_join_type, 'ref_type' => $ref_type,
+                                        'ref_clause' => $this->removeParenthesisFromStart($ref_expr),
+                                        'base_expr' => $expression, 'sub_tree' => $sub_tree);
+
+                    } else {
+
+                        $expr[] = array('expr_type' => 'table', 'table' => $table, 'alias' => $alias,
+                                        'join_type' => $join_type, 'ref_type' => $ref_type,
+                                        'ref_clause' => $this->removeParenthesisFromStart($ref_expr),
+                                        'base_expr' => $expression, 'sub_tree' => $sub_tree);
                     }
 
-                    $expr[] = array('table' => $table, 'alias' => $alias,
-                                    'join_type' => $join_type, 'ref_type' => $ref_type,
-                                    'ref_clause' => $this->removeParenthesisFromStart($ref_expr),
-                            'base_expr' => $expression, 'sub_tree' => $sub_tree);
                     $modifier = ""; #it is stored into saved_join_type
 
                     $token_count = 0; # we start a new part of the expression
@@ -1019,7 +1022,7 @@ EOREGEX
 
                 default:
                 # this "continue" moves to the end of the "default" statement
-                    if ($token === "") {
+                    if ($upper === "") {
                         continue;
                     }
 
@@ -1035,23 +1038,31 @@ EOREGEX
                 }
                 ++$i;
             }
-            if (substr(trim($table), 0, 1) == '(') {
-                $expression = $this->removeParenthesisFromStart($table);
-                $join_type = 'JOIN';
-                $sub_tree = $this->split_sql($expression);
-                $sub_tree = $this->process_from($sub_tree);
-                $alias = "";
-            }
 
             # this occurs, if we have a single table
             if ($join_type == "") {
                 $saved_join_type = 'JOIN';
             }
 
-            $expr[] = array('table' => $table, 'alias' => $alias, 'join_type' => $saved_join_type,
-                            'ref_type' => $ref_type,
-                            'ref_clause' => $this->removeParenthesisFromStart($ref_expr),
-                    'base_expr' => $expression, 'sub_tree' => $sub_tree);
+            if (substr(trim($table), 0, 1) == '(') {
+                $expression = $this->removeParenthesisFromStart($table);
+                $join_type = 'JOIN';
+                $sub_tree = $this->split_sql($expression);
+                $sub_tree = $this->process_from($sub_tree);
+                $alias = "";
+
+                $expr[] = array('expr_type' => 'table-expression', 'alias' => $alias,
+                                'join_type' => $saved_join_type, 'ref_type' => $ref_type,
+                                'ref_clause' => $this->removeParenthesisFromStart($ref_expr),
+                                'base_expr' => $expression, 'sub_tree' => $sub_tree);
+            } else {
+
+                $expr[] = array('expr_type' => 'table', 'table' => $table, 'alias' => $alias,
+                                'join_type' => $saved_join_type, 'ref_type' => $ref_type,
+                                'ref_clause' => $this->removeParenthesisFromStart($ref_expr),
+                                'base_expr' => $expression, 'sub_tree' => $sub_tree);
+            }
+
             return $expr;
         }
 
@@ -1207,9 +1218,7 @@ EOREGEX
                 } elseif ($upper[0] == '(' && substr($upper, -1) == ')') {
                     if ($prev_token == 'IN') {
                         $type = "in-list";
-                        $processed = $this
-                                ->split_sql(
-                                        $this->removeParenthesisFromStart($token));
+                        $processed = $this->split_sql($this->removeParenthesisFromStart($token));
                         $list = array();
                         foreach ($processed as $v) {
                             if ($v == ',')
@@ -1222,9 +1231,7 @@ EOREGEX
 
                     } elseif ($prev_token == 'AGAINST') {
                         $type = "match-arguments";
-                        $list = $this
-                                ->split_sql(
-                                        $this->removeParenthesisFromStart($token));
+                        $list = $this->split_sql($this->removeParenthesisFromStart($token));
                         if (count($list) > 1) {
                             $match_mode = implode('', array_slice($list, 1));
                             $processed = array($list[0], $match_mode);
@@ -1397,11 +1404,8 @@ EOREGEX
                 $type = "";
             }
             if ($sub_expr !== "") {
-                $processed['sub_tree'] = $this
-                        ->process_expr_list(
-                                $this
-                                        ->split_sql(
-                                                $this->removeParenthesisFromStart($sub_expr)));
+                $processed['sub_tree'] = $this->process_expr_list(
+                        $this->split_sql($this->removeParenthesisFromStart($sub_expr)));
             }
 
             if (!is_array($processed)) {
@@ -1441,7 +1445,7 @@ EOREGEX
             return $tokens;
         }
 
-        function process_insert($tokens, $token_category = 'INSERT') {
+        private function process_insert($tokens, $token_category = 'INSERT') {
             $table = "";
             $cols = "";
 
@@ -1467,7 +1471,7 @@ EOREGEX
 
         }
 
-        function load_reserved_words() {
+        private function load_reserved_words() {
 
             $this->functions = array('abs', 'acos', 'adddate', 'addtime', 'aes_encrypt',
                                      'aes_decrypt', 'against', 'ascii', 'asin', 'atan', 'avg',
