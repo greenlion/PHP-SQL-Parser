@@ -345,8 +345,8 @@ if (!defined('HAVE_PHP_SQL_PARSER')) {
 
          # issue 21: replace tabs within the query string
          # TODO: this removes special characters also from inside of Strings (is that a problem?)
-         return str_replace(array('\\\'', '\\"', "\r\n", "\n", "\t", "()"), array("''", '""', "  ", " ", " ", "  "),
-         $sql);
+         //return str_replace(array('\\\'', '\\"', "\r\n", "\n", "\t", "()"), array("''", '""', "  ", " ", " ", "  "), $sql);
+         return str_replace(array("\r\n", "\n", "\t", "()"), array("  ", " ", " ", "  "), $sql);
       }
 
       #This function counts open and close backticks and
@@ -410,8 +410,8 @@ if (!defined('HAVE_PHP_SQL_PARSER')) {
          $regex = <<<EOREGEX
 /(`(?:[^`]|``)`|[@A-Za-z0-9_.`-]+)
 |(\+|-|\*|\/|!=|>=|<=|<>|>|<|&&|\|\||=|\^|\(|\))
-|('(?:[^']+|'')*'+)
-|("(?:[^"]+|"")*"+)
+|('(?:[^']+|''|\\')*'+)
+|("(?:[^"]+|""|\\")*"+)
 |([^ ,]+)
 /ix
 EOREGEX
