@@ -28,7 +28,7 @@ class OracleSQLTranslator extends PHPSQLCreator {
             return "";
         }
         # we don't need an AS between expression and alias
-        $sql = $parsed['name'];
+        $sql = " " . $parsed['name'];
         return $sql;
     }
 
@@ -86,7 +86,12 @@ class OracleSQLTranslator extends PHPSQLCreator {
         # if we have * as colref, we cannot use other columns
         $preventColumnRefs = $preventColumnRefs || (($table === "") && ($col === "*"));
 
-        return (($table !== "") ? ($table . "." . $col) : $col);
+        $alias = "";
+        if (isset($parsed['alias'])) {
+            $alias = $this->processAlias($parsed['alias']);
+        }
+
+        return (($table !== "") ? ($table . "." . $col) : $col) . $alias;
     }
 
     protected function processSELECT($parsed) {
@@ -140,6 +145,9 @@ class OracleSQLTranslator extends PHPSQLCreator {
  */
 
 $parser = new OracleSQLTranslator(false);
+
+$sql = "SELECT a.uid, a.users_name FROM USERS AS a LEFT JOIN (SELECT uid AS id FROM USER_IN_GROUPS WHERE ugid = 1) AS b ON a.uid = b.id WHERE id IS NULL ORDER BY a.users_name";
+$parser->process($sql);
 
 $sql = "INSERT INTO surveys ( SID, OWNER_ID, ADMIN, ACTIVE, EXPIRES, STARTDATE, ADMINEMAIL, ANONYMIZED, FAXTO, FORMAT, SAVETIMINGS, TEMPLATE, LANGUAGE, DATESTAMP, USECOOKIE, ALLOWREGISTER, ALLOWSAVE, AUTOREDIRECT, ALLOWPREV, PRINTANSWERS, IPADDR, REFURL, DATECREATED, PUBLICSTATISTICS, PUBLICGRAPHS, LISTPUBLIC, HTMLEMAIL, TOKENANSWERSPERSISTENCE, ASSESSMENTS, USECAPTCHA, BOUNCE_EMAIL, EMAILRESPONSETO, EMAILNOTIFICATIONTO, TOKENLENGTH, SHOWXQUESTIONS, SHOWGROUPINFO, SHOWNOANSWER, SHOWQNUMCODE, SHOWWELCOME, SHOWPROGRESS, ALLOWJUMPS, NAVIGATIONDELAY, NOKEYBOARD, ALLOWEDITAFTERCOMPLETION ) 
 VALUES ( 32225, 1, 'André', 'N', null, null, 'hello@zks.uni-leipzig.de', 'N', '', 'G', 'N', 'default', 'de-informal', 'N', 'N', 'N', 'Y', 'N', 'N', 'N', 'N', 'N', a_function('2012-02-16','YYYY-MM-DD'), 'N', 'N', 'Y', 'Y', 'N', 'N', 'D', 'hello@zks.uni-leipzig.de', '', '', 15, 'Y', 'B', 'Y', 'X', 'Y', 'Y', 'N', 0, 'N', 'N' )";

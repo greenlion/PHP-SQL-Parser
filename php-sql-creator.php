@@ -86,7 +86,7 @@ if (!defined('HAVE_PHP_SQL_CREATOR')) {
 
                 $sql .= ",";
             }
-            $sql = substr($sql, 0, strlen($sql) - 1);
+            $sql = substr($sql, 0, -1);
             return "SELECT " . $sql;
         }
 
@@ -104,7 +104,7 @@ if (!defined('HAVE_PHP_SQL_CREATOR')) {
 
                 $sql .= " ";
             }
-            return "FROM " . $sql;
+            return "FROM " . substr($sql, 0, -1);
         }
 
         protected function processORDER($parsed) {
@@ -119,7 +119,7 @@ if (!defined('HAVE_PHP_SQL_CREATOR')) {
 
                 $sql .= ",";
             }
-            $sql = substr($sql, 0, strlen($sql) - 1);
+            $sql = substr($sql, 0, -1);
             return "ORDER BY " . $sql;
         }
 
@@ -143,7 +143,7 @@ if (!defined('HAVE_PHP_SQL_CREATOR')) {
 
                 $sql .= ",";
             }
-            $sql = substr($sql, 0, strlen($sql) - 1);
+            $sql = substr($sql, 0, -1);
             return "VALUES (" . $sql . ")";
         }
 
@@ -167,7 +167,7 @@ if (!defined('HAVE_PHP_SQL_CREATOR')) {
             }
 
             if ($columns !== "") {
-                $columns = " (" . substr($columns, 0, strlen($columns) - 1) . ")";
+                $columns = " (" . substr($columns, 0, -1) . ")";
             }
 
             $sql .= $columns;
@@ -256,7 +256,7 @@ if (!defined('HAVE_PHP_SQL_CREATOR')) {
                 $sql .= " ";
             }
 
-            $sql .= $this->processAlias($parsed['alias']);
+            $sql = substr($sql, 0, -1) . $this->processAlias($parsed['alias']);
             return $sql;
         }
 
@@ -325,7 +325,7 @@ if (!defined('HAVE_PHP_SQL_CREATOR')) {
             }
 
             $sql = $parsed['table'];
-            $sql .= " " . $this->processAlias($parsed['alias']);
+            $sql .= $this->processAlias($parsed['alias']);
 
             if ($index !== 0) {
                 $sql = " " . $this->processJoin($parsed['join_type']) . " " . $sql;
@@ -355,7 +355,7 @@ if (!defined('HAVE_PHP_SQL_CREATOR')) {
             if ($parsed['expr_type'] !== 'subquery') {
                 return "";
             }
-            
+
             $sql = $this->processSelectStatement($parsed['sub_tree']);
             $sql = "(" . $sql . ")";
             $sql .= $this->processAlias($parsed['alias']);
@@ -379,7 +379,11 @@ if (!defined('HAVE_PHP_SQL_CREATOR')) {
             if ($parsed['expr_type'] !== 'colref') {
                 return "";
             }
-            return $parsed['base_expr'];
+            $sql = $parsed['base_expr'];
+            if (isset($parsed['alias'])) {
+                $sql .= $this->processAlias($parsed['alias']);
+            }
+            return $sql;
         }
 
         protected function processConstant($parsed) {
@@ -397,7 +401,7 @@ if (!defined('HAVE_PHP_SQL_CREATOR')) {
             foreach ($parsed['sub_tree'] as $k => $v) {
                 $sql .= $v . ",";
             }
-            return "(" . substr($sql, 0, strlen($sql) - 1) . ")";
+            return "(" . substr($sql, 0, -1) . ")";
         }
 
     } // END CLASS
