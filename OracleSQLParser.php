@@ -102,18 +102,34 @@ class OracleSQLParser {
         }
     }
 
-    private function replaceASWithinAlias(&$sql, $start, $table, $alias) {
-        if (strcmp($table, $alias)) {
-            // # is a delimiter and will be ignrored
-            $pattern = "#" . $table . "\\s+AS\\s+" . $alias . "#i";
-            $part = preg_replace($pattern, $table . "  " . $alias, substr($sql, $start), 1);
-            $sql = substr($sql, 0, $start) . $part;
+    private function replaceASWithinAlias(&$sql, &$alias) {
+        if ($alias === false || $alias['as'] === false) {
+            return;
+        }
+
+        // the base_expr starts with regex("\s+as\s+")
+        // the AS will be replaced with two space characters to hold a stable position within $sql
+        //preg_replace("#\\s*AS\\s+#i", " ", $sql);
+
+        for ($i = 0; $i < strlen($alias['base_expr']); $i++) {
+            if (strtoupper($alias['base_expr'][$i]) !== "A") {
+                continue;
+            }
+            $sql = substr($sql, 0, $alias['position'] + $i) . "  "
+                    . substr($sql, $alias['position'] + $i + 2);
+            break;
         }
     }
 
     private function replaceLongTableName(&$sql, $start, $table, $needle, $replacement) {
-        if (!strcasecmp($table, $needle)) {
-            $sql = substr($sql, 0, $start) . $replacement . substr($sql, $start + strlen($needle));
+        if (strcasecmp($table, $needle) == 0) {
+            # hold a stable position within $sql
+            $spaces = "";
+            for ($i = 0; $i < strlen($needle) - strlen($replacement); $i++) {
+                $spaces .= " ";
+            }
+            $sql = substr($sql, 0, $start + 1) . $replacement . $spaces
+                    . substr($sql, $start + 1 + strlen($needle));
         }
     }
 
@@ -122,15 +138,11 @@ class OracleSQLParser {
 
             switch ($v['expr_type']) {
             case 'colref':
-                $this->replaceKeyword($sql, $v['base_expr'], $v['position'], "uid", "uid_");
+                $this->replaceKeyword($sql, $v['base_expr'], $v['position'], "uid", "diu");
                 break;
             case 'subquery':
-                $this->replaceASWithinAlias($sql, $v['position'], $v['base_expr'], $v['alias']);
-                $this->processSQL($sql, $curr, $parsed[$k]['sub_tree']);
-
-                // both methods change the $sql, so we cannot search for parts
-                // we must change the base_expr too
-
+                $this->replaceASWithinAlias($sql, $v['alias']);
+                $this->processSQL($sql, $parsed[$k]['sub_tree']);
                 break;
             default:
             }
@@ -142,11 +154,11 @@ class OracleSQLParser {
     private function handleFrom(&$sql, &$parsed) {
         foreach ($parsed as $k => $v) {
 
-            $this->replaceASWithinAlias($sql, $v['position'], $v['table'], $v['alias']);
+            $this->replaceASWithinAlias($sql, $v['alias']);
             $this->replaceLongTableName($sql, $v['position'], $v['table'],
                     'surveys_languagesettings', 'surveys_lngsettings');
 
-            // 'ref_clause' look for uid
+            // 'ref_clause' look for uid !!!
             // subquery?
         }
 
@@ -160,7 +172,7 @@ class OracleSQLParser {
                 $this->processSQL($sql, $v['base_expr'], $parsed[$k]['sub_tree']);
                 break;
             case 'colref':
-                $this->replaceKeyword($sql, $v['base_expr'], $v['position'], "uid", "uid_");
+                $this->replaceKeyword($sql, $v['base_expr'], $v['position'], "uid", "diu");
                 break;
             default:
             }
@@ -171,7 +183,7 @@ class OracleSQLParser {
     private function handleGroupBy(&$sql, &$parsed) {
         foreach ($parsed as $k => $v) {
             if ($v['expr_type'] == 'colref') {
-                $this->replaceKeyword($sql, $v['base_expr'], $v['position'], "uid", "uid_");
+                $this->replaceKeyword($sql, $v['base_expr'], $v['position'], "uid", "diu");
             }
         }
     }
@@ -179,7 +191,7 @@ class OracleSQLParser {
     private function handleOrderBy(&$sql, &$parsed) {
         foreach ($parsed as $k => $v) {
             if ($v['type'] == 'expression') {
-                $this->replaceKeyword($sql, $v['base_expr'], $v['position'], "uid", "uid_");
+                $this->replaceKeyword($sql, $v['base_expr'], $v['position'], "uid", "diu");
                 $this->replaceLOBColumn($sql, $v['base_expr'], $v['position']);
             }
         }
@@ -217,27 +229,21 @@ class OracleSQLParser {
         }
     }
 
-    private function handleInserting(&$sql, &$parsed) {
+    private function handleInsert(&$sql, &$parsed) {
 
         $this->replaceLongTableName($sql, $parsed['position'], $parsed['table'],
                 'surveys_languagesettings', 'surveys_lngsettings');
 
-        foreach ($parsed['cols'] as $k => $v) {
-
-            $curr = stripos($sql, $v, $curr);
-            $parsed['cols'][$k] = array('colref' => $curr, 'pos' => $curr);
-
-            $this->replaceKeyword($sql, $v, $curr, "uid", "uid_");
+        if ($parsed['columns']) { # all column statement
+            foreach ($parsed['columns'] as $k => $v) {
+                $this->replaceKeyword($sql, $v['base_expr'], $v['position'], "uid", "diu");
+            }
         }
     }
 
-    private function handleSet(&$sql, &$curr, &$parsed) {
+    private function handleSet(&$sql, &$parsed) {
         foreach ($parsed as $k => $v) {
-            $curr = stripos($sql, $v['column'], $curr);
-            $parsed[$k]['pos'] = $curr;
-
-            // we have to check the alias.uid!!
-            $this->replaceKeyword($sql, $v['column'], $curr, "uid", "uid_");
+            $this->replaceKeyword($sql, $v['column'], $v['position'], "uid", "diu");
 
             // colref = alias.clob ?
             // subquery?
@@ -245,20 +251,19 @@ class OracleSQLParser {
 
     }
 
-    private function handleValues(&$sql, &$curr, &$parsed) {
+    private function handleValues(&$sql, &$parsed) {
         // ignore it at the moment
+        // some subqueries?
     }
 
     private function handleInsertStatement($sql, $parsed) {
         foreach ($parsed as $k => $v) {
             switch ($k) {
             case 'INSERT':
-                $curr = stripos($sql, 'INSERT', $curr);
-                $this->handleInserting($sql, $curr, $parsed[$k]);
+                $this->handleInsert($sql, $parsed[$k]);
                 break;
             case 'VALUES':
-                $curr = stripos($sql, 'VALUES', $curr);
-                $this->handleValues($sql, $curr, $parsed[$k]);
+                $this->handleValues($sql, $parsed[$k]);
                 break;
             default:
                 safe_die("unknown INSERT statement part " . $k);
@@ -274,16 +279,13 @@ class OracleSQLParser {
         foreach ($parsed as $k => $v) {
             switch ($k) {
             case 'UPDATE':
-                $curr = stripos($sql, 'UPDATE', $curr);
-                $this->handleUpdating($sql, $curr, $parsed[$k]);
+                $this->handleUpdating($sql, $parsed[$k]);
                 break;
             case 'SET':
-                $curr = stripos($sql, 'SET', $curr);
-                $this->handleSet($sql, $curr, $parsed[$k]);
+                $this->handleSet($sql, $parsed[$k]);
                 break;
             case 'WHERE':
-                $curr = stripos($sql, 'WHERE', $curr);
-                $this->handleWhere($sql, $curr, $parsed[$k]);
+                $this->handleWhere($sql, $parsed[$k]);
                 break;
             default:
                 safe_die("unknown UPDATE statement part " . $k);
@@ -306,20 +308,43 @@ class OracleSQLParser {
         case 'DELETE':
             $this->handleDeleteStatement($sql, $parsed);
             break;
+        case 'USE': # use database, it is not necessary
+            $sql = "";
+            break;
         default:
             safe_die("invalid SQL type " . key($parsed));
         }
     }
 
+    # prevents parsing of create-oracle.php statements
+    # maybe we run into problems with Limesurvey internal creation statements
+    private function isOracleStatement($sql) {
+        $sql = trim($sql);
+        if (stripos($sql, "CREATE") !== false) {
+            return true;
+        }
+        if (stripos($sql, "ALTER") !== false) {
+            return true;
+        }
+        if (stripos($sql, "COMMENT") !== false) {
+            return true;
+        }
+        return false;
+    }
+
     public function process($sql) {
+        if ($this->isOracleStatement($sql)) {
+            return $sql;
+        }
+
         $parser = new PHPSQLParser($sql, true);
         $parsed = $parser->parsed;
 
-        $this->preprint($parsed);
+        echo "before: " . $this->preprint($sql, true) . "\n";
         $this->processSQLStatement($sql, $parsed);
-        $this->preprint($parsed);
+        echo "after: " . $this->preprint($sql, true) . "\n";
 
-        return $sql;
+        return rtrim(trim($sql), ';');
     }
 
     public function getAllTables($sql) {
@@ -330,8 +355,12 @@ class OracleSQLParser {
 }
 
 $parser = new OracleSQLParser(false);
-$parser->process("SELECT * FROM SETTINGS_GLOBAL");
-$parser->process("SELECT stg_value FROM SETTINGS_GLOBAL where stg_name='force_ssl'");
-$parser->process("update SETTINGS_GLOBAL set stg_value='' where stg_name='force_ssl'");
-$parser->process("insert into SETTINGS_GLOBAL (stg_value,stg_name) values('','force_ssl')");
-$parser->process("SELECT * FROM FAILED_LOGIN_ATTEMPTS WHERE ip='172.18.47.211'");
+$parser->process(" SELECT a.*, surveyls_title, surveyls_description, surveyls_welcometext, surveyls_url  FROM SURVEYS AS a INNER JOIN SURVEYS_LANGUAGESETTINGS on (surveyls_survey_id=a.sid and surveyls_language=a.language)  order by active DESC, surveyls_title");
+//$parser->process(" INSERT INTO settings_global VALUES ('DBVersion', '146')");
+//$parser->process("CREATE TABLE answers ( qid number(11) default '0' NOT NULL, code varchar2(5) default '' NOT NULL, answer CLOB NOT NULL, assessment_value number(11) default '0' NOT NULL, sortorder number(11) NOT NULL, language varchar2(20) default 'en', scale_id number(3) default '0' NOT NULL, PRIMARY KEY (qid,code,language,scale_id) )");
+//$parser->process("USE DATABASE `sdbprod`");
+//$parser->process("insert into SETTINGS_GLOBAL (stg_value,stg_name) values('','force_ssl')");
+//$parser->process("SELECT * FROM SETTINGS_GLOBAL");
+//$parser->process("SELECT stg_value FROM SETTINGS_GLOBAL where stg_name='force_ssl'");
+//$parser->process("update SETTINGS_GLOBAL set stg_value='' where stg_name='force_ssl'");
+//$parser->process("SELECT * FROM FAILED_LOGIN_ATTEMPTS WHERE ip='172.18.47.211'");
