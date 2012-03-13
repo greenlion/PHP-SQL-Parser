@@ -320,6 +320,52 @@ if (!defined('HAVE_PHP_SQL_PARSER')) {
          $sql);
       }
 
+      #This function counts open and close backticks and
+      #returns their location.  This might be faster as a regex
+      private function count_backtick($token, $char) {
+         $len = strlen($token);
+         $cnt = 0;
+         for ($i = 0; $i < $len; ++$i) {
+            if ($token[$i] == $char)
+            ++$cnt;
+         }
+         return $cnt;
+      }
+
+      # backticks are not balanced within one token, so we have
+      # to re-combine some tokens
+      private function balanceBackticks($tokens, $char) {
+         $token_count = count($tokens);
+         $i = 0;
+         while ($i < $token_count) {
+             
+            if ($tokens[$i] === "") {
+               $i++;
+               continue;
+            }
+
+            $needed = $this->count_backtick($tokens[$i], $char) % 2;
+            if ($needed === 0) {
+               $i++;
+               continue;
+            }
+
+            for ($n = $i + 1; $n<$token_count; $n++) {
+               $needed = ($needed + $this->count_backtick($tokens[$n], $char)) % 2;
+
+               $tokens[$i] .= $tokens[$n];
+               unset($tokens[$n]);
+
+               if ($needed === 0) {
+                  $n++;
+                  break;
+               }
+            }
+            $i = $n;
+         }
+         return array_values($tokens);
+      }
+
       #This is the lexer
       #this function splits up a SQL statement into easy to "parse"
       #tokens for the SQL processor
@@ -344,14 +390,15 @@ EOREGEX
 
          $tokens = preg_split($regex, $sql, -1, PREG_SPLIT_NO_EMPTY | PREG_SPLIT_DELIM_CAPTURE);
          $tokens = $this->balanceParenthesis($tokens);
-
+         $tokens = $this->balanceBackticks($tokens, '`');
+         $tokens = $this->balanceBackticks($tokens, '\'');
          return $tokens;
       }
 
       private function balanceParenthesis($tokens) {
 
          $token_count = count($tokens);
-          
+
          $i = 0;
          while ($i < $token_count) {
 
@@ -362,10 +409,6 @@ EOREGEX
 
             $count = 1;
             for ($n = $i+1; $n < $token_count; $n++) {
-
-               if ($tokens[$n] ==="") {
-                  continue;
-               }
 
                $token = $tokens[$n];
 
@@ -380,11 +423,13 @@ EOREGEX
                unset($tokens[$n]);
 
                if ($count === 0) {
-                  $i = $n + 1;
+                  $n++;
                   break;
                }
             }
+            $i = $n;
          }
+          
          return array_values($tokens);
       }
 
