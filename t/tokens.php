@@ -44,5 +44,17 @@ foreach ($tokens as $token) {
 		echo "token is not identic to false\n";
 	}
 	
+	if ($token === "0") {
+	   echo "token is identic to 0\n";
+	} else {
+	   echo "token is not identic to 0\n";
+	}
+	
+	if ($token == "0") {
+	   echo "token is equal to 0\n";
+	} else {
+	   echo "token is not equal to 0\n";
+	}
+	
 	echo "\n";
 }
