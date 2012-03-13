@@ -978,7 +978,7 @@ EOREGEX
 
         private function process_from(&$tokens) {
 
-            $data = $this->initializeTableExpression();
+            $parseInfo = $this->initParseInfoForFrom();
             $expr = array();
 
             $skip_next = false;
@@ -988,7 +988,7 @@ EOREGEX
                 $upper = strtoupper(trim($token));
 
                 if ($skip_next && $token !== "") {
-                    $data['token_count']++;
+                    $parseInfo['token_count']++;
                     $skip_next = false;
                     continue;
                 } else {
@@ -1009,26 +1009,26 @@ EOREGEX
                     break;
 
                 default:
-                    $data['expression'] .= $token == '' ? " " : $token;
-                    if ($data['ref_type'] !== false) { # all after ON / USING
-                        $data['ref_expr'] .= $token == '' ? " " : $token;
+                    $parseInfo['expression'] .= $token == '' ? " " : $token;
+                    if ($parseInfo['ref_type'] !== false) { # all after ON / USING
+                        $parseInfo['ref_expr'] .= $token == '' ? " " : $token;
                     }
                     break;
                 }
 
                 switch ($upper) {
                 case 'AS':
-                    $data['alias'] = array('as' => true, 'name' => "", 'base_expr' => $token);
-                    $data['token_count']++;
+                    $parseInfo['alias'] = array('as' => true, 'name' => "", 'base_expr' => $token);
+                    $parseInfo['token_count']++;
                     $n = 1;
                     $str = "";
                     while ($str == "") {
-                        $data['alias']['base_expr'] .= ($tokens[$i + $n] === "" ? " " : $tokens[$i + $n]);
+                        $parseInfo['alias']['base_expr'] .= ($tokens[$i + $n] === "" ? " " : $tokens[$i + $n]);
                         $str = trim($tokens[$i + $n]);
                         ++$n;
                     }
-                    $data['alias']['name'] = $str;
-                    $data['alias']['base_expr'] = trim($data['alias']['base_expr']);
+                    $parseInfo['alias']['name'] = $str;
+                    $parseInfo['alias']['base_expr'] = trim($parseInfo['alias']['base_expr']);
                     continue;
 
                 case 'INDEX':
@@ -1041,8 +1041,8 @@ EOREGEX
 
                 case 'USING':
                 case 'ON':
-                    $data['ref_type'] = $upper;
-                    $data['ref_expr'] = "";
+                    $parseInfo['ref_type'] = $upper;
+                    $parseInfo['ref_expr'] = "";
 
                 case 'CROSS':
                 case 'USE':
@@ -1050,12 +1050,12 @@ EOREGEX
                 case 'IGNORE':
                 case 'INNER':
                 case 'OUTER':
-                    $data['token_count']++;
+                    $parseInfo['token_count']++;
                     continue;
                     break;
 
                 case 'FOR':
-                    $data['token_count']++;
+                    $parseInfo['token_count']++;
                     $skip_next = true;
                     continue;
                     break;
@@ -1063,20 +1063,20 @@ EOREGEX
                 case 'LEFT':
                 case 'RIGHT':
                 case 'STRAIGHT_JOIN':
-                    $data['next_join_type'] = $upper;
+                    $parseInfo['next_join_type'] = $upper;
                     break;
 
                 case ',':
-                    $data['next_join_type'] = 'CROSS';
+                    $parseInfo['next_join_type'] = 'CROSS';
 
                 case 'JOIN':
-                    if ($data['subquery']) {
-                        $data['sub_tree'] = $this->parse($this->removeParenthesisFromStart($data['subquery']));
-                        $data['expression'] = $data['subquery'];
+                    if ($parseInfo['subquery']) {
+                        $parseInfo['sub_tree'] = $this->parse($this->removeParenthesisFromStart($parseInfo['subquery']));
+                        $parseInfo['expression'] = $parseInfo['subquery'];
                     }
 
-                    $expr[] = $this->saveTableExpression($data);
-                    $data = $this->initializeTableExpression($data);
+                    $expr[] = $this->processFromExpression($parseInfo);
+                    $parseInfo = $this->initParseInfoForFrom($parseInfo);
                     break;
 
                 default:
@@ -1084,71 +1084,71 @@ EOREGEX
                         continue; # ends the switch statement!
                     }
 
-                    if ($data['token_count'] == 0) {
-                        if ($data['table'] === "") {
-                            $data['table'] = $token;
+                    if ($parseInfo['token_count'] == 0) {
+                        if ($parseInfo['table'] === "") {
+                            $parseInfo['table'] = $token;
                         }
-                    } else if ($data['token_count'] == 1) {
-                        $data['alias'] = array('as' => false, 'name' => trim($token), 'base_expr' => trim($token));
+                    } else if ($parseInfo['token_count'] == 1) {
+                        $parseInfo['alias'] = array('as' => false, 'name' => trim($token), 'base_expr' => trim($token));
                     }
-                    $data['token_count']++;
+                    $parseInfo['token_count']++;
                     break;
                 }
                 ++$i;
             }
 
-            $expr[] = $this->saveTableExpression($data);
+            $expr[] = $this->processFromExpression($parseInfo);
             return $expr;
         }
 
-        private function initializeTableExpression($data = false) {
+        private function initParseInfoForFrom($parseInfo = false) {
             # first init
-            if ($data === false) {
-                $data = array('join_type' => "", 'saved_join_type' => "JOIN");
+            if ($parseInfo === false) {
+                $parseInfo = array('join_type' => "", 'saved_join_type' => "JOIN");
             }
             # loop init
             return array('expression' => "", 'token_count' => 0, 'table' => "", 'alias' => false, 'join_type' => "",
-                         'next_join_type' => "", 'saved_join_type' => $data['saved_join_type'], 'ref_type' => false,
+                         'next_join_type' => "", 'saved_join_type' => $parseInfo['saved_join_type'], 'ref_type' => false,
                          'ref_expr' => false, 'base_expr' => false, 'sub_tree' => false, 'subquery' => "");
         }
 
-        private function saveTableExpression(&$data) {
+        private function processFromExpression(&$parseInfo) {
 
             $res = array();
 
             # exchange the join types (join_type is save now, saved_join_type holds the next one)
-            $data['join_type'] = $data['saved_join_type']; # initialized with JOIN
-            $data['saved_join_type'] = ($data['next_join_type'] ? $data['next_join_type'] : 'JOIN');
+            $parseInfo['join_type'] = $parseInfo['saved_join_type']; # initialized with JOIN
+            $parseInfo['saved_join_type'] = ($parseInfo['next_join_type'] ? $parseInfo['next_join_type'] : 'JOIN');
 
             # we have a reg_expr, so we have to parse it
-            if ($data['ref_expr'] !== false) {
-                $data['ref_expr'] = $this->process_expr_list(
-                        $this->split_sql($this->removeParenthesisFromStart($data['ref_expr'])));
+            if ($parseInfo['ref_expr'] !== false) {
+                $parseInfo['ref_expr'] = $this->process_expr_list(
+                        $this->split_sql($this->removeParenthesisFromStart($parseInfo['ref_expr'])));
             }
 
             # there is an expression, we have to parse it
-            if (substr(trim($data['table']), 0, 1) == '(') {
-                $data['expression'] = $this->removeParenthesisFromStart($data['table']);
+            if (substr(trim($parseInfo['table']), 0, 1) == '(') {
+                $parseInfo['expression'] = $this->removeParenthesisFromStart($parseInfo['table']);
 
-                if (preg_match("/^\\s*select/i", $data['expression'])) {
-                    $data['sub_tree'] = $this->parse($data['expression']);
+                if (preg_match("/^\\s*select/i", $parseInfo['expression'])) {
+                    $parseInfo['sub_tree'] = $this->parse($parseInfo['expression']);
                     $res['expr_type'] = 'subquery';
                 } else {
-                    $tmp = $this->split_sql($data['expression']);
-                    $data['sub_tree'] = $this->process_from($tmp);
+                    $tmp = $this->split_sql($parseInfo['expression']);
+                    $parseInfo['sub_tree'] = $this->process_from($tmp);
                     $res['expr_type'] = 'table_expression';
                 }
             } else {
                 $res['expr_type'] = 'table';
-                $res['table'] = $data['table'];
+                $res['table'] = $parseInfo['table'];
             }
 
-            $res['alias'] = $data['alias'];
-            $res['join_type'] = $data['join_type'];
-            $res['ref_type'] = $data['ref_type'];
-            $res['ref_clause'] = $data['ref_expr'];
-            $res['base_expr'] = trim($data['expression']);
-            $res['sub_tree'] = $data['sub_tree'];
+            $res['alias'] = $parseInfo['alias'];
+            $res['join_type'] = $parseInfo['join_type'];
+            $res['ref_type'] = $parseInfo['ref_type'];
+            $res['ref_clause'] = $parseInfo['ref_expr'];
+            $res['base_expr'] = trim($parseInfo['expression']);
+            $res['sub_tree'] = $parseInfo['sub_tree'];
             return $res;
         }
 
@@ -1158,7 +1158,7 @@ EOREGEX
             }
 
             $parseInfo['expr'] = trim($this->revokeEscaping($parseInfo['expr']));
-
+            
             if (is_numeric($parseInfo['expr'])) {
                 $parseInfo['type'] = 'pos';
             } else {
@@ -1167,7 +1167,7 @@ EOREGEX
                     if (!$clause['alias']) {
                         continue;
                     }
-                    if ($clause['alias']['name'] == $escaped) {
+                    if ($clause['alias']['name'] == $parseInfo['expr']) {
                         $parseInfo['type'] = 'alias';
                     }
                 }
