@@ -1,7 +1,7 @@
 <?php
 
-require_once(dirname(__FILE__) . '/php-sql-parser.php');
-require_once(dirname(__FILE__) . '/php-sql-creator.php');
+require_once(dirname(__FILE__) . '/../php-sql-parser.php');
+require_once(dirname(__FILE__) . '/../php-sql-creator.php');
 require_once(dirname(__FILE__) . '/test-more.php');
 
 function process($sql) {
