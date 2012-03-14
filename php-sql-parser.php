@@ -44,10 +44,8 @@ if (!defined('HAVE_PHP_SQL_PARSER')) {
         }
 
         public function parse($sql, $calcPositions = false) {
-            $original = $this->replaceSpecialCharacters($sql);
-
             #lex the SQL statement
-            $inputArray = $this->split_sql(trim($original));
+            $inputArray = $this->split_sql($sql);
 
             #This is the highest level lexical analysis.  This is the part of the
             #code which finds UNION and UNION ALL query parts
@@ -416,7 +414,7 @@ if (!defined('HAVE_PHP_SQL_PARSER')) {
             # added some code from issue 11 comment 3
             $regex = <<<EOREGEX
 /(`(?:[^`]|``)`|[@A-Za-z0-9_.`-]+)
-|(\+|-|\*|\/|!=|>=|<=|<>|>|<|&&|\|\||=|\^|\(|\))
+|(\+|-|\*|\/|!=|>=|<=|<>|>|<|&&|\|\||=|\^|\(|\)|\\t|\\r\\n|\\n)
 |('(?:[^']+|'')*'+)
 |("(?:[^"]+|"")*"+)
 |([^ ,]+)
@@ -432,32 +430,24 @@ EOREGEX
         }
 
         private function balanceParenthesis($tokens) {
-
             $token_count = count($tokens);
-
             $i = 0;
             while ($i < $token_count) {
-
                 if ($tokens[$i] !== '(') {
                     $i++;
                     continue;
                 }
-
                 $count = 1;
                 for ($n = $i + 1; $n < $token_count; $n++) {
-
                     $token = $tokens[$n];
-
                     if ($token === '(') {
                         $count++;
                     }
                     if ($token === ')') {
                         $count--;
                     }
-
                     $tokens[$i] .= $token;
                     unset($tokens[$n]);
-
                     if ($count === 0) {
                         $n++;
                         break;
@@ -465,7 +455,6 @@ EOREGEX
                 }
                 $i = $n;
             }
-
             return array_values($tokens);
         }
 
