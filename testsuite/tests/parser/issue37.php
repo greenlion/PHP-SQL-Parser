@@ -7,6 +7,5 @@ $parser = new PHPSQLParser();
 $sql = "INSERT INTO test (`name`, `test`) VALUES ('Hello this is what happens\n when new lines are involved', '')";
 $parser->parse($sql);
 $p = $parser->parsed;
-print_r($p);
-$expected = getExpectedValue('issue37a.serialized');
+$expected = getExpectedValue('issue37.serialized');
 eq_array($p, $expected, 'INSERT statement with newline character');

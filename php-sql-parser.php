@@ -54,12 +54,12 @@ if (!defined('HAVE_PHP_SQL_PARSER')) {
             # If there was no UNION or UNION ALL in the query, then the query is
             # stored at $queries[0].
             if (!$this->isUnion($queries)) {
-                $queries = $this->process_sql($queries[0]);
+                $queries = $this->processSQL($queries[0]);
             }
 
             # calc the positions of some important tokens
             if ($calcPositions) {
-                $queries = $this->calculatePositionsWithinSQL($original, $queries);
+                $queries = $this->calculatePositionsWithinSQL($sql, $queries);
             }
 
             # store the parsed queries
@@ -178,7 +178,7 @@ if (!defined('HAVE_PHP_SQL_PARSER')) {
                             break;
                         }
 
-                        $queries[$unionType][$key] = $this->process_sql($queries[$unionType][$key]);
+                        $queries[$unionType][$key] = $this->processSQL($queries[$unionType][$key]);
                         break;
                     }
                 }
@@ -337,15 +337,6 @@ if (!defined('HAVE_PHP_SQL_PARSER')) {
 
         }
 
-        private function replaceSpecialCharacters($sql) {
-            # replace always the same number of characters, so we have the same positions
-            # within the original string
-
-            # issue 21: replace tabs within the query string
-            # TODO: this removes special characters also from inside of Strings (is that a problem?)
-            return str_replace(array("\r\n", "\n", "\t", "()"), array("  ", " ", " ", "  "), $sql);
-        }
-
         #This function counts open and close backticks and
         #returns their location.  This might be faster as a regex
         private function count_backtick($token, $char) {
@@ -461,24 +452,20 @@ EOREGEX
         /* This function breaks up the SQL statement into logical sections.
          Some sections are then further handled by specialized functions.
          */
-        private function process_sql(&$tokens, $start_at = 0, $stop_at = false) {
+        private function processSQL(&$tokens) {
             $prev_category = "";
-            $start = microtime(true);
             $token_category = "";
-
             $skip_next = false;
-            $token_count = count($tokens);
-
-            if (!$stop_at) {
-                $stop_at = $token_count;
-            }
-
             $out = false;
 
-            for ($token_number = $start_at; $token_number < $stop_at; ++$token_number) {
-                $token = trim($tokens[$token_number]);
+            $tokenCount = count($tokens);
+            for ($tokenNumber = 0; $tokenNumber < $tokenCount; ++$tokenNumber) {
+               
+                $token = $tokens[$tokenNumber];
+                $trim = trim($token);
+
                 # if it starts with an "(", it should follow a SELECT
-                if ($token !== "" && $token[0] == '(' && $token_category == "") {
+                if ($trim !== "" && $trim[0] == '(' && $token_category == "") {
                     $token_category = 'SELECT';
                 }
 
@@ -496,7 +483,7 @@ EOREGEX
                     $skip_next = false;
                 }
 
-                $upper = strtoupper($token);
+                $upper = strtoupper($trim);
                 switch ($upper) {
 
                 /* Tokens that get their own sections. These keywords have subclauses. */
@@ -536,7 +523,7 @@ EOREGEX
                 case 'EXECUTE':
                 case 'PREPARE':
                 case 'DEALLOCATE':
-                    if ($token == 'DEALLOCATE') {
+                    if ($trim == 'DEALLOCATE') {
                         $skip_next = true;
                     }
                     /* this FROM is different from FROM in other DML (not join related) */
@@ -619,9 +606,9 @@ EOREGEX
                         $token_category = $upper;
                         $out[$upper][0] = $upper;
                     } else {
-                        $token = 'LOCK IN SHARE MODE';
+                        $trim = 'LOCK IN SHARE MODE';
                         $skip_next = true;
-                        $out['OPTIONS'][] = $token;
+                        $out['OPTIONS'][] = $trim;
                     }
                     continue 2;
                     break;
@@ -664,7 +651,7 @@ EOREGEX
                     break;
 
                 case 'START':
-                    $token = "BEGIN";
+                    $trim = "BEGIN";
                     $out[$upper][0] = $upper;
                     $skip_next = true;
                     break;
@@ -687,7 +674,7 @@ EOREGEX
 
                 /* These tokens set particular options for the statement.  They never stand alone.*/
                 case 'DISTINCTROW':
-                    $token = 'DISTINCT';
+                    $trim = 'DISTINCT';
                 case 'DISTINCT':
                 case 'HIGH_PRIORITY':
                 case 'LOW_PRIORITY':
@@ -728,14 +715,15 @@ EOREGEX
 
                 # remove obsolete category after union (empty category because of
                 # empty token before select)
-                if ($token_category && ($prev_category == $token_category)) {
+                if ($token_category !== "" && ($prev_category === $token_category)) {
 
                     # if we have more than one whitespace within a token
                     # we add a token for every character
                     # this prevents wrong base_expr within process_from()
                     # TODO: may it is better to leave the original whitespace as token
-                    if ($token === "" && trim($tokens[$token_number]) === "") {
-                        for ($i = 0; $i < strlen($tokens[$token_number]) - 1; $i++) {
+                    if ($trim === "") {
+                        for ($i = 0; $i < strlen($token) - 1; $i++) {
+                            echo "more whitespace within a token";
                             $out[$token_category][] = $token;
                         }
                     }
@@ -745,10 +733,13 @@ EOREGEX
                 $prev_category = $token_category;
             }
 
-            if (!$out)
-                return false;
+            return $this->processSQLParts($out);
+        }
 
-            #process the SELECT clause
+        private function processSQLParts($out) {
+            if (!$out) {
+                return false;
+            }
             if (!empty($out['SELECT'])) {
                 $out['SELECT'] = $this->process_select($out['SELECT']);
             }
@@ -800,7 +791,7 @@ EOREGEX
             }
             return $out;
         }
-
+        
         /* A SET list is simply a list of key = value expressions separated by comma (,).
          This function produces a list of the key/value expressions.
          */
@@ -1250,7 +1241,7 @@ EOREGEX
         }
 
         private function initParseInfoForGroup() {
-            return array('expr' => "", 'type' => 'expression');
+            return array('expr' => "", 'dir' => "", 'type' => 'expression');
         }
         
         private function process_group(&$tokens, &$select) {
