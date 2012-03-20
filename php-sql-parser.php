@@ -462,7 +462,7 @@ EOREGEX
             for ($tokenNumber = 0; $tokenNumber < $tokenCount; ++$tokenNumber) {
                
                 $token = $tokens[$tokenNumber];
-                $trim = trim($token);
+                $trim = trim($token); # this removes also \n and \t!
 
                 # if it starts with an "(", it should follow a SELECT
                 if ($trim !== "" && $trim[0] == '(' && $token_category == "") {
@@ -473,12 +473,14 @@ EOREGEX
                  token, that is we ignore whitespace.
                  */
                 if ($skip_next) {
-                    #whitespace does not count as a next token
-                    if ($token === "") {
-                        continue;
-                    }
-
+                   if ($trim === "") {
+                      if ($token_category !== "") { # is this correct??
+                       $out[$token_category][] = $token;   
+                      }
+                      continue;
+                   }
                     #to skip the token we replace it with whitespace
+                    $trim = "";
                     $token = "";
                     $skip_next = false;
                 }
@@ -716,17 +718,6 @@ EOREGEX
                 # remove obsolete category after union (empty category because of
                 # empty token before select)
                 if ($token_category !== "" && ($prev_category === $token_category)) {
-
-                    # if we have more than one whitespace within a token
-                    # we add a token for every character
-                    # this prevents wrong base_expr within process_from()
-                    # TODO: may it is better to leave the original whitespace as token
-                    if ($trim === "") {
-                        for ($i = 0; $i < strlen($token) - 1; $i++) {
-                            echo "more whitespace within a token";
-                            $out[$token_category][] = $token;
-                        }
-                    }
                     $out[$token_category][] = $token;
                 }
 
@@ -874,14 +865,11 @@ EOREGEX
             $expression = "";
             $expr = array();
             foreach ($tokens as $token) {
-                if ($token == ',') {
+                if (trim($token) === ',') {
                     $expr[] = $this->process_select_expr(trim($expression));
                     $expression = "";
                 } else {
-                    if ($token === "") {
-                        $token = " ";
-                    }
-                    $expression .= $token;
+                   $expression .= $token;
                 }
             }
             if ($expression) {
