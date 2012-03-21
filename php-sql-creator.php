@@ -331,12 +331,13 @@ if (!defined('HAVE_PHP_SQL_CREATOR')) {
                 $sql .= $this->processFunction($v);
                 $sql .= $this->processConstant($v);
                 $sql .= $this->processColRef($v);
+                $sql .= $this->processReserved($v);
 
                 if ($len == strlen($sql)) {
                     $this->stop('function subtree', $k, $v, 'expr_type');
                 }
 
-                $sql .= ",";
+                $sql .= ($this->isReserved($v) ? " " : ",");
             }
             return $parsed['base_expr'] . "(" . substr($sql,0,-1) . ")";
         }
@@ -503,6 +504,17 @@ if (!defined('HAVE_PHP_SQL_CREATOR')) {
             return $sql;
         }
 
+        protected function processReserved($parsed) {
+            if (!$this->isReserved($parsed)) {
+                return "";
+            }
+            return $parsed['base_expr'];
+        }
+        
+        protected function isReserved($parsed) {
+            return ($parsed['expr_type'] === 'reserved');
+        }
+        
         protected function processConstant($parsed) {
             if ($parsed['expr_type'] !== 'const') {
                 return "";
