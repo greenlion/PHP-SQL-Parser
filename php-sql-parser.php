@@ -1011,9 +1011,9 @@ EOREGEX
                     break;
 
                 default:
-                    $parseInfo['expression'] .= $token == '' ? " " : $token;
+                    $parseInfo['expression'] .= $token;
                     if ($parseInfo['ref_type'] !== false) { # all after ON / USING
-                        $parseInfo['ref_expr'] .= $token == '' ? " " : $token;
+                        $parseInfo['ref_expr'] .= $token;
                     }
                     break;
                 }
@@ -1086,11 +1086,11 @@ EOREGEX
                         continue; # ends the switch statement!
                     }
 
-                    if ($parseInfo['token_count'] == 0) {
+                    if ($parseInfo['token_count'] === 0) {
                         if ($parseInfo['table'] === "") {
                             $parseInfo['table'] = $token;
                         }
-                    } else if ($parseInfo['token_count'] == 1) {
+                    } else if ($parseInfo['token_count'] === 1) {
                         $parseInfo['alias'] = array('as' => false, 'name' => trim($token), 'base_expr' => trim($token));
                     }
                     $parseInfo['token_count']++;
@@ -1163,6 +1163,8 @@ EOREGEX
         }
 
         private function processOrderExpression(&$parseInfo, $select) {
+            $parseInfo['expr'] = trim($parseInfo['expr']);
+            
             if ($parseInfo['expr'] === "") {
                 return false;
             }
@@ -1177,7 +1179,7 @@ EOREGEX
                     if (!$clause['alias']) {
                         continue;
                     }
-                    if ($clause['alias']['name'] == $parseInfo['expr']) {
+                    if ($clause['alias']['name'] === $parseInfo['expr']) {
                         $parseInfo['type'] = 'alias';
                     }
                 }
@@ -1219,7 +1221,7 @@ EOREGEX
                     break;
 
                 default:
-                    $parseInfo['expr'] .= $token == '' ? ' ' : $token;
+                    $parseInfo['expr'] .= $token;
 
                 }
             }
@@ -1241,7 +1243,8 @@ EOREGEX
             }
 
             foreach ($tokens as $token) {
-                switch (strtoupper($token)) {
+                $trim = strtoupper(trim($token));
+                switch ($trim) {
                 case ',':
                     $parsed = $this->processOrderExpression($parseInfo, $select);
                     unset($parsed['direction']);
@@ -1250,7 +1253,7 @@ EOREGEX
                     $parseInfo = $this->initParseInfoForGroup();
                     break;
                 default:
-                    $parseInfo['expr'] .= $token == '' ? ' ' : $token;
+                    $parseInfo['expr'] .= $token;
 
                 }
             }
