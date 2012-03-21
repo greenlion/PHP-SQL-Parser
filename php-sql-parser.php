@@ -1260,13 +1260,9 @@ EOREGEX
             return $out;
         }
 
-        private function initParseInfoForGroup() {
-            return array('expr' => "", 'type' => 'expression');
-        }
-        
         private function process_group(&$tokens, &$select) {
             $out = array();
-            $parseInfo = $this->initParseInfoForGroup();
+            $parseInfo = $this->initParseInfoForOrder();
 
             if (!$tokens) {
                 return false;
@@ -1279,7 +1275,7 @@ EOREGEX
                     unset($parsed['direction']);
                     
                     $out[] = $parsed;                    
-                    $parseInfo = $this->initParseInfoForGroup();
+                    $parseInfo = $this->initParseInfoForOrder();
                     break;
                 default:
                     $parseInfo['expr'] .= $token == '' ? ' ' : $token;
