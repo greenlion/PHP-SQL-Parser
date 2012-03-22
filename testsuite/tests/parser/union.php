@@ -15,7 +15,7 @@ eq_array($p, $expected, 'simple union');
 $sql = '(SELECT colA From test a)
         union all
         (SELECT colB from test b)';
-#order by 1  # this will not parsed
+#order by 1  # this has not been parsed
 $p = $parser->parse($sql, true);
 $expected = getExpectedValue('union2.serialized');
 eq_array($p, $expected, 'mysql union');
