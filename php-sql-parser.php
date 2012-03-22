@@ -1593,17 +1593,11 @@ EOREGEX
                         $this->split_sql($this->removeParenthesisFromStart($sub_expr)));
             }
 
-            if (!is_array($processed)) {
-                # fixed issue 12.1
-                # it seems that we will reach that point if the $tokens is empty
-                $this->preprint($processed); # TODO: why we do that?
-                $processed = false;
-            }
-
             if ($expr_type) {
                 $expr[] = array('expr_type' => $type, 'base_expr' => $token, 'sub_tree' => $processed);
             }
-            return $expr;
+            
+            return (is_array($expr) ? $expr : false);
         }
 
         private function process_update($tokens) {
