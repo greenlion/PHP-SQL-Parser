@@ -224,7 +224,7 @@ if (!defined('HAVE_PHP_SQL_PARSER')) {
 
         private function findPositionWithinString($sql, $value, $expr_type) {
 
-            $allowedOnOperator = array("\t", "\n", "\r", " ", ",", "(", ")", "_", "\'");
+            $allowedOnOperator = array("\t", "\n", "\r", " ", ",", "(", ")", "_", "'");
             $allowedOnOthers = array("\t", "\n", "\r", " ", ",", "(", ")", "<", ">", "*", "+", "-", "/", "|", "&", "=",
                                      "!", ";");
 
@@ -416,7 +416,7 @@ EOREGEX
             $tokens = preg_split($regex, $sql, -1, PREG_SPLIT_NO_EMPTY | PREG_SPLIT_DELIM_CAPTURE);
             $tokens = $this->balanceParenthesis($tokens);
             $tokens = $this->balanceBackticks($tokens, "`");
-            $tokens = $this->balanceBackticks($tokens, "\'");
+            $tokens = $this->balanceBackticks($tokens, "'");
             return $tokens;
         }
 
@@ -1273,7 +1273,7 @@ EOREGEX
                     continue;
                 }
 
-                if (in_array($trim[$i], array("\'", '"'))) {
+                if (in_array($trim[$i], array("'", '"'))) {
                     $string++;
                 }
 
