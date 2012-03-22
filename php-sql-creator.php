@@ -246,13 +246,42 @@ if (!defined('HAVE_PHP_SQL_CREATOR')) {
             return "UPDATE " . $parsed[0]['table'];
         }
 
+        protected function processSetExpression($parsed) {
+            if ($parsed['expr_type'] !== 'expression') {
+                return "";
+            }
+            $sql = "";
+            foreach ($parsed['sub_tree'] as $k => $v) {
+                $len = strlen($sql);
+                $sql .= $this->processColRef($v);
+                $sql .= $this->processConstant($v);
+                $sql .= $this->processOperator($v);
+                $sql .= $this->processFunction($v);
+                
+                if ($len == strlen($sql)) {
+                    $this->stop('SET expression subtree', $k, $v, 'expr_type');
+                }
+
+                $sql .= " ";
+            }
+
+            $sql = substr($sql, 0, -1);
+            return $sql;
+        }
+        
         protected function processSET($parsed) {
             $sql = "";
             foreach ($parsed as $k => $v) {
-                $sql .= $v['column'] . "=" . $v['expr'] . ",";
+                $len = strlen($sql);
+                $sql .= $this->processSetExpression($v);
+                
+                if ($len == strlen($sql)) {
+                    $this->stop('SET', $k, $v, 'expr_type');
+                }
+                
+                $sql .= ",";
             }
-            $sql = substr($sql, 0, -1);
-            return "SET " . $sql;
+            return "SET " . substr($sql, 0, -1);
         }
 
         protected function processWHERE($parsed) {
@@ -265,10 +294,9 @@ if (!defined('HAVE_PHP_SQL_CREATOR')) {
                 $sql .= $this->processColRef($v);
                 $sql .= $this->processSubquery($v);
                 $sql .= $this->processInList($v);
+                $sql .= $this->processFunction($v);
                 $sql .= $this->processWhereExpression($v);
 
-                # TODO: functions?
-                                
                 if (strlen($sql) == $len) {
                     $this->stop('WHERE', $k, $v, 'expr_type');
                 }
@@ -322,7 +350,7 @@ if (!defined('HAVE_PHP_SQL_CREATOR')) {
             }
 
             if ($parsed['sub_tree'] === false) {
-                return $parsed['base_expr']; // TODO: maybe we need ()!
+                return $parsed['base_expr'] . "()";
             }
 
             $sql = "";
