@@ -2,7 +2,6 @@
 require_once(dirname(__FILE__) . '/../../../php-sql-parser.php');
 require_once(dirname(__FILE__) . '/../../test-more.php');
 
-# not solved
 $parser = new PHPSQLParser();
 $sql = "SELECT	sp.level,
 		CASE sp.level
