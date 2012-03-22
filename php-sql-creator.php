@@ -67,7 +67,8 @@ if (!defined('HAVE_PHP_SQL_CREATOR')) {
         }
 
         protected function stop($part, $partkey, $entry, $entrykey) {
-            die("unknown " . $entrykey . " in " . $part . "[" . $partkey . "] " . $entry[$entrykey]);
+            $caller = debug_backtrace();
+            die("unknown " . $entrykey . " in " . $part . "[" . $partkey . "] " . $entry[$entrykey] . " - see line " . $caller[1]['line']);
         }
 
         protected function processSelectStatement($parsed) {
