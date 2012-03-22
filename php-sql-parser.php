@@ -115,19 +115,19 @@ if (!defined('HAVE_PHP_SQL_PARSER')) {
                     continue;
                 }
 
-                $unionType = 'UNION';
+                $unionType = "UNION";
 
                 # we are looking for an ALL token right after UNION
                 for ($i = $key + 1; $i < count($inputArray); ++$i) {
                     if (trim($inputArray[$i]) === "") {
                         continue;
                     }
-                    if (strtoupper($inputArray[$i]) !== 'ALL') {
+                    if (strtoupper($inputArray[$i]) !== "ALL") {
                         break;
                     }
                     # the other for-loop should overread till "ALL"
-                    $skipUntilToken = 'ALL';
-                    $unionType = 'UNION ALL';
+                    $skipUntilToken = "ALL";
+                    $unionType = "UNION ALL";
                 }
 
                 # store the tokens related to the unionType
@@ -173,7 +173,7 @@ if (!defined('HAVE_PHP_SQL_PARSER')) {
                         }
 
                         # starts with "(select"
-                        if (preg_match('/^\\(\\s*select\\s*/i', $token)) {
+                        if (preg_match("/^\\(\\s*select\\s*/i", $token)) {
                             $queries[$unionType][$key] = $this->parse($this->removeParenthesisFromStart($token));
                             break;
                         }
@@ -224,9 +224,9 @@ if (!defined('HAVE_PHP_SQL_PARSER')) {
 
         private function findPositionWithinString($sql, $value, $expr_type) {
 
-            $allowedOnOperator = array('\t', '\n', '\r', ' ', ',', '(', ')', '_', '\'');
-            $allowedOnOthers = array('\t', '\n', '\r', ' ', ',', '(', ')', '<', '>', '*', '+', '-', '/', '|', '&', '=',
-                                     '!', ';');
+            $allowedOnOperator = array("\t", "\n", "\r", " ", ",", "(", ")", "_", "\'");
+            $allowedOnOthers = array("\t", "\n", "\r", " ", ",", "(", ")", "<", ">", "*", "+", "-", "/", "|", "&", "=",
+                                     "!", ";");
 
             $offset = 0;
             $ok = false;
@@ -253,11 +253,11 @@ if (!defined('HAVE_PHP_SQL_PARSER')) {
 
                 if ($expr_type === 'operator') {
 
-                    $ok = ($before === "" || in_array($before, $allowedOnOperator))
+                    $ok = ($before === "" || in_array($before, $allowedOnOperator, true))
                             || (strtolower($before) >= 'a' && strtolower($before) <= 'z')
                             || ($before >= '0' && $before <= '9');
                     $ok = $ok
-                            && ($after === "" || in_array($after, $allowedOnOperator)
+                            && ($after === "" || in_array($after, $allowedOnOperator, true)
                                     || (strtolower($after) >= 'a' && strtolower($after) <= 'z')
                                     || ($after >= '0' && $after <= '9'));
 
@@ -272,8 +272,8 @@ if (!defined('HAVE_PHP_SQL_PARSER')) {
                 # in all other cases we accept
                 # whitespace, comma, operators, parenthesis and end_of_string
 
-                $ok = ($before === "" || in_array($before, $allowedOnOthers));
-                $ok = $ok && ($after === "" || in_array($after, $allowedOnOthers));
+                $ok = ($before === "" || in_array($before, $allowedOnOthers, true));
+                $ok = $ok && ($after === "" || in_array($after, $allowedOnOthers, true));
 
                 if ($ok) {
                     break;
@@ -345,7 +345,7 @@ if (!defined('HAVE_PHP_SQL_PARSER')) {
             $escaped = false;
 
             for ($i = 0; $i < $len; ++$i) {
-                if ($token[$i] === '\\') {
+                if ($token[$i] === "\\") {
                     $escaped = true;
                     continue;
                 }
@@ -415,8 +415,8 @@ EOREGEX
 
             $tokens = preg_split($regex, $sql, -1, PREG_SPLIT_NO_EMPTY | PREG_SPLIT_DELIM_CAPTURE);
             $tokens = $this->balanceParenthesis($tokens);
-            $tokens = $this->balanceBackticks($tokens, '`');
-            $tokens = $this->balanceBackticks($tokens, '\'');
+            $tokens = $this->balanceBackticks($tokens, "`");
+            $tokens = $this->balanceBackticks($tokens, "\'");
             return $tokens;
         }
 
@@ -465,7 +465,7 @@ EOREGEX
                 $trim = trim($token); # this removes also \n and \t!
 
                 # if it starts with an "(", it should follow a SELECT
-                if ($trim !== "" && $trim[0] == '(' && $token_category == "") {
+                if ($trim !== "" && $trim[0] == "(" && $token_category == "") {
                     $token_category = 'SELECT';
                 }
 
@@ -1268,12 +1268,12 @@ EOREGEX
             $string = 0;
             while ($i < strlen($trim)) {
 
-                if ($trim[$i] === '\\') {
+                if ($trim[$i] === "\\") {
                     $i += 2; # an escape character, the next character is irrelevant
                     continue;
                 }
 
-                if (in_array($trim[$i], array('\'', '"'))) {
+                if (in_array($trim[$i], array("\'", '"'))) {
                     $string++;
                 }
 
