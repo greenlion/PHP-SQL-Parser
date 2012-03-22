@@ -786,39 +786,29 @@ EOREGEX
         /* A SET list is simply a list of key = value expressions separated by comma (,).
          This function produces a list of the key/value expressions.
          */
-        private function getColumn($column, $expression, $base_expr) {
-            return array('column' => trim($column), 'expr' => trim($expression), 'base_expr' => trim($base_expr));
+        private function getColumn($base_expr) {
+            $column = $this->process_expr_list($this->split_sql($base_expr));
+            return array('expr_type' => 'expression', 'base_expr' => trim($base_expr), 'sub_tree' => $column);
         }
 
         private function process_set_list($tokens) {
-            $column = "";
-            $expression = "";
+            $expr = array();
             $base_expr = "";
 
             foreach ($tokens as $token) {
-                $base_expr .= $token;
                 $trim = trim($token);
 
-                if ($column === "") {
-                    if ($trim === "")
-                        continue;
-                    $column .= $trim;
-                    continue;
-                }
-
-                if ($trim === "=")
-                    continue;
-
                 if ($trim === ",") {
-                    $expr[] = $this->getColumn($column, $expression, $base_expr);
-                    $expression = $column = $base_expr = "";
+                    $expr[] = $this->getColumn($base_expr);
+                    $base_expr = "";
                     continue;
                 }
 
-                $expression .= $token;
+                $base_expr .= $token;
             }
-            if ($expression) {
-                $expr[] = $this->getColumn($column, $expression, $base_expr);
+
+            if (trim($base_expr) !== "") {
+                $expr[] = $this->getColumn($base_expr);
             }
 
             return $expr;
@@ -832,20 +822,20 @@ EOREGEX
             $start = "";
             $end = "";
             $comma = -1;
-            
+
             for ($i = 0; $i < count($tokens); ++$i) {
                 if (trim($tokens[$i]) === ",") {
                     $comma = $i;
                     break;
                 }
             }
-            
+
             for ($i = 0; $i < $comma; ++$i) {
                 $start .= $tokens[$i];
             }
 
             for ($i = $comma + 1; $i < count($tokens); ++$i) {
-                 $end .= $tokens[$i];
+                $end .= $tokens[$i];
             }
 
             return array('start' => trim($start), 'end' => trim($end));
