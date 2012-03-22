@@ -16,4 +16,4 @@ $sql = "INSERT INTO test (`name`) VALUES ('ben\\'s test containing an escaped qu
 $parser->parse($sql);
 $p = $parser->parsed;
 $expected = getExpectedValue('backtick1.serialized');
-eq_array($p, $expected, 'issue 35: ben\'s test');
+eq_array($p, $expected, "issue 35: ben's test");

@@ -44,10 +44,8 @@ if (!defined('HAVE_PHP_SQL_PARSER')) {
         }
 
         public function parse($sql, $calcPositions = false) {
-            $original = $this->replaceSpecialCharacters($sql);
-
             #lex the SQL statement
-            $inputArray = $this->split_sql(trim($original));
+            $inputArray = $this->split_sql($sql);
 
             #This is the highest level lexical analysis.  This is the part of the
             #code which finds UNION and UNION ALL query parts
@@ -56,12 +54,12 @@ if (!defined('HAVE_PHP_SQL_PARSER')) {
             # If there was no UNION or UNION ALL in the query, then the query is
             # stored at $queries[0].
             if (!$this->isUnion($queries)) {
-                $queries = $this->process_sql($queries[0]);
+                $queries = $this->processSQL($queries[0]);
             }
 
             # calc the positions of some important tokens
             if ($calcPositions) {
-                $queries = $this->calculatePositionsWithinSQL($original, $queries);
+                $queries = $this->calculatePositionsWithinSQL($sql, $queries);
             }
 
             # store the parsed queries
@@ -117,19 +115,19 @@ if (!defined('HAVE_PHP_SQL_PARSER')) {
                     continue;
                 }
 
-                $unionType = 'UNION';
+                $unionType = "UNION";
 
                 # we are looking for an ALL token right after UNION
                 for ($i = $key + 1; $i < count($inputArray); ++$i) {
                     if (trim($inputArray[$i]) === "") {
                         continue;
                     }
-                    if (strtoupper($inputArray[$i]) !== 'ALL') {
+                    if (strtoupper($inputArray[$i]) !== "ALL") {
                         break;
                     }
                     # the other for-loop should overread till "ALL"
-                    $skipUntilToken = 'ALL';
-                    $unionType = 'UNION ALL';
+                    $skipUntilToken = "ALL";
+                    $unionType = "UNION ALL";
                 }
 
                 # store the tokens related to the unionType
@@ -175,12 +173,12 @@ if (!defined('HAVE_PHP_SQL_PARSER')) {
                         }
 
                         # starts with "(select"
-                        if (preg_match('/^\\(\\s*select\\s*/i', $token)) {
+                        if (preg_match("/^\\(\\s*select\\s*/i", $token)) {
                             $queries[$unionType][$key] = $this->parse($this->removeParenthesisFromStart($token));
                             break;
                         }
 
-                        $queries[$unionType][$key] = $this->process_sql($queries[$unionType][$key]);
+                        $queries[$unionType][$key] = $this->processSQL($queries[$unionType][$key]);
                         break;
                     }
                 }
@@ -226,9 +224,9 @@ if (!defined('HAVE_PHP_SQL_PARSER')) {
 
         private function findPositionWithinString($sql, $value, $expr_type) {
 
-            $allowedOnOperator = array('\t', '\n', '\r', ' ', ',', '(', ')', '_', '\'');
-            $allowedOnOthers = array('\t', '\n', '\r', ' ', ',', '(', ')', '<', '>', '*', '+', '-', '/', '|', '&', '=',
-                                     '!', ';');
+            $allowedOnOperator = array("\t", "\n", "\r", " ", ",", "(", ")", "_", "'");
+            $allowedOnOthers = array("\t", "\n", "\r", " ", ",", "(", ")", "<", ">", "*", "+", "-", "/", "|", "&", "=",
+                                     "!", ";");
 
             $offset = 0;
             $ok = false;
@@ -255,11 +253,11 @@ if (!defined('HAVE_PHP_SQL_PARSER')) {
 
                 if ($expr_type === 'operator') {
 
-                    $ok = ($before === "" || in_array($before, $allowedOnOperator))
+                    $ok = ($before === "" || in_array($before, $allowedOnOperator, true))
                             || (strtolower($before) >= 'a' && strtolower($before) <= 'z')
                             || ($before >= '0' && $before <= '9');
                     $ok = $ok
-                            && ($after === "" || in_array($after, $allowedOnOperator)
+                            && ($after === "" || in_array($after, $allowedOnOperator, true)
                                     || (strtolower($after) >= 'a' && strtolower($after) <= 'z')
                                     || ($after >= '0' && $after <= '9'));
 
@@ -274,8 +272,8 @@ if (!defined('HAVE_PHP_SQL_PARSER')) {
                 # in all other cases we accept
                 # whitespace, comma, operators, parenthesis and end_of_string
 
-                $ok = ($before === "" || in_array($before, $allowedOnOthers));
-                $ok = $ok && ($after === "" || in_array($after, $allowedOnOthers));
+                $ok = ($before === "" || in_array($before, $allowedOnOthers, true));
+                $ok = $ok && ($after === "" || in_array($after, $allowedOnOthers, true));
 
                 if ($ok) {
                     break;
@@ -339,15 +337,6 @@ if (!defined('HAVE_PHP_SQL_PARSER')) {
 
         }
 
-        private function replaceSpecialCharacters($sql) {
-            # replace always the same number of characters, so we have the same positions
-            # within the original string
-
-            # issue 21: replace tabs within the query string
-            # TODO: this removes special characters also from inside of Strings (is that a problem?)
-            return str_replace(array("\r\n", "\n", "\t", "()"), array("  ", " ", " ", "  "), $sql);
-        }
-
         #This function counts open and close backticks and
         #returns their location.  This might be faster as a regex
         private function count_backtick($token, $char) {
@@ -356,7 +345,7 @@ if (!defined('HAVE_PHP_SQL_PARSER')) {
             $escaped = false;
 
             for ($i = 0; $i < $len; ++$i) {
-                if ($token[$i] === '\\') {
+                if ($token[$i] === "\\") {
                     $escaped = true;
                     continue;
                 }
@@ -402,6 +391,46 @@ if (!defined('HAVE_PHP_SQL_PARSER')) {
             return array_values($tokens);
         }
 
+        private function concatQuotedColReferences($tokens) {
+
+            $i = 0;
+            $tokenCount = count($tokens);
+
+            while ($i < $tokenCount) {
+
+                $trim = trim($tokens[$i]);
+                if ($trim === "") {
+                    $i++;
+                    continue;
+                }
+
+                if ($trim[strlen($trim) - 1] !== "`") {
+                    $i++;
+                    continue;
+                }
+
+                $i++;
+
+                if (!isset($tokens[$i])) {
+                    continue;
+                }
+
+                $trim = trim($tokens[$i]);
+                if ($trim === "") {
+                    $i++;
+                    continue;
+                }
+
+                if ($trim[0] === ".") {
+                    $tokens[$i - 1] .= $tokens[$i];
+                    unset($tokens[$i]);
+                    $i++;
+                }
+            }
+
+            return array_values($tokens);
+        }
+
         #This is the lexer
         #this function splits up a SQL statement into easy to "parse"
         #tokens for the SQL processor
@@ -416,7 +445,7 @@ if (!defined('HAVE_PHP_SQL_PARSER')) {
             # added some code from issue 11 comment 3
             $regex = <<<EOREGEX
 /(`(?:[^`]|``)`|[@A-Za-z0-9_.`-]+)
-|(\+|-|\*|\/|!=|>=|<=|<>|>|<|&&|\|\||=|\^|\(|\))
+|(\+|-|\*|\/|!=|>=|<=|<>|>|<|&&|\|\||=|\^|\(|\)|\\t|\\r\\n|\\n)
 |('(?:[^']+|'')*'+)
 |("(?:[^"]+|"")*"+)
 |([^ ,]+)
@@ -426,38 +455,31 @@ EOREGEX
 
             $tokens = preg_split($regex, $sql, -1, PREG_SPLIT_NO_EMPTY | PREG_SPLIT_DELIM_CAPTURE);
             $tokens = $this->balanceParenthesis($tokens);
-            $tokens = $this->balanceBackticks($tokens, '`');
-            $tokens = $this->balanceBackticks($tokens, '\'');
+            $tokens = $this->balanceBackticks($tokens, "`");
+            $tokens = $this->balanceBackticks($tokens, "'");
+            $tokens = $this->concatQuotedColReferences($tokens);
             return $tokens;
         }
 
         private function balanceParenthesis($tokens) {
-
             $token_count = count($tokens);
-
             $i = 0;
             while ($i < $token_count) {
-
                 if ($tokens[$i] !== '(') {
                     $i++;
                     continue;
                 }
-
                 $count = 1;
                 for ($n = $i + 1; $n < $token_count; $n++) {
-
                     $token = $tokens[$n];
-
                     if ($token === '(') {
                         $count++;
                     }
                     if ($token === ')') {
                         $count--;
                     }
-
                     $tokens[$i] .= $token;
                     unset($tokens[$n]);
-
                     if ($count === 0) {
                         $n++;
                         break;
@@ -465,31 +487,26 @@ EOREGEX
                 }
                 $i = $n;
             }
-
             return array_values($tokens);
         }
 
         /* This function breaks up the SQL statement into logical sections.
          Some sections are then further handled by specialized functions.
          */
-        private function process_sql(&$tokens, $start_at = 0, $stop_at = false) {
+        private function processSQL(&$tokens) {
             $prev_category = "";
-            $start = microtime(true);
             $token_category = "";
-
             $skip_next = false;
-            $token_count = count($tokens);
-
-            if (!$stop_at) {
-                $stop_at = $token_count;
-            }
-
             $out = false;
 
-            for ($token_number = $start_at; $token_number < $stop_at; ++$token_number) {
-                $token = trim($tokens[$token_number]);
+            $tokenCount = count($tokens);
+            for ($tokenNumber = 0; $tokenNumber < $tokenCount; ++$tokenNumber) {
+
+                $token = $tokens[$tokenNumber];
+                $trim = trim($token); # this removes also \n and \t!
+
                 # if it starts with an "(", it should follow a SELECT
-                if ($token !== "" && $token[0] == '(' && $token_category == "") {
+                if ($trim !== "" && $trim[0] == "(" && $token_category == "") {
                     $token_category = 'SELECT';
                 }
 
@@ -497,17 +514,19 @@ EOREGEX
                  token, that is we ignore whitespace.
                  */
                 if ($skip_next) {
-                    #whitespace does not count as a next token
-                    if ($token === "") {
+                    if ($trim === "") {
+                        if ($token_category !== "") { # is this correct??
+                            $out[$token_category][] = $token;
+                        }
                         continue;
                     }
-
                     #to skip the token we replace it with whitespace
+                    $trim = "";
                     $token = "";
                     $skip_next = false;
                 }
 
-                $upper = strtoupper($token);
+                $upper = strtoupper($trim);
                 switch ($upper) {
 
                 /* Tokens that get their own sections. These keywords have subclauses. */
@@ -547,7 +566,7 @@ EOREGEX
                 case 'EXECUTE':
                 case 'PREPARE':
                 case 'DEALLOCATE':
-                    if ($token == 'DEALLOCATE') {
+                    if ($trim == 'DEALLOCATE') {
                         $skip_next = true;
                     }
                     /* this FROM is different from FROM in other DML (not join related) */
@@ -559,7 +578,7 @@ EOREGEX
                     break;
 
                 case 'INTO':
-                    # prevent wrong handling of CACHE within LOAD INDEX INTO CACHE...
+                # prevent wrong handling of CACHE within LOAD INDEX INTO CACHE...
                     if ($prev_category === 'LOAD') {
                         $out[$prev_category][] = $upper;
                         continue 2;
@@ -630,9 +649,9 @@ EOREGEX
                         $token_category = $upper;
                         $out[$upper][0] = $upper;
                     } else {
-                        $token = 'LOCK IN SHARE MODE';
+                        $trim = 'LOCK IN SHARE MODE';
                         $skip_next = true;
-                        $out['OPTIONS'][] = $token;
+                        $out['OPTIONS'][] = $trim;
                     }
                     continue 2;
                     break;
@@ -675,7 +694,7 @@ EOREGEX
                     break;
 
                 case 'START':
-                    $token = "BEGIN";
+                    $trim = "BEGIN";
                     $out[$upper][0] = $upper;
                     $skip_next = true;
                     break;
@@ -698,7 +717,7 @@ EOREGEX
 
                 /* These tokens set particular options for the statement.  They never stand alone.*/
                 case 'DISTINCTROW':
-                    $token = 'DISTINCT';
+                    $trim = 'DISTINCT';
                 case 'DISTINCT':
                 case 'HIGH_PRIORITY':
                 case 'LOW_PRIORITY':
@@ -739,27 +758,20 @@ EOREGEX
 
                 # remove obsolete category after union (empty category because of
                 # empty token before select)
-                if ($token_category && ($prev_category == $token_category)) {
-
-                    # if we have more than one whitespace within a token
-                    # we add a token for every character
-                    # this prevents wrong base_expr within process_from()
-                    # TODO: may it is better to leave the original whitespace as token
-                    if ($token === "" && trim($tokens[$token_number]) === "") {
-                        for ($i = 0; $i < strlen($tokens[$token_number]) - 1; $i++) {
-                            $out[$token_category][] = $token;
-                        }
-                    }
+                if ($token_category !== "" && ($prev_category === $token_category)) {
                     $out[$token_category][] = $token;
                 }
 
                 $prev_category = $token_category;
             }
 
-            if (!$out)
-                return false;
+            return $this->processSQLParts($out);
+        }
 
-            #process the SELECT clause
+        private function processSQLParts($out) {
+            if (!$out) {
+                return false;
+            }
             if (!empty($out['SELECT'])) {
                 $out['SELECT'] = $this->process_select($out['SELECT']);
             }
@@ -815,39 +827,29 @@ EOREGEX
         /* A SET list is simply a list of key = value expressions separated by comma (,).
          This function produces a list of the key/value expressions.
          */
-        private function getColumn($column, $expression, $base_expr) {
-            return array('column' => trim($column), 'expr' => trim($expression), 'base_expr' => trim($base_expr));
+        private function getColumn($base_expr) {
+            $column = $this->process_expr_list($this->split_sql($base_expr));
+            return array('expr_type' => 'expression', 'base_expr' => trim($base_expr), 'sub_tree' => $column);
         }
 
         private function process_set_list($tokens) {
-            $column = "";
-            $expression = "";
+            $expr = array();
             $base_expr = "";
 
             foreach ($tokens as $token) {
-                $base_expr .= $token;
                 $trim = trim($token);
 
-                if ($column === "") {
-                    if ($trim === "")
-                        continue;
-                    $column .= $trim;
-                    continue;
-                }
-
-                if ($trim === "=")
-                    continue;
-
                 if ($trim === ",") {
-                    $expr[] = $this->getColumn($column, $expression, $base_expr);
-                    $expression = $column = $base_expr = "";
+                    $expr[] = $this->getColumn($base_expr);
+                    $base_expr = "";
                     continue;
                 }
 
-                $expression .= $token;
+                $base_expr .= $token;
             }
-            if ($expression) {
-                $expr[] = $this->getColumn($column, $expression, $base_expr);
+
+            if (trim($base_expr) !== "") {
+                $expr[] = $this->getColumn($base_expr);
             }
 
             return $expr;
@@ -858,30 +860,26 @@ EOREGEX
          then start is set to 0.
          */
         private function process_limit($tokens) {
-            $start = 0;
-            $end = 0;
+            $start = "";
+            $end = "";
+            $comma = -1;
 
-            if ($pos = array_search(',', $tokens)) {
-                for ($i = 0; $i < $pos; ++$i) {
-                    if ($tokens[$i] !== "") {
-                        $start = $tokens[$i];
-                        break;
-                    }
-                }
-                $pos = $pos + 1;
-
-            } else {
-                $pos = 0;
-            }
-
-            for ($i = $pos; $i < count($tokens); ++$i) {
-                if ($tokens[$i] !== "") {
-                    $end = $tokens[$i];
+            for ($i = 0; $i < count($tokens); ++$i) {
+                if (trim($tokens[$i]) === ",") {
+                    $comma = $i;
                     break;
                 }
             }
 
-            return array('start' => $start, 'end' => $end);
+            for ($i = 0; $i < $comma; ++$i) {
+                $start .= $tokens[$i];
+            }
+
+            for ($i = $comma + 1; $i < count($tokens); ++$i) {
+                $end .= $tokens[$i];
+            }
+
+            return array('start' => trim($start), 'end' => trim($end));
         }
 
         /* This function processes the SELECT section.  It splits the clauses at the commas.
@@ -894,13 +892,10 @@ EOREGEX
             $expression = "";
             $expr = array();
             foreach ($tokens as $token) {
-                if ($token == ',') {
+                if (trim($token) === ',') {
                     $expr[] = $this->process_select_expr(trim($expression));
                     $expression = "";
                 } else {
-                    if ($token === "") {
-                        $token = " ";
-                    }
                     $expression .= $token;
                 }
             }
@@ -1043,9 +1038,9 @@ EOREGEX
                     break;
 
                 default:
-                    $parseInfo['expression'] .= $token == '' ? " " : $token;
+                    $parseInfo['expression'] .= $token;
                     if ($parseInfo['ref_type'] !== false) { # all after ON / USING
-                        $parseInfo['ref_expr'] .= $token == '' ? " " : $token;
+                        $parseInfo['ref_expr'] .= $token;
                     }
                     break;
                 }
@@ -1118,11 +1113,11 @@ EOREGEX
                         continue; # ends the switch statement!
                     }
 
-                    if ($parseInfo['token_count'] == 0) {
+                    if ($parseInfo['token_count'] === 0) {
                         if ($parseInfo['table'] === "") {
                             $parseInfo['table'] = $token;
                         }
-                    } else if ($parseInfo['token_count'] == 1) {
+                    } else if ($parseInfo['token_count'] === 1) {
                         $parseInfo['alias'] = array('as' => false, 'name' => trim($token), 'base_expr' => trim($token));
                     }
                     $parseInfo['token_count']++;
@@ -1158,7 +1153,7 @@ EOREGEX
             # we have a reg_expr, so we have to parse it
             if ($parseInfo['ref_expr'] !== false) {
                 $unparsed = $this->split_sql($this->removeParenthesisFromStart($parseInfo['ref_expr']));
-                
+
                 // here we can get a comma separated list
                 foreach ($unparsed as $k => $v) {
                     if (trim($v) === ',') {
@@ -1195,6 +1190,8 @@ EOREGEX
         }
 
         private function processOrderExpression(&$parseInfo, $select) {
+            $parseInfo['expr'] = trim($parseInfo['expr']);
+
             if ($parseInfo['expr'] === "") {
                 return false;
             }
@@ -1209,7 +1206,7 @@ EOREGEX
                     if (!$clause['alias']) {
                         continue;
                     }
-                    if ($clause['alias']['name'] == $parseInfo['expr']) {
+                    if ($clause['alias']['name'] === $parseInfo['expr']) {
                         $parseInfo['type'] = 'alias';
                     }
                 }
@@ -1227,7 +1224,7 @@ EOREGEX
             return array('expr' => "", 'dir' => "ASC", 'type' => 'expression');
         }
 
-        private function process_order(&$tokens, &$select) {
+        private function process_order($tokens, $select) {
             $out = array();
             $parseInfo = $this->initParseInfoForOrder();
 
@@ -1236,7 +1233,8 @@ EOREGEX
             }
 
             foreach ($tokens as $token) {
-                switch (strtoupper($token)) {
+                $upper = strtoupper(trim($token));
+                switch ($upper) {
                 case ',':
                     $out[] = $this->processOrderExpression($parseInfo, $select);
                     $parseInfo = $this->initParseInfoForOrder();
@@ -1251,7 +1249,7 @@ EOREGEX
                     break;
 
                 default:
-                    $parseInfo['expr'] .= $token == '' ? ' ' : $token;
+                    $parseInfo['expr'] .= $token;
 
                 }
             }
@@ -1269,16 +1267,17 @@ EOREGEX
             }
 
             foreach ($tokens as $token) {
-                switch (strtoupper($token)) {
+                $trim = strtoupper(trim($token));
+                switch ($trim) {
                 case ',':
                     $parsed = $this->processOrderExpression($parseInfo, $select);
                     unset($parsed['direction']);
-                    
-                    $out[] = $parsed;                    
+
+                    $out[] = $parsed;
                     $parseInfo = $this->initParseInfoForOrder();
                     break;
                 default:
-                    $parseInfo['expr'] .= $token == '' ? ' ' : $token;
+                    $parseInfo['expr'] .= $token;
 
                 }
             }
@@ -1286,10 +1285,10 @@ EOREGEX
             $parsed = $this->processOrderExpression($parseInfo, $select);
             unset($parsed['direction']);
             $out[] = $parsed;
-            
+
             return $out;
         }
-        
+
         private function removeParenthesisFromStart($token) {
 
             $parenthesisRemoved = 0;
@@ -1306,12 +1305,12 @@ EOREGEX
             $string = 0;
             while ($i < strlen($trim)) {
 
-                if ($trim[$i] === '\\') {
+                if ($trim[$i] === "\\") {
                     $i += 2; # an escape character, the next character is irrelevant
                     continue;
                 }
 
-                if (in_array($trim[$i], array('\'', '"'))) {
+                if (in_array($trim[$i], array("'", '"'))) {
                     $string++;
                 }
 
@@ -1590,17 +1589,11 @@ EOREGEX
                         $this->split_sql($this->removeParenthesisFromStart($sub_expr)));
             }
 
-            if (!is_array($processed)) {
-                # fixed issue 12.1
-                # it seems that we will reach that point if the $tokens is empty
-                $this->preprint($processed); # TODO: why we do that?
-                $processed = false;
-            }
-
             if ($expr_type) {
                 $expr[] = array('expr_type' => $type, 'base_expr' => $token, 'sub_tree' => $processed);
             }
-            return $expr;
+            
+            return (is_array($expr) ? $expr : false);
         }
 
         private function process_update($tokens) {
@@ -1694,7 +1687,7 @@ EOREGEX
             $tokens['VALUES'] = array_values($values);
             return $tokens;
         }
-        
+
         /**
          * TODO: This is a dummy function, we cannot parse INTO as part of SELECT
          * at the moment
@@ -1706,7 +1699,7 @@ EOREGEX
                     unset($unparsed[$k]);
                 }
             }
-            $tokens['INTO'] = array_values($unparsed);            
+            $tokens['INTO'] = array_values($unparsed);
             return $tokens;
         }
 
