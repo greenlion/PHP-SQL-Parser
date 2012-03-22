@@ -391,6 +391,46 @@ if (!defined('HAVE_PHP_SQL_PARSER')) {
             return array_values($tokens);
         }
 
+        private function concatQuotedColReferences($tokens) {
+
+            $i = 0;
+            $tokenCount = count($tokens);
+
+            while ($i < $tokenCount) {
+
+                $trim = trim($tokens[$i]);
+                if ($trim === "") {
+                    $i++;
+                    continue;
+                }
+
+                if ($trim[strlen($trim) - 1] !== "`") {
+                    $i++;
+                    continue;
+                }
+
+                $i++;
+
+                if (!isset($tokens[$i])) {
+                    continue;
+                }
+
+                $trim = trim($tokens[$i]);
+                if ($trim === "") {
+                    $i++;
+                    continue;
+                }
+
+                if ($trim[0] === ".") {
+                    $tokens[$i - 1] .= $tokens[$i];
+                    unset($tokens[$i]);
+                    $i++;
+                }
+            }
+
+            return array_values($tokens);
+        }
+
         #This is the lexer
         #this function splits up a SQL statement into easy to "parse"
         #tokens for the SQL processor
@@ -417,6 +457,7 @@ EOREGEX
             $tokens = $this->balanceParenthesis($tokens);
             $tokens = $this->balanceBackticks($tokens, "`");
             $tokens = $this->balanceBackticks($tokens, "'");
+            $tokens = $this->concatQuotedColReferences($tokens);
             return $tokens;
         }
 
