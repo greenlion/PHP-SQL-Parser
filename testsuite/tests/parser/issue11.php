@@ -7,5 +7,5 @@ $query  = "UPDATE club SET logo='$test' WHERE id=1";
  
 $parser = new PHPSQLParser();
 $p = $parser->parse($query);
-$expected = getExpectedValue('issue11.serialized');
+$expected = getExpectedValue(dirname(__FILE__), 'issue11.serialized');
 eq_array($p, $expected, 'very long statement');

@@ -6,5 +6,5 @@ $parser = new PHPSQLParser();
 $sql = "UPDATE user SET lastlogin = 7, x = 3";
 $parser->parse($sql);
 $p = $parser->parsed;
-$expected = getExpectedValue('issue32.serialized');
+$expected = getExpectedValue(dirname(__FILE__), 'issue32.serialized');
 eq_array($p, $expected, 'update with keyword user as table');

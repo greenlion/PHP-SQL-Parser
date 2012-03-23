@@ -47,275 +47,259 @@ $_num_skips = 0;
 $_test_num = 0;
 $_currTestScript = "";
 
-function plan($plan)
-{
-	/*
-	 plan('no_plan');
-	 plan('skip_all');
-	 plan(array('skip_all' => 'My reason is...'));
-	 plan(23);
-	 */
+function plan($plan) {
+    /*
+     plan('no_plan');
+     plan('skip_all');
+     plan(array('skip_all' => 'My reason is...'));
+     plan(23);
+     */
 
-	global $_no_plan;
-	global $_skip_all;
+    global $_no_plan;
+    global $_skip_all;
 
-	switch ($plan) {
-		case 'no_plan':
-			$_no_plan = TRUE;
-			break;
+    switch ($plan) {
+    case 'no_plan':
+        $_no_plan = TRUE;
+        break;
 
-		case 'skip_all':
-			echo "1..0\n";
-			break;
+    case 'skip_all':
+        echo "1..0\n";
+        break;
 
-		default:
-			if (is_array($plan)) {
-				echo "1..0 # Skip {$plan['skip_all']}\n";
-				exit;
-			}
+    default:
+        if (is_array($plan)) {
+            echo "1..0 # Skip {$plan['skip_all']}\n";
+            exit;
+        }
 
-			echo "1..$plan\n";
-			break;
-	}
+        echo "1..$plan\n";
+        break;
+    }
 }
 
 function get_origin() {
-    
+
     global $_currTestScript;
-    
-	$res = array();
-	$caller = debug_backtrace();
 
-	$thisFile = __FILE__;
-	
-	$i = 0;
-	while (strstr($caller[$i]['file'], $thisFile)) {
-		$i++;
-	}
+    $res = array();
+    $caller = debug_backtrace();
 
-	$res['file'] = $caller[$i]['file'];
-	$res['line'] = $caller[$i]['line'];
-	
-	if (isset($_SERVER['SERVER_ROOT'])){
-		$res['file'] = str_replace($_SERVER['SERVER_ROOT'], 't', $res['file']);
-	}
+    $thisFile = __FILE__;
+
+    $i = 0;
+    while (strstr($caller[$i]['file'], $thisFile)) {
+        $i++;
+    }
+
+    $res['file'] = $caller[$i]['file'];
+    $res['line'] = $caller[$i]['line'];
+
+    if (isset($_SERVER['SERVER_ROOT'])) {
+        $res['file'] = str_replace($_SERVER['SERVER_ROOT'], 't', $res['file']);
+    }
 
     if ($res['file'] !== $_currTestScript) {
         $_currTestScript = $res['file'];
-        echo "\nexecuting tests within ".$_currTestScript."\n\n";
+        echo "\nexecuting tests within " . $_currTestScript . "\n\n";
     }
-	
-	return $res;
+
+    return $res;
 }
 
-function ok($pass, $test_name = '')
-{
-	global $_test_num;
-	global $_num_failures;
-	global $_num_skips;
+function ok($pass, $test_name = '') {
+    global $_test_num;
+    global $_num_failures;
+    global $_num_skips;
 
-	$_test_num++;
+    $_test_num++;
 
-	if ($_num_skips) {
-		$_num_skips--;
-		return TRUE;
-	}
+    if ($_num_skips) {
+        $_num_skips--;
+        return TRUE;
+    }
 
-	if (!empty($test_name) && $test_name[0] != '#') {
-		$test_name = "- $test_name";
-	}
+    if (!empty($test_name) && $test_name[0] != '#') {
+        $test_name = "- $test_name";
+    }
 
-	$origin = get_origin();
-	$file = $origin['file'];
-	$line = $origin['line'];
+    $origin = get_origin();
+    $file = $origin['file'];
+    $line = $origin['line'];
 
-	if ($pass) {
-		echo "ok $_test_num $test_name\n";
-	} else {
-		diag("    Failed test (at line $line)");
-		echo "not ok $_test_num $test_name\n";
-		$_num_failures++;
-	}
+    if ($pass) {
+        echo "ok $_test_num $test_name\n";
+    } else {
+        diag("    Failed test (at line $line)");
+        echo "not ok $_test_num $test_name\n";
+        $_num_failures++;
+    }
 
-	return $pass;
+    return $pass;
 }
 
-function is($this, $that, $test_name = '')
-{
-	$pass = ($this == $that);
+function is($this, $that, $test_name = '') {
+    $pass = ($this == $that);
 
-	ok($pass, $test_name);
+    ok($pass, $test_name);
 
-	if (!$pass) {
-		diag("         got: '$this'");
-		diag("    expected: '$that'");
-	}
+    if (!$pass) {
+        diag("         got: '$this'");
+        diag("    expected: '$that'");
+    }
 
-	return $pass;
+    return $pass;
 }
 
-function isnt($this, $that, $test_name = '')
-{
-	$pass = ($this != $that);
+function isnt($this, $that, $test_name = '') {
+    $pass = ($this != $that);
 
-	ok($pass, $test_name);
+    ok($pass, $test_name);
 
-	if (!$pass) {
-		diag("    '$this'");
-		diag('        !=');
-		diag("    '$that'");
-	}
+    if (!$pass) {
+        diag("    '$this'");
+        diag('        !=');
+        diag("    '$that'");
+    }
 
-	return $pass;
+    return $pass;
 }
 
-function like($string, $pattern, $test_name = '')
-{
-	$pass = preg_match($pattern, $string);
+function like($string, $pattern, $test_name = '') {
+    $pass = preg_match($pattern, $string);
 
-	ok($pass, $test_name);
+    ok($pass, $test_name);
 
-	if (!$pass) {
-		diag("                  '$string'");
-		diag("    doesn't match '$pattern'");
-	}
+    if (!$pass) {
+        diag("                  '$string'");
+        diag("    doesn't match '$pattern'");
+    }
 
-	return $pass;
+    return $pass;
 }
 
-function unlike($string, $pattern, $test_name = '')
-{
-	$pass = !preg_match($pattern, $string);
+function unlike($string, $pattern, $test_name = '') {
+    $pass = !preg_match($pattern, $string);
 
-	ok($pass, $test_name);
+    ok($pass, $test_name);
 
-	if (!$pass) {
-		diag("                  '$string'");
-		diag("          matches '$pattern'");
-	}
+    if (!$pass) {
+        diag("                  '$string'");
+        diag("          matches '$pattern'");
+    }
 
-	return $pass;
+    return $pass;
 }
 
-function cmp_ok($this, $operator, $that, $test_name = '')
-{
-	eval("\$pass = (\$this $operator \$that);");
+function cmp_ok($this, $operator, $that, $test_name = '') {
+    eval("\$pass = (\$this $operator \$that);");
 
-	ob_start();
-	var_dump($this);
-	$_this = trim(ob_get_clean());
+    ob_start();
+    var_dump($this);
+    $_this = trim(ob_get_clean());
 
-	ob_start();
-	var_dump($that);
-	$_that = trim(ob_get_clean());
+    ob_start();
+    var_dump($that);
+    $_that = trim(ob_get_clean());
 
-	ok($pass, $test_name);
+    ok($pass, $test_name);
 
-	if (!$pass) {
-		diag("         got: $_this");
-		diag("    expected: $_that");
-	}
+    if (!$pass) {
+        diag("         got: $_this");
+        diag("    expected: $_that");
+    }
 
-	return $pass;
+    return $pass;
 }
 
-function can_ok($object, $methods)
-{
-	$pass = TRUE;
-	$errors = array();
+function can_ok($object, $methods) {
+    $pass = TRUE;
+    $errors = array();
 
-	foreach ($methods as $method) {
-		if (!method_exists($object, $method)) {
-			$pass = FALSE;
-			$errors[] = "    method_exists(\$object, $method) failed";
-		}
-	}
+    foreach ($methods as $method) {
+        if (!method_exists($object, $method)) {
+            $pass = FALSE;
+            $errors[] = "    method_exists(\$object, $method) failed";
+        }
+    }
 
-	if ($pass) {
-		ok(TRUE, "method_exists(\$object, ...)");
-	} else {
-		ok(FALSE, "method_exists(\$object, ...)");
-		diag($errors);
-	}
+    if ($pass) {
+        ok(TRUE, "method_exists(\$object, ...)");
+    } else {
+        ok(FALSE, "method_exists(\$object, ...)");
+        diag($errors);
+    }
 
-	return $pass;
+    return $pass;
 }
 
-function isa_ok($object, $expected_class, $object_name = 'The object')
-{
-	$got_class = get_class($object);
+function isa_ok($object, $expected_class, $object_name = 'The object') {
+    $got_class = get_class($object);
 
-	if (version_compare(phpversion(), '5', '>=')) {
-		$pass = ($got_class == $expected_class);
-	} else {
-		$pass = ($got_class == strtolower($expected_class));
-	}
+    if (version_compare(phpversion(), '5', '>=')) {
+        $pass = ($got_class == $expected_class);
+    } else {
+        $pass = ($got_class == strtolower($expected_class));
+    }
 
-	if ($pass) {
-		ok(TRUE, "$object_name isa $expected_class");
-	} else {
-		ok(FALSE, "$object_name isn't a '$expected_class' it's a '$got_class'");
-	}
+    if ($pass) {
+        ok(TRUE, "$object_name isa $expected_class");
+    } else {
+        ok(FALSE, "$object_name isn't a '$expected_class' it's a '$got_class'");
+    }
 
-	return $pass;
+    return $pass;
 }
 
-function pass($test_name = '')
-{
-	return ok(TRUE, $test_name);
+function pass($test_name = '') {
+    return ok(TRUE, $test_name);
 }
 
-function fail($test_name = '')
-{
-	return ok(FALSE, $test_name);
+function fail($test_name = '') {
+    return ok(FALSE, $test_name);
 }
 
-function diag($message)
-{
-	if (is_array($message)) {
-		foreach($message as $current) {
-			echo "# $current\n";
-		}
-	} else {
-		echo "# $message\n";
-	}
+function diag($message) {
+    if (is_array($message)) {
+        foreach ($message as $current) {
+            echo "# $current\n";
+        }
+    } else {
+        echo "# $message\n";
+    }
 }
 
-function include_ok($module)
-{
-	$pass = ((include $module) == 1);
-	return ok($pass);
+function include_ok($module) {
+    $pass = ((include $module) == 1);
+    return ok($pass);
 }
 
-function require_ok($module)
-{
-	$pass = ((require $module) == 1);
-	return ok($pass);
+function require_ok($module) {
+    $pass = ((require $module) == 1);
+    return ok($pass);
 }
 
-function skip($message, $num)
-{
-	global $_num_skips;
+function skip($message, $num) {
+    global $_num_skips;
 
-	if ($num < 0) {
-		$num = 0;
-	}
+    if ($num < 0) {
+        $num = 0;
+    }
 
-	for ($i = 0; $i < $num; $i++) {
-		pass("# SKIP $message");
-	}
+    for ($i = 0; $i < $num; $i++) {
+        pass("# SKIP $message");
+    }
 
-	$_num_skips = $num;
+    $_num_skips = $num;
 }
 
-function eq_array($arrA, $arrB, $testName)
-{
-	$result = serialize($arrA) === serialize($arrB);
-	if ($result) {
-		pass($testName);
-	} else {
-		fail($testName);
-	}
+function eq_array($arrA, $arrB, $testName) {
+    $result = serialize($arrA) === serialize($arrB);
+    if ($result) {
+        pass($testName);
+    } else {
+        fail($testName);
+    }
 }
 
 /*
@@ -346,22 +330,21 @@ function eq_set()
 {
 }
 
-*/
+ */
 
-function _test_end()
-{
-	global $_no_plan;
-	global $_num_failures;
-	global $_test_num;
+function _test_end() {
+    global $_no_plan;
+    global $_num_failures;
+    global $_test_num;
 
-	if ($_no_plan) {
-		echo "1..$_test_num\n";
-	}
+    if ($_no_plan) {
+        echo "1..$_test_num\n";
+    }
 
-	if ($_num_failures) {
-	    echo "\n";
-		diag("Looks like you failed $_num_failures tests of $_test_num.");
-	}
+    if ($_num_failures) {
+        echo "\n";
+        diag("Looks like you failed $_num_failures tests of $_test_num.");
+    }
 }
 
 /**
@@ -371,9 +354,10 @@ function _test_end()
  *
  * @param String $filename
  */
-function getExpectedValue($filename, $unserialize = true) {
-	$content = file_get_contents(dirname(__FILE__) . "/expected/".$filename);
-	return ($unserialize ? unserialize($content) : $content);
+function getExpectedValue($path, $filename, $unserialize = true) {
+    $path = explode("/", $path);
+    $content = file_get_contents(dirname(__FILE__) . "/expected/" . array_pop($path) . "/" . $filename);
+    return ($unserialize ? unserialize($content) : $content);
 }
 
 ?>

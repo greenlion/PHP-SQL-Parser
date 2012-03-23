@@ -6,6 +6,6 @@ $parser = new PHPSQLParser();
 
 $sql = "delete from testA as a where a.id = 1";
 $p = $parser->parse($sql);
-$expected = getExpectedValue('delete1.serialized');
+$expected = getExpectedValue(dirname(__FILE__), 'delete1.serialized');
 eq_array($p, $expected, 'simple delete statement');
 

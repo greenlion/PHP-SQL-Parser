@@ -33,13 +33,13 @@ ok($parser->parsed['SELECT'][3]['base_expr'] == 'sysdate');
 $sql = " SELECT a.*, surveyls_title, surveyls_description, surveyls_welcometext, surveyls_url  FROM SURVEYS AS a INNER JOIN SURVEYS_LANGUAGESETTINGS on (surveyls_survey_id=a.sid and surveyls_language=a.language)  order by active DESC, surveyls_title";
 $parser->parse($sql);
 $p = $parser->parsed;
-$expected = getExpectedValue('select1.serialized');
+$expected = getExpectedValue(dirname(__FILE__), 'select1.serialized');
 eq_array($p, $expected, 'a test for ref_clauses');
 
 
 $sql = "SELECT pl_namespace,pl_title FROM `pagelinks` WHERE pl_from = '1' FOR UPDATE";
 $parser->parse($sql);
 $p = $parser->parsed;
-$expected = getExpectedValue('select2.serialized');
+$expected = getExpectedValue(dirname(__FILE__), 'select2.serialized');
 eq_array($p, $expected, 'select for update');
 

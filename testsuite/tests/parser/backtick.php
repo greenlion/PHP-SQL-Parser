@@ -15,5 +15,5 @@ ok($parser->parsed['GROUP'][0]['type'] == 'alias');
 $sql = "INSERT INTO test (`name`) VALUES ('ben\\'s test containing an escaped quote')";
 $parser->parse($sql);
 $p = $parser->parsed;
-$expected = getExpectedValue('backtick1.serialized');
+$expected = getExpectedValue(dirname(__FILE__), 'backtick1.serialized');
 eq_array($p, $expected, "issue 35: ben's test");
