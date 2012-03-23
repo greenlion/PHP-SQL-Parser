@@ -13,5 +13,5 @@ $sql = 'SELECT *
 $parser = new PHPSQLParser($sql);
 $creator = new PHPSQLCreator($parser->parsed);
 $created = $creator->created;
-$expected = getExpectedValue(dirname(__FILE__), 'create4.sql', false);
+$expected = getExpectedValue(dirname(__FILE__), 'left.sql', false);
 ok($created === $expected, 'left joins and table-expression');

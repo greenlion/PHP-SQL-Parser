@@ -10,5 +10,5 @@ $sql = "SELECT * FROM t1 LEFT JOIN (t2, t3, t4)
 $parser = new PHPSQLParser($sql);
 $creator = new PHPSQLCreator($parser->parsed);
 $created = $creator->created;
-$expected = getExpectedValue(dirname(__FILE__), 'create5.sql', false);
+$expected = getExpectedValue(dirname(__FILE__), 'tableexpr.sql', false);
 ok($created === $expected, 'table-expression on second position');

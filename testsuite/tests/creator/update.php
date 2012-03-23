@@ -9,5 +9,5 @@ $sql = "UPDATE `table` SET a = 15, b = 'haha' WHERE x = now()";
 $parser = new PHPSQLParser($sql);
 $creator = new PHPSQLCreator($parser->parsed);
 $created = $creator->created;
-$expected = getExpectedValue(dirname(__FILE__), 'create12.sql', false);
+$expected = getExpectedValue(dirname(__FILE__), 'update.sql', false);
 ok($created === $expected, 'UPDATE with function');

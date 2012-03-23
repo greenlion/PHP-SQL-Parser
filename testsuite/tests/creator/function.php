@@ -9,6 +9,6 @@ $sql = 'SELECT 	SUM( 10 ) as test FROM account';
 $parser = new PHPSQLParser($sql);
 $creator = new PHPSQLCreator($parser->parsed);
 $created = $creator->created;
-$expected = getExpectedValue(dirname(__FILE__), 'create3.sql', false);
+$expected = getExpectedValue(dirname(__FILE__), 'function.sql', false);
 ok($created === $expected, 'a function');
 

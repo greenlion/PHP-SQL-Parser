@@ -8,5 +8,5 @@ $sql = "SELECT * FROM contacts WHERE contacts.id IN (SELECT email_addr_bean_rel.
 $parser = new PHPSQLParser($sql);
 $creator = new PHPSQLCreator($parser->parsed);
 $created = $creator->created;
-$expected = getExpectedValue(dirname(__FILE__), 'create2.sql', false);
+$expected = getExpectedValue(dirname(__FILE__), 'inlist.sql', false);
 ok($created === $expected, 'a subquery and in-lists');

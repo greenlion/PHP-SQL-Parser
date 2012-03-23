@@ -9,5 +9,5 @@ $sql = "SELECT * FROM `table` `t` WHERE ( ( UNIX_TIMESTAMP() + 3600 ) > `t`.`exp
 $parser = new PHPSQLParser($sql);
 $creator = new PHPSQLCreator($parser->parsed);
 $created = $creator->created;
-$expected = getExpectedValue(dirname(__FILE__), 'create10.sql', false);
+$expected = getExpectedValue(dirname(__FILE__), 'where.sql', false);
 ok($created === $expected, 'expressions with function within WHERE clause');
