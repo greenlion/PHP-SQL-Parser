@@ -7,5 +7,5 @@ $parser = new PHPSQLParser();
 $sql = "SELECT COUNT(DISTINCT bla) FROM foo";
 $parser->parse($sql);
 $p = $parser->parsed;
-$expected = getExpectedValue('issue39.serialized');
+$expected = getExpectedValue(dirname(__FILE__), 'issue39.serialized');
 eq_array($p, $expected, 'count(distinct x)');

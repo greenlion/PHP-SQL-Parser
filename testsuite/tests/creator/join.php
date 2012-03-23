@@ -9,5 +9,5 @@ $sql = " SELECT a.*, surveyls_title, surveyls_description, surveyls_welcometext,
 $parser = new PHPSQLParser($sql);
 $creator = new PHPSQLCreator($parser->parsed);
 $created = $creator->created;
-$expected = getExpectedValue('create1.sql', false);
+$expected = getExpectedValue(dirname(__FILE__), 'create1.sql', false);
 ok($created === $expected, 'a join');

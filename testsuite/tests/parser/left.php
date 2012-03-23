@@ -12,7 +12,7 @@ $sql = 'SELECT a.field1, b.field1, c.field1
 
 $parser->parse($sql, true);
 $p = $parser->parsed;
-$expected = getExpectedValue('left1.serialized');
+$expected = getExpectedValue(dirname(__FILE__), 'left1.serialized');
 eq_array($p, $expected, 'left join with alias');
 
 $sql = 'SELECT a.field1, b.field1, c.field1
@@ -26,5 +26,5 @@ $sql = 'SELECT a.field1, b.field1, c.field1
 
 $parser->parse($sql);
 $p = $parser->parsed;
-$expected = getExpectedValue('left2.serialized');
+$expected = getExpectedValue(dirname(__FILE__), 'left2.serialized');
 eq_array($p, $expected, 'right and left outer joins');

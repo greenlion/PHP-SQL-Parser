@@ -20,5 +20,5 @@ ok($p['FROM'][0]['alias']['position'] == 28, 'position of table alias');
 
 $sql = "SELECT a.*, c.*, u.users_name FROM SURVEYS as a  INNER JOIN SURVEYS_LANGUAGESETTINGS as c ON ( surveyls_survey_id = a.sid AND surveyls_language = a.language ) AND surveyls_survey_id=a.sid and surveyls_language=a.language  INNER JOIN USERS as u ON (u.uid=a.owner_id)  ORDER BY surveyls_title";
 $p = $parser->parse($sql, true);
-$expected = getExpectedValue('positions1.serialized');
+$expected = getExpectedValue(dirname(__FILE__), 'positions1.serialized');
 eq_array($p, $expected, 'a long query with join and order clauses');

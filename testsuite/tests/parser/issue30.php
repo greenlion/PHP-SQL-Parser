@@ -6,5 +6,5 @@ $parser = new PHPSQLParser();
 $sql = "SELECT foo.a FROM test foo WHERE RIGHT(REPLACE(foo.bar,'(0',''),7) = 'a'";
 $parser->parse($sql);
 $p = $parser->parsed;
-$expected = getExpectedValue('issue30.serialized');
+$expected = getExpectedValue(dirname(__FILE__), 'issue30.serialized');
 eq_array($p, $expected, 'parenthesis within string literals within function parameter list');

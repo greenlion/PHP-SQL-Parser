@@ -10,5 +10,5 @@ $sql = "SELECT qid FROM QUESTIONS WHERE gid='1' and language='de-informal' ORDER
 $parser = new PHPSQLParser($sql);
 $creator = new PHPSQLCreator($parser->parsed);
 $created = $creator->created;
-$expected = getExpectedValue('create6.sql', false);
+$expected = getExpectedValue(dirname(__FILE__), 'create6.sql', false);
 ok($created === $expected, 'explicit ASC statement');

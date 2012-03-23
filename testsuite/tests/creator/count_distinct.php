@@ -10,5 +10,5 @@ $sql = "SELECT COUNT(DISTINCT bla) FROM foo";
 $parser = new PHPSQLParser($sql);
 $creator = new PHPSQLCreator($parser->parsed);
 $created = $creator->created;
-$expected = getExpectedValue('create11.sql', false);
+$expected = getExpectedValue(dirname(__FILE__), 'create11.sql', false);
 ok($created === $expected, 'count(distinct x)');
