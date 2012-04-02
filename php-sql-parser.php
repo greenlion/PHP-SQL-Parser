@@ -357,11 +357,34 @@ if (!defined('HAVE_PHP_SQL_PARSER')) {
             return $cnt;
         }
 
+        private function balanceBackticks($tokens) {
+            $i = 0;
+            while ($i < count($tokens)) {
+
+                $token = $tokens[$i];
+                if ($token === "") {
+                    $i++;
+                    continue;
+                }
+
+                $len = strlen($token);
+                for ($j = 0; $j < $len; $j++) {
+                    if (in_array($token[$j], array("'", "\"", "`"))) {
+                        $tokens = $this->balanceCharacter($tokens, $i, $token[$j]);
+                        break;
+                    }
+                }
+                $i++;
+            }
+
+            return $tokens;
+        }
+
         # backticks are not balanced within one token, so we have
         # to re-combine some tokens
-        private function balanceBackticks($tokens, $char) {
+        private function balanceCharacter($tokens, $idx, $char) {
             $token_count = count($tokens);
-            $i = 0;
+            $i = $idx;
             while ($i < $token_count) {
 
                 if ($tokens[$i] === "") {
@@ -372,7 +395,7 @@ if (!defined('HAVE_PHP_SQL_PARSER')) {
                 $needed = $this->count_backtick($tokens[$i], $char) % 2;
                 if ($needed === 0) {
                     $i++;
-                    continue;
+                    break;
                 }
 
                 for ($n = $i + 1; $n < $token_count; $n++) {
@@ -455,8 +478,7 @@ EOREGEX
 
             $tokens = preg_split($regex, $sql, -1, PREG_SPLIT_NO_EMPTY | PREG_SPLIT_DELIM_CAPTURE);
             $tokens = $this->balanceParenthesis($tokens);
-            $tokens = $this->balanceBackticks($tokens, "`");
-            $tokens = $this->balanceBackticks($tokens, "'");
+            $tokens = $this->balanceBackticks($tokens);
             $tokens = $this->concatQuotedColReferences($tokens);
             return $tokens;
         }
@@ -1339,7 +1361,7 @@ EOREGEX
             $expr = $parseInfo['expr'];
             $expr[] = array('expr_type' => $parseInfo['tokenType'], 'base_expr' => $parseInfo['token'],
                             'sub_tree' => $parseInfo['processed']);
-            
+
             return array('processed' => false, 'expr' => $expr, 'key' => false, 'token' => false, 'tokenType' => "",
                          'prevToken' => $parseInfo['upper'], 'prevTokenType' => $parseInfo['tokenType'],
                          'trim' => false, 'upper' => false);
