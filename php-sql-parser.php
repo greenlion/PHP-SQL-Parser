@@ -67,7 +67,11 @@ if (!defined('HAVE_PHP_SQL_PARSER')) {
             return $this->parsed;
         }
 
-        private function preprint($s, $return = false) {
+        protected function stop($error) {
+            die($error);
+        }
+        
+        protected function preprint($s, $return = false) {
             $x = "<pre>";
             $x .= print_r($s, 1);
             $x .= "</pre>";
@@ -80,7 +84,7 @@ if (!defined('HAVE_PHP_SQL_PARSER')) {
             }
         }
 
-        private function startsWith($haystack, $needle) {
+        protected function startsWith($haystack, $needle) {
             if (is_string($needle)) {
                 $needle = array($needle);
             }
@@ -93,7 +97,7 @@ if (!defined('HAVE_PHP_SQL_PARSER')) {
             return false;
         }
 
-        private function endsWith($haystack, $needle) {
+        protected function endsWith($haystack, $needle) {
             $length = strlen($needle);
             if ($length == 0) {
                 return true;
@@ -227,24 +231,6 @@ if (!defined('HAVE_PHP_SQL_PARSER')) {
             return $parsed;
         }
 
-        # helper method to debug lookForBaseExpression
-        private function printPos($text, $sql, $charPos, $key, $parsed, $backtracking) {
-            if (!isset($_ENV['DEBUG'])) {
-                return;
-            }
-
-            $spaces = "";
-            $caller = debug_backtrace();
-            $i = 1;
-            while ($caller[$i]['function'] === 'lookForBaseExpression') {
-                $spaces .= "   ";
-                $i++;
-            }
-            $holdem = substr($sql, 0, $charPos) . "^" . substr($sql, $charPos);
-            echo $spaces . $text . " key:" . $key . "  parsed:" . $parsed . " back:" . serialize($backtracking) . " "
-                    . $holdem . "\n";
-        }
-
         private function findPositionWithinString($sql, $value, $expr_type) {
 
             $allowedOnOperator = array("\t", "\n", "\r", " ", ",", "(", ")", "_", "'");
@@ -344,7 +330,7 @@ if (!defined('HAVE_PHP_SQL_PARSER')) {
                     $pos = $this->findPositionWithinString($subject, $value,
                             isset($parsed['expr_type']) ? $parsed['expr_type'] : 'alias');
                     if ($pos === false) {
-                        die("cannot calculate position of " . $value . " within " . $subject);
+                        stop("cannot calculate position of " . $value . " within " . $subject);
                     }
 
                     $parsed['position'] = $charPos + $pos;
@@ -466,9 +452,7 @@ if (!defined('HAVE_PHP_SQL_PARSER')) {
         private function split_sql($sql) {
 
             if (!is_string($sql)) {
-                echo "SQL:\n";
-                print_r($sql);
-                exit;
+                stop("SQL:\n" . print_r($sql, true));
             }
 
             $tokens = array();
