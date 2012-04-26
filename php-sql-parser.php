@@ -68,9 +68,10 @@ if (!defined('HAVE_PHP_SQL_PARSER')) {
         }
 
         protected function stop($error) {
-            die($error);
+            $caller = debug_backtrace();
+            die($error . "\nstopped on line " . $caller[1]['line']);
         }
-        
+
         protected function preprint($s, $return = false) {
             $x = "<pre>";
             $x .= print_r($s, 1);
@@ -300,9 +301,8 @@ if (!defined('HAVE_PHP_SQL_PARSER')) {
                         || ($key === 'expr_type' && $parsed === 'expression')
                         || ($key === 'expr_type' && $parsed === 'subquery')
                         || ($key === 'expr_type' && $parsed === 'table_expression')
-                        || ($key === 'expr_type' && $parsed === 'record') 
-                        || ($key === 'expr_type' && $parsed === 'in-list')
-                        || ($key === 'alias' && $parsed !== false)) {
+                        || ($key === 'expr_type' && $parsed === 'record')
+                        || ($key === 'expr_type' && $parsed === 'in-list') || ($key === 'alias' && $parsed !== false)) {
                     $backtracking[] = $charPos; # on the next base_expr we set the pointer back to this value
 
                 } elseif (($key === 'ref_clause' || $key === 'columns') && $parsed !== false) {
@@ -357,13 +357,13 @@ if (!defined('HAVE_PHP_SQL_PARSER')) {
                     $i++;
                     continue;
                 }
-                
+
                 $token = $tokens[$i];
-                
+
                 if (in_array($token, array("'", "\"", "`"))) {
                     $tokens = $this->balanceCharacter($tokens, $i, $token);
                 }
-                
+
                 $i++;
             }
 
@@ -373,7 +373,7 @@ if (!defined('HAVE_PHP_SQL_PARSER')) {
         # backticks are not balanced within one token, so we have
         # to re-combine some tokens
         private function balanceCharacter($tokens, $idx, $char) {
-            
+
             $token_count = count($tokens);
             $i = $idx + 1;
             while ($i < $token_count) {
@@ -385,12 +385,12 @@ if (!defined('HAVE_PHP_SQL_PARSER')) {
 
                 $token = $tokens[$i];
                 $tokens[$idx] .= $token;
-                unset ($tokens[$i]);
-                
+                unset($tokens[$i]);
+
                 if ($token === $char) {
                     break;
                 }
-                                
+
                 $i++;
             }
             return array_values($tokens);
@@ -439,7 +439,7 @@ if (!defined('HAVE_PHP_SQL_PARSER')) {
                         $k++;
                     }
                 }
-                
+
                 $i++;
             }
 
@@ -496,7 +496,7 @@ if (!defined('HAVE_PHP_SQL_PARSER')) {
                 if ($this->endsWith($tokens[$i], "\\")) {
                     $i++;
                     if (isset($tokens[$i])) {
-                        $tokens[$i-1] .= $tokens[$i];
+                        $tokens[$i - 1] .= $tokens[$i];
                         unset($tokens[$i]);
                     }
                 }
@@ -504,7 +504,7 @@ if (!defined('HAVE_PHP_SQL_PARSER')) {
             }
             return array_values($tokens);
         }
-        
+
         private function balanceParenthesis($tokens) {
             $token_count = count($tokens);
             $i = 0;
