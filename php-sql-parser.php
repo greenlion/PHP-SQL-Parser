@@ -80,6 +80,29 @@ if (!defined('HAVE_PHP_SQL_PARSER')) {
             }
         }
 
+        private function startsWith($haystack, $needle) {
+            if (is_string($needle)) {
+                $needle = array($needle);
+            }
+            for ($j = 0; $j < count($needle); ++$j) {
+                $length = strlen($needle[$j]);
+                if (substr($haystack, 0, $length) === $needle[$j]) {
+                    return $j;
+                }
+            }
+            return false;
+        }
+
+        private function endsWith($haystack, $needle) {
+            $length = strlen($needle);
+            if ($length == 0) {
+                return true;
+            }
+
+            $start = $length * -1;
+            return (substr($haystack, $start) === $needle);
+        }
+
         private function processUnion($inputArray) {
             $outputArray = array();
 
@@ -337,43 +360,22 @@ if (!defined('HAVE_PHP_SQL_PARSER')) {
 
         }
 
-        #This function counts open and close backticks and
-        #returns their location.  This might be faster as a regex
-        private function count_backtick($token, $char) {
-            $len = strlen($token);
-            $cnt = 0;
-            $escaped = false;
-
-            for ($i = 0; $i < $len; ++$i) {
-                if ($token[$i] === "\\") {
-                    $escaped = true;
-                    continue;
-                }
-                if (!$escaped && $token[$i] == $char) {
-                    ++$cnt;
-                }
-                $escaped = false;
-            }
-            return $cnt;
-        }
-
         private function balanceBackticks($tokens) {
             $i = 0;
-            while ($i < count($tokens)) {
+            $cnt = count($tokens);
+            while ($i < $cnt) {
 
-                $token = $tokens[$i];
-                if ($token === "") {
+                if (!isset($tokens[$i])) {
                     $i++;
                     continue;
                 }
-
-                $len = strlen($token);
-                for ($j = 0; $j < $len; $j++) {
-                    if (in_array($token[$j], array("'", "\"", "`"))) {
-                        $tokens = $this->balanceCharacter($tokens, $i, $token[$j]);
-                        break;
-                    }
+                
+                $token = $tokens[$i];
+                
+                if (in_array($token, array("'", "\"", "`"))) {
+                    $tokens = $this->balanceCharacter($tokens, $i, $token);
                 }
+                
                 $i++;
             }
 
@@ -383,72 +385,74 @@ if (!defined('HAVE_PHP_SQL_PARSER')) {
         # backticks are not balanced within one token, so we have
         # to re-combine some tokens
         private function balanceCharacter($tokens, $idx, $char) {
+            
             $token_count = count($tokens);
-            $i = $idx;
+            $i = $idx + 1;
             while ($i < $token_count) {
 
-                if ($tokens[$i] === "") {
+                if (!isset($tokens[$i])) {
                     $i++;
                     continue;
                 }
 
-                $needed = $this->count_backtick($tokens[$i], $char) % 2;
-                if ($needed === 0) {
-                    $i++;
+                $token = $tokens[$i];
+                $tokens[$idx] .= $token;
+                unset ($tokens[$i]);
+                
+                if ($token === $char) {
                     break;
                 }
-
-                for ($n = $i + 1; $n < $token_count; $n++) {
-                    $needed = ($needed + $this->count_backtick($tokens[$n], $char)) % 2;
-
-                    $tokens[$i] .= $tokens[$n];
-                    unset($tokens[$n]);
-
-                    if ($needed === 0) {
-                        $n++;
-                        break;
-                    }
-                }
-                $i = $n;
+                                
+                $i++;
             }
             return array_values($tokens);
         }
 
-        private function concatQuotedColReferences($tokens) {
+        /*
+         * does the token ends with dot?
+         * concat it with the next token
+         * 
+         * does the token starts with a dot?
+         * concat it with the previous token
+         */
+        private function concatColReferences($tokens) {
 
+            $cnt = count($tokens);
             $i = 0;
-            $tokenCount = count($tokens);
-
-            while ($i < $tokenCount) {
-
-                $trim = trim($tokens[$i]);
-                if ($trim === "") {
-                    $i++;
-                    continue;
-                }
-
-                if ($trim[strlen($trim) - 1] !== "`") {
-                    $i++;
-                    continue;
-                }
-
-                $i++;
+            while ($i < $cnt) {
 
                 if (!isset($tokens[$i])) {
+                    $i++;
                     continue;
                 }
 
                 $trim = trim($tokens[$i]);
-                if ($trim === "") {
-                    $i++;
-                    continue;
+
+                if ($this->startsWith($tokens[$i], '.') !== false) {
+
+                    // concat the previous tokens, till the token has been changed
+                    $k = $i - 1;
+                    $len = strlen($tokens[$i]);
+                    while (($k >= 0) && ($len == strlen($tokens[$i]))) {
+                        $tokens[$i] = $tokens[$k] . $tokens[$i];
+                        unset($tokens[$k]);
+                        $k--;
+                    }
                 }
 
-                if ($trim[0] === ".") {
-                    $tokens[$i - 1] .= $tokens[$i];
-                    unset($tokens[$i]);
-                    $i++;
+                if ($this->endsWith($tokens[$i], '.')) {
+
+                    // concat the next tokens, till the token has been changed
+                    $k = $i + 1;
+                    $len = strlen($tokens[$i]);
+                    while (($k < $cnt) && ($len == strlen($tokens[$i]))) {
+                        $tokens[$i] .= $tokens[$k];
+                        unset($tokens[$k]);
+                        $k++;
+                    }
                 }
+                
+                $i++;
             }
 
             return array_values($tokens);
@@ -465,24 +469,56 @@ if (!defined('HAVE_PHP_SQL_PARSER')) {
                 exit;
             }
 
-            # added some code from issue 11 comment 3
-            $regex = <<<EOREGEX
-/(`(?:[^`]|``)`|[@A-Za-z0-9_.`-]+)
-|(\+|-|\*|\/|!=|>=|<=|<>|>|<|&&|\|\||=|\^|\(|\)|\\t|\\r\\n|\\n)
-|('(?:[^']+|'')*'+)
-|("(?:[^"]+|"")*"+)
-|([^ ,]+)
-/ix
-EOREGEX
-            ;
+            $tokens = array();
+            $token = "";
+            $splitter = array("\r\n", "!=", ">=", "<=", "<>", "\\", "&&", ">", "<", "|", "=", "^", "(", ")", "\t",
+                              "\n", "'", "\"", "`", ",", "@", " ", "+", "-", "*", "/", ";");
 
-            $tokens = preg_split($regex, $sql, -1, PREG_SPLIT_NO_EMPTY | PREG_SPLIT_DELIM_CAPTURE);
-            $tokens = $this->balanceParenthesis($tokens);
+            while (strlen($sql) > 0) {
+
+                $idx = $this->startsWith($sql, $splitter);
+                if ($idx === false) {
+                    $token .= $sql[0];
+                    $sql = substr($sql, 1);
+                    continue;
+                }
+
+                if ($token !== "") {
+                    $tokens[] = $token;
+                }
+                $tokens[] = $splitter[$idx];
+                $sql = substr($sql, strlen($splitter[$idx]));
+                $token = "";
+            }
+
+            if ($token !== "") {
+                $tokens[] = $token;
+            }
+
+            $tokens = $this->concatEscapeSequences($tokens);
             $tokens = $this->balanceBackticks($tokens);
-            $tokens = $this->concatQuotedColReferences($tokens);
+            $tokens = $this->concatColReferences($tokens);
+            $tokens = $this->balanceParenthesis($tokens);
             return $tokens;
         }
 
+        private function concatEscapeSequences($tokens) {
+            $tokenCount = count($tokens);
+            $i = 0;
+            while ($i < $tokenCount) {
+
+                if ($this->endsWith($tokens[$i], "\\")) {
+                    $i++;
+                    if (isset($tokens[$i])) {
+                        $tokens[$i-1] .= $tokens[$i];
+                        unset($tokens[$i]);
+                    }
+                }
+                $i++;
+            }
+            return array_values($tokens);
+        }
+        
         private function balanceParenthesis($tokens) {
             $token_count = count($tokens);
             $i = 0;
@@ -1505,7 +1541,6 @@ EOREGEX
                     case '<=':
                     case '<':
                     case 'LIKE':
-                    case '-':
                     case '%':
                     case '!=':
                     case '<>':
@@ -1513,15 +1548,26 @@ EOREGEX
                     case '!':
                     case '||':
                     case 'OR':
-                    case '+':
                     case '>>':
                     case 'RLIKE':
                     case 'SOUNDS':
-                    case '-':
                     case 'XOR':
                     case 'IN':
                         $parseInfo['processed'] = false;
                         $parseInfo['tokenType'] = "operator";
+                        break;
+
+                    case '-':
+                    case '+':
+                    // differ between preceding sign and operator
+                        $parseInfo['processed'] = false;
+
+                        if (in_array($parseInfo['prevTokenType'],
+                                array('colref', 'function', 'aggregate_function', 'const', 'subquery'))) {
+                            $parseInfo['tokenType'] = "operator";
+                        } else {
+                            $parseInfo['tokenType'] = "sign";
+                        }
                         break;
 
                     default:
@@ -1537,6 +1583,12 @@ EOREGEX
                         default:
                             if (is_numeric($parseInfo['token'])) {
                                 $parseInfo['tokenType'] = 'const';
+
+                                if ($parseInfo['prevTokenType'] === 'sign') {
+                                    array_pop($parseInfo['expr']);
+                                    $parseInfo['token'] = $parseInfo['prevToken'] . $parseInfo['token'];
+                                }
+
                             } else {
                                 $parseInfo['tokenType'] = 'colref';
                             }
