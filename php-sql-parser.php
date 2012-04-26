@@ -36,6 +36,9 @@ if (!defined('HAVE_PHP_SQL_PARSER')) {
         var $reserved = array();
         var $functions = array();
 
+        const POSITION_ERROR = 5;
+        const PARAMETER_ERROR = 10;
+
         public function __construct($sql = false, $calcPositions = false) {
             $this->load_reserved_words();
             if ($sql) {
@@ -65,11 +68,6 @@ if (!defined('HAVE_PHP_SQL_PARSER')) {
             # store the parsed queries
             $this->parsed = $queries;
             return $this->parsed;
-        }
-
-        protected function stop($error) {
-            $caller = debug_backtrace();
-            die($error . "\nstopped on line " . $caller[1]['line']);
         }
 
         protected function preprint($s, $return = false) {
@@ -310,6 +308,10 @@ if (!defined('HAVE_PHP_SQL_PARSER')) {
                     for ($i = 1; $i < count($parsed); $i++) {
                         $backtracking[] = false; # backtracking only after n base_expr!
                     }
+                } elseif ($key === 'sub_tree' && $parsed !== false) {
+                    for ($i = 1; $i < count($parsed); $i++) {
+                        $backtracking[] = false; # backtracking only after n base_expr!  TODO: we are on the wrong place, if there is no base_expr after this on a parent element (like IN (1,1) -> we are on "(" instead on ")")
+                    }
                 } else {
                     # SELECT, WHERE, INSERT etc.
                     if (in_array($key, $this->reserved)) {
@@ -330,7 +332,8 @@ if (!defined('HAVE_PHP_SQL_PARSER')) {
                     $pos = $this->findPositionWithinString($subject, $value,
                             isset($parsed['expr_type']) ? $parsed['expr_type'] : 'alias');
                     if ($pos === false) {
-                        stop("cannot calculate position of " . $value . " within " . $subject);
+                        throw new Exception("cannot calculate position of " . $value . " within " . $subject,
+                                self::POSITION_ERROR);
                     }
 
                     $parsed['position'] = $charPos + $pos;
@@ -452,7 +455,7 @@ if (!defined('HAVE_PHP_SQL_PARSER')) {
         private function split_sql($sql) {
 
             if (!is_string($sql)) {
-                stop("SQL:\n" . print_r($sql, true));
+                throw new Exception("no SQL string to parse\n" . $sql, self::PARAMETER_ERROR);
             }
 
             $tokens = array();
