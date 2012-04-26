@@ -25,6 +25,7 @@ require_once(dirname(__FILE__) . '/tests/parser/issue37.php');
 require_once(dirname(__FILE__) . '/tests/parser/issue38.php');
 require_once(dirname(__FILE__) . '/tests/parser/issue39.php');
 require_once(dirname(__FILE__) . '/tests/parser/issue40.php');
+require_once(dirname(__FILE__) . '/tests/parser/issue41.php');
 require_once(dirname(__FILE__) . '/tests/parser/issue42.php');
 require_once(dirname(__FILE__) . '/tests/parser/issue43.php');
 require_once(dirname(__FILE__) . '/tests/parser/left.php');
