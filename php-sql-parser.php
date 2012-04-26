@@ -314,7 +314,9 @@ if (!defined('HAVE_PHP_SQL_PARSER')) {
                         || ($key === 'expr_type' && $parsed === 'expression')
                         || ($key === 'expr_type' && $parsed === 'subquery')
                         || ($key === 'expr_type' && $parsed === 'table_expression')
-                        || ($key === 'expr_type' && $parsed === 'record') || ($key === 'alias' && $parsed !== false)) {
+                        || ($key === 'expr_type' && $parsed === 'record') 
+                        || ($key === 'expr_type' && $parsed === 'in-list')
+                        || ($key === 'alias' && $parsed !== false)) {
                     $backtracking[] = $charPos; # on the next base_expr we set the pointer back to this value
 
                 } elseif (($key === 'ref_clause' || $key === 'columns') && $parsed !== false) {
