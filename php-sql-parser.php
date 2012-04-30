@@ -36,9 +36,6 @@ if (!defined('HAVE_PHP_SQL_PARSER')) {
         var $reserved = array();
         var $functions = array();
 
-        const POSITION_ERROR = 5;
-        const PARAMETER_ERROR = 10;
-
         public function __construct($sql = false, $calcPositions = false) {
             $this->load_reserved_words();
             if ($sql) {
@@ -332,8 +329,7 @@ if (!defined('HAVE_PHP_SQL_PARSER')) {
                     $pos = $this->findPositionWithinString($subject, $value,
                             isset($parsed['expr_type']) ? $parsed['expr_type'] : 'alias');
                     if ($pos === false) {
-                        throw new Exception("cannot calculate position of " . $value . " within " . $subject,
-                                self::POSITION_ERROR);
+                        throw new UnableToCalculatePositionException($value, $subject);
                     }
 
                     $parsed['position'] = $charPos + $pos;
@@ -455,7 +451,7 @@ if (!defined('HAVE_PHP_SQL_PARSER')) {
         private function split_sql($sql) {
 
             if (!is_string($sql)) {
-                throw new Exception("no SQL string to parse\n" . $sql, self::PARAMETER_ERROR);
+                throw new InvalidParameterException($sql);
             }
 
             $tokens = array();
@@ -1858,6 +1854,41 @@ if (!defined('HAVE_PHP_SQL_PARSER')) {
         }
 
     } // END CLASS
+    
+    class UnableToCalculatePositionException extends Exception {
+        
+        protected $needle;
+        protected $haystack;
+        
+        public function __construct($needle, $haystack) {
+            $this->needle = $needle;
+            $this->haystack = $haystack;
+            parent::__construct("cannot calculate position of " . $needle . " within " . $haystack, 5);
+        }
+        
+        public function getNeedle() {
+            return $this->needle;
+        }
+        
+        public function getHaystack() {
+            return $this->haystack;
+        }
+    }
+    
+    class InvalidParameterException extends InvalidArgumentException {
+        
+        protected $argument;
+        
+        public function __construct($argument) {
+            $this->argument = $argument;
+            parent::__construct("no SQL string to parse: \n".$argument, 10);
+        }
+        
+        public function getArgument() {
+            return $this->argument;
+        }
+    }
+        
     define('HAVE_PHP_SQL_PARSER', 1);
 }
 
