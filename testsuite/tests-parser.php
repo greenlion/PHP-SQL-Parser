@@ -40,5 +40,3 @@ require_once(dirname(__FILE__) . '/tests/parser/subselect.php');
 require_once(dirname(__FILE__) . '/tests/parser/union.php');
 require_once(dirname(__FILE__) . '/tests/parser/update.php');
 require_once(dirname(__FILE__) . '/tests/parser/zero.php');
-
-exit;
