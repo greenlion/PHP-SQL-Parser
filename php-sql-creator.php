@@ -45,7 +45,7 @@ if (!defined('HAVE_PHP_SQL_CREATOR')) {
 
             case "UNION":
             case "UNION ALL":
-                die("UNIONS not implemented");
+                throw new UnsupportedFeatureException($k);
                 break;
             case "SELECT":
                 $this->created = $this->processSelectStatement($parsed);
@@ -60,7 +60,7 @@ if (!defined('HAVE_PHP_SQL_CREATOR')) {
                 $this->created = $this->processUpdateStatement($parsed);
                 break;
             default:
-                die("unknown key " . $k);
+                throw new UnsupportedFeatureException($k);
                 break;
             }
             return $this->created;
@@ -442,7 +442,7 @@ if (!defined('HAVE_PHP_SQL_CREATOR')) {
                 return "RIGHT JOIN";
             }
             // TODO: add more
-            die("unknown join type " . $parsed);
+            throw new UnsupportedFeatureException($parsed);
         }
 
         protected function processRefType($parsed) {
@@ -456,7 +456,7 @@ if (!defined('HAVE_PHP_SQL_CREATOR')) {
                 return " USING ";
             }
             // TODO: add more
-            die("unknown ref type " . $parsed);
+            throw new UnsupportedFeatureException($parsed);
         }
 
         protected function processTable($parsed, $index) {
@@ -565,10 +565,10 @@ if (!defined('HAVE_PHP_SQL_CREATOR')) {
         protected $entrykey;
 
         public function __construct($part, $partkey, $entry, $entrykey) {
-            $this->$part = $part;
-            $this->$partkey = $partkey;
-            $this->$entry = $entry;
-            $this->$entrykey = $entrykey;
+            $this->part = $part;
+            $this->partkey = $partkey;
+            $this->entry = $entry;
+            $this->entrykey = $entrykey;
             parent::__construct("unknown " . $entrykey . " in " . $part . "[" . $partkey . "] " . $entry[$entrykey], 15);
         }
 
@@ -589,5 +589,18 @@ if (!defined('HAVE_PHP_SQL_CREATOR')) {
         }
     }
 
+    class UnsupportedFeatureException extends Exception {
+
+        protected $key;
+
+        public function __construct($key) {
+            $this->key = $key;
+            parent::__construct($key . " not implemented.", 20);
+        }
+
+        public function getKey() {
+            return $this->key;
+        }
+    }
     define('HAVE_PHP_SQL_CREATOR', 1);
 }
