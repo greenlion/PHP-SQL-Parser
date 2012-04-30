@@ -32,12 +32,197 @@
 
 if (!defined('HAVE_PHP_SQL_PARSER')) {
 
-    class PHPSQLParser {
-        var $reserved = array();
-        var $functions = array();
+    /**
+     * This class implements some helper functions.
+     * @author arothe
+     *
+     */
+    class ParserUtils {
+
+        protected $reserved;
+        protected $functions;
+
+        public function __construct() {
+            $this->reserved = $this->getReservedWords();
+            $this->functions = $this->getFunctionWords();
+        }
+
+        /**
+         * Prints an array only if debug mode is on.
+         * @param array $s
+         * @param boolean $return, if true, the formatted array is returned via return parameter
+         */
+        protected function preprint($arr, $return = false) {
+            $x = "<pre>";
+            $x .= print_r($arr, 1);
+            $x .= "</pre>";
+            if ($return) {
+                return $x;
+            } else {
+                if (isset($_ENV['DEBUG'])) {
+                    print $x . "\n";
+                }
+            }
+        }
+
+        /**
+         * Starts one of the strings within the given array $haystack with the string $needle?
+         * @param string or array $haystack
+         * @param string $needle
+         */
+        protected function startsWith($haystack, $needle) {
+            if (is_string($needle)) {
+                $needle = array($needle);
+            }
+            for ($j = 0; $j < count($needle); ++$j) {
+                $length = strlen($needle[$j]);
+                if (substr($haystack, 0, $length) === $needle[$j]) {
+                    return $j;
+                }
+            }
+            return false;
+        }
+
+        /**
+         * Ends the given string $haystack with the string $needle?
+         * @param string $haystack
+         * @param string $needle
+         */
+        protected function endsWith($haystack, $needle) {
+            $length = strlen($needle);
+            if ($length == 0) {
+                return true;
+            }
+
+            $start = $length * -1;
+            return (substr($haystack, $start) === $needle);
+        }
+
+        protected function getFunctionWords() {
+            $result = array('abs', 'acos', 'adddate', 'addtime', 'aes_encrypt', 'aes_decrypt', 'against', 'ascii',
+                            'asin', 'atan', 'avg', 'benchmark', 'bin', 'bit_and', 'bit_or', 'bitcount', 'bitlength',
+                            'cast', 'ceiling', 'char', 'char_length', 'character_length', 'charset', 'coalesce',
+                            'coercibility', 'collation', 'compress', 'concat', 'concat_ws', 'conection_id', 'conv',
+                            'convert', 'convert_tz', 'cos', 'cot', 'count', 'crc32', 'curdate', 'current_user',
+                            'currval', 'curtime', 'database', 'date_add', 'date_diff', 'date_format', 'date_sub',
+                            'day', 'dayname', 'dayofmonth', 'dayofweek', 'dayofyear', 'decode', 'default', 'degrees',
+                            'des_decrypt', 'des_encrypt', 'elt', 'encode', 'encrypt', 'exp', 'export_set', 'extract',
+                            'field', 'find_in_set', 'floor', 'format', 'found_rows', 'from_days', 'from_unixtime',
+                            'get_format', 'get_lock', 'group_concat', 'greatest', 'hex', 'hour', 'if', 'ifnull', 'in',
+                            'inet_aton', 'inet_ntoa', 'insert', 'instr', 'interval', 'is_free_lock', 'is_used_lock',
+                            'last_day', 'last_insert_id', 'lcase', 'least', 'left', 'length', 'ln', 'load_file',
+                            'localtime', 'localtimestamp', 'locate', 'log', 'log2', 'log10', 'lower', 'lpad', 'ltrim',
+                            'make_set', 'makedate', 'maketime', 'master_pos_wait', 'match', 'max', 'md5',
+                            'microsecond', 'mid', 'min', 'minute', 'mod', 'month', 'monthname', 'nextval', 'now',
+                            'nullif', 'oct', 'octet_length', 'old_password', 'ord', 'password', 'period_add',
+                            'period_diff', 'pi', 'position', 'pow', 'power', 'quarter', 'quote', 'radians', 'rand',
+                            'release_lock', 'repeat', 'replace', 'reverse', 'right', 'round', 'row_count', 'rpad',
+                            'rtrim', 'sec_to_time', 'second', 'session_user', 'sha', 'sha1', 'sign', 'soundex',
+                            'space', 'sqrt', 'std', 'stddev', 'stddev_pop', 'stddev_samp', 'strcmp', 'str_to_date',
+                            'subdate', 'substring', 'substring_index', 'subtime', 'sum', 'sysdate', 'system_user',
+                            'tan', 'time', 'timediff', 'timestamp', 'timestampadd', 'timestampdiff', 'time_format',
+                            'time_to_sec', 'to_days', 'trim', 'truncate', 'ucase', 'uncompress', 'uncompressed_length',
+                            'unhex', 'unix_timestamp', 'upper', 'user', 'utc_date', 'utc_time', 'utc_timestamp',
+                            'uuid', 'var_pop', 'var_samp', 'variance', 'version', 'week', 'weekday', 'weekofyear',
+                            'year', 'yearweek');
+
+            return $this->changeCaseForArrayValues($result, CASE_UPPER);
+        }
+
+        protected function getReservedWords() {
+            /* includes functions */
+            $result = array('abs', 'acos', 'adddate', 'addtime', 'aes_encrypt', 'aes_decrypt', 'against', 'ascii',
+                            'asin', 'atan', 'avg', 'benchmark', 'bin', 'bit_and', 'bit_or', 'bitcount', 'bitlength',
+                            'cast', 'ceiling', 'char', 'char_length', 'character_length', 'charset', 'coalesce',
+                            'coercibility', 'collation', 'compress', 'concat', 'concat_ws', 'conection_id', 'conv',
+                            'convert', 'convert_tz', 'cos', 'cot', 'count', 'crc32', 'curdate', 'current_user',
+                            'currval', 'curtime', 'database', 'date_add', 'date_diff', 'date_format', 'date_sub',
+                            'day', 'dayname', 'dayofmonth', 'dayofweek', 'dayofyear', 'decode', 'default', 'degrees',
+                            'des_decrypt', 'des_encrypt', 'elt', 'encode', 'encrypt', 'exp', 'export_set', 'extract',
+                            'field', 'find_in_set', 'floor', 'format', 'found_rows', 'from_days', 'from_unixtime',
+                            'get_format', 'get_lock', 'group_concat', 'greatest', 'hex', 'hour', 'if', 'ifnull', 'in',
+                            'inet_aton', 'inet_ntoa', 'insert', 'instr', 'interval', 'is_free_lock', 'is_used_lock',
+                            'last_day', 'last_insert_id', 'lcase', 'least', 'left', 'length', 'ln', 'load_file',
+                            'localtime', 'localtimestamp', 'locate', 'log', 'log2', 'log10', 'lower', 'lpad', 'ltrim',
+                            'make_set', 'makedate', 'maketime', 'master_pos_wait', 'match', 'max', 'md5',
+                            'microsecond', 'mid', 'min', 'minute', 'mod', 'month', 'monthname', 'nextval', 'now',
+                            'nullif', 'oct', 'octet_length', 'old_password', 'ord', 'password', 'period_add',
+                            'period_diff', 'pi', 'position', 'pow', 'power', 'quarter', 'quote', 'radians', 'rand',
+                            'release_lock', 'repeat', 'replace', 'reverse', 'right', 'round', 'row_count', 'rpad',
+                            'rtrim', 'sec_to_time', 'second', 'session_user', 'sha', 'sha1', 'sign', 'soundex',
+                            'space', 'sqrt', 'std', 'stddev', 'stddev_pop', 'stddev_samp', 'strcmp', 'str_to_date',
+                            'subdate', 'substring', 'substring_index', 'subtime', 'sum', 'sysdate', 'system_user',
+                            'tan', 'time', 'timediff', 'timestamp', 'timestampadd', 'timestampdiff', 'time_format',
+                            'time_to_sec', 'to_days', 'trim', 'truncate', 'ucase', 'uncompress', 'uncompressed_length',
+                            'unhex', 'unix_timestamp', 'upper', 'user', 'utc_date', 'utc_time', 'utc_timestamp',
+                            'uuid', 'var_pop', 'var_samp', 'variance', 'version', 'week', 'weekday', 'weekofyear',
+                            'year', 'yearweek', 'add', 'all', 'alter', 'analyze', 'and', 'as', 'asc', 'asensitive',
+                            'auto_increment', 'bdb', 'before', 'berkeleydb', 'between', 'bigint', 'binary', 'blob',
+                            'both', 'by', 'call', 'cascade', 'case', 'change', 'char', 'character', 'check', 'collate',
+                            'column', 'columns', 'condition', 'connection', 'constraint', 'continue', 'create',
+                            'cross', 'current_date', 'current_time', 'current_timestamp', 'cursor', 'database',
+                            'databases', 'day_hour', 'day_microsecond', 'day_minute', 'day_second', 'dec', 'decimal',
+                            'declare', 'default', 'delayed', 'delete', 'desc', 'describe', 'deterministic', 'distinct',
+                            'distinctrow', 'div', 'double', 'drop', 'else', 'elseif', 'end', 'enclosed', 'escaped',
+                            'exists', 'exit', 'explain', 'false', 'fetch', 'fields', 'float', 'for', 'force',
+                            'foreign', 'found', 'frac_second', 'from', 'fulltext', 'grant', 'group', 'having',
+                            'high_priority', 'hour_microsecond', 'hour_minute', 'hour_second', 'if', 'ignore', 'in',
+                            'index', 'infile', 'inner', 'innodb', 'inout', 'insensitive', 'insert', 'int', 'integer',
+                            'interval', 'into', 'io_thread', 'is', 'iterate', 'join', 'key', 'keys', 'kill', 'leading',
+                            'leave', 'left', 'like', 'limit', 'lines', 'load', 'localtime', 'localtimestamp', 'lock',
+                            'long', 'longblob', 'longtext', 'loop', 'low_priority', 'master_server_id', 'match',
+                            'mediumblob', 'mediumint', 'mediumtext', 'middleint', 'minute_microsecond',
+                            'minute_second', 'mod', 'natural', 'not', 'no_write_to_binlog', 'null', 'numeric', 'on',
+                            'optimize', 'option', 'optionally', 'or', 'order', 'out', 'outer', 'outfile', 'precision',
+                            'primary', 'privileges', 'procedure', 'purge', 'read', 'real', 'references', 'regexp',
+                            'rename', 'repeat', 'replace', 'require', 'restrict', 'return', 'revoke', 'right', 'rlike',
+                            'second_microsecond', 'select', 'sensitive', 'separator', 'set', 'show', 'smallint',
+                            'some', 'soname', 'spatial', 'specific', 'sql', 'sqlexception', 'sqlstate', 'sqlwarning',
+                            'sql_big_result', 'sql_calc_found_rows', 'sql_small_result', 'sql_tsi_day',
+                            'sql_tsi_frac_second', 'sql_tsi_hour', 'sql_tsi_minute', 'sql_tsi_month',
+                            'sql_tsi_quarter', 'sql_tsi_second', 'sql_tsi_week', 'sql_tsi_year', 'ssl', 'starting',
+                            'straight_join', 'striped', 'table', 'tables', 'terminated', 'then', 'timestampadd',
+                            'timestampdiff', 'tinyblob', 'tinyint', 'tinytext', 'to', 'trailing', 'true', 'undo',
+                            'union', 'unique', 'unlock', 'unsigned', 'update', 'usage', 'use', 'user_resources',
+                            'using', 'utc_date', 'utc_time', 'utc_timestamp', 'values', 'varbinary', 'varchar',
+                            'varcharacter', 'varying', 'when', 'where', 'while', 'with', 'write', 'xor', 'year_month',
+                            'zerofill');
+
+            return $this->changeCaseForArrayValues($result, CASE_UPPER);
+        }
+
+        /**
+         * 
+         * Change the case of the values of an array.
+         * 
+         * @param Array of Strings $arr
+         * @param unknown_type $case (CASE_LOWER or CASE_UPPER)
+         * @throws InvalidArgumentException if the first argument is not an array
+         */
+        protected function changeCaseForArrayValues($arr, $case) {
+            if (!is_array($arr)) {
+                throw new InvalidArgumentException("first argument must be an array");
+            }
+            for ($i = 0; $i < count($arr); ++$i) {
+                if ($case == CASE_LOWER) {
+                    $arr[$i] = strtolower($arr[$i]);
+                }
+                if ($case == CASE_UPPER) {
+                    $arr[$i] = strtoupper($arr[$i]);
+                }
+            }
+            return $arr;
+        }
+    }
+    
+    /**
+     * This class implements the parser functionality.
+     * 
+     */
+    class PHPSQLParser extends ParserUtils {
 
         public function __construct($sql = false, $calcPositions = false) {
-            $this->load_reserved_words();
+            parent::__construct();
             if ($sql) {
                 $this->parse($sql, $calcPositions);
             }
@@ -59,48 +244,13 @@ if (!defined('HAVE_PHP_SQL_PARSER')) {
 
             # calc the positions of some important tokens
             if ($calcPositions) {
-                $queries = $this->calculatePositionsWithinSQL($sql, $queries);
+                $calculator = new PositionCalculator();
+                $queries = $calculator->setPositionsWithinSQL($sql, $queries);
             }
 
             # store the parsed queries
             $this->parsed = $queries;
             return $this->parsed;
-        }
-
-        protected function preprint($s, $return = false) {
-            $x = "<pre>";
-            $x .= print_r($s, 1);
-            $x .= "</pre>";
-            if ($return) {
-                return $x;
-            } else {
-                if (isset($_ENV['DEBUG'])) {
-                    print $x . "\n";
-                }
-            }
-        }
-
-        protected function startsWith($haystack, $needle) {
-            if (is_string($needle)) {
-                $needle = array($needle);
-            }
-            for ($j = 0; $j < count($needle); ++$j) {
-                $length = strlen($needle[$j]);
-                if (substr($haystack, 0, $length) === $needle[$j]) {
-                    return $j;
-                }
-            }
-            return false;
-        }
-
-        protected function endsWith($haystack, $needle) {
-            $length = strlen($needle);
-            if ($length == 0) {
-                return true;
-            }
-
-            $start = $length * -1;
-            return (substr($haystack, $start) === $needle);
         }
 
         private function processUnion($inputArray) {
@@ -218,133 +368,6 @@ if (!defined('HAVE_PHP_SQL_PARSER')) {
                 }
             }
             return false;
-        }
-
-        private function calculatePositionsWithinSQL($sql, $parsed) {
-            $charPos = 0;
-            $backtracking = array();
-            $this->lookForBaseExpression($sql, $charPos, $parsed, 0, $backtracking);
-            return $parsed;
-        }
-
-        private function findPositionWithinString($sql, $value, $expr_type) {
-
-            $allowedOnOperator = array("\t", "\n", "\r", " ", ",", "(", ")", "_", "'");
-            $allowedOnOthers = array("\t", "\n", "\r", " ", ",", "(", ")", "<", ">", "*", "+", "-", "/", "|", "&", "=",
-                                     "!", ";");
-
-            $offset = 0;
-            $ok = false;
-            while (true) {
-
-                $pos = strpos($sql, $value, $offset);
-                if ($pos === false) {
-                    break;
-                }
-
-                $before = "";
-                if ($pos > 0) {
-                    $before = $sql[$pos - 1];
-                }
-
-                $after = "";
-                if (isset($sql[$pos + strlen($value)])) {
-                    $after = $sql[$pos + strlen($value)];
-                }
-
-                # if we have an operator, it should be surrounded by
-                # whitespace, comma, parenthesis, digit or letter, end_of_string
-                # an operator should not be surrounded by another operator
-
-                if ($expr_type === 'operator') {
-
-                    $ok = ($before === "" || in_array($before, $allowedOnOperator, true))
-                            || (strtolower($before) >= 'a' && strtolower($before) <= 'z')
-                            || ($before >= '0' && $before <= '9');
-                    $ok = $ok
-                            && ($after === "" || in_array($after, $allowedOnOperator, true)
-                                    || (strtolower($after) >= 'a' && strtolower($after) <= 'z')
-                                    || ($after >= '0' && $after <= '9'));
-
-                    if (!$ok) {
-                        $offset = $pos + 1;
-                        continue;
-                    }
-
-                    break;
-                }
-
-                # in all other cases we accept
-                # whitespace, comma, operators, parenthesis and end_of_string
-
-                $ok = ($before === "" || in_array($before, $allowedOnOthers, true));
-                $ok = $ok && ($after === "" || in_array($after, $allowedOnOthers, true));
-
-                if ($ok) {
-                    break;
-                }
-
-                $offset = $pos + 1;
-            }
-
-            return $pos;
-        }
-
-        private function lookForBaseExpression($sql, &$charPos, &$parsed, $key, &$backtracking) {
-            if (!is_numeric($key)) {
-                if (in_array($key, array('UNION', 'UNION ALL'), true)
-                        || ($key === 'expr_type' && $parsed === 'expression')
-                        || ($key === 'expr_type' && $parsed === 'subquery')
-                        || ($key === 'expr_type' && $parsed === 'table_expression')
-                        || ($key === 'expr_type' && $parsed === 'record')
-                        || ($key === 'expr_type' && $parsed === 'in-list') || ($key === 'alias' && $parsed !== false)) {
-                    $backtracking[] = $charPos; # on the next base_expr we set the pointer back to this value
-
-                } elseif (($key === 'ref_clause' || $key === 'columns') && $parsed !== false) {
-                    $backtracking[] = $charPos;
-                    for ($i = 1; $i < count($parsed); $i++) {
-                        $backtracking[] = false; # backtracking only after n base_expr!
-                    }
-                } elseif ($key === 'sub_tree' && $parsed !== false) {
-                    for ($i = 1; $i < count($parsed); $i++) {
-                        $backtracking[] = false; # backtracking only after n base_expr!  TODO: we are on the wrong place, if there is no base_expr after this on a parent element (like IN (1,1) -> we are on "(" instead on ")")
-                    }
-                } else {
-                    # SELECT, WHERE, INSERT etc.
-                    if (in_array($key, $this->reserved)) {
-                        $charPos = stripos($sql, $key, $charPos);
-                        $charPos += strlen($key);
-                    }
-                }
-            }
-
-            if (!is_array($parsed)) {
-                return;
-            }
-
-            foreach ($parsed as $key => $value) {
-                if ($key === 'base_expr') {
-
-                    $subject = substr($sql, $charPos);
-                    $pos = $this->findPositionWithinString($subject, $value,
-                            isset($parsed['expr_type']) ? $parsed['expr_type'] : 'alias');
-                    if ($pos === false) {
-                        throw new UnableToCalculatePositionException($value, $subject);
-                    }
-
-                    $parsed['position'] = $charPos + $pos;
-                    $charPos += $pos + strlen($value);
-
-                    $oldPos = array_pop($backtracking);
-                    if (isset($oldPos) && $oldPos !== false) {
-                        $charPos = $oldPos;
-                    }
-
-                } else {
-                    $this->lookForBaseExpression($sql, $charPos, $parsed[$key], $key, $backtracking);
-                }
-            }
-
         }
 
         private function balanceBackticks($tokens) {
@@ -1747,148 +1770,186 @@ if (!defined('HAVE_PHP_SQL_PARSER')) {
             $tokens['INTO'] = array_values($unparsed);
             return $tokens;
         }
+    }
 
-        private function load_reserved_words() {
+    /**
+     * 
+     * This class calculates the positions 
+     * of base_expr within the origina SQL statement.
+     * 
+     * @author arothe
+     * 
+     */
+    class PositionCalculator extends ParserUtils {
 
-            $this->functions = array('abs', 'acos', 'adddate', 'addtime', 'aes_encrypt', 'aes_decrypt', 'against',
-                                     'ascii', 'asin', 'atan', 'avg', 'benchmark', 'bin', 'bit_and', 'bit_or',
-                                     'bitcount', 'bitlength', 'cast', 'ceiling', 'char', 'char_length',
-                                     'character_length', 'charset', 'coalesce', 'coercibility', 'collation',
-                                     'compress', 'concat', 'concat_ws', 'conection_id', 'conv', 'convert',
-                                     'convert_tz', 'cos', 'cot', 'count', 'crc32', 'curdate', 'current_user',
-                                     'currval', 'curtime', 'database', 'date_add', 'date_diff', 'date_format',
-                                     'date_sub', 'day', 'dayname', 'dayofmonth', 'dayofweek', 'dayofyear', 'decode',
-                                     'default', 'degrees', 'des_decrypt', 'des_encrypt', 'elt', 'encode', 'encrypt',
-                                     'exp', 'export_set', 'extract', 'field', 'find_in_set', 'floor', 'format',
-                                     'found_rows', 'from_days', 'from_unixtime', 'get_format', 'get_lock',
-                                     'group_concat', 'greatest', 'hex', 'hour', 'if', 'ifnull', 'in', 'inet_aton',
-                                     'inet_ntoa', 'insert', 'instr', 'interval', 'is_free_lock', 'is_used_lock',
-                                     'last_day', 'last_insert_id', 'lcase', 'least', 'left', 'length', 'ln',
-                                     'load_file', 'localtime', 'localtimestamp', 'locate', 'log', 'log2', 'log10',
-                                     'lower', 'lpad', 'ltrim', 'make_set', 'makedate', 'maketime', 'master_pos_wait',
-                                     'match', 'max', 'md5', 'microsecond', 'mid', 'min', 'minute', 'mod', 'month',
-                                     'monthname', 'nextval', 'now', 'nullif', 'oct', 'octet_length', 'old_password',
-                                     'ord', 'password', 'period_add', 'period_diff', 'pi', 'position', 'pow', 'power',
-                                     'quarter', 'quote', 'radians', 'rand', 'release_lock', 'repeat', 'replace',
-                                     'reverse', 'right', 'round', 'row_count', 'rpad', 'rtrim', 'sec_to_time',
-                                     'second', 'session_user', 'sha', 'sha1', 'sign', 'soundex', 'space', 'sqrt',
-                                     'std', 'stddev', 'stddev_pop', 'stddev_samp', 'strcmp', 'str_to_date', 'subdate',
-                                     'substring', 'substring_index', 'subtime', 'sum', 'sysdate', 'system_user', 'tan',
-                                     'time', 'timediff', 'timestamp', 'timestampadd', 'timestampdiff', 'time_format',
-                                     'time_to_sec', 'to_days', 'trim', 'truncate', 'ucase', 'uncompress',
-                                     'uncompressed_length', 'unhex', 'unix_timestamp', 'upper', 'user', 'utc_date',
-                                     'utc_time', 'utc_timestamp', 'uuid', 'var_pop', 'var_samp', 'variance', 'version',
-                                     'week', 'weekday', 'weekofyear', 'year', 'yearweek');
-
-            /* includes functions */
-            $this->reserved = array('abs', 'acos', 'adddate', 'addtime', 'aes_encrypt', 'aes_decrypt', 'against',
-                                    'ascii', 'asin', 'atan', 'avg', 'benchmark', 'bin', 'bit_and', 'bit_or',
-                                    'bitcount', 'bitlength', 'cast', 'ceiling', 'char', 'char_length',
-                                    'character_length', 'charset', 'coalesce', 'coercibility', 'collation', 'compress',
-                                    'concat', 'concat_ws', 'conection_id', 'conv', 'convert', 'convert_tz', 'cos',
-                                    'cot', 'count', 'crc32', 'curdate', 'current_user', 'currval', 'curtime',
-                                    'database', 'date_add', 'date_diff', 'date_format', 'date_sub', 'day', 'dayname',
-                                    'dayofmonth', 'dayofweek', 'dayofyear', 'decode', 'default', 'degrees',
-                                    'des_decrypt', 'des_encrypt', 'elt', 'encode', 'encrypt', 'exp', 'export_set',
-                                    'extract', 'field', 'find_in_set', 'floor', 'format', 'found_rows', 'from_days',
-                                    'from_unixtime', 'get_format', 'get_lock', 'group_concat', 'greatest', 'hex',
-                                    'hour', 'if', 'ifnull', 'in', 'inet_aton', 'inet_ntoa', 'insert', 'instr',
-                                    'interval', 'is_free_lock', 'is_used_lock', 'last_day', 'last_insert_id', 'lcase',
-                                    'least', 'left', 'length', 'ln', 'load_file', 'localtime', 'localtimestamp',
-                                    'locate', 'log', 'log2', 'log10', 'lower', 'lpad', 'ltrim', 'make_set', 'makedate',
-                                    'maketime', 'master_pos_wait', 'match', 'max', 'md5', 'microsecond', 'mid', 'min',
-                                    'minute', 'mod', 'month', 'monthname', 'nextval', 'now', 'nullif', 'oct',
-                                    'octet_length', 'old_password', 'ord', 'password', 'period_add', 'period_diff',
-                                    'pi', 'position', 'pow', 'power', 'quarter', 'quote', 'radians', 'rand',
-                                    'release_lock', 'repeat', 'replace', 'reverse', 'right', 'round', 'row_count',
-                                    'rpad', 'rtrim', 'sec_to_time', 'second', 'session_user', 'sha', 'sha1', 'sign',
-                                    'soundex', 'space', 'sqrt', 'std', 'stddev', 'stddev_pop', 'stddev_samp', 'strcmp',
-                                    'str_to_date', 'subdate', 'substring', 'substring_index', 'subtime', 'sum',
-                                    'sysdate', 'system_user', 'tan', 'time', 'timediff', 'timestamp', 'timestampadd',
-                                    'timestampdiff', 'time_format', 'time_to_sec', 'to_days', 'trim', 'truncate',
-                                    'ucase', 'uncompress', 'uncompressed_length', 'unhex', 'unix_timestamp', 'upper',
-                                    'user', 'utc_date', 'utc_time', 'utc_timestamp', 'uuid', 'var_pop', 'var_samp',
-                                    'variance', 'version', 'week', 'weekday', 'weekofyear', 'year', 'yearweek', 'add',
-                                    'all', 'alter', 'analyze', 'and', 'as', 'asc', 'asensitive', 'auto_increment',
-                                    'bdb', 'before', 'berkeleydb', 'between', 'bigint', 'binary', 'blob', 'both', 'by',
-                                    'call', 'cascade', 'case', 'change', 'char', 'character', 'check', 'collate',
-                                    'column', 'columns', 'condition', 'connection', 'constraint', 'continue', 'create',
-                                    'cross', 'current_date', 'current_time', 'current_timestamp', 'cursor', 'database',
-                                    'databases', 'day_hour', 'day_microsecond', 'day_minute', 'day_second', 'dec',
-                                    'decimal', 'declare', 'default', 'delayed', 'delete', 'desc', 'describe',
-                                    'deterministic', 'distinct', 'distinctrow', 'div', 'double', 'drop', 'else',
-                                    'elseif', 'end', 'enclosed', 'escaped', 'exists', 'exit', 'explain', 'false',
-                                    'fetch', 'fields', 'float', 'for', 'force', 'foreign', 'found', 'frac_second',
-                                    'from', 'fulltext', 'grant', 'group', 'having', 'high_priority',
-                                    'hour_microsecond', 'hour_minute', 'hour_second', 'if', 'ignore', 'in', 'index',
-                                    'infile', 'inner', 'innodb', 'inout', 'insensitive', 'insert', 'int', 'integer',
-                                    'interval', 'into', 'io_thread', 'is', 'iterate', 'join', 'key', 'keys', 'kill',
-                                    'leading', 'leave', 'left', 'like', 'limit', 'lines', 'load', 'localtime',
-                                    'localtimestamp', 'lock', 'long', 'longblob', 'longtext', 'loop', 'low_priority',
-                                    'master_server_id', 'match', 'mediumblob', 'mediumint', 'mediumtext', 'middleint',
-                                    'minute_microsecond', 'minute_second', 'mod', 'natural', 'not',
-                                    'no_write_to_binlog', 'null', 'numeric', 'on', 'optimize', 'option', 'optionally',
-                                    'or', 'order', 'out', 'outer', 'outfile', 'precision', 'primary', 'privileges',
-                                    'procedure', 'purge', 'read', 'real', 'references', 'regexp', 'rename', 'repeat',
-                                    'replace', 'require', 'restrict', 'return', 'revoke', 'right', 'rlike',
-                                    'second_microsecond', 'select', 'sensitive', 'separator', 'set', 'show',
-                                    'smallint', 'some', 'soname', 'spatial', 'specific', 'sql', 'sqlexception',
-                                    'sqlstate', 'sqlwarning', 'sql_big_result', 'sql_calc_found_rows',
-                                    'sql_small_result', 'sql_tsi_day', 'sql_tsi_frac_second', 'sql_tsi_hour',
-                                    'sql_tsi_minute', 'sql_tsi_month', 'sql_tsi_quarter', 'sql_tsi_second',
-                                    'sql_tsi_week', 'sql_tsi_year', 'ssl', 'starting', 'straight_join', 'striped',
-                                    'table', 'tables', 'terminated', 'then', 'timestampadd', 'timestampdiff',
-                                    'tinyblob', 'tinyint', 'tinytext', 'to', 'trailing', 'true', 'undo', 'union',
-                                    'unique', 'unlock', 'unsigned', 'update', 'usage', 'use', 'user_resources',
-                                    'using', 'utc_date', 'utc_time', 'utc_timestamp', 'values', 'varbinary', 'varchar',
-                                    'varcharacter', 'varying', 'when', 'where', 'while', 'with', 'write', 'xor',
-                                    'year_month', 'zerofill');
-
-            for ($i = 0; $i < count($this->reserved); ++$i) {
-                $this->reserved[$i] = strtoupper($this->reserved[$i]);
-                // the funcions should not contain 0
-                if (!empty($this->functions[$i])) {
-                    $this->functions[$i] = strtoupper($this->functions[$i]);
-                }
-            }
+        public function __construct() {
+            parent::__construct();
         }
 
-    } // END CLASS
-    
+        public function setPositionsWithinSQL($sql, $parsed) {
+            $charPos = 0;
+            $backtracking = array();
+            $this->lookForBaseExpression($sql, $charPos, $parsed, 0, $backtracking);
+            return $parsed;
+        }
+
+        private function findPositionWithinString($sql, $value, $expr_type) {
+
+            $allowedOnOperator = array("\t", "\n", "\r", " ", ",", "(", ")", "_", "'");
+            $allowedOnOthers = array("\t", "\n", "\r", " ", ",", "(", ")", "<", ">", "*", "+", "-", "/", "|", "&", "=",
+                                     "!", ";");
+
+            $offset = 0;
+            $ok = false;
+            while (true) {
+
+                $pos = strpos($sql, $value, $offset);
+                if ($pos === false) {
+                    break;
+                }
+
+                $before = "";
+                if ($pos > 0) {
+                    $before = $sql[$pos - 1];
+                }
+
+                $after = "";
+                if (isset($sql[$pos + strlen($value)])) {
+                    $after = $sql[$pos + strlen($value)];
+                }
+
+                # if we have an operator, it should be surrounded by
+                # whitespace, comma, parenthesis, digit or letter, end_of_string
+                # an operator should not be surrounded by another operator
+
+                if ($expr_type === 'operator') {
+
+                    $ok = ($before === "" || in_array($before, $allowedOnOperator, true))
+                            || (strtolower($before) >= 'a' && strtolower($before) <= 'z')
+                            || ($before >= '0' && $before <= '9');
+                    $ok = $ok
+                            && ($after === "" || in_array($after, $allowedOnOperator, true)
+                                    || (strtolower($after) >= 'a' && strtolower($after) <= 'z')
+                                    || ($after >= '0' && $after <= '9'));
+
+                    if (!$ok) {
+                        $offset = $pos + 1;
+                        continue;
+                    }
+
+                    break;
+                }
+
+                # in all other cases we accept
+                # whitespace, comma, operators, parenthesis and end_of_string
+
+                $ok = ($before === "" || in_array($before, $allowedOnOthers, true));
+                $ok = $ok && ($after === "" || in_array($after, $allowedOnOthers, true));
+
+                if ($ok) {
+                    break;
+                }
+
+                $offset = $pos + 1;
+            }
+
+            return $pos;
+        }
+
+        private function lookForBaseExpression($sql, &$charPos, &$parsed, $key, &$backtracking) {
+            if (!is_numeric($key)) {
+                if (in_array($key, array('UNION', 'UNION ALL'), true)
+                        || ($key === 'expr_type' && $parsed === 'expression')
+                        || ($key === 'expr_type' && $parsed === 'subquery')
+                        || ($key === 'expr_type' && $parsed === 'table_expression')
+                        || ($key === 'expr_type' && $parsed === 'record')
+                        || ($key === 'expr_type' && $parsed === 'in-list') || ($key === 'alias' && $parsed !== false)) {
+                    $backtracking[] = $charPos; # on the next base_expr we set the pointer back to this value
+
+                } elseif (($key === 'ref_clause' || $key === 'columns') && $parsed !== false) {
+                    $backtracking[] = $charPos;
+                    for ($i = 1; $i < count($parsed); $i++) {
+                        $backtracking[] = false; # backtracking only after n base_expr!
+                    }
+                } elseif ($key === 'sub_tree' && $parsed !== false) {
+                    for ($i = 1; $i < count($parsed); $i++) {
+                        $backtracking[] = false; # backtracking only after n base_expr!  TODO: we are on the wrong place, if there is no base_expr after this on a parent element (like IN (1,1) -> we are on "(" instead on ")")
+                    }
+                } else {
+                    # SELECT, WHERE, INSERT etc.
+                    if (in_array($key, $this->reserved)) {
+                        $charPos = stripos($sql, $key, $charPos);
+                        $charPos += strlen($key);
+                    }
+                }
+            }
+
+            if (!is_array($parsed)) {
+                return;
+            }
+
+            foreach ($parsed as $key => $value) {
+                if ($key === 'base_expr') {
+
+                    $subject = substr($sql, $charPos);
+                    $pos = $this->findPositionWithinString($subject, $value,
+                            isset($parsed['expr_type']) ? $parsed['expr_type'] : 'alias');
+                    if ($pos === false) {
+                        throw new UnableToCalculatePositionException($value, $subject);
+                    }
+
+                    $parsed['position'] = $charPos + $pos;
+                    $charPos += $pos + strlen($value);
+
+                    $oldPos = array_pop($backtracking);
+                    if (isset($oldPos) && $oldPos !== false) {
+                        $charPos = $oldPos;
+                    }
+
+                } else {
+                    $this->lookForBaseExpression($sql, $charPos, $parsed[$key], $key, $backtracking);
+                }
+            }
+
+        }
+
+    }
+
+
     class UnableToCalculatePositionException extends Exception {
-        
+
         protected $needle;
         protected $haystack;
-        
+
         public function __construct($needle, $haystack) {
             $this->needle = $needle;
             $this->haystack = $haystack;
             parent::__construct("cannot calculate position of " . $needle . " within " . $haystack, 5);
         }
-        
+
         public function getNeedle() {
             return $this->needle;
         }
-        
+
         public function getHaystack() {
             return $this->haystack;
         }
     }
-    
+
     class InvalidParameterException extends InvalidArgumentException {
-        
+
         protected $argument;
-        
+
         public function __construct($argument) {
             $this->argument = $argument;
-            parent::__construct("no SQL string to parse: \n".$argument, 10);
+            parent::__construct("no SQL string to parse: \n" . $argument, 10);
         }
-        
+
         public function getArgument() {
             return $this->argument;
         }
     }
-        
+
     define('HAVE_PHP_SQL_PARSER', 1);
 }
 
