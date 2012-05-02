@@ -4,15 +4,9 @@ require_once(dirname(__FILE__) . '/../../test-more.php');
 
 $parser = new PHPSQLParser();
 
-// not solved
-
 $sql = 'SELECT a from b left join c on c.a = b.a and (c.b. = b.b) where a.a > 1';
-$parser->parse($sql, false);
-$p = $parser->parsed;
-
 $parser->parse($sql, true);
 $p = $parser->parsed;
-
 $expected = getExpectedValue(dirname(__FILE__), 'issue45.serialized');
 eq_array($p, $expected, 'issue 45 position problem');
 
