@@ -1926,7 +1926,7 @@ if (!defined('HAVE_PHP_SQL_PARSER')) {
                         $backtracking[] = false; # backtracking only after n base_expr!
                     }
                 } elseif ($key === 'sub_tree' && $parsed !== false) {
-                    # we hold the current position and come back after n base_expr(s)
+                    # we prevent wrong backtracking on subtrees (too much array_pop())
                     # there is an array of sub-elements after(!) the base_expr clause of the current element
                     # so we go through the sub-elements and must not come back at the end
                     for ($i = 1; $i < count($parsed); $i++) {
@@ -1949,6 +1949,8 @@ if (!defined('HAVE_PHP_SQL_PARSER')) {
             foreach ($parsed as $key => $value) {
                 if ($key === 'base_expr') {
 
+                    #$this->printPos("0", $sql, $charPos, $key, $value, $backtracking);
+                    
                     $subject = substr($sql, $charPos);
                     $pos = $this->findPositionWithinString($subject, $value,
                             isset($parsed['expr_type']) ? $parsed['expr_type'] : 'alias');
@@ -1959,10 +1961,14 @@ if (!defined('HAVE_PHP_SQL_PARSER')) {
                     $parsed['position'] = $charPos + $pos;
                     $charPos += $pos + strlen($value);
                     
+                    #$this->printPos("1", $sql, $charPos, $key, $value, $backtracking);
+                    
                     $oldPos = array_pop($backtracking);
                     if (isset($oldPos) && $oldPos !== false) {
                         $charPos = $oldPos;
                     }
+                    
+                    #$this->printPos("2", $sql, $charPos, $key, $value, $backtracking);
                     
                 } else {
                     $this->lookForBaseExpression($sql, $charPos, $parsed[$key], $key, $backtracking);
