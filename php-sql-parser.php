@@ -419,11 +419,11 @@ if (!defined('HAVE_PHP_SQL_PARSER')) {
     class PHPSQLParser extends PHPSQLParserUtils {
 
         private $lexer;
-        
+
         public function __construct($sql = false, $calcPositions = false) {
             parent::__construct();
             $this->lexer = new PHPSQLLexer();
-            
+
             if ($sql) {
                 $this->parse($sql, $calcPositions);
             }
@@ -1803,10 +1803,40 @@ if (!defined('HAVE_PHP_SQL_PARSER')) {
      */
     class PositionCalculator extends PHPSQLParserUtils {
 
+        private $allowedOnOperator;
+        private $allowedOnOther;
+
         public function __construct() {
+            $this->allowedOnOperator = $this->getAllowedOnOperator();
+            $this->allowedOnOther = $this->getAllowedOnOther();
             parent::__construct();
         }
 
+        private function getAllowedOnOperator() {
+            return array("\t", "\n", "\r", " ", ",", "(", ")", "_", "'");
+        }
+
+        private function getAllowedOnOther() {
+            return array("\t", "\n", "\r", " ", ",", "(", ")", "<", ">", "*", "+", "-", "/", "|", "&", "=", "!", ";");
+        }
+
+        private function printPos($text, $sql, $charPos, $key, $parsed, $backtracking) {
+            if (!isset($_ENV['DEBUG'])) {
+                return;
+            }
+
+            $spaces = "";
+            $caller = debug_backtrace();
+            $i = 1;
+            while ($caller[$i]['function'] === 'lookForBaseExpression') {
+                $spaces .= "   ";
+                $i++;
+            }
+            $holdem = substr($sql, 0, $charPos) . "^" . substr($sql, $charPos);
+            echo $spaces . $text . " key:" . $key . "  parsed:" . $parsed . " back:" . serialize($backtracking) . " "
+                    . $holdem . "\n";
+        }        
+        
         public function setPositionsWithinSQL($sql, $parsed) {
             $charPos = 0;
             $backtracking = array();
@@ -1815,10 +1845,6 @@ if (!defined('HAVE_PHP_SQL_PARSER')) {
         }
 
         private function findPositionWithinString($sql, $value, $expr_type) {
-
-            $allowedOnOperator = array("\t", "\n", "\r", " ", ",", "(", ")", "_", "'");
-            $allowedOnOthers = array("\t", "\n", "\r", " ", ",", "(", ")", "<", ">", "*", "+", "-", "/", "|", "&", "=",
-                                     "!", ";");
 
             $offset = 0;
             $ok = false;
@@ -1845,11 +1871,11 @@ if (!defined('HAVE_PHP_SQL_PARSER')) {
 
                 if ($expr_type === 'operator') {
 
-                    $ok = ($before === "" || in_array($before, $allowedOnOperator, true))
+                    $ok = ($before === "" || in_array($before, $this->allowedOnOperator, true))
                             || (strtolower($before) >= 'a' && strtolower($before) <= 'z')
                             || ($before >= '0' && $before <= '9');
                     $ok = $ok
-                            && ($after === "" || in_array($after, $allowedOnOperator, true)
+                            && ($after === "" || in_array($after, $this->allowedOnOperator, true)
                                     || (strtolower($after) >= 'a' && strtolower($after) <= 'z')
                                     || ($after >= '0' && $after <= '9'));
 
@@ -1864,8 +1890,8 @@ if (!defined('HAVE_PHP_SQL_PARSER')) {
                 # in all other cases we accept
                 # whitespace, comma, operators, parenthesis and end_of_string
 
-                $ok = ($before === "" || in_array($before, $allowedOnOthers, true));
-                $ok = $ok && ($after === "" || in_array($after, $allowedOnOthers, true));
+                $ok = ($before === "" || in_array($before, $this->allowedOnOther, true));
+                $ok = $ok && ($after === "" || in_array($after, $this->allowedOnOther, true));
 
                 if ($ok) {
                     break;
@@ -1884,19 +1910,30 @@ if (!defined('HAVE_PHP_SQL_PARSER')) {
                         || ($key === 'expr_type' && $parsed === 'subquery')
                         || ($key === 'expr_type' && $parsed === 'table_expression')
                         || ($key === 'expr_type' && $parsed === 'record')
-                        || ($key === 'expr_type' && $parsed === 'in-list') || ($key === 'alias' && $parsed !== false)) {
-                    $backtracking[] = $charPos; # on the next base_expr we set the pointer back to this value
+                        || ($key === 'expr_type' && $parsed === 'in-list') 
+                        || ($key === 'alias' && $parsed !== false)) {
+                    # we hold the current position and come back after the next base_expr
+                    # we do this, because the next base_expr contains the complete expression/subquery/record
+                    # and we have to look into it too
+                    $backtracking[] = $charPos; 
 
                 } elseif (($key === 'ref_clause' || $key === 'columns') && $parsed !== false) {
+                    # we hold the current position and come back after n base_expr(s)
+                    # there is an array of sub-elements before (!) the base_expr clause of the current element
+                    # so we go through the sub-elements and must come at the end
                     $backtracking[] = $charPos;
                     for ($i = 1; $i < count($parsed); $i++) {
                         $backtracking[] = false; # backtracking only after n base_expr!
                     }
                 } elseif ($key === 'sub_tree' && $parsed !== false) {
+                    # we hold the current position and come back after n base_expr(s)
+                    # there is an array of sub-elements after(!) the base_expr clause of the current element
+                    # so we go through the sub-elements and must not come back at the end
                     for ($i = 1; $i < count($parsed); $i++) {
-                        $backtracking[] = false; # backtracking only after n base_expr!  TODO: we are on the wrong place, if there is no base_expr after this on a parent element (like IN (1,1) -> we are on "(" instead on ")")
+                        $backtracking[] = false; 
                     }
                 } else {
+                    # move the current pos after the keyword
                     # SELECT, WHERE, INSERT etc.
                     if (in_array($key, $this->reserved)) {
                         $charPos = stripos($sql, $key, $charPos);
@@ -1921,19 +1958,17 @@ if (!defined('HAVE_PHP_SQL_PARSER')) {
 
                     $parsed['position'] = $charPos + $pos;
                     $charPos += $pos + strlen($value);
-
+                    
                     $oldPos = array_pop($backtracking);
                     if (isset($oldPos) && $oldPos !== false) {
                         $charPos = $oldPos;
                     }
-
+                    
                 } else {
                     $this->lookForBaseExpression($sql, $charPos, $parsed[$key], $key, $backtracking);
                 }
             }
-
         }
-
     }
 
     class UnableToCalculatePositionException extends Exception {
