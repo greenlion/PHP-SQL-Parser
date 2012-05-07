@@ -955,26 +955,42 @@ if (!defined('HAVE_PHP_SQL_PARSER')) {
          then start is set to 0.
          */
         private function process_limit($tokens) {
-            $start = "";
-            $end = "";
+            $rowcount = "";
+            $offset = "";
+            
             $comma = -1;
+            $exchange = false;
 
             for ($i = 0; $i < count($tokens); ++$i) {
-                if (trim($tokens[$i]) === ",") {
+                $trim = trim($tokens[$i]);
+                if ($trim === ",") {
                     $comma = $i;
+                    break;
+                }
+                if ($trim ===  "OFFSET") {
+                    $comma = $i;
+                    $exchange = true;
                     break;
                 }
             }
 
             for ($i = 0; $i < $comma; ++$i) {
-                $start .= $tokens[$i];
+                if ($exchange) {
+                    $rowcount .= $tokens[$i];
+                } else {
+                    $offset .= $tokens[$i];
+                }
             }
 
             for ($i = $comma + 1; $i < count($tokens); ++$i) {
-                $end .= $tokens[$i];
+                if ($exchange) {
+                    $offset .= $tokens[$i];
+                } else {
+                    $rowcount .= $tokens[$i];
+                }
             }
-
-            return array('start' => trim($start), 'end' => trim($end));
+            
+            return array('offset' => trim($offset), 'rowcount' => trim($rowcount));
         }
 
         /* This function processes the SELECT section.  It splits the clauses at the commas.
