@@ -340,6 +340,10 @@ if (!defined('HAVE_PHP_SQL_PARSER')) {
                     $k = $i - 1;
                     $len = strlen($tokens[$i]);
                     while (($k >= 0) && ($len == strlen($tokens[$i]))) {
+                        if (!isset($tokens[$k])) {
+                            $k--;
+                            continue;
+                        }
                         $tokens[$i] = $tokens[$k] . $tokens[$i];
                         unset($tokens[$k]);
                         $k--;
@@ -352,6 +356,10 @@ if (!defined('HAVE_PHP_SQL_PARSER')) {
                     $k = $i + 1;
                     $len = strlen($tokens[$i]);
                     while (($k < $cnt) && ($len == strlen($tokens[$i]))) {
+                        if (!isset($tokens[$k])) {
+                            $k++;
+                            continue;
+                        }
                         $tokens[$i] .= $tokens[$k];
                         unset($tokens[$k]);
                         $k++;
@@ -1835,8 +1843,8 @@ if (!defined('HAVE_PHP_SQL_PARSER')) {
             $holdem = substr($sql, 0, $charPos) . "^" . substr($sql, $charPos);
             echo $spaces . $text . " key:" . $key . "  parsed:" . $parsed . " back:" . serialize($backtracking) . " "
                     . $holdem . "\n";
-        }        
-        
+        }
+
         public function setPositionsWithinSQL($sql, $parsed) {
             $charPos = 0;
             $backtracking = array();
@@ -1910,12 +1918,11 @@ if (!defined('HAVE_PHP_SQL_PARSER')) {
                         || ($key === 'expr_type' && $parsed === 'subquery')
                         || ($key === 'expr_type' && $parsed === 'table_expression')
                         || ($key === 'expr_type' && $parsed === 'record')
-                        || ($key === 'expr_type' && $parsed === 'in-list') 
-                        || ($key === 'alias' && $parsed !== false)) {
+                        || ($key === 'expr_type' && $parsed === 'in-list') || ($key === 'alias' && $parsed !== false)) {
                     # we hold the current position and come back after the next base_expr
                     # we do this, because the next base_expr contains the complete expression/subquery/record
                     # and we have to look into it too
-                    $backtracking[] = $charPos; 
+                    $backtracking[] = $charPos;
 
                 } elseif (($key === 'ref_clause' || $key === 'columns') && $parsed !== false) {
                     # we hold the current position and come back after n base_expr(s)
@@ -1930,7 +1937,7 @@ if (!defined('HAVE_PHP_SQL_PARSER')) {
                     # there is an array of sub-elements after(!) the base_expr clause of the current element
                     # so we go through the sub-elements and must not come back at the end
                     for ($i = 1; $i < count($parsed); $i++) {
-                        $backtracking[] = false; 
+                        $backtracking[] = false;
                     }
                 } else {
                     # move the current pos after the keyword
@@ -1950,7 +1957,7 @@ if (!defined('HAVE_PHP_SQL_PARSER')) {
                 if ($key === 'base_expr') {
 
                     #$this->printPos("0", $sql, $charPos, $key, $value, $backtracking);
-                    
+
                     $subject = substr($sql, $charPos);
                     $pos = $this->findPositionWithinString($subject, $value,
                             isset($parsed['expr_type']) ? $parsed['expr_type'] : 'alias');
@@ -1960,16 +1967,16 @@ if (!defined('HAVE_PHP_SQL_PARSER')) {
 
                     $parsed['position'] = $charPos + $pos;
                     $charPos += $pos + strlen($value);
-                    
+
                     #$this->printPos("1", $sql, $charPos, $key, $value, $backtracking);
-                    
+
                     $oldPos = array_pop($backtracking);
                     if (isset($oldPos) && $oldPos !== false) {
                         $charPos = $oldPos;
                     }
-                    
+
                     #$this->printPos("2", $sql, $charPos, $key, $value, $backtracking);
-                    
+
                 } else {
                     $this->lookForBaseExpression($sql, $charPos, $parsed[$key], $key, $backtracking);
                 }
