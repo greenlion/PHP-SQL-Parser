@@ -2,7 +2,7 @@
 /**
  * PHPSQLCreator
  * 
- * A pure PHP SQL creator, which generates SQL from the output of PLSQLParser.
+ * A pure PHP SQL creator, which generates SQL from the output of PHPSQLParser.
  * 
  * Copyright (c) 2012, André Rothe <arothe@phosco.info, phosco@gmx.de>
  * 
@@ -313,6 +313,7 @@ if (!defined('HAVE_PHP_SQL_CREATOR')) {
                 $sql .= $this->processColRef($v);
                 $sql .= $this->processConstant($v);
                 $sql .= $this->processOperator($v);
+                $sql .= $this->processInList($v);
                 $sql .= $this->processFunction($v);
                 $sql .= $this->processWhereExpression($v);
 
