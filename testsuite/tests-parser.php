@@ -35,6 +35,7 @@ require_once(dirname(__FILE__) . '/tests/parser/issue51.php');
 require_once(dirname(__FILE__) . '/tests/parser/issue52.php');
 require_once(dirname(__FILE__) . '/tests/parser/issue53.php');
 require_once(dirname(__FILE__) . '/tests/parser/issue54.php');
+require_once(dirname(__FILE__) . '/tests/parser/issue55.php');
 require_once(dirname(__FILE__) . '/tests/parser/left.php');
 require_once(dirname(__FILE__) . '/tests/parser/nested.php');
 require_once(dirname(__FILE__) . '/tests/parser/positions.php');
