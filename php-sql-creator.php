@@ -406,7 +406,8 @@ if (!defined('HAVE_PHP_SQL_CREATOR')) {
                 $len = strlen($sql);
                 $sql .= $this->processColRef($v);
                 $sql .= $this->processOperator($v);
-
+                $sql .= $this->processConstant($v);
+                
                 if ($len == strlen($sql)) {
                     throw new UnableToCreateSQLException('expression ref_clause', $k, $v, 'expr_type');
                 }
