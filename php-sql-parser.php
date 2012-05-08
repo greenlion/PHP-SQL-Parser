@@ -263,7 +263,51 @@ if (!defined('HAVE_PHP_SQL_PARSER')) {
             $tokens = $this->balanceBackticks($tokens);
             $tokens = $this->concatColReferences($tokens);
             $tokens = $this->balanceParenthesis($tokens);
+            $tokens = $this->balanceComments($tokens);
             return $tokens;
+        }
+
+        private function balanceComments($tokens) {
+
+            $i = 0;
+            $cnt = count($tokens);
+            $comment = false;
+
+            while ($i < $cnt) {
+
+                if (!isset($tokens[$i])) {
+                    $i++;
+                    continue;
+                }
+
+                $token = $tokens[$i];
+
+                if ($comment !== false) {
+                    unset($tokens[$i]);
+                    $tokens[$comment] .= $token;
+                }
+
+                if (($comment === false) && ($token === "/")) {
+                    if (isset($tokens[$i + 1]) && $tokens[$i + 1] === "*") {
+                        $comment = $i;
+                        $tokens[$i] = "/*";
+                        $i++;
+                        unset($tokens[$i]);
+                        continue;
+                    }
+                }
+
+                if (($comment !== false) && ($token === "*")) {
+                    if (isset($tokens[$i + 1]) && $tokens[$i + 1] === "/") {
+                        unset($tokens[$i + 1]);
+                        $tokens[$comment] .= "/";
+                        $comment = false;
+                    }
+                }
+
+                $i++;
+            }
+            return array_values($tokens);
         }
 
         private function balanceBackticks($tokens) {
@@ -959,7 +1003,7 @@ if (!defined('HAVE_PHP_SQL_PARSER')) {
         private function process_limit($tokens) {
             $rowcount = "";
             $offset = "";
-            
+
             $comma = -1;
             $exchange = false;
 
@@ -969,7 +1013,7 @@ if (!defined('HAVE_PHP_SQL_PARSER')) {
                     $comma = $i;
                     break;
                 }
-                if ($trim ===  "OFFSET") {
+                if ($trim === "OFFSET") {
                     $comma = $i;
                     $exchange = true;
                     break;
@@ -991,7 +1035,7 @@ if (!defined('HAVE_PHP_SQL_PARSER')) {
                     $rowcount .= $tokens[$i];
                 }
             }
-            
+
             return array('offset' => trim($offset), 'rowcount' => trim($rowcount));
         }
 
