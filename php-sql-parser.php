@@ -880,10 +880,12 @@ if (!defined('HAVE_PHP_SQL_PARSER')) {
                 $out['UPDATE'] = $this->process_from($out['UPDATE']);
             }
             if (!empty($out['GROUP'])) {
-                $out['GROUP'] = $this->process_group($out['GROUP'], $out['SELECT']);
+                # set empty array if we have partial SQL statement 
+                $out['GROUP'] = $this->process_group($out['GROUP'], isset($out['SELECT']) ? $out['SELECT'] : array());
             }
             if (!empty($out['ORDER'])) {
-                $out['ORDER'] = $this->process_order($out['ORDER'], $out['SELECT']);
+                # set empty array if we have partial SQL statement
+                $out['ORDER'] = $this->process_order($out['ORDER'], isset($out['SELECT']) ? $out['SELECT'] : array());
             }
             if (!empty($out['LIMIT'])) {
                 $out['LIMIT'] = $this->process_limit($out['LIMIT']);
@@ -1369,7 +1371,7 @@ if (!defined('HAVE_PHP_SQL_PARSER')) {
             return $out;
         }
 
-        private function process_group(&$tokens, &$select) {
+        private function process_group($tokens, $select) {
             $out = array();
             $parseInfo = $this->initParseInfoForOrder();
 
