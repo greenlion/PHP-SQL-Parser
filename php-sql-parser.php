@@ -32,12 +32,7 @@
 
 if (!defined('HAVE_PHP_SQL_PARSER')) {
 
-    /**
-     * This class implements some helper functions.
-     * @author arothe
-     *
-     */
-    class PHPSQLParserUtils {
+    class PHPSQLParserConstants {
 
         protected $reserved;
         protected $functions;
@@ -45,6 +40,106 @@ if (!defined('HAVE_PHP_SQL_PARSER')) {
         public function __construct() {
             $this->reserved = $this->getReservedWords();
             $this->functions = $this->getFunctionWords();
+        }
+
+        // set as protected
+        public function getFunctionWords() {
+            return array('ABS', 'ACOS', 'ADDDATE', 'ADDTIME', 'AES_ENCRYPT', 'AES_DECRYPT', 'AGAINST', 'ASCII', 'ASIN',
+                         'ATAN', 'AVG', 'BENCHMARK', 'BIN', 'BIT_AND', 'BIT_OR', 'BITCOUNT', 'BITLENGTH', 'CAST',
+                         'CEILING', 'CHAR', 'CHAR_LENGTH', 'CHARACTER_LENGTH', 'CHARSET', 'COALESCE', 'COERCIBILITY',
+                         'COLLATION', 'COMPRESS', 'CONCAT', 'CONCAT_WS', 'CONECTION_ID', 'CONV', 'CONVERT',
+                         'CONVERT_TZ', 'COS', 'COT', 'COUNT', 'CRC32', 'CURDATE', 'CURRENT_USER', 'CURRVAL', 'CURTIME',
+                         'DATABASE', 'DATE_ADD', 'DATE_DIFF', 'DATE_FORMAT', 'DATE_SUB', 'DAY', 'DAYNAME',
+                         'DAYOFMONTH', 'DAYOFWEEK', 'DAYOFYEAR', 'DECODE', 'DEFAULT', 'DEGREES', 'DES_DECRYPT',
+                         'DES_ENCRYPT', 'ELT', 'ENCODE', 'ENCRYPT', 'EXP', 'EXPORT_SET', 'EXTRACT', 'FIELD',
+                         'FIND_IN_SET', 'FLOOR', 'FORMAT', 'FOUND_ROWS', 'FROM_DAYS', 'FROM_UNIXTIME', 'GET_FORMAT',
+                         'GET_LOCK', 'GROUP_CONCAT', 'GREATEST', 'HEX', 'HOUR', 'IF', 'IFNULL', 'IN', 'INET_ATON',
+                         'INET_NTOA', 'INSERT', 'INSTR', 'INTERVAL', 'IS_FREE_LOCK', 'IS_USED_LOCK', 'LAST_DAY',
+                         'LAST_INSERT_ID', 'LCASE', 'LEAST', 'LEFT', 'LENGTH', 'LN', 'LOAD_FILE', 'LOCALTIME',
+                         'LOCALTIMESTAMP', 'LOCATE', 'LOG', 'LOG2', 'LOG10', 'LOWER', 'LPAD', 'LTRIM', 'MAKE_SET',
+                         'MAKEDATE', 'MAKETIME', 'MASTER_POS_WAIT', 'MATCH', 'MAX', 'MD5', 'MICROSECOND', 'MID', 'MIN',
+                         'MINUTE', 'MOD', 'MONTH', 'MONTHNAME', 'NEXTVAL', 'NOW', 'NULLIF', 'OCT', 'OCTET_LENGTH',
+                         'OLD_PASSWORD', 'ORD', 'PASSWORD', 'PERIOD_ADD', 'PERIOD_DIFF', 'PI', 'POSITION', 'POW',
+                         'POWER', 'QUARTER', 'QUOTE', 'RADIANS', 'RAND', 'RELEASE_LOCK', 'REPEAT', 'REPLACE',
+                         'REVERSE', 'RIGHT', 'ROUND', 'ROW_COUNT', 'RPAD', 'RTRIM', 'SEC_TO_TIME', 'SECOND',
+                         'SESSION_USER', 'SHA', 'SHA1', 'SIGN', 'SOUNDEX', 'SPACE', 'SQRT', 'STD', 'STDDEV',
+                         'STDDEV_POP', 'STDDEV_SAMP', 'STRCMP', 'STR_TO_DATE', 'SUBDATE', 'SUBSTRING',
+                         'SUBSTRING_INDEX', 'SUBTIME', 'SUM', 'SYSDATE', 'SYSTEM_USER', 'TAN', 'TIME', 'TIMEDIFF',
+                         'TIMESTAMP', 'TIMESTAMPADD', 'TIMESTAMPDIFF', 'TIME_FORMAT', 'TIME_TO_SEC', 'TO_DAYS', 'TRIM',
+                         'TRUNCATE', 'UCASE', 'UNCOMPRESS', 'UNCOMPRESSED_LENGTH', 'UNHEX', 'UNIX_TIMESTAMP', 'UPPER',
+                         'USER', 'UTC_DATE', 'UTC_TIME', 'UTC_TIMESTAMP', 'UUID', 'VAR_POP', 'VAR_SAMP', 'VARIANCE',
+                         'VERSION', 'WEEK', 'WEEKDAY', 'WEEKOFYEAR', 'YEAR', 'YEARWEEK');
+        }
+
+        // set as protected
+        public function getReservedWords() {
+            /* includes functions */
+            return array('ABS', 'ACOS', 'ADDDATE', 'ADDTIME', 'AES_ENCRYPT', 'AES_DECRYPT', 'AGAINST', 'ASCII', 'ASIN',
+                         'ATAN', 'AVG', 'BENCHMARK', 'BIN', 'BIT_AND', 'BIT_OR', 'BITCOUNT', 'BITLENGTH', 'CAST',
+                         'CEILING', 'CHAR', 'CHAR_LENGTH', 'CHARACTER_LENGTH', 'CHARSET', 'COALESCE', 'COERCIBILITY',
+                         'COLLATION', 'COMPRESS', 'CONCAT', 'CONCAT_WS', 'CONECTION_ID', 'CONV', 'CONVERT',
+                         'CONVERT_TZ', 'COS', 'COT', 'COUNT', 'CRC32', 'CURDATE', 'CURRENT_USER', 'CURRVAL', 'CURTIME',
+                         'DATABASE', 'DATE_ADD', 'DATE_DIFF', 'DATE_FORMAT', 'DATE_SUB', 'DAY', 'DAYNAME',
+                         'DAYOFMONTH', 'DAYOFWEEK', 'DAYOFYEAR', 'DECODE', 'DEFAULT', 'DEGREES', 'DES_DECRYPT',
+                         'DES_ENCRYPT', 'ELT', 'ENCODE', 'ENCRYPT', 'EXP', 'EXPORT_SET', 'EXTRACT', 'FIELD',
+                         'FIND_IN_SET', 'FLOOR', 'FORMAT', 'FOUND_ROWS', 'FROM_DAYS', 'FROM_UNIXTIME', 'GET_FORMAT',
+                         'GET_LOCK', 'GROUP_CONCAT', 'GREATEST', 'HEX', 'HOUR', 'IF', 'IFNULL', 'IN', 'INET_ATON',
+                         'INET_NTOA', 'INSERT', 'INSTR', 'INTERVAL', 'IS_FREE_LOCK', 'IS_USED_LOCK', 'LAST_DAY',
+                         'LAST_INSERT_ID', 'LCASE', 'LEAST', 'LEFT', 'LENGTH', 'LN', 'LOAD_FILE', 'LOCALTIME',
+                         'LOCALTIMESTAMP', 'LOCATE', 'LOG', 'LOG2', 'LOG10', 'LOWER', 'LPAD', 'LTRIM', 'MAKE_SET',
+                         'MAKEDATE', 'MAKETIME', 'MASTER_POS_WAIT', 'MATCH', 'MAX', 'MD5', 'MICROSECOND', 'MID', 'MIN',
+                         'MINUTE', 'MOD', 'MONTH', 'MONTHNAME', 'NEXTVAL', 'NOW', 'NULLIF', 'OCT', 'OCTET_LENGTH',
+                         'OLD_PASSWORD', 'ORD', 'PASSWORD', 'PERIOD_ADD', 'PERIOD_DIFF', 'PI', 'POSITION', 'POW',
+                         'POWER', 'QUARTER', 'QUOTE', 'RADIANS', 'RAND', 'RELEASE_LOCK', 'REPEAT', 'REPLACE',
+                         'REVERSE', 'RIGHT', 'ROUND', 'ROW_COUNT', 'RPAD', 'RTRIM', 'SEC_TO_TIME', 'SECOND',
+                         'SESSION_USER', 'SHA', 'SHA1', 'SIGN', 'SOUNDEX', 'SPACE', 'SQRT', 'STD', 'STDDEV',
+                         'STDDEV_POP', 'STDDEV_SAMP', 'STRCMP', 'STR_TO_DATE', 'SUBDATE', 'SUBSTRING',
+                         'SUBSTRING_INDEX', 'SUBTIME', 'SUM', 'SYSDATE', 'SYSTEM_USER', 'TAN', 'TIME', 'TIMEDIFF',
+                         'TIMESTAMP', 'TIMESTAMPADD', 'TIMESTAMPDIFF', 'TIME_FORMAT', 'TIME_TO_SEC', 'TO_DAYS', 'TRIM',
+                         'TRUNCATE', 'UCASE', 'UNCOMPRESS', 'UNCOMPRESSED_LENGTH', 'UNHEX', 'UNIX_TIMESTAMP', 'UPPER',
+                         'USER', 'UTC_DATE', 'UTC_TIME', 'UTC_TIMESTAMP', 'UUID', 'VAR_POP', 'VAR_SAMP', 'VARIANCE',
+                         'VERSION', 'WEEK', 'WEEKDAY', 'WEEKOFYEAR', 'YEAR', 'YEARWEEK', 'ADD', 'ALL', 'ALTER',
+                         'ANALYZE', 'AND', 'AS', 'ASC', 'ASENSITIVE', 'AUTO_INCREMENT', 'BDB', 'BEFORE', 'BERKELEYDB',
+                         'BETWEEN', 'BIGINT', 'BINARY', 'BLOB', 'BOTH', 'BY', 'CALL', 'CASCADE', 'CASE', 'CHANGE',
+                         'CHAR', 'CHARACTER', 'CHECK', 'COLLATE', 'COLUMN', 'COLUMNS', 'CONDITION', 'CONNECTION',
+                         'CONSTRAINT', 'CONTINUE', 'CREATE', 'CROSS', 'CURRENT_DATE', 'CURRENT_TIME',
+                         'CURRENT_TIMESTAMP', 'CURSOR', 'DATABASE', 'DATABASES', 'DAY_HOUR', 'DAY_MICROSECOND',
+                         'DAY_MINUTE', 'DAY_SECOND', 'DEC', 'DECIMAL', 'DECLARE', 'DEFAULT', 'DELAYED', 'DELETE',
+                         'DESC', 'DESCRIBE', 'DETERMINISTIC', 'DISTINCT', 'DISTINCTROW', 'DIV', 'DOUBLE', 'DROP',
+                         'ELSE', 'ELSEIF', 'END', 'ENCLOSED', 'ESCAPED', 'EXISTS', 'EXIT', 'EXPLAIN', 'FALSE', 'FETCH',
+                         'FIELDS', 'FLOAT', 'FOR', 'FORCE', 'FOREIGN', 'FOUND', 'FRAC_SECOND', 'FROM', 'FULLTEXT',
+                         'GRANT', 'GROUP', 'HAVING', 'HIGH_PRIORITY', 'HOUR_MICROSECOND', 'HOUR_MINUTE', 'HOUR_SECOND',
+                         'IF', 'IGNORE', 'IN', 'INDEX', 'INFILE', 'INNER', 'INNODB', 'INOUT', 'INSENSITIVE', 'INSERT',
+                         'INT', 'INTEGER', 'INTERVAL', 'INTO', 'IO_THREAD', 'IS', 'ITERATE', 'JOIN', 'KEY', 'KEYS',
+                         'KILL', 'LEADING', 'LEAVE', 'LEFT', 'LIKE', 'LIMIT', 'LINES', 'LOAD', 'LOCALTIME',
+                         'LOCALTIMESTAMP', 'LOCK', 'LONG', 'LONGBLOB', 'LONGTEXT', 'LOOP', 'LOW_PRIORITY',
+                         'MASTER_SERVER_ID', 'MATCH', 'MEDIUMBLOB', 'MEDIUMINT', 'MEDIUMTEXT', 'MIDDLEINT',
+                         'MINUTE_MICROSECOND', 'MINUTE_SECOND', 'MOD', 'NATURAL', 'NOT', 'NO_WRITE_TO_BINLOG', 'NULL',
+                         'NUMERIC', 'ON', 'OPTIMIZE', 'OPTION', 'OPTIONALLY', 'OR', 'ORDER', 'OUT', 'OUTER', 'OUTFILE',
+                         'PRECISION', 'PRIMARY', 'PRIVILEGES', 'PROCEDURE', 'PURGE', 'READ', 'REAL', 'REFERENCES',
+                         'REGEXP', 'RENAME', 'REPEAT', 'REPLACE', 'REQUIRE', 'RESTRICT', 'RETURN', 'REVOKE', 'RIGHT',
+                         'RLIKE', 'SECOND_MICROSECOND', 'SELECT', 'SENSITIVE', 'SEPARATOR', 'SET', 'SHOW', 'SMALLINT',
+                         'SOME', 'SONAME', 'SPATIAL', 'SPECIFIC', 'SQL', 'SQLEXCEPTION', 'SQLSTATE', 'SQLWARNING',
+                         'SQL_BIG_RESULT', 'SQL_CALC_FOUND_ROWS', 'SQL_SMALL_RESULT', 'SQL_TSI_DAY',
+                         'SQL_TSI_FRAC_SECOND', 'SQL_TSI_HOUR', 'SQL_TSI_MINUTE', 'SQL_TSI_MONTH', 'SQL_TSI_QUARTER',
+                         'SQL_TSI_SECOND', 'SQL_TSI_WEEK', 'SQL_TSI_YEAR', 'SSL', 'STARTING', 'STRAIGHT_JOIN',
+                         'STRIPED', 'TABLE', 'TABLES', 'TERMINATED', 'THEN', 'TIMESTAMPADD', 'TIMESTAMPDIFF',
+                         'TINYBLOB', 'TINYINT', 'TINYTEXT', 'TO', 'TRAILING', 'TRUE', 'UNDO', 'UNION', 'UNIQUE',
+                         'UNLOCK', 'UNSIGNED', 'UPDATE', 'USAGE', 'USE', 'USER_RESOURCES', 'USING', 'UTC_DATE',
+                         'UTC_TIME', 'UTC_TIMESTAMP', 'VALUES', 'VARBINARY', 'VARCHAR', 'VARCHARACTER', 'VARYING',
+                         'WHEN', 'WHERE', 'WHILE', 'WITH', 'WRITE', 'XOR', 'YEAR_MONTH', 'ZEROFILL');
+        }
+    }
+
+    /**
+     * This class implements some helper functions.
+     * @author arothe
+     *
+     */
+    class PHPSQLParserUtils extends PHPSQLParserConstants {
+
+        public function __construct() {
+            parent::__construct();
         }
 
         /**
@@ -63,6 +158,29 @@ if (!defined('HAVE_PHP_SQL_PARSER')) {
                     print $x . "\n";
                 }
             }
+        }
+
+        /**
+         * 
+         * Change the case of the values of an array.
+         * 
+         * @param Array of Strings $arr
+         * @param unknown_type $case (CASE_LOWER or CASE_UPPER)
+         * @throws InvalidArgumentException if the first argument is not an array
+         */
+        protected function changeCaseForArrayValues($arr, $case) {
+            if (!is_array($arr)) {
+                throw new InvalidArgumentException("first argument must be an array");
+            }
+            for ($i = 0; $i < count($arr); ++$i) {
+                if ($case == CASE_LOWER) {
+                    $arr[$i] = strtolower($arr[$i]);
+                }
+                if ($case == CASE_UPPER) {
+                    $arr[$i] = strtoupper($arr[$i]);
+                }
+            }
+            return $arr;
         }
 
         /**
@@ -96,122 +214,6 @@ if (!defined('HAVE_PHP_SQL_PARSER')) {
 
             $start = $length * -1;
             return (substr($haystack, $start) === $needle);
-        }
-
-        protected function getFunctionWords() {
-            $result = array('abs', 'acos', 'adddate', 'addtime', 'aes_encrypt', 'aes_decrypt', 'against', 'ascii',
-                            'asin', 'atan', 'avg', 'benchmark', 'bin', 'bit_and', 'bit_or', 'bitcount', 'bitlength',
-                            'cast', 'ceiling', 'char', 'char_length', 'character_length', 'charset', 'coalesce',
-                            'coercibility', 'collation', 'compress', 'concat', 'concat_ws', 'conection_id', 'conv',
-                            'convert', 'convert_tz', 'cos', 'cot', 'count', 'crc32', 'curdate', 'current_user',
-                            'currval', 'curtime', 'database', 'date_add', 'date_diff', 'date_format', 'date_sub',
-                            'day', 'dayname', 'dayofmonth', 'dayofweek', 'dayofyear', 'decode', 'default', 'degrees',
-                            'des_decrypt', 'des_encrypt', 'elt', 'encode', 'encrypt', 'exp', 'export_set', 'extract',
-                            'field', 'find_in_set', 'floor', 'format', 'found_rows', 'from_days', 'from_unixtime',
-                            'get_format', 'get_lock', 'group_concat', 'greatest', 'hex', 'hour', 'if', 'ifnull', 'in',
-                            'inet_aton', 'inet_ntoa', 'insert', 'instr', 'interval', 'is_free_lock', 'is_used_lock',
-                            'last_day', 'last_insert_id', 'lcase', 'least', 'left', 'length', 'ln', 'load_file',
-                            'localtime', 'localtimestamp', 'locate', 'log', 'log2', 'log10', 'lower', 'lpad', 'ltrim',
-                            'make_set', 'makedate', 'maketime', 'master_pos_wait', 'match', 'max', 'md5',
-                            'microsecond', 'mid', 'min', 'minute', 'mod', 'month', 'monthname', 'nextval', 'now',
-                            'nullif', 'oct', 'octet_length', 'old_password', 'ord', 'password', 'period_add',
-                            'period_diff', 'pi', 'position', 'pow', 'power', 'quarter', 'quote', 'radians', 'rand',
-                            'release_lock', 'repeat', 'replace', 'reverse', 'right', 'round', 'row_count', 'rpad',
-                            'rtrim', 'sec_to_time', 'second', 'session_user', 'sha', 'sha1', 'sign', 'soundex',
-                            'space', 'sqrt', 'std', 'stddev', 'stddev_pop', 'stddev_samp', 'strcmp', 'str_to_date',
-                            'subdate', 'substring', 'substring_index', 'subtime', 'sum', 'sysdate', 'system_user',
-                            'tan', 'time', 'timediff', 'timestamp', 'timestampadd', 'timestampdiff', 'time_format',
-                            'time_to_sec', 'to_days', 'trim', 'truncate', 'ucase', 'uncompress', 'uncompressed_length',
-                            'unhex', 'unix_timestamp', 'upper', 'user', 'utc_date', 'utc_time', 'utc_timestamp',
-                            'uuid', 'var_pop', 'var_samp', 'variance', 'version', 'week', 'weekday', 'weekofyear',
-                            'year', 'yearweek');
-
-            return $this->changeCaseForArrayValues($result, CASE_UPPER);
-        }
-
-        protected function getReservedWords() {
-            /* includes functions */
-            $result = array('abs', 'acos', 'adddate', 'addtime', 'aes_encrypt', 'aes_decrypt', 'against', 'ascii',
-                            'asin', 'atan', 'avg', 'benchmark', 'bin', 'bit_and', 'bit_or', 'bitcount', 'bitlength',
-                            'cast', 'ceiling', 'char', 'char_length', 'character_length', 'charset', 'coalesce',
-                            'coercibility', 'collation', 'compress', 'concat', 'concat_ws', 'conection_id', 'conv',
-                            'convert', 'convert_tz', 'cos', 'cot', 'count', 'crc32', 'curdate', 'current_user',
-                            'currval', 'curtime', 'database', 'date_add', 'date_diff', 'date_format', 'date_sub',
-                            'day', 'dayname', 'dayofmonth', 'dayofweek', 'dayofyear', 'decode', 'default', 'degrees',
-                            'des_decrypt', 'des_encrypt', 'elt', 'encode', 'encrypt', 'exp', 'export_set', 'extract',
-                            'field', 'find_in_set', 'floor', 'format', 'found_rows', 'from_days', 'from_unixtime',
-                            'get_format', 'get_lock', 'group_concat', 'greatest', 'hex', 'hour', 'if', 'ifnull', 'in',
-                            'inet_aton', 'inet_ntoa', 'insert', 'instr', 'interval', 'is_free_lock', 'is_used_lock',
-                            'last_day', 'last_insert_id', 'lcase', 'least', 'left', 'length', 'ln', 'load_file',
-                            'localtime', 'localtimestamp', 'locate', 'log', 'log2', 'log10', 'lower', 'lpad', 'ltrim',
-                            'make_set', 'makedate', 'maketime', 'master_pos_wait', 'match', 'max', 'md5',
-                            'microsecond', 'mid', 'min', 'minute', 'mod', 'month', 'monthname', 'nextval', 'now',
-                            'nullif', 'oct', 'octet_length', 'old_password', 'ord', 'password', 'period_add',
-                            'period_diff', 'pi', 'position', 'pow', 'power', 'quarter', 'quote', 'radians', 'rand',
-                            'release_lock', 'repeat', 'replace', 'reverse', 'right', 'round', 'row_count', 'rpad',
-                            'rtrim', 'sec_to_time', 'second', 'session_user', 'sha', 'sha1', 'sign', 'soundex',
-                            'space', 'sqrt', 'std', 'stddev', 'stddev_pop', 'stddev_samp', 'strcmp', 'str_to_date',
-                            'subdate', 'substring', 'substring_index', 'subtime', 'sum', 'sysdate', 'system_user',
-                            'tan', 'time', 'timediff', 'timestamp', 'timestampadd', 'timestampdiff', 'time_format',
-                            'time_to_sec', 'to_days', 'trim', 'truncate', 'ucase', 'uncompress', 'uncompressed_length',
-                            'unhex', 'unix_timestamp', 'upper', 'user', 'utc_date', 'utc_time', 'utc_timestamp',
-                            'uuid', 'var_pop', 'var_samp', 'variance', 'version', 'week', 'weekday', 'weekofyear',
-                            'year', 'yearweek', 'add', 'all', 'alter', 'analyze', 'and', 'as', 'asc', 'asensitive',
-                            'auto_increment', 'bdb', 'before', 'berkeleydb', 'between', 'bigint', 'binary', 'blob',
-                            'both', 'by', 'call', 'cascade', 'case', 'change', 'char', 'character', 'check', 'collate',
-                            'column', 'columns', 'condition', 'connection', 'constraint', 'continue', 'create',
-                            'cross', 'current_date', 'current_time', 'current_timestamp', 'cursor', 'database',
-                            'databases', 'day_hour', 'day_microsecond', 'day_minute', 'day_second', 'dec', 'decimal',
-                            'declare', 'default', 'delayed', 'delete', 'desc', 'describe', 'deterministic', 'distinct',
-                            'distinctrow', 'div', 'double', 'drop', 'else', 'elseif', 'end', 'enclosed', 'escaped',
-                            'exists', 'exit', 'explain', 'false', 'fetch', 'fields', 'float', 'for', 'force',
-                            'foreign', 'found', 'frac_second', 'from', 'fulltext', 'grant', 'group', 'having',
-                            'high_priority', 'hour_microsecond', 'hour_minute', 'hour_second', 'if', 'ignore', 'in',
-                            'index', 'infile', 'inner', 'innodb', 'inout', 'insensitive', 'insert', 'int', 'integer',
-                            'interval', 'into', 'io_thread', 'is', 'iterate', 'join', 'key', 'keys', 'kill', 'leading',
-                            'leave', 'left', 'like', 'limit', 'lines', 'load', 'localtime', 'localtimestamp', 'lock',
-                            'long', 'longblob', 'longtext', 'loop', 'low_priority', 'master_server_id', 'match',
-                            'mediumblob', 'mediumint', 'mediumtext', 'middleint', 'minute_microsecond',
-                            'minute_second', 'mod', 'natural', 'not', 'no_write_to_binlog', 'null', 'numeric', 'on',
-                            'optimize', 'option', 'optionally', 'or', 'order', 'out', 'outer', 'outfile', 'precision',
-                            'primary', 'privileges', 'procedure', 'purge', 'read', 'real', 'references', 'regexp',
-                            'rename', 'repeat', 'replace', 'require', 'restrict', 'return', 'revoke', 'right', 'rlike',
-                            'second_microsecond', 'select', 'sensitive', 'separator', 'set', 'show', 'smallint',
-                            'some', 'soname', 'spatial', 'specific', 'sql', 'sqlexception', 'sqlstate', 'sqlwarning',
-                            'sql_big_result', 'sql_calc_found_rows', 'sql_small_result', 'sql_tsi_day',
-                            'sql_tsi_frac_second', 'sql_tsi_hour', 'sql_tsi_minute', 'sql_tsi_month',
-                            'sql_tsi_quarter', 'sql_tsi_second', 'sql_tsi_week', 'sql_tsi_year', 'ssl', 'starting',
-                            'straight_join', 'striped', 'table', 'tables', 'terminated', 'then', 'timestampadd',
-                            'timestampdiff', 'tinyblob', 'tinyint', 'tinytext', 'to', 'trailing', 'true', 'undo',
-                            'union', 'unique', 'unlock', 'unsigned', 'update', 'usage', 'use', 'user_resources',
-                            'using', 'utc_date', 'utc_time', 'utc_timestamp', 'values', 'varbinary', 'varchar',
-                            'varcharacter', 'varying', 'when', 'where', 'while', 'with', 'write', 'xor', 'year_month',
-                            'zerofill');
-
-            return $this->changeCaseForArrayValues($result, CASE_UPPER);
-        }
-
-        /**
-         * 
-         * Change the case of the values of an array.
-         * 
-         * @param Array of Strings $arr
-         * @param unknown_type $case (CASE_LOWER or CASE_UPPER)
-         * @throws InvalidArgumentException if the first argument is not an array
-         */
-        protected function changeCaseForArrayValues($arr, $case) {
-            if (!is_array($arr)) {
-                throw new InvalidArgumentException("first argument must be an array");
-            }
-            for ($i = 0; $i < count($arr); ++$i) {
-                if ($case == CASE_LOWER) {
-                    $arr[$i] = strtolower($arr[$i]);
-                }
-                if ($case == CASE_UPPER) {
-                    $arr[$i] = strtoupper($arr[$i]);
-                }
-            }
-            return $arr;
         }
     }
 
@@ -310,6 +312,10 @@ if (!defined('HAVE_PHP_SQL_PARSER')) {
             return array_values($tokens);
         }
 
+        private function isBacktick($token) {
+            return ($token === "'" || $token === "\"" || $token === "`");
+        }
+        
         private function balanceBackticks($tokens) {
             $i = 0;
             $cnt = count($tokens);
@@ -322,7 +328,7 @@ if (!defined('HAVE_PHP_SQL_PARSER')) {
 
                 $token = $tokens[$i];
 
-                if (in_array($token, array("'", "\"", "`"))) {
+                if ($this->isBacktick($token)) {
                     $tokens = $this->balanceCharacter($tokens, $i, $token);
                 }
 
