@@ -217,6 +217,31 @@ if (!defined('HAVE_PHP_SQL_PARSER')) {
         }
     }
 
+    class LexerSplitter {
+
+        private $splitters;
+        private $tokenSize;
+
+        public function __construct() {
+            $splitters = $this->getSplitArray();
+            $this->tokenSize = strlen($splitters[0]); # should be the largest
+            $this->splitters = array_flip($splitters);
+        }
+
+        private function getSplitArray() {
+            return array("\r\n", "!=", ">=", "<=", "<>", "\\", "&&", ">", "<", "|", "=", "^", "(", ")", "\t", "\n",
+                         "'", "\"", "`", ",", "@", " ", "+", "-", "*", "/", ";");
+        }
+
+        public function getMaxLengthOfSplitter() {
+            return $this->tokenSize;
+        }
+        
+        public function isSplitter($token) {
+            return isset($this->splitters[$token]);
+        }
+    }
+
     /**
      * This class splits the SQL string into little parts, which the parser can
      * use to build the result array.
@@ -226,7 +251,10 @@ if (!defined('HAVE_PHP_SQL_PARSER')) {
      */
     class PHPSQLLexer extends PHPSQLParserUtils {
 
+        private $splitters;
+
         public function __construct() {
+            $this->splitters = new LexerSplitter();
             parent::__construct();
         }
 
@@ -237,24 +265,32 @@ if (!defined('HAVE_PHP_SQL_PARSER')) {
 
             $tokens = array();
             $token = "";
-            $splitter = array("\r\n", "!=", ">=", "<=", "<>", "\\", "&&", ">", "<", "|", "=", "^", "(", ")", "\t",
-                              "\n", "'", "\"", "`", ",", "@", " ", "+", "-", "*", "/", ";");
 
-            while (strlen($sql) > 0) {
+            $splitLen = $this->splitters->getMaxLengthOfSplitter();
+            $found = false;
+            $len = strlen($sql);
+            $pos = 0;
 
-                $idx = $this->startsWith($sql, $splitter);
-                if ($idx === false) {
-                    $token .= $sql[0];
-                    $sql = substr($sql, 1);
-                    continue;
+            while ($pos < $len) {
+
+                for ($i = $splitLen; $i > 0; $i--) {
+                    $substr = substr($sql, $pos, $i);
+                    if ($this->splitters->isSplitter($substr)) {
+
+                        if ($token !== "") {
+                            $tokens[] = $token;
+                        }
+
+                        $tokens[] = $substr;
+                        $pos += $i;
+                        $token = "";
+
+                        continue 2;
+                    }
                 }
 
-                if ($token !== "") {
-                    $tokens[] = $token;
-                }
-                $tokens[] = $splitter[$idx];
-                $sql = substr($sql, strlen($splitter[$idx]));
-                $token = "";
+                $token .= $sql[$pos];
+                $pos++;
             }
 
             if ($token !== "") {
