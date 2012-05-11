@@ -315,7 +315,7 @@ if (!defined('HAVE_PHP_SQL_PARSER')) {
         private function isBacktick($token) {
             return ($token === "'" || $token === "\"" || $token === "`");
         }
-        
+
         private function balanceBackticks($tokens) {
             $i = 0;
             $cnt = count($tokens);
@@ -733,14 +733,14 @@ if (!defined('HAVE_PHP_SQL_PARSER')) {
 
                 case 'USER':
                 # prevent wrong processing as keyword
-                    if (in_array($prev_category, array('CREATE', 'RENAME', 'DROP'), true)) {
+                    if ($prev_category === 'CREATE' || $prev_category === 'RENAME' || $prev_category === 'DROP') {
                         $token_category = $upper;
                     }
                     break;
 
                 case 'VIEW':
                 # prevent wrong processing as keyword
-                    if (in_array($prev_category, array('CREATE', 'ALTER', 'DROP'), true)) {
+                    if ($prev_category === 'CREATE' || $prev_category === 'ALTER' || $prev_category === 'DROP') {
                         $token_category = $upper;
                     }
                     break;
@@ -782,7 +782,8 @@ if (!defined('HAVE_PHP_SQL_PARSER')) {
                     break;
 
                 case 'CACHE':
-                    if (($prev_category === "") || (in_array($prev_category, array('RESET', 'FLUSH', 'LOAD')))) {
+                    if ($prev_category === "" || $prev_category === 'RESET' || $prev_category === 'FLUSH'
+                            || $prev_category === 'LOAD') {
                         $token_category = $upper;
                         continue 2;
                     }
@@ -1473,7 +1474,7 @@ if (!defined('HAVE_PHP_SQL_PARSER')) {
                     continue;
                 }
 
-                if (in_array($trim[$i], array("'", '"'))) {
+                if ($trim[$i] === "'" || $trim[$i] === '"') {
                     $string++;
                 }
 
@@ -1544,7 +1545,8 @@ if (!defined('HAVE_PHP_SQL_PARSER')) {
 
                     # if we have a colref followed by a parenthesis pair,
                     # it isn't a colref, it is a user-function
-                    if (in_array($parseInfo['prevTokenType'], array('colref', 'function', 'aggregate_function'))) {
+                    if ($parseInfo['prevTokenType'] === 'colref' || $parseInfo['prevTokenType'] === 'function'
+                            || $parseInfo['prevTokenType'] === 'aggregate_function') {
 
                         $tmptokens = $this->split_sql($this->removeParenthesisFromStart($parseInfo['trim']));
                         foreach ($tmptokens as $k => $v) {
@@ -1608,7 +1610,8 @@ if (!defined('HAVE_PHP_SQL_PARSER')) {
                         }
 
                         $last = array_pop($parseInfo['expr']);
-                        if (!in_array($last['expr_type'], array('colref', 'const', 'expression'))) {
+                        if ($last['expr_type'] !== 'colref' && $last['expr_type'] !== 'const'
+                                && $last['expr_type'] !== 'expression') {
                             $parseInfo['expr'][] = $last;
                             $parseInfo['tokenType'] = "colref";
                             break;
@@ -1667,8 +1670,10 @@ if (!defined('HAVE_PHP_SQL_PARSER')) {
                     // differ between preceding sign and operator
                         $parseInfo['processed'] = false;
 
-                        if (in_array($parseInfo['prevTokenType'],
-                                array('colref', 'function', 'aggregate_function', 'const', 'subquery'))) {
+                        if ($parseInfo['prevTokenType'] === 'colref' || $parseInfo['prevTokenType'] === 'function'
+                                || $parseInfo['prevTokenType'] === 'aggregate_function'
+                                || $parseInfo['prevTokenType'] === 'const'
+                                || $parseInfo['prevTokenType'] === 'subquery') {
                             $parseInfo['tokenType'] = "operator";
                         } else {
                             $parseInfo['tokenType'] = "sign";
@@ -1705,7 +1710,8 @@ if (!defined('HAVE_PHP_SQL_PARSER')) {
                 }
 
                 /* is a reserved word? */
-                if (!in_array($parseInfo['tokenType'], array('operator', 'in-list', 'function', 'aggregate_function'))
+                if ($parseInfo['tokenType'] !== 'operator' && $parseInfo['tokenType'] !== 'in-list'
+                        && $parseInfo['tokenType'] !== 'function' && $parseInfo['tokenType'] !== 'aggregate_function'
                         && in_array($parseInfo['upper'], $this->reserved)) {
 
                     if (!in_array($parseInfo['upper'], $this->functions)) {
@@ -1981,8 +1987,7 @@ if (!defined('HAVE_PHP_SQL_PARSER')) {
 
         private function lookForBaseExpression($sql, &$charPos, &$parsed, $key, &$backtracking) {
             if (!is_numeric($key)) {
-                if (in_array($key, array('UNION', 'UNION ALL'), true)
-                        || ($key === 'expr_type' && $parsed === 'expression')
+                if (($key === 'UNION' || $key === 'UNION ALL') || ($key === 'expr_type' && $parsed === 'expression')
                         || ($key === 'expr_type' && $parsed === 'subquery')
                         || ($key === 'expr_type' && $parsed === 'table_expression')
                         || ($key === 'expr_type' && $parsed === 'record')
