@@ -418,9 +418,7 @@ if (!defined('HAVE_PHP_SQL_PARSER')) {
                     continue;
                 }
 
-                $trim = trim($tokens[$i]);
-
-                if ($this->startsWith($tokens[$i], '.') !== false) {
+                if ($tokens[$i][0] === ".") {
 
                     // concat the previous tokens, till the token has been changed
                     $k = $i - 1;
