@@ -729,7 +729,6 @@ if (!defined('HAVE_PHP_SQL_PARSER')) {
                 case 'TRIGGER':
                 case 'DATA':
                 case 'DO':
-                case 'PASSWORD':
                 case 'PLUGIN':
                 case 'FROM':
                 case 'FLUSH':
@@ -752,6 +751,13 @@ if (!defined('HAVE_PHP_SQL_PARSER')) {
                     $token_category = $upper;
                     break;
 
+                case 'PASSWORD':
+                	# prevent wrong handling of PASSWORD as keyword
+                	if ($prev_category == 'SET') {
+                		$token_category = $upper;
+                	}
+                	break;    
+                    
                 case 'INTO':
                 # prevent wrong handling of CACHE within LOAD INDEX INTO CACHE...
                     if ($prev_category === 'LOAD') {
