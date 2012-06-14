@@ -1415,10 +1415,11 @@ if (!defined('HAVE_PHP_SQL_PARSER')) {
             if ($parseInfo['type'] === "expression") {
                 $expr = $this->process_select_expr($parseInfo['expr']);
                 $expr['direction'] = $parseInfo['dir'];
+                unset($expr['alias']);
                 return $expr;
             }
             
-            return array('type' => $parseInfo['type'], 'base_expr' => $parseInfo['expr'],
+            return array('expr_type' => $parseInfo['type'], 'base_expr' => $parseInfo['expr'],
                          'direction' => $parseInfo['dir']);
         }
 

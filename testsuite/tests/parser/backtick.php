@@ -9,7 +9,7 @@ $parser->parse($sql);
 $p = $parser->parsed;
 ok($parser->parsed['SELECT'][0]['alias']['name'] == 'an alias');
 ok($parser->parsed['SELECT'][0]['sub_tree'][4]['base_expr'] == 'c1.`some column`');
-ok($parser->parsed['GROUP'][0]['type'] == 'alias');
+ok($parser->parsed['GROUP'][0]['expr_type'] == 'alias');
 
 
 $sql = "INSERT INTO test (`name`) VALUES ('ben\\'s test containing an escaped quote')";
