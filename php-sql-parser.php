@@ -1410,14 +1410,14 @@ if (!defined('HAVE_PHP_SQL_PARSER')) {
                         $parseInfo['type'] = 'alias';
                     }
                 }
-
-                if (!$parseInfo['type']) {
-                    $parseInfo['type'] = "expression";
-                }
             }
 
-            return array('type' => $parseInfo['type'], 'base_expr' => $parseInfo['expr'],
+            if ($parseInfo['type'] !== "expression") {
+                return array('type' => $parseInfo['type'], 'base_expr' => $parseInfo['expr'],
                          'direction' => $parseInfo['dir']);
+            }
+            
+            return $this->process_select_expr($parseInfo['expr']);
         }
 
         private function initParseInfoForOrder() {
