@@ -77,6 +77,9 @@ if (!defined('HAVE_PHP_SQL_CREATOR')) {
             if (isset($parsed['ORDER'])) {
                 $sql .= " " . $this->processORDER($parsed['ORDER']);
             }
+            if (isset($parsed['LIMIT'])) {
+                $sql .= " " . $this->processLIMIT($parsed['LIMIT']);
+            }
             return $sql;
         }
 
@@ -146,10 +149,11 @@ if (!defined('HAVE_PHP_SQL_CREATOR')) {
             $sql = "";
             foreach ($parsed as $k => $v) {
                 $len = strlen($sql);
-                $sql .= $this->processOrderByExpression($v);
+                $sql .= $this->processOrderByAlias($v);
+                $sql .= $this->processColRef($v);
 
                 if ($len == strlen($sql)) {
-                    throw new UnableToCreateSQLException('ORDER', $k, $v, 'type');
+                    throw new UnableToCreateSQLException('ORDER', $k, $v, 'expr_type');
                 }
 
                 $sql .= ",";
@@ -158,14 +162,22 @@ if (!defined('HAVE_PHP_SQL_CREATOR')) {
             return "ORDER BY " . $sql;
         }
 
+        protected function processLIMIT($parsed) {
+            $sql = ($parsed['offset'] ? $parsed['offset'] . ", " : "") . $parsed['rowcount'];
+            if ($sql === "") {
+                throw new UnableToCreateSQLException('LIMIT', 'rowcount', $parsed, 'rowcount');
+            }
+            return "LIMIT " . $sql;
+        }
+
         protected function processGROUP($parsed) {
             $sql = "";
             foreach ($parsed as $k => $v) {
                 $len = strlen($sql);
-                $sql .= $this->processGroupByExpression($v);
+                $sql .= $this->processColRef($v);
 
                 if ($len == strlen($sql)) {
-                    throw new UnableToCreateSQLException('GROUP', $k, $v, 'type');
+                    throw new UnableToCreateSQLException('GROUP', $k, $v, 'expr_type');
                 }
 
                 $sql .= ",";
@@ -328,18 +340,25 @@ if (!defined('HAVE_PHP_SQL_CREATOR')) {
             return $sql;
         }
 
-        protected function processOrderByExpression($parsed) {
-            if ($parsed['type'] !== 'expression') {
+        protected function processOrderByAlias($parsed) {
+            if ($parsed['expr_type'] !== 'alias') {
                 return "";
             }
-            return $parsed['base_expr'] . " " . $parsed['direction'];
+            return $parsed['base_expr'] . $this->processDirection($parsed['direction']);
         }
 
-        protected function processGroupByExpression($parsed) {
-            if ($parsed['type'] !== 'expression') {
+        protected function processLimitRowCount($key, $value) {
+            if ($key != 'rowcount') {
                 return "";
             }
-            return $parsed['base_expr'];
+            return $value;
+        }
+
+        protected function processLimitOffset($key, $value) {
+            if ($key !== 'offset') {
+                return "";
+            }
+            return $value;
         }
 
         protected function processFunction($parsed) {
@@ -408,7 +427,7 @@ if (!defined('HAVE_PHP_SQL_CREATOR')) {
                 $sql .= $this->processColRef($v);
                 $sql .= $this->processOperator($v);
                 $sql .= $this->processConstant($v);
-                
+
                 if ($len == strlen($sql)) {
                     throw new UnableToCreateSQLException('expression ref_clause', $k, $v, 'expr_type');
                 }
@@ -528,6 +547,14 @@ if (!defined('HAVE_PHP_SQL_CREATOR')) {
             if (isset($parsed['alias'])) {
                 $sql .= $this->processAlias($parsed['alias']);
             }
+            if (isset($parsed['direction'])) {
+                $sql .= $this->processDirection($parsed['direction']);
+            }
+            return $sql;
+        }
+
+        protected function processDirection($parsed) {
+            $sql = ($parsed ? " " . $parsed : "");
             return $sql;
         }
 
