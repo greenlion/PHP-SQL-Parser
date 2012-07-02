@@ -1168,6 +1168,7 @@ if (!defined('HAVE_PHP_SQL_PARSER')) {
 
                 if (isset($prev)
                         && ($prev['expr_type'] == 'reserved' || $prev['expr_type'] == 'const'
+                                || $prev['expr_type'] == 'aggregate_function'
                                 || $prev['expr_type'] == 'function' || $prev['expr_type'] == 'expression'
                                 || $prev['expr_type'] == 'subquery' || $prev['expr_type'] == 'colref')) {
 
