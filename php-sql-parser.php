@@ -1944,7 +1944,7 @@ if (!defined('HAVE_PHP_SQL_PARSER')) {
                     $ok = $ok
                             && ($after === "" || in_array($after, self::$allowedOnOperator, true)
                                     || (strtolower($after) >= 'a' && strtolower($after) <= 'z')
-                                    || ($after >= '0' && $after <= '9'));
+                                    || ($after >= '0' && $after <= '9') || ($after === '?'));
 
                     if (!$ok) {
                         $offset = $pos + 1;
