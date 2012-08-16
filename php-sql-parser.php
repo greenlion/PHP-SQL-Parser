@@ -1643,7 +1643,6 @@ if (!defined('HAVE_PHP_SQL_PARSER')) {
                     case '>':
                     case 'IS':
                     case 'NOT':
-                    case 'NULL':
                     case '<<':
                     case '<=':
                     case '<':
@@ -1664,6 +1663,11 @@ if (!defined('HAVE_PHP_SQL_PARSER')) {
                         $parseInfo['tokenType'] = "operator";
                         break;
 
+                    case 'NULL':
+                    	$parseInfo['processed'] = false;
+                    	$parseInfo['tokenType'] = 'const';
+                    	break;
+                    	
                     case '-':
                     case '+':
                     // differ between preceding sign and operator
@@ -1713,33 +1717,37 @@ if (!defined('HAVE_PHP_SQL_PARSER')) {
                         && $parseInfo['tokenType'] !== 'function' && $parseInfo['tokenType'] !== 'aggregate_function'
                         && in_array($parseInfo['upper'], parent::$reserved)) {
 
-                    if (!in_array($parseInfo['upper'], parent::$functions)) {
-                        $parseInfo['tokenType'] = 'reserved';
+                    switch ($parseInfo['upper']) {
+                    case 'AVG':
+                    case 'SUM':
+                    case 'COUNT':
+                    case 'MIN':
+                    case 'MAX':
+                    case 'STDDEV':
+                    case 'STDDEV_SAMP':
+                    case 'STDDEV_POP':
+                    case 'VARIANCE':
+                    case 'VAR_SAMP':
+                    case 'VAR_POP':
+                    case 'GROUP_CONCAT':
+                    case 'BIT_AND':
+                    case 'BIT_OR':
+                    case 'BIT_XOR':
+                        $parseInfo['tokenType'] = 'aggregate_function';
+                        break;
 
-                    } else {
-                        switch ($parseInfo['upper']) {
-                        case 'AVG':
-                        case 'SUM':
-                        case 'COUNT':
-                        case 'MIN':
-                        case 'MAX':
-                        case 'STDDEV':
-                        case 'STDDEV_SAMP':
-                        case 'STDDEV_POP':
-                        case 'VARIANCE':
-                        case 'VAR_SAMP':
-                        case 'VAR_POP':
-                        case 'GROUP_CONCAT':
-                        case 'BIT_AND':
-                        case 'BIT_OR':
-                        case 'BIT_XOR':
-                            $parseInfo['tokenType'] = 'aggregate_function';
-                            break;
-
-                        default:
-                            $parseInfo['tokenType'] = 'function';
-                            break;
-                        }
+                    case 'NULL':
+                       	// it is a reserved word, but we would like to have set it as constant
+                       	$parseInfo['tokenType'] = 'constant';
+                       	break;
+                        	
+                    default:
+                       	if (in_array($parseInfo['upper'], parent::$functions)) {
+                       		$parseInfo['tokenType'] = 'function';
+                       	} else {
+                           	$parseInfo['tokenType'] = 'reserved';
+                     	}
+                        break;
                     }
                 }
 
