@@ -683,7 +683,6 @@ if (!defined('HAVE_PHP_SQL_PARSER')) {
                 case 'LOGFILE':
                 case 'DEFINER':
                 case 'RETURNS':
-                case 'EVENT':
                 case 'TABLESPACE':
                 case 'TRIGGER':
                 case 'DATA':
@@ -706,10 +705,17 @@ if (!defined('HAVE_PHP_SQL_PARSER')) {
                     if ($token_category == 'PREPARE' && $upper == 'FROM') {
                         continue 2;
                     }
-
+                    
                     $token_category = $upper;
                     break;
 
+                case 'EVENT':
+                	# issue 71
+                	if ($prev_category != 'FROM') {
+                		$token_category = $upper;
+                	}    
+                	break;
+                	
                 case 'PASSWORD':
                 	# prevent wrong handling of PASSWORD as keyword
                 	if ($prev_category == 'SET') {
