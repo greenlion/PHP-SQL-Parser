@@ -44,6 +44,8 @@ require_once(dirname(__FILE__) . '/tests/parser/issue62.php');
 require_once(dirname(__FILE__) . '/tests/parser/issue65.php');
 require_once(dirname(__FILE__) . '/tests/parser/issue68.php');
 require_once(dirname(__FILE__) . '/tests/parser/issue69.php');
+require_once(dirname(__FILE__) . '/tests/parser/issue70.php');
+require_once(dirname(__FILE__) . '/tests/parser/issue71.php');
 require_once(dirname(__FILE__) . '/tests/parser/left.php');
 require_once(dirname(__FILE__) . '/tests/parser/nested.php');
 require_once(dirname(__FILE__) . '/tests/parser/positions.php');
