@@ -305,6 +305,7 @@ if (!defined('HAVE_PHP_SQL_CREATOR')) {
                 $sql .= $this->processInList($v);
                 $sql .= $this->processFunction($v);
                 $sql .= $this->processWhereExpression($v);
+                $sql .= $this->processWhereBracketExpression($v);
 
                 if (strlen($sql) == $len) {
                     throw new UnableToCreateSQLException('WHERE', $k, $v, 'expr_type');
@@ -328,6 +329,33 @@ if (!defined('HAVE_PHP_SQL_CREATOR')) {
                 $sql .= $this->processInList($v);
                 $sql .= $this->processFunction($v);
                 $sql .= $this->processWhereExpression($v);
+                $sql .= $this->processWhereBracketExpression($v);
+
+                if ($len == strlen($sql)) {
+                    throw new UnableToCreateSQLException('WHERE expression subtree', $k, $v, 'expr_type');
+                }
+
+                $sql .= " ";
+            }
+
+            $sql = substr($sql, 0, -1);
+            return $sql;
+        }
+
+        protected function processWhereBracketExpression($parsed) {
+            if ($parsed['expr_type'] !== 'bracket_expression') {
+                return "";
+            }
+            $sql = "";
+            foreach ($parsed['sub_tree'] as $k => $v) {
+                $len = strlen($sql);
+                $sql .= $this->processColRef($v);
+                $sql .= $this->processConstant($v);
+                $sql .= $this->processOperator($v);
+                $sql .= $this->processInList($v);
+                $sql .= $this->processFunction($v);
+                $sql .= $this->processWhereExpression($v);
+                $sql .= $this->processWhereBracketExpression($v);
 
                 if ($len == strlen($sql)) {
                     throw new UnableToCreateSQLException('WHERE expression subtree', $k, $v, 'expr_type');
@@ -339,7 +367,7 @@ if (!defined('HAVE_PHP_SQL_CREATOR')) {
             $sql = "(" . substr($sql, 0, -1) . ")";
             return $sql;
         }
-
+        
         protected function processOrderByAlias($parsed) {
             if ($parsed['expr_type'] !== 'alias') {
                 return "";
@@ -396,6 +424,15 @@ if (!defined('HAVE_PHP_SQL_CREATOR')) {
             return $sql;
         }
 
+        protected function processSelectBracketExpression($parsed) {
+            if ($parsed['expr_type'] !== 'bracket_expression') {
+                return "";
+            }
+            $sql = $this->processSubTree($parsed, " ");
+            $sql = "(" . $sql . ")";
+            return $sql;
+        }
+                
         protected function processSubTree($parsed, $delim = " ") {
             if ($parsed['sub_tree'] === '') {
                 return "";
@@ -407,6 +444,7 @@ if (!defined('HAVE_PHP_SQL_CREATOR')) {
                 $sql .= $this->processOperator($v);
                 $sql .= $this->processConstant($v);
                 $sql .= $this->processSubQuery($v);
+                $sql .= $this->processSelectBracketExpression($v);
 
                 if ($len == strlen($sql)) {
                     throw new UnableToCreateSQLException('expression subtree', $k, $v, 'expr_type');

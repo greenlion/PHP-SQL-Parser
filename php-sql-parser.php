@@ -1738,7 +1738,7 @@ if (!defined('HAVE_PHP_SQL_PARSER')) {
 
                     case 'NULL':
                        	// it is a reserved word, but we would like to have set it as constant
-                       	$parseInfo['tokenType'] = 'constant';
+                       	$parseInfo['tokenType'] = 'const';
                        	break;
                         	
                     default:
@@ -1752,19 +1752,20 @@ if (!defined('HAVE_PHP_SQL_PARSER')) {
                 }
 
                 if (!$parseInfo['tokenType']) {
-                    if ($parseInfo['upper'][0] == '(') {
+                    if ($parseInfo['upper'][0] === '(') {
                         $local_expr = $this->removeParenthesisFromStart($parseInfo['trim']);
+                        $parseInfo['tokenType'] = 'bracket_expression';
                     } else {
                         $local_expr = $parseInfo['trim'];
+                        $parseInfo['tokenType'] = 'expression';
                     }
                     $parseInfo['processed'] = $this->process_expr_list($this->split_sql($local_expr));
-                    $parseInfo['tokenType'] = 'expression';
 
-                    if (count($parseInfo['processed']) === 1) {
+                    /*if (count($parseInfo['processed']) === 1) {
                         $parseInfo['tokenType'] = $parseInfo['processed'][0]['expr_type'];
                         $parseInfo['base_expr'] = $parseInfo['processed'][0]['base_expr'];
                         $parseInfo['processed'] = $parseInfo['processed'][0]['sub_tree'];
-                    }
+                    }*/
 
                 }
 
@@ -1952,7 +1953,8 @@ if (!defined('HAVE_PHP_SQL_PARSER')) {
                     $ok = $ok
                             && ($after === "" || in_array($after, self::$allowedOnOperator, true)
                                     || (strtolower($after) >= 'a' && strtolower($after) <= 'z')
-                                    || ($after >= '0' && $after <= '9') || ($after === '?'));
+                                    || ($after >= '0' && $after <= '9') || ($after === '?') 
+                                    || ($after === '@'));
 
                     if (!$ok) {
                         $offset = $pos + 1;
@@ -1982,6 +1984,7 @@ if (!defined('HAVE_PHP_SQL_PARSER')) {
             if (!is_numeric($key)) {
                 if (($key === 'UNION' || $key === 'UNION ALL') || ($key === 'expr_type' && $parsed === 'expression')
                         || ($key === 'expr_type' && $parsed === 'subquery')
+                        || ($key === 'expr_type' && $parsed === 'bracket_expression')
                         || ($key === 'expr_type' && $parsed === 'table_expression')
                         || ($key === 'expr_type' && $parsed === 'record')
                         || ($key === 'expr_type' && $parsed === 'in-list') || ($key === 'alias' && $parsed !== false)) {
