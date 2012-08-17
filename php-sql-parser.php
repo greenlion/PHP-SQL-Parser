@@ -1893,7 +1893,7 @@ if (!defined('HAVE_PHP_SQL_PARSER')) {
      */
     class PositionCalculator extends PHPSQLParserUtils {
 
-        private static $allowedOnOperator = array("\t", "\n", "\r", " ", ",", "(", ")", "_", "'");
+        private static $allowedOnOperator = array("\t", "\n", "\r", " ", ",", "(", ")", "_", "'", "\"");
         private static $allowedOnOther = array("\t", "\n", "\r", " ", ",", "(", ")", "<", ">", "*", "+", "-", "/", "|", "&", "=", "!", ";");
 
         private function printPos($text, $sql, $charPos, $key, $parsed, $backtracking) {
