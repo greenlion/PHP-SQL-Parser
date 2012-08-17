@@ -711,7 +711,7 @@ if (!defined('HAVE_PHP_SQL_PARSER')) {
 
                 case 'EVENT':
                 	# issue 71
-                	if ($prev_category != 'FROM') {
+                	if ($prev_category == 'DROP' || $prev_category == 'ALTER' || $prev_category == 'CREATE') {
                 		$token_category = $upper;
                 	}    
                 	break;
