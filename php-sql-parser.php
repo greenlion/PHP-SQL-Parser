@@ -721,7 +721,6 @@ if (!defined('HAVE_PHP_SQL_PARSER')) {
                 case 'RETURNS':
                 case 'TABLESPACE':
                 case 'TRIGGER':
-                case 'DATA':
                 case 'DO':
                 case 'PLUGIN':
                 case 'FROM':
@@ -734,11 +733,11 @@ if (!defined('HAVE_PHP_SQL_PARSER')) {
                 case 'EXECUTE':
                 case 'PREPARE':
                 case 'DEALLOCATE':
-                    if ($trim == 'DEALLOCATE') {
+                    if ($trim === 'DEALLOCATE') {
                         $skip_next = true;
                     }
                     /* this FROM is different from FROM in other DML (not join related) */
-                    if ($token_category == 'PREPARE' && $upper == 'FROM') {
+                    if ($token_category === 'PREPARE' && $upper === 'FROM') {
                         continue 2;
                     }
 
@@ -747,14 +746,21 @@ if (!defined('HAVE_PHP_SQL_PARSER')) {
 
                 case 'EVENT':
                 # issue 71
-                    if ($prev_category == 'DROP' || $prev_category == 'ALTER' || $prev_category == 'CREATE') {
+                    if ($prev_category === 'DROP' || $prev_category === 'ALTER' || $prev_category === 'CREATE') {
                         $token_category = $upper;
                     }
                     break;
 
+                case 'DATA':
+                    # prevent wrong handling of DATA as keyword
+                    if ($prev_category === 'LOAD') {
+                        $token_category = $upper;
+                    }
+                    break;
+                    
                 case 'PASSWORD':
-                # prevent wrong handling of PASSWORD as keyword
-                    if ($prev_category == 'SET') {
+                    # prevent wrong handling of PASSWORD as keyword
+                    if ($prev_category === 'SET') {
                         $token_category = $upper;
                     }
                     break;
@@ -828,7 +834,7 @@ if (!defined('HAVE_PHP_SQL_PARSER')) {
 
                 /* This is either LOCK TABLES or SELECT ... LOCK IN SHARE MODE*/
                 case 'LOCK':
-                    if ($token_category == "") {
+                    if ($token_category === "") {
                         $token_category = $upper;
                         $out[$upper][0] = $upper;
                     } else {
@@ -840,11 +846,11 @@ if (!defined('HAVE_PHP_SQL_PARSER')) {
                     break;
 
                 case 'USING': /* USING in FROM clause is different from USING w/ prepared statement*/
-                    if ($token_category == 'EXECUTE') {
+                    if ($token_category === 'EXECUTE') {
                         $token_category = $upper;
                         continue 2;
                     }
-                    if ($token_category == 'FROM' && !empty($out['DELETE'])) {
+                    if ($token_category === 'FROM' && !empty($out['DELETE'])) {
                         $token_category = $upper;
                         continue 2;
                     }
@@ -852,7 +858,7 @@ if (!defined('HAVE_PHP_SQL_PARSER')) {
 
                 /* DROP TABLE is different from ALTER TABLE DROP ... */
                 case 'DROP':
-                    if ($token_category != 'ALTER') {
+                    if ($token_category !== 'ALTER') {
                         $token_category = $upper;
                         $out[$upper][0] = $upper;
                         continue 2;
@@ -866,12 +872,12 @@ if (!defined('HAVE_PHP_SQL_PARSER')) {
                     break;
 
                 case 'UPDATE':
-                    if ($token_category == "") {
+                    if ($token_category === "") {
                         $token_category = $upper;
                         continue 2;
 
                     }
-                    if ($token_category == 'DUPLICATE') {
+                    if ($token_category === 'DUPLICATE') {
                         continue 2;
                     }
                     break;
@@ -893,7 +899,7 @@ if (!defined('HAVE_PHP_SQL_PARSER')) {
                     break;
 
                 case 'KEY':
-                    if ($token_category == 'DUPLICATE') {
+                    if ($token_category === 'DUPLICATE') {
                         continue 2;
                     }
                     break;
@@ -920,7 +926,7 @@ if (!defined('HAVE_PHP_SQL_PARSER')) {
                     break;
 
                 case 'WITH':
-                    if ($token_category == 'GROUP') {
+                    if ($token_category === 'GROUP') {
                         $skip_next = true;
                         $out['OPTIONS'][] = 'WITH ROLLUP';
                         continue 2;
