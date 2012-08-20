@@ -1,6 +1,6 @@
 <?php
 /**
- * PHPSQLCreator
+ * php-sql-creator.php
  * 
  * A pure PHP SQL creator, which generates SQL from the output of PHPSQLParser.
  * 
@@ -31,6 +31,8 @@
 
 if (!defined('HAVE_PHP_SQL_CREATOR')) {
 
+	require_once(dirname(__FILE__) . '/exceptions.php');
+	
     class PHPSQLCreator {
 
         public function __construct($parsed = false) {
@@ -625,50 +627,5 @@ if (!defined('HAVE_PHP_SQL_CREATOR')) {
 
     } // END CLASS
 
-    class UnableToCreateSQLException extends Exception {
-
-        protected $part;
-        protected $partkey;
-        protected $entry;
-        protected $entrykey;
-
-        public function __construct($part, $partkey, $entry, $entrykey) {
-            $this->part = $part;
-            $this->partkey = $partkey;
-            $this->entry = $entry;
-            $this->entrykey = $entrykey;
-            parent::__construct("unknown " . $entrykey . " in " . $part . "[" . $partkey . "] " . $entry[$entrykey], 15);
-        }
-
-        public function getEntry() {
-            return $this->entry;
-        }
-
-        public function getEntryKey() {
-            return $this->entrykey;
-        }
-
-        public function getSQLPart() {
-            return $this->part;
-        }
-
-        public function getSQLPartKey() {
-            return $this->partkey;
-        }
-    }
-
-    class UnsupportedFeatureException extends Exception {
-
-        protected $key;
-
-        public function __construct($key) {
-            $this->key = $key;
-            parent::__construct($key . " not implemented.", 20);
-        }
-
-        public function getKey() {
-            return $this->key;
-        }
-    }
     define('HAVE_PHP_SQL_CREATOR', 1);
 }
