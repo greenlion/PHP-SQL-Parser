@@ -532,7 +532,7 @@ if (!defined('HAVE_PHP_SQL_PARSER')) {
                 $out['HAVING'] = $this->process_expr_list($out['HAVING']);
             }
             if (!empty($out['SET'])) {
-                $out['SET'] = $this->process_set_list($out['SET']);
+                $out['SET'] = $this->process_set_list($out['SET'], isset($out['UPDATE']) ? $out['UPDATE'] : array());
             }
             if (!empty($out['DUPLICATE'])) {
                 $out['ON DUPLICATE KEY UPDATE'] = $this->process_set_list($out['DUPLICATE']);
@@ -564,20 +564,36 @@ if (!defined('HAVE_PHP_SQL_PARSER')) {
             return array('expr_type' => 'expression', 'base_expr' => trim($base_expr), 'sub_tree' => $column);
         }
 
-        private function process_set_list($tokens) {
+        // TODO: SET is possible after UPDATE but also as stand-alone token
+        // handle SESSION, GLOBAL
+        private function process_set_list($tokens, $update) {
             $expr = array();
             $base_expr = "";
 
             foreach ($tokens as $token) {
-                $trim = trim($token);
-
-                if ($trim === ",") {
-                    $expr[] = $this->getColumn($base_expr);
-                    $base_expr = "";
-                    continue;
+				$upper = strtoupper(trim($token));
+                
+                switch ($upper) {
+                	case 'SESSION':
+                		if (is_empty($update)) {
+                			// TODO: SET SESSION var=value
+                		}
+                		break;
+                		
+                	case 'GLOBAL':
+                		if (is_empty($update)) {
+                			// TODO: SET GLOBAL var=value
+                		}
+                		break;
+                		
+                	case ',':
+                    	$expr[] = $this->getColumn($base_expr);
+                    	$base_expr = "";
+                    	continue 2;
+                    	
+                	default:
                 }
-
-                $base_expr .= $token;
+       			$base_expr .= $token;
             }
 
             if (trim($base_expr) !== "") {
