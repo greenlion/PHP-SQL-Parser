@@ -38,6 +38,7 @@ require_once(dirname(__FILE__) . '/tests/parser/issue52.php');
 require_once(dirname(__FILE__) . '/tests/parser/issue53.php');
 require_once(dirname(__FILE__) . '/tests/parser/issue54.php');
 require_once(dirname(__FILE__) . '/tests/parser/issue55.php');
+require_once(dirname(__FILE__) . '/tests/parser/issue56.php');
 require_once(dirname(__FILE__) . '/tests/parser/issue60.php');
 require_once(dirname(__FILE__) . '/tests/parser/issue61.php');
 require_once(dirname(__FILE__) . '/tests/parser/issue62.php');
