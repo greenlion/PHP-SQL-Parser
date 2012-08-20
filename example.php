@@ -6,7 +6,7 @@
  * directly within a shell.
  */
 
-require_once('classes/php-sql-parser.php');
+require_once('php-sql-parser.php');
 $sql = 'SELECT 1';
 echo $sql . "\n";
 $start = microtime(true);

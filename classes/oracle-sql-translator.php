@@ -29,8 +29,8 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
  * DAMAGE.
  */
-require_once('php-sql-parser.php');
-require_once('php-sql-creator.php');
+require_once('../php-sql-parser.php');
+require_once('../php-sql-creator.php');
 include_once($rootdir . '/classes/adodb/adodb.inc.php');
 
 $_ENV['DEBUG'] = 1;
