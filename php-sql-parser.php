@@ -33,9 +33,9 @@
 
 if (!defined('HAVE_PHP_SQL_PARSER')) {
 	
-	require_once(dirname(__FILE__) . '/parser-utils.php');
-	require_once(dirname(__FILE__) . '/lexer.php');
-	require_once(dirname(__FILE__) . '/position-calculator.php');
+	require_once(dirname(__FILE__) . '/classes/parser-utils.php');
+	require_once(dirname(__FILE__) . '/classes/lexer.php');
+	require_once(dirname(__FILE__) . '/classes/position-calculator.php');
 
 	/**
      * This class implements the parser functionality.
