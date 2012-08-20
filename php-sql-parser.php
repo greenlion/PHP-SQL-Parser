@@ -179,11 +179,11 @@ if (!defined('HAVE_PHP_SQL_PARSER')) {
 
     class LexerSplitter {
 
-        private static $splitters = array("\r\n", "!=", ">=", "<=", "<>", "\\", "&&", ">", "<", "|", "=", "^", "(", ")", "\t", "\n",
-                         "'", "\"", "`", ",", "@", " ", "+", "-", "*", "/", ";");
+        private static $splitters = array("\r\n", "!=", ">=", "<=", "<>", "\\", "&&", ">", "<", "|", "=", "^", "(",
+                                          ")", "\t", "\n", "'", "\"", "`", ",", "@", " ", "+", "-", "*", "/", ";");
         private $tokenSize;
         private $hashSet;
-        
+
         public function __construct() {
             $this->tokenSize = strlen(self::$splitters[0]); # should be the largest one
             $this->hashSet = array_flip(self::$splitters);
@@ -256,14 +256,53 @@ if (!defined('HAVE_PHP_SQL_PARSER')) {
             $tokens = $this->balanceBackticks($tokens);
             $tokens = $this->concatColReferences($tokens);
             $tokens = $this->balanceParenthesis($tokens);
-            $tokens = $this->balanceComments($tokens);
+            $tokens = $this->balanceMultilineComments($tokens);
+            $tokens = $this->balanceInlineComments($tokens);
             return $tokens;
         }
 
-        private function balanceComments($tokens) {
+        private function balanceInlineComments($tokens) {
 
-            $result = array();
-            
+            $i = 0;
+            $cnt = count($tokens);
+            $comment = false;
+
+            while ($i < $cnt) {
+
+                if (!isset($tokens[$i])) {
+                    $i++;
+                    continue;
+                }
+
+                $token = $tokens[$i];
+
+                if ($comment !== false) {
+                    if ($token === "\n" || $token === "\r\n") {
+                        $comment = false;
+                    } else {
+                        unset($tokens[$i]);
+                        $tokens[$comment] .= $token;
+                    }
+                }
+
+                if (($comment === false) && ($token === "-")) {
+                    if (isset($tokens[$i + 1]) && $tokens[$i + 1] === "-") {
+                        $comment = $i;
+                        $tokens[$i] = "--";
+                        $i++;
+                        unset($tokens[$i]);
+                        continue;
+                    }
+                }
+
+                $i++;
+            }
+
+            return array_values($tokens);
+        }
+
+        private function balanceMultilineComments($tokens) {
+
             $i = 0;
             $cnt = count($tokens);
             $comment = false;
@@ -280,6 +319,11 @@ if (!defined('HAVE_PHP_SQL_PARSER')) {
                 if ($comment !== false) {
                     unset($tokens[$i]);
                     $tokens[$comment] .= $token;
+                    if ($token === "*" && isset($tokens[$i + 1]) && $tokens[$i + 1] === "/") {
+                        unset($tokens[$i + 1]);
+                        $tokens[$comment] .= "/";
+                        $comment = false;
+                    }
                 }
 
                 if (($comment === false) && ($token === "/")) {
@@ -289,14 +333,6 @@ if (!defined('HAVE_PHP_SQL_PARSER')) {
                         $i++;
                         unset($tokens[$i]);
                         continue;
-                    }
-                }
-
-                if (($comment !== false) && ($token === "*")) {
-                    if (isset($tokens[$i + 1]) && $tokens[$i + 1] === "/") {
-                        unset($tokens[$i + 1]);
-                        $tokens[$comment] .= "/";
-                        $comment = false;
                     }
                 }
 
@@ -705,24 +741,24 @@ if (!defined('HAVE_PHP_SQL_PARSER')) {
                     if ($token_category == 'PREPARE' && $upper == 'FROM') {
                         continue 2;
                     }
-                    
+
                     $token_category = $upper;
                     break;
 
                 case 'EVENT':
-                	# issue 71
-                	if ($prev_category == 'DROP' || $prev_category == 'ALTER' || $prev_category == 'CREATE') {
-                		$token_category = $upper;
-                	}    
-                	break;
-                	
+                # issue 71
+                    if ($prev_category == 'DROP' || $prev_category == 'ALTER' || $prev_category == 'CREATE') {
+                        $token_category = $upper;
+                    }
+                    break;
+
                 case 'PASSWORD':
-                	# prevent wrong handling of PASSWORD as keyword
-                	if ($prev_category == 'SET') {
-                		$token_category = $upper;
-                	}
-                	break;    
-                    
+                # prevent wrong handling of PASSWORD as keyword
+                    if ($prev_category == 'SET') {
+                        $token_category = $upper;
+                    }
+                    break;
+
                 case 'INTO':
                 # prevent wrong handling of CACHE within LOAD INDEX INTO CACHE...
                     if ($prev_category === 'LOAD') {
@@ -1133,9 +1169,9 @@ if (!defined('HAVE_PHP_SQL_PARSER')) {
 
                 if (isset($prev)
                         && ($prev['expr_type'] == 'reserved' || $prev['expr_type'] == 'const'
-                                || $prev['expr_type'] == 'aggregate_function'
-                                || $prev['expr_type'] == 'function' || $prev['expr_type'] == 'expression'
-                                || $prev['expr_type'] == 'subquery' || $prev['expr_type'] == 'colref')) {
+                                || $prev['expr_type'] == 'aggregate_function' || $prev['expr_type'] == 'function'
+                                || $prev['expr_type'] == 'expression' || $prev['expr_type'] == 'subquery'
+                                || $prev['expr_type'] == 'colref')) {
 
                     $alias = array('as' => false, 'name' => trim($last['base_expr']),
                                    'base_expr' => trim($last['base_expr']));
@@ -1384,7 +1420,7 @@ if (!defined('HAVE_PHP_SQL_PARSER')) {
                 unset($expr['alias']);
                 return $expr;
             }
-            
+
             return array('expr_type' => $parseInfo['type'], 'base_expr' => $parseInfo['expr'],
                          'direction' => $parseInfo['dir']);
         }
@@ -1670,10 +1706,10 @@ if (!defined('HAVE_PHP_SQL_PARSER')) {
                         break;
 
                     case 'NULL':
-                    	$parseInfo['processed'] = false;
-                    	$parseInfo['tokenType'] = 'const';
-                    	break;
-                    	
+                        $parseInfo['processed'] = false;
+                        $parseInfo['tokenType'] = 'const';
+                        break;
+
                     case '-':
                     case '+':
                     // differ between preceding sign and operator
@@ -1743,16 +1779,16 @@ if (!defined('HAVE_PHP_SQL_PARSER')) {
                         break;
 
                     case 'NULL':
-                       	// it is a reserved word, but we would like to have set it as constant
-                       	$parseInfo['tokenType'] = 'const';
-                       	break;
-                        	
+                    // it is a reserved word, but we would like to have set it as constant
+                        $parseInfo['tokenType'] = 'const';
+                        break;
+
                     default:
-                       	if (in_array($parseInfo['upper'], parent::$functions)) {
-                       		$parseInfo['tokenType'] = 'function';
-                       	} else {
-                           	$parseInfo['tokenType'] = 'reserved';
-                     	}
+                        if (in_array($parseInfo['upper'], parent::$functions)) {
+                            $parseInfo['tokenType'] = 'function';
+                        } else {
+                            $parseInfo['tokenType'] = 'reserved';
+                        }
                         break;
                     }
                 }
@@ -1900,7 +1936,8 @@ if (!defined('HAVE_PHP_SQL_PARSER')) {
     class PositionCalculator extends PHPSQLParserUtils {
 
         private static $allowedOnOperator = array("\t", "\n", "\r", " ", ",", "(", ")", "_", "'", "\"");
-        private static $allowedOnOther = array("\t", "\n", "\r", " ", ",", "(", ")", "<", ">", "*", "+", "-", "/", "|", "&", "=", "!", ";");
+        private static $allowedOnOther = array("\t", "\n", "\r", " ", ",", "(", ")", "<", ">", "*", "+", "-", "/", "|",
+                                               "&", "=", "!", ";");
 
         private function printPos($text, $sql, $charPos, $key, $parsed, $backtracking) {
             if (!isset($_ENV['DEBUG'])) {
@@ -1959,8 +1996,7 @@ if (!defined('HAVE_PHP_SQL_PARSER')) {
                     $ok = $ok
                             && ($after === "" || in_array($after, self::$allowedOnOperator, true)
                                     || (strtolower($after) >= 'a' && strtolower($after) <= 'z')
-                                    || ($after >= '0' && $after <= '9') || ($after === '?') 
-                                    || ($after === '@'));
+                                    || ($after >= '0' && $after <= '9') || ($after === '?') || ($after === '@'));
 
                     if (!$ok) {
                         $offset = $pos + 1;
