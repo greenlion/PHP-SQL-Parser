@@ -257,11 +257,44 @@ if (!defined('HAVE_PHP_SQL_PARSER')) {
             $tokens = $this->concatColReferences($tokens);
             $tokens = $this->balanceParenthesis($tokens);
             $tokens = $this->balanceMultilineComments($tokens);
-            $tokens = $this->balanceInlineComments($tokens);
+            $tokens = $this->concatInlineComments($tokens);
+            $tokens = $this->concatUserDefinedVariables($tokens);
             return $tokens;
         }
 
-        private function balanceInlineComments($tokens) {
+        private function concatUserDefinedVariables($tokens) {
+            $i = 0;
+            $cnt = count($tokens);
+            $userdef = false;
+
+            while ($i < $cnt) {
+
+                if (!isset($tokens[$i])) {
+                    $i++;
+                    continue;
+                }
+
+                $token = $tokens[$i];
+
+                if ($userdef !== false) {
+                    $tokens[$userdef] .= $token;
+                    unset($tokens[$i]);
+                    if ($token !== "@") {
+                        $userdef = false;
+                    }
+                }
+
+                if ($userdef === false && $token === "@") {
+                    $userdef = $i;
+                }
+
+                $i++;
+            }
+
+            return array_values($tokens);
+        }
+
+        private function concatInlineComments($tokens) {
 
             $i = 0;
             $cnt = count($tokens);
@@ -752,14 +785,14 @@ if (!defined('HAVE_PHP_SQL_PARSER')) {
                     break;
 
                 case 'DATA':
-                    # prevent wrong handling of DATA as keyword
+                # prevent wrong handling of DATA as keyword
                     if ($prev_category === 'LOAD') {
                         $token_category = $upper;
                     }
                     break;
-                    
+
                 case 'PASSWORD':
-                    # prevent wrong handling of PASSWORD as keyword
+                # prevent wrong handling of PASSWORD as keyword
                     if ($prev_category === 'SET') {
                         $token_category = $upper;
                     }
@@ -1641,6 +1674,10 @@ if (!defined('HAVE_PHP_SQL_PARSER')) {
                         $parseInfo['tokenType'] = "match-arguments";
                     }
 
+                } elseif ($parseInfo['upper'][0] === '@') {
+                    // user-defined variable
+                    $parseInfo['tokenType'] = 'user_variable';
+                    $parseInfo['processed'] = false;
                 } else {
                     /* it is either an operator, a colref or a constant */
                     switch ($parseInfo['upper']) {
@@ -1808,13 +1845,6 @@ if (!defined('HAVE_PHP_SQL_PARSER')) {
                         $parseInfo['tokenType'] = 'expression';
                     }
                     $parseInfo['processed'] = $this->process_expr_list($this->split_sql($local_expr));
-
-                    /*if (count($parseInfo['processed']) === 1) {
-                        $parseInfo['tokenType'] = $parseInfo['processed'][0]['expr_type'];
-                        $parseInfo['base_expr'] = $parseInfo['processed'][0]['base_expr'];
-                        $parseInfo['processed'] = $parseInfo['processed'][0]['sub_tree'];
-                    }*/
-
                 }
 
                 $parseInfo = $this->initParseInfoExprList($parseInfo);
