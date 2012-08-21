@@ -33,7 +33,7 @@
 
 	class LexerSplitter {
 
-        private static $splitters = array("\r\n", "!=", ">=", "<=", "<>", "\\", "&&", ">", "<", "|", "=", "^", "(",
+        private static $splitters = array("\r\n", "!=", ">=", "<=", "<>", ":=", "\\", "&&", ">", "<", "|", "=", "^", "(",
                                           ")", "\t", "\n", "'", "\"", "`", ",", "@", " ", "+", "-", "*", "/", ";");
         private $tokenSize;
         private $hashSet;
