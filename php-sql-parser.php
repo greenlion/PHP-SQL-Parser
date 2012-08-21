@@ -564,10 +564,26 @@ if (!defined('HAVE_PHP_SQL_PARSER')) {
             return array('expr_type' => 'expression', 'base_expr' => trim($base_expr), 'sub_tree' => $column);
         }
 
-        // TODO: differ @@global. | @@session. | @@local. | @@ | @ (User)
         private function getVariableType($expression) {
-        	// maybe we can handle that within process_expr_list!!!
-        	return 'still in development';
+        	// $expression contains only upper-case characters
+        	
+        	if ($expression[1] !== "@") {
+				return 'user_variable';        		
+        	}
+        	
+        	$type = substr($expression, 2, strpos($expression, ".", 2));
+        	
+        	switch ($type) {
+        		case 'GLOBAL':
+        		case 'LOCAL':
+        		case 'SESSION':
+        			$type = strtolower($type) . '_variable';
+        			break;
+        		default:
+        			$type = 'session_variable';
+        			break;
+        	}
+			return $type;        	
         }
         
         private function process_set_list($tokens, $isUpdate) {
@@ -580,22 +596,23 @@ if (!defined('HAVE_PHP_SQL_PARSER')) {
 				$upper = strtoupper(trim($token));
                 
                 switch ($upper) {
-                	case 'SESSION':
-                	case 'GLOBAL':
                 	case 'LOCAL':
+ 	              	case 'SESSION':
+ 	              	case 'GLOBAL':
                 		if (!$isUpdate) {
-                			$varType = $upper;
+                			$varType = strtolower($upper) . '_variable';
                 			$baseExpr = "";
                 			continue 2;
                 		}
-                		
+                		break;
+	                		
                 	case ',':
                     	$assignment = $this->getAssignment($baseExpr);
                     	if (!$isUpdate) {
-                    		$assignment['var_type'] = ($varType ? $varType : $this->getVariableType($assignment['sub_tree']));
+			                // TODO: go down to the first colref, replace it with vartype
+
                     	}
                     	$result[] = $assignment;
-                    	
                     	$baseExpr = "";
             			$varType = false;
                     	continue 2;
@@ -608,8 +625,10 @@ if (!defined('HAVE_PHP_SQL_PARSER')) {
             if (trim($baseExpr) !== "") {
                 $assignment = $this->getAssignment($baseExpr);
                	if (!$isUpdate) {
-               		// TODO: better: change the first colref/user_variable to vartype
-          			$assignment['var_type'] = ($varType ? $varType : $this->getVariableType($assignment['sub_tree']));
+               		
+               		
+               		
+	                // TODO: go down to the first colref, replace it with vartype
                	}
                 $result[] = $assignment;
             }
@@ -1213,8 +1232,8 @@ if (!defined('HAVE_PHP_SQL_PARSER')) {
                     }
 
                 } elseif ($parseInfo['upper'][0] === '@') {
-                    // user-defined variable
-                    $parseInfo['tokenType'] = 'user_variable';
+                    // a variable
+                    $parseInfo['tokenType'] = $this->getVariableType($parseInfo['upper']);
                     $parseInfo['processed'] = false;
                 } else {
                     /* it is either an operator, a colref or a constant */
