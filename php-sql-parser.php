@@ -532,7 +532,7 @@ if (!defined('HAVE_PHP_SQL_PARSER')) {
                 $out['HAVING'] = $this->process_expr_list($out['HAVING']);
             }
             if (!empty($out['SET'])) {
-                $out['SET'] = $this->process_set_list($out['SET'], isset($out['UPDATE']) ? $out['UPDATE'] : array());
+                $out['SET'] = $this->process_set_list($out['SET'], isset($out['UPDATE']));
             }
             if (!empty($out['DUPLICATE'])) {
                 $out['ON DUPLICATE KEY UPDATE'] = $this->process_set_list($out['DUPLICATE']);
@@ -559,48 +559,62 @@ if (!defined('HAVE_PHP_SQL_PARSER')) {
         /* A SET list is simply a list of key = value expressions separated by comma (,).
          This function produces a list of the key/value expressions.
          */
-        private function getColumn($base_expr) {
+        private function getAssignment($base_expr) {
             $column = $this->process_expr_list($this->split_sql($base_expr));
             return array('expr_type' => 'expression', 'base_expr' => trim($base_expr), 'sub_tree' => $column);
         }
 
-        // TODO: SET is possible after UPDATE but also as stand-alone token
-        // handle SESSION, GLOBAL
-        private function process_set_list($tokens, $update) {
-            $expr = array();
-            $base_expr = "";
-
+        // TODO: differ @@global. | @@session. | @@local. | @@ | @ (User)
+        private function getVariableType($expression) {
+        	// maybe we can handle that within process_expr_list!!!
+        	return 'still in development';
+        }
+        
+        private function process_set_list($tokens, $isUpdate) {
+            $result = array();
+            $baseExpr = "";
+			$assignment = false;
+            $varType = false;
+			
             foreach ($tokens as $token) {
 				$upper = strtoupper(trim($token));
                 
                 switch ($upper) {
                 	case 'SESSION':
-                		if (is_empty($update)) {
-                			// TODO: SET SESSION var=value
-                		}
-                		break;
-                		
                 	case 'GLOBAL':
-                		if (is_empty($update)) {
-                			// TODO: SET GLOBAL var=value
+                	case 'LOCAL':
+                		if (!$isUpdate) {
+                			$varType = $upper;
+                			$baseExpr = "";
+                			continue 2;
                 		}
-                		break;
                 		
                 	case ',':
-                    	$expr[] = $this->getColumn($base_expr);
-                    	$base_expr = "";
+                    	$assignment = $this->getAssignment($baseExpr);
+                    	if (!$isUpdate) {
+                    		$assignment['var_type'] = ($varType ? $varType : $this->getVariableType($assignment['sub_tree']));
+                    	}
+                    	$result[] = $assignment;
+                    	
+                    	$baseExpr = "";
+            			$varType = false;
                     	continue 2;
                     	
                 	default:
                 }
-       			$base_expr .= $token;
+       			$baseExpr .= $token;
             }
 
-            if (trim($base_expr) !== "") {
-                $expr[] = $this->getColumn($base_expr);
+            if (trim($baseExpr) !== "") {
+                $assignment = $this->getAssignment($baseExpr);
+               	if (!$isUpdate) {
+               		// TODO: better: change the first colref/user_variable to vartype
+          			$assignment['var_type'] = ($varType ? $varType : $this->getVariableType($assignment['sub_tree']));
+               	}
+                $result[] = $assignment;
             }
 
-            return $expr;
+            return $result;
         }
 
         /* This function processes the LIMIT section.
