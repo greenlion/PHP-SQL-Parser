@@ -189,7 +189,7 @@ if (!defined('HAVE_PHP_SQL_CREATOR')) {
         }
 
         protected function processRecord($parsed) {
-            if ($parsed['expr_type'] !== 'record') {
+            if ($parsed['expr_type'] !== ExpressionType::RECORD) {
                 return "";
             }
             $sql = "";
@@ -200,7 +200,7 @@ if (!defined('HAVE_PHP_SQL_CREATOR')) {
                 $sql .= $this->processOperator($v);
 
                 if ($len == strlen($sql)) {
-                    throw new UnableToCreateSQLException('record', $k, $v, 'expr_type');
+                    throw new UnableToCreateSQLException(ExpressionType::RECORD, $k, $v, 'expr_type');
                 }
 
                 $sql .= ",";
@@ -258,7 +258,7 @@ if (!defined('HAVE_PHP_SQL_CREATOR')) {
         }
 
         protected function processSetExpression($parsed) {
-            if ($parsed['expr_type'] !== 'expression') {
+            if ($parsed['expr_type'] !== ExpressionType::EXPRESSION) {
                 return "";
             }
             $sql = "";
@@ -319,7 +319,7 @@ if (!defined('HAVE_PHP_SQL_CREATOR')) {
         }
 
         protected function processWhereExpression($parsed) {
-            if ($parsed['expr_type'] !== 'expression') {
+            if ($parsed['expr_type'] !== ExpressionType::EXPRESSION) {
                 return "";
             }
             $sql = "";
@@ -345,7 +345,7 @@ if (!defined('HAVE_PHP_SQL_CREATOR')) {
         }
 
         protected function processWhereBracketExpression($parsed) {
-            if ($parsed['expr_type'] !== 'bracket_expression') {
+            if ($parsed['expr_type'] !== ExpressionType::BRACKED_EXPRESSION) {
                 return "";
             }
             $sql = "";
@@ -371,7 +371,7 @@ if (!defined('HAVE_PHP_SQL_CREATOR')) {
         }
 
         protected function processOrderByAlias($parsed) {
-            if ($parsed['expr_type'] !== 'alias') {
+            if ($parsed['expr_type'] !== ExpressionType::ALIAS) {
                 return "";
             }
             return $parsed['base_expr'] . $this->processDirection($parsed['direction']);
@@ -392,7 +392,8 @@ if (!defined('HAVE_PHP_SQL_CREATOR')) {
         }
 
         protected function processFunction($parsed) {
-            if (($parsed['expr_type'] !== 'aggregate_function') && ($parsed['expr_type'] !== 'function')) {
+            if (($parsed['expr_type'] !== ExpressionType::AGGREGATE_FUNCTION)
+                    && ($parsed['expr_type'] !== ExpressionType::SIMPLE_FUNCTION)) {
                 return "";
             }
 
@@ -418,7 +419,7 @@ if (!defined('HAVE_PHP_SQL_CREATOR')) {
         }
 
         protected function processSelectExpression($parsed) {
-            if ($parsed['expr_type'] !== 'expression') {
+            if ($parsed['expr_type'] !== ExpressionType::EXPRESSION) {
                 return "";
             }
             $sql = $this->processSubTree($parsed, " ");
@@ -427,7 +428,7 @@ if (!defined('HAVE_PHP_SQL_CREATOR')) {
         }
 
         protected function processSelectBracketExpression($parsed) {
-            if ($parsed['expr_type'] !== 'bracket_expression') {
+            if ($parsed['expr_type'] !== ExpressionType::BRACKED_EXPRESSION) {
                 return "";
             }
             $sql = $this->processSubTree($parsed, " ");
@@ -522,7 +523,7 @@ if (!defined('HAVE_PHP_SQL_CREATOR')) {
         }
 
         protected function processTable($parsed, $index) {
-            if ($parsed['expr_type'] !== 'table') {
+            if ($parsed['expr_type'] !== ExpressionType::TABLE) {
                 return "";
             }
 
@@ -538,7 +539,7 @@ if (!defined('HAVE_PHP_SQL_CREATOR')) {
         }
 
         protected function processTableExpression($parsed, $index) {
-            if ($parsed['expr_type'] !== 'table_expression') {
+            if ($parsed['expr_type'] !== ExpressionType::TABLE_EXPRESSION) {
                 return "";
             }
             $sql = substr($this->processFROM($parsed['sub_tree']), 5); // remove FROM keyword
@@ -554,7 +555,7 @@ if (!defined('HAVE_PHP_SQL_CREATOR')) {
         }
 
         protected function processSubQuery($parsed, $index = 0) {
-            if ($parsed['expr_type'] !== 'subquery') {
+            if ($parsed['expr_type'] !== ExpressionType::SUBQUERY) {
                 return "";
             }
 
@@ -574,14 +575,14 @@ if (!defined('HAVE_PHP_SQL_CREATOR')) {
         }
 
         protected function processOperator($parsed) {
-            if ($parsed['expr_type'] !== 'operator') {
+            if ($parsed['expr_type'] !== ExpressionType::OPERATOR) {
                 return "";
             }
             return $parsed['base_expr'];
         }
 
         protected function processColRef($parsed) {
-            if ($parsed['expr_type'] !== 'colref') {
+            if ($parsed['expr_type'] !== ExpressionType::COLREF) {
                 return "";
             }
             $sql = $parsed['base_expr'];
@@ -607,18 +608,18 @@ if (!defined('HAVE_PHP_SQL_CREATOR')) {
         }
 
         protected function isReserved($parsed) {
-            return ($parsed['expr_type'] === 'reserved');
+            return ($parsed['expr_type'] === ExpressionType::RESERVED);
         }
 
         protected function processConstant($parsed) {
-            if ($parsed['expr_type'] !== 'const') {
+            if ($parsed['expr_type'] !== ExpressionType::CONSTANT) {
                 return "";
             }
             return $parsed['base_expr'];
         }
 
         protected function processInList($parsed) {
-            if ($parsed['expr_type'] !== 'in-list') {
+            if ($parsed['expr_type'] !== ExpressionType::IN_LIST) {
                 return "";
             }
             $sql = $this->processSubTree($parsed, ",");

@@ -71,4 +71,61 @@ class PHPSQLParserUtils extends PHPSQLParserConstants {
         $start = $length * -1;
         return (substr($haystack, $start) === $needle);
     }
+
+    /**
+     * Revokes the escaping characters from an expression
+     */
+    protected function revokeEscaping($sql) {
+        $result = trim($sql);
+        if (($result[0] === '`') && ($result[strlen($result) - 1] === '`')) {
+            $result = substr($result, 1, -1);
+        }
+        return str_replace('``', '`', $result);
+    }
+
+    /**
+     * This method removes parenthesis from start of the given string.
+     * It removes also the associated closing parenthesis.
+     */
+    protected function removeParenthesisFromStart($token) {
+
+        $parenthesisRemoved = 0;
+
+        $trim = trim($token);
+        if ($trim !== "" && $trim[0] === "(") { // remove only one parenthesis pair now!
+            $parenthesisRemoved++;
+            $trim[0] = " ";
+            $trim = trim($trim);
+        }
+
+        $parenthesis = $parenthesisRemoved;
+        $i = 0;
+        $string = 0;
+        while ($i < strlen($trim)) {
+
+            if ($trim[$i] === "\\") {
+                $i += 2; # an escape character, the next character is irrelevant
+                continue;
+            }
+
+            if ($trim[$i] === "'" || $trim[$i] === '"') {
+                $string++;
+            }
+
+            if (($string % 2 === 0) && ($trim[$i] === "(")) {
+                $parenthesis++;
+            }
+
+            if (($string % 2 === 0) && ($trim[$i] === ")")) {
+                if ($parenthesis == $parenthesisRemoved) {
+                    $trim[$i] = " ";
+                    $parenthesisRemoved--;
+                }
+                $parenthesis--;
+            }
+            $i++;
+        }
+        return trim($trim);
+    }
+
 }

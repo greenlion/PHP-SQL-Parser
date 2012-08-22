@@ -133,12 +133,14 @@ class PositionCalculator extends PHPSQLParserUtils {
 
     private function lookForBaseExpression($sql, &$charPos, &$parsed, $key, &$backtracking) {
         if (!is_numeric($key)) {
-            if (($key === 'UNION' || $key === 'UNION ALL') || ($key === 'expr_type' && $parsed === 'expression')
-                    || ($key === 'expr_type' && $parsed === 'subquery')
-                    || ($key === 'expr_type' && $parsed === 'bracket_expression')
-                    || ($key === 'expr_type' && $parsed === 'table_expression')
-                    || ($key === 'expr_type' && $parsed === 'record')
-                    || ($key === 'expr_type' && $parsed === 'in-list') || ($key === 'alias' && $parsed !== false)) {
+            if (($key === 'UNION' || $key === 'UNION ALL')
+                    || ($key === 'expr_type' && $parsed === ExpressionType::EXPRESSION)
+                    || ($key === 'expr_type' && $parsed === ExpressionType::SUBQUERY)
+                    || ($key === 'expr_type' && $parsed === ExpressionType::BRACKED_EXPRESSION)
+                    || ($key === 'expr_type' && $parsed === ExpressionType::TABLE_EXPRESSION)
+                    || ($key === 'expr_type' && $parsed === ExpressionType::RECORD)
+                    || ($key === 'expr_type' && $parsed === ExpressionType::IN_LIST)
+                    || ($key === 'alias' && $parsed !== false)) {
                 # we hold the current position and come back after the next base_expr
                 # we do this, because the next base_expr contains the complete expression/subquery/record
                 # and we have to look into it too
