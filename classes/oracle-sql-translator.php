@@ -333,7 +333,7 @@ class OracleSQLTranslator extends PHPSQLCreator {
         $k = key($parsed);
         switch ($k) {
         case "USE":
-            # this statement is not an Oracle statement
+        # this statement is not an Oracle statement
             $this->created = "";
             break;
 

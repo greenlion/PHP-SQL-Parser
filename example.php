@@ -13,7 +13,7 @@ $start = microtime(true);
 $parser = new PHPSQLParser($sql, true);
 
 print_r($parser->parsed);
-echo "parse time simplest query:" .( microtime(true) - $start) . "\n";
+echo "parse time simplest query:" . (microtime(true) - $start) . "\n";
 
 /*You can use the constuctor for parsing.  The parsed statement is stored at the ->parsed property.*/
 $sql = 'REPLACE INTO table (a,b,c) VALUES (1,2,3)';
@@ -22,7 +22,7 @@ $start = microtime(true);
 $parser = new PHPSQLParser($sql);
 
 print_r($parser->parsed);
-echo "parse time very somewhat simple statement:" . ( microtime(true) - $start) . "\n";
+echo "parse time very somewhat simple statement:" . (microtime(true) - $start) . "\n";
 
 /* You can use the ->parse() method too.  The parsed structure is returned, and 
    also available in the ->parsed property. */
@@ -82,25 +82,21 @@ echo $sql . "\n";
 $parser = new PHPSQLParser($sql);
 print_r($parser->parsed);
 
-
 $sql = 'DELETE FROM t1, t2 USING t1 INNER JOIN t2 INNER JOIN t3
 WHERE t1.id=t2.id AND t2.id=t3.id;';
 echo $sql . "\n";
 $parser = new PHPSQLParser($sql);
 print_r($parser->parsed);
 
-
 $sql = 'delete low_priority partitioned_table.* from partitioned_table where partition_id = 1;';
 echo $sql . "\n";
 $parser = new PHPSQLParser($sql);
 print_r($parser->parsed);
 
-
 $sql = "UPDATE t1 SET col1 = col1 + 1, col2 = col1;";
 echo $sql . "\n";
 $parser = new PHPSQLParser($sql);
 print_r($parser->parsed);
-
 
 $sql = 'insert into partitioned_table (partition_id, some_col) values (1,2);';
 echo $sql . "\n";
@@ -138,7 +134,6 @@ echo $sql . "\n";
 $parser = new PHPSQLParser($sql);
 print_r($parser->parsed);
 
-
 $sql = "(select 1, 1, 1, 1 from dual dual1) union all (select 2, 2, 2, 2 from dual dual2) union all (select c1,c2,c3,sum(c4) from (select c1,c2,c3,c4 from a_table where c2 = 1) subquery group by 1,2,3) limit 10";
 echo $sql . "\n";
 $parser = new PHPSQLParser($sql);
@@ -156,6 +151,6 @@ SELECT NULL,NULL,NULL,NULL,NULL FROM DUAL LIMIT 1';
 
 $start = microtime(true);
 $parser = new PHPSQLParser($sql);
-echo "Parse time highly complex statement: " .  (microtime(true) - $start) . "\n";
+echo "Parse time highly complex statement: " . (microtime(true) - $start) . "\n";
 
 exit;
