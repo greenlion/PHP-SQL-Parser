@@ -32,12 +32,12 @@
  */
 
 if (!defined('HAVE_PHP_SQL_PARSER')) {
-	
-	require_once(dirname(__FILE__) . '/classes/parser-utils.php');
-	require_once(dirname(__FILE__) . '/classes/lexer.php');
-	require_once(dirname(__FILE__) . '/classes/position-calculator.php');
 
-	/**
+    require_once(dirname(__FILE__) . '/classes/parser-utils.php');
+    require_once(dirname(__FILE__) . '/classes/lexer.php');
+    require_once(dirname(__FILE__) . '/classes/position-calculator.php');
+
+    /**
      * This class implements the parser functionality.
      * @author greenlion@gmail.com
      * @author arothe@phosco.info
@@ -560,76 +560,75 @@ if (!defined('HAVE_PHP_SQL_PARSER')) {
          This function produces a list of the key/value expressions.
          */
         private function getAssignment($base_expr) {
-            $column = $this->process_expr_list($this->split_sql($base_expr));
-            return array('expr_type' => 'expression', 'base_expr' => trim($base_expr), 'sub_tree' => $column);
+            $assignment = $this->process_expr_list($this->split_sql($base_expr));
+            return array('expr_type' => 'expression', 'base_expr' => trim($base_expr), 'sub_tree' => $assignment);
         }
 
         private function getVariableType($expression) {
-        	// $expression contains only upper-case characters
-        	
-        	if ($expression[1] !== "@") {
-				return 'user_variable';        		
-        	}
-        	
-        	$type = substr($expression, 2, strpos($expression, ".", 2));
-        	
-        	switch ($type) {
-        		case 'GLOBAL':
-        		case 'LOCAL':
-        		case 'SESSION':
-        			$type = strtolower($type) . '_variable';
-        			break;
-        		default:
-        			$type = 'session_variable';
-        			break;
-        	}
-			return $type;        	
+            // $expression must contain only upper-case characters
+            if ($expression[1] !== "@") {
+                return 'user_variable';
+            }
+
+            $type = substr($expression, 2, strpos($expression, ".", 2));
+
+            switch ($type) {
+            case 'GLOBAL':
+            case 'LOCAL':
+            case 'SESSION':
+                $type = strtolower($type) . '_variable';
+                break;
+            default:
+                $type = 'session_variable';
+                break;
+            }
+            return $type;
         }
-        
+
         private function process_set_list($tokens, $isUpdate) {
             $result = array();
             $baseExpr = "";
-			$assignment = false;
+            $assignment = false;
             $varType = false;
-			
-            foreach ($tokens as $token) {
-				$upper = strtoupper(trim($token));
-                
-                switch ($upper) {
-                	case 'LOCAL':
- 	              	case 'SESSION':
- 	              	case 'GLOBAL':
-                		if (!$isUpdate) {
-                			$varType = strtolower($upper) . '_variable';
-                			$baseExpr = "";
-                			continue 2;
-                		}
-                		break;
-	                		
-                	case ',':
-                    	$assignment = $this->getAssignment($baseExpr);
-                    	if (!$isUpdate) {
-			                // TODO: go down to the first colref, replace it with vartype
 
-                    	}
-                    	$result[] = $assignment;
-                    	$baseExpr = "";
-            			$varType = false;
-                    	continue 2;
-                    	
-                	default:
+            foreach ($tokens as $token) {
+                $upper = strtoupper(trim($token));
+
+                switch ($upper) {
+                case 'LOCAL':
+                case 'SESSION':
+                case 'GLOBAL':
+                    if (!$isUpdate) {
+                        $varType = strtolower($upper) . '_variable';
+                        $baseExpr = "";
+                        continue 2;
+                    }
+                    break;
+
+                case ',':
+                    $assignment = $this->getAssignment($baseExpr);
+                    if (!$isUpdate) {
+                        if ($varType !== false) {
+                            $assignment['sub_tree'][0]['expr_type'] = $varType;
+                        }
+                    }
+                    $result[] = $assignment;
+                    $baseExpr = "";
+                    $varType = false;
+                    continue 2;
+
+                default:
                 }
-       			$baseExpr .= $token;
+                $baseExpr .= $token;
             }
 
             if (trim($baseExpr) !== "") {
                 $assignment = $this->getAssignment($baseExpr);
-               	if (!$isUpdate) {
-               		
-               		
-               		
-	                // TODO: go down to the first colref, replace it with vartype
-               	}
+                if (!$isUpdate) {
+                    if ($varType !== false) {
+                        $assignment['sub_tree'][0]['expr_type'] = $varType;
+                    }
+                }
                 $result[] = $assignment;
             }
 
@@ -710,6 +709,47 @@ if (!defined('HAVE_PHP_SQL_PARSER')) {
             return str_replace('``', '`', $sql);
         }
 
+        private function isWhitespaceToken($token) {
+            return (trim($token) === "");
+        }
+
+        private function isCommentToken($token) {
+            return isset($token[0]) && isset($token[1])
+                    && (($token[0] === '-' && $token[1] === '-') || ($token[0] === '/' && $token[1] === '*'));
+        }
+
+        private function isColumnReference($out) {
+            return (isset($out['expr_type']) && $out['expr_type'] === 'colref');
+        }
+
+        private function isReserved($out) {
+            return (isset($out['expr_type']) && $out['expr_type'] === 'reserved');
+        }
+
+        private function isConstant($out) {
+            return (isset($out['expr_type']) && $out['expr_type'] === 'const');
+        }
+
+        private function isAggregateFunction($out) {
+            return (isset($out['expr_type']) && $out['expr_type'] === 'aggregate_function');
+        }
+
+        private function isFunction($out) {
+            return (isset($out['expr_type']) && $out['expr_type'] === 'function');
+        }
+
+        private function isExpression($out) {
+            return (isset($out['expr_type']) && $out['expr_type'] === 'expression');
+        }
+
+        private function isBrackedExpression($out) {
+            return (isset($out['expr_type']) && $out['expr_type'] === 'bracked_expression');
+        }
+
+        private function isSubQuery($out) {
+            return (isset($out['expr_type']) && $out['expr_type'] === 'subquery');
+        }
+
         /* This fuction processes each SELECT clause.  We determine what (if any) alias
          is provided, and we set the type of expression.
          */
@@ -727,47 +767,54 @@ if (!defined('HAVE_PHP_SQL_PARSER')) {
             $capture = false;
             $alias = false;
             $processed = false;
-            for ($i = 0; $i < $token_count; ++$i) {
-                $token = strtoupper($tokens[$i]);
-                if (trim($token) !== "") {
-                    $stripped[] = $tokens[$i];
-                }
 
-                if ($token == 'AS') {
-                    $alias = array('as' => true, "name" => "", "base_expr" => $tokens[$i]);
+            for ($i = 0; $i < $token_count; ++$i) {
+                $token = $tokens[$i];
+                $upper = strtoupper($token);
+
+                if ($upper === 'AS') {
+                    $alias = array('as' => true, "name" => "", "base_expr" => $token);
                     $tokens[$i] = "";
-                    array_pop($stripped); // remove it from the expression
                     $capture = true;
                     continue;
                 }
 
+                if (!$this->isWhitespaceToken($upper)) {
+                    $stripped[] = $token;
+                }
+
+                // we have an explicit AS, next one can be the alias
+                // but also a comment!
                 if ($capture) {
-                    if (trim($token) !== "") {
-                        $alias['name'] .= $tokens[$i];
+                    if (!$this->isWhitespaceToken($upper) && !$this->isCommentToken($upper)) {
+                        $alias['name'] .= $token;
                         array_pop($stripped);
                     }
-                    $alias['base_expr'] .= $tokens[$i];
+                    $alias['base_expr'] .= $token;
                     $tokens[$i] = "";
                     continue;
                 }
-                $base_expr .= $tokens[$i];
+
+                $base_expr .= $token;
             }
 
             $stripped = $this->process_expr_list($stripped);
 
+            # TODO: the last part can also be a comment, don't use array_pop
+
             # we remove the last token, if it is a colref,
             # it can be an alias without an AS
             $last = array_pop($stripped);
-            if (!$alias && $last['expr_type'] == 'colref') {
+            if (!$alias && $this->isColumnReference($last)) {
+
+                # TODO: it can be a comment, don't use array_pop
 
                 # check the token before the colref
                 $prev = array_pop($stripped);
 
-                if (isset($prev)
-                        && ($prev['expr_type'] == 'reserved' || $prev['expr_type'] == 'const'
-                                || $prev['expr_type'] == 'aggregate_function' || $prev['expr_type'] == 'function'
-                                || $prev['expr_type'] == 'expression' || $prev['expr_type'] == 'subquery'
-                                || $prev['expr_type'] == 'colref')) {
+                if ($this->isReserved($prev) || $this->isConstant($prev) || $this->isAggregateFunction($prev)
+                        || $this->isFunction($prev) || $this->isExpression($prev) || $this->isSubQuery($prev)
+                        || $this->isColumnReference($prev) || $this->isBrackedExpression($prev)) {
 
                     $alias = array('as' => false, 'name' => trim($last['base_expr']),
                                    'base_expr' => trim($last['base_expr']));
@@ -792,7 +839,7 @@ if (!defined('HAVE_PHP_SQL_PARSER')) {
             # in all other cases we use "expression" as global type
             $type = 'expression';
             if (count($processed) == 1) {
-                if ($processed[0]['expr_type'] != 'subquery') {
+                if (!$this->isSubQuery($processed[0])) {
                     $type = $processed[0]['expr_type'];
                     $base_expr = $processed[0]['base_expr'];
                     $processed = $processed[0]['sub_tree']; // it can be FALSE
@@ -1517,5 +1564,5 @@ if (!defined('HAVE_PHP_SQL_PARSER')) {
             return $tokens;
         }
     }
-    define ('HAVE_PHP_SQL_PARSER', 1);
+    define('HAVE_PHP_SQL_PARSER', 1);
 }
