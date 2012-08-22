@@ -31,82 +31,82 @@
  * DAMAGE.
  */
 
-    class UnableToCreateSQLException extends Exception {
+class UnableToCreateSQLException extends Exception {
 
-        protected $part;
-        protected $partkey;
-        protected $entry;
-        protected $entrykey;
+    protected $part;
+    protected $partkey;
+    protected $entry;
+    protected $entrykey;
 
-        public function __construct($part, $partkey, $entry, $entrykey) {
-            $this->part = $part;
-            $this->partkey = $partkey;
-            $this->entry = $entry;
-            $this->entrykey = $entrykey;
-            parent::__construct("unknown " . $entrykey . " in " . $part . "[" . $partkey . "] " . $entry[$entrykey], 15);
-        }
-
-        public function getEntry() {
-            return $this->entry;
-        }
-
-        public function getEntryKey() {
-            return $this->entrykey;
-        }
-
-        public function getSQLPart() {
-            return $this->part;
-        }
-
-        public function getSQLPartKey() {
-            return $this->partkey;
-        }
+    public function __construct($part, $partkey, $entry, $entrykey) {
+        $this->part = $part;
+        $this->partkey = $partkey;
+        $this->entry = $entry;
+        $this->entrykey = $entrykey;
+        parent::__construct("unknown " . $entrykey . " in " . $part . "[" . $partkey . "] " . $entry[$entrykey], 15);
     }
 
-    class UnsupportedFeatureException extends Exception {
-
-        protected $key;
-
-        public function __construct($key) {
-            $this->key = $key;
-            parent::__construct($key . " not implemented.", 20);
-        }
-
-        public function getKey() {
-            return $this->key;
-        }
+    public function getEntry() {
+        return $this->entry;
     }
 
-    class InvalidParameterException extends InvalidArgumentException {
-
-        protected $argument;
-
-        public function __construct($argument) {
-            $this->argument = $argument;
-            parent::__construct("no SQL string to parse: \n" . $argument, 10);
-        }
-
-        public function getArgument() {
-            return $this->argument;
-        }
+    public function getEntryKey() {
+        return $this->entrykey;
     }
 
-    class UnableToCalculatePositionException extends Exception {
-
-        protected $needle;
-        protected $haystack;
-
-        public function __construct($needle, $haystack) {
-            $this->needle = $needle;
-            $this->haystack = $haystack;
-            parent::__construct("cannot calculate position of " . $needle . " within " . $haystack, 5);
-        }
-
-        public function getNeedle() {
-            return $this->needle;
-        }
-
-        public function getHaystack() {
-            return $this->haystack;
-        }
+    public function getSQLPart() {
+        return $this->part;
     }
+
+    public function getSQLPartKey() {
+        return $this->partkey;
+    }
+}
+
+class UnsupportedFeatureException extends Exception {
+
+    protected $key;
+
+    public function __construct($key) {
+        $this->key = $key;
+        parent::__construct($key . " not implemented.", 20);
+    }
+
+    public function getKey() {
+        return $this->key;
+    }
+}
+
+class InvalidParameterException extends InvalidArgumentException {
+
+    protected $argument;
+
+    public function __construct($argument) {
+        $this->argument = $argument;
+        parent::__construct("no SQL string to parse: \n" . $argument, 10);
+    }
+
+    public function getArgument() {
+        return $this->argument;
+    }
+}
+
+class UnableToCalculatePositionException extends Exception {
+
+    protected $needle;
+    protected $haystack;
+
+    public function __construct($needle, $haystack) {
+        $this->needle = $needle;
+        $this->haystack = $haystack;
+        parent::__construct("cannot calculate position of " . $needle . " within " . $haystack, 5);
+    }
+
+    public function getNeedle() {
+        return $this->needle;
+    }
+
+    public function getHaystack() {
+        return $this->haystack;
+    }
+}

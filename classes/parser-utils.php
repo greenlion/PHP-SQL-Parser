@@ -30,45 +30,45 @@
  * DAMAGE.
  */
 
-	require_once(dirname(__FILE__) . '/constants.php');
-	
+require_once(dirname(__FILE__) . '/constants.php');
+
+/**
+ * This class implements some helper functions.
+ * @author arothe
+ *
+ */
+class PHPSQLParserUtils extends PHPSQLParserConstants {
+
     /**
-     * This class implements some helper functions.
-     * @author arothe
-     *
+     * Prints an array only if debug mode is on.
+     * @param array $s
+     * @param boolean $return, if true, the formatted array is returned via return parameter
      */
-    class PHPSQLParserUtils extends PHPSQLParserConstants {
-
-        /**
-         * Prints an array only if debug mode is on.
-         * @param array $s
-         * @param boolean $return, if true, the formatted array is returned via return parameter
-         */
-        protected function preprint($arr, $return = false) {
-            $x = "<pre>";
-            $x .= print_r($arr, 1);
-            $x .= "</pre>";
-            if ($return) {
-                return $x;
-            } else {
-                if (isset($_ENV['DEBUG'])) {
-                    print $x . "\n";
-                }
+    protected function preprint($arr, $return = false) {
+        $x = "<pre>";
+        $x .= print_r($arr, 1);
+        $x .= "</pre>";
+        if ($return) {
+            return $x;
+        } else {
+            if (isset($_ENV['DEBUG'])) {
+                print $x . "\n";
             }
-        }
-
-        /**
-         * Ends the given string $haystack with the string $needle?
-         * @param string $haystack
-         * @param string $needle
-         */
-        protected function endsWith($haystack, $needle) {
-            $length = strlen($needle);
-            if ($length == 0) {
-                return true;
-            }
-
-            $start = $length * -1;
-            return (substr($haystack, $start) === $needle);
         }
     }
+
+    /**
+     * Ends the given string $haystack with the string $needle?
+     * @param string $haystack
+     * @param string $needle
+     */
+    protected function endsWith($haystack, $needle) {
+        $length = strlen($needle);
+        if ($length == 0) {
+            return true;
+        }
+
+        $start = $length * -1;
+        return (substr($haystack, $start) === $needle);
+    }
+}

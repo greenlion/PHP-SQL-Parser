@@ -31,8 +31,8 @@
 
 if (!defined('HAVE_PHP_SQL_CREATOR')) {
 
-	require_once(dirname(__FILE__) . '/classes/exceptions.php');
-	
+    require_once(dirname(__FILE__) . '/classes/exceptions.php');
+
     class PHPSQLCreator {
 
         public function __construct($parsed = false) {
@@ -369,7 +369,7 @@ if (!defined('HAVE_PHP_SQL_CREATOR')) {
             $sql = "(" . substr($sql, 0, -1) . ")";
             return $sql;
         }
-        
+
         protected function processOrderByAlias($parsed) {
             if ($parsed['expr_type'] !== 'alias') {
                 return "";
@@ -434,7 +434,7 @@ if (!defined('HAVE_PHP_SQL_CREATOR')) {
             $sql = "(" . $sql . ")";
             return $sql;
         }
-                
+
         protected function processSubTree($parsed, $delim = " ") {
             if ($parsed['sub_tree'] === '') {
                 return "";
