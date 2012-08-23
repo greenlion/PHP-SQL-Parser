@@ -56,7 +56,7 @@ if (!defined('HAVE_PHP_SQL_PARSER')) {
 
         public function parse($sql, $calcPositions = false) {
             #lex the SQL statement
-            $inputArray = $this->split_sql($sql);
+            $inputArray = $this->splitSQLIntoTokens($sql);
 
             #This is the highest level lexical analysis.  This is the part of the
             #code which finds UNION and UNION ALL query parts
@@ -198,7 +198,7 @@ if (!defined('HAVE_PHP_SQL_PARSER')) {
 
         #this function splits up a SQL statement into easy to "parse"
         #tokens for the SQL processor
-        private function split_sql($sql) {
+        private function splitSQLIntoTokens($sql) {
             return $this->lexer->split($sql);
         }
 
@@ -562,7 +562,7 @@ if (!defined('HAVE_PHP_SQL_PARSER')) {
          *  This function produces a list of the key/value expressions.
          */
         private function getAssignment($base_expr) {
-            $assignment = $this->process_expr_list($this->split_sql($base_expr));
+            $assignment = $this->process_expr_list($this->splitSQLIntoTokens($base_expr));
             return array('expr_type' => ExpressionType::EXPRESSION, 'base_expr' => trim($base_expr),
                          'sub_tree' => $assignment);
         }
@@ -758,7 +758,7 @@ if (!defined('HAVE_PHP_SQL_PARSER')) {
          */
         private function process_select_expr($expression) {
 
-            $tokens = $this->split_sql($expression);
+            $tokens = $this->splitSQLIntoTokens($expression);
             $token_count = count($tokens);
 
             /* Determine if there is an explicit alias after the AS clause.
@@ -1003,7 +1003,7 @@ if (!defined('HAVE_PHP_SQL_PARSER')) {
 
             # we have a reg_expr, so we have to parse it
             if ($parseInfo['ref_expr'] !== false) {
-                $unparsed = $this->split_sql($this->removeParenthesisFromStart($parseInfo['ref_expr']));
+                $unparsed = $this->splitSQLIntoTokens($this->removeParenthesisFromStart($parseInfo['ref_expr']));
 
                 // here we can get a comma separated list
                 foreach ($unparsed as $k => $v) {
@@ -1022,7 +1022,7 @@ if (!defined('HAVE_PHP_SQL_PARSER')) {
                     $parseInfo['sub_tree'] = $this->parse($parseInfo['expression']);
                     $res['expr_type'] = ExpressionType::SUBQUERY;
                 } else {
-                    $tmp = $this->split_sql($parseInfo['expression']);
+                    $tmp = $this->splitSQLIntoTokens($parseInfo['expression']);
                     $parseInfo['sub_tree'] = $this->process_from($tmp);
                     $res['expr_type'] = ExpressionType::TABLE_EXPRESSION;
                 }
@@ -1205,7 +1205,7 @@ if (!defined('HAVE_PHP_SQL_PARSER')) {
                             || $parseInfo['prevTokenType'] === ExpressionType::SIMPLE_FUNCTION
                             || $parseInfo['prevTokenType'] === Expressiontype::AGGREGATE_FUNCTION) {
 
-                        $tmptokens = $this->split_sql($this->removeParenthesisFromStart($parseInfo['trim']));
+                        $tmptokens = $this->splitSQLIntoTokens($this->removeParenthesisFromStart($parseInfo['trim']));
                         foreach ($tmptokens as $k => $v) {
                             if ($this->isCommaToken($v)) {
                                 unset($tmptokens[$k]);
@@ -1224,7 +1224,7 @@ if (!defined('HAVE_PHP_SQL_PARSER')) {
 
                     if ($parseInfo['prevToken'] === 'IN') {
 
-                        $tmptokens = $this->split_sql($this->removeParenthesisFromStart($parseInfo['trim']));
+                        $tmptokens = $this->splitSQLIntoTokens($this->removeParenthesisFromStart($parseInfo['trim']));
                         foreach ($tmptokens as $k => $v) {
                             if ($this->isCommaToken($v)) {
                                 unset($tmptokens[$k]);
@@ -1239,7 +1239,7 @@ if (!defined('HAVE_PHP_SQL_PARSER')) {
 
                     if ($parseInfo['prevToken'] === 'AGAINST') {
 
-                        $tmptokens = $this->split_sql($this->removeParenthesisFromStart($parseInfo['trim']));
+                        $tmptokens = $this->splitSQLIntoTokens($this->removeParenthesisFromStart($parseInfo['trim']));
                         if (count($tmptokens) > 1) {
                             $match_mode = implode('', array_slice($tmptokens, 1));
                             $parseInfo['processed'] = array($list[0], $match_mode);
@@ -1427,7 +1427,7 @@ if (!defined('HAVE_PHP_SQL_PARSER')) {
                         $local_expr = $parseInfo['trim'];
                         $parseInfo['tokenType'] = ExpressionType::EXPRESSION;
                     }
-                    $parseInfo['processed'] = $this->process_expr_list($this->split_sql($local_expr));
+                    $parseInfo['processed'] = $this->process_expr_list($this->splitSQLIntoTokens($local_expr));
                 }
 
                 $parseInfo = $this->initParseInfoExprList($parseInfo);
@@ -1503,7 +1503,7 @@ if (!defined('HAVE_PHP_SQL_PARSER')) {
         private function process_record($unparsed) {
 
             $unparsed = $this->removeParenthesisFromStart($unparsed);
-            $values = $this->split_sql($unparsed);
+            $values = $this->splitSQLIntoTokens($unparsed);
 
             foreach ($values as $k => $v) {
                 if ($this->isCommaToken($v)) {
@@ -1526,7 +1526,7 @@ if (!defined('HAVE_PHP_SQL_PARSER')) {
                 $unparsed .= $v;
             }
 
-            $values = $this->split_sql($unparsed);
+            $values = $this->splitSQLIntoTokens($unparsed);
 
             $parsed = array();
             foreach ($values as $k => $v) {
