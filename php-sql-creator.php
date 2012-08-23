@@ -32,6 +32,7 @@
 if (!defined('HAVE_PHP_SQL_CREATOR')) {
 
     require_once(dirname(__FILE__) . '/classes/exceptions.php');
+    require_once(dirname(__FILE__) . '/classes/expression-types.php');
 
     class PHPSQLCreator {
 
