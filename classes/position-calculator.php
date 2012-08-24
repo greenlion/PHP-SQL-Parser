@@ -136,10 +136,11 @@ class PositionCalculator extends PHPSQLParserUtils {
             if (($key === 'UNION' || $key === 'UNION ALL')
                     || ($key === 'expr_type' && $parsed === ExpressionType::EXPRESSION)
                     || ($key === 'expr_type' && $parsed === ExpressionType::SUBQUERY)
-                    || ($key === 'expr_type' && $parsed === ExpressionType::BRACKED_EXPRESSION)
+                    || ($key === 'expr_type' && $parsed === ExpressionType::BRACKET_EXPRESSION)
                     || ($key === 'expr_type' && $parsed === ExpressionType::TABLE_EXPRESSION)
                     || ($key === 'expr_type' && $parsed === ExpressionType::RECORD)
                     || ($key === 'expr_type' && $parsed === ExpressionType::IN_LIST)
+                    || ($key === 'expr_type' && $parsed === ExpressionType::MATCH_ARGUMENTS)
                     || ($key === 'alias' && $parsed !== false)) {
                 # we hold the current position and come back after the next base_expr
                 # we do this, because the next base_expr contains the complete expression/subquery/record
