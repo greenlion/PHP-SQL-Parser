@@ -346,7 +346,7 @@ if (!defined('HAVE_PHP_SQL_CREATOR')) {
         }
 
         protected function processWhereBracketExpression($parsed) {
-            if ($parsed['expr_type'] !== ExpressionType::BRACKED_EXPRESSION) {
+            if ($parsed['expr_type'] !== ExpressionType::BRACKET_EXPRESSION) {
                 return "";
             }
             $sql = "";
@@ -429,7 +429,7 @@ if (!defined('HAVE_PHP_SQL_CREATOR')) {
         }
 
         protected function processSelectBracketExpression($parsed) {
-            if ($parsed['expr_type'] !== ExpressionType::BRACKED_EXPRESSION) {
+            if ($parsed['expr_type'] !== ExpressionType::BRACKET_EXPRESSION) {
                 return "";
             }
             $sql = $this->processSubTree($parsed, " ");
