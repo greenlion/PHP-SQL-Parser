@@ -46,17 +46,19 @@ class ExpressionType {
     const SIMPLE_FUNCTION = "function";
 
     const EXPRESSION = "expression";
-    const BRACKED_EXPRESSION = "bracket_expression";
+    const BRACKET_EXPRESSION = "bracket_expression";
     const TABLE_EXPRESSION = "table_expression";
 
     const SUBQUERY = "subquery";
     const TABLE = "table";
     const IN_LIST = "in-list";
-    const MATCH_ARGUMENTS = "match-arguments";
     const OPERATOR = "operator";
     const SIGN = "sign";
     const RECORD = "record";
-
+    
+    const MATCH_ARGUMENTS = "match-arguments";
+    const MATCH_MODE = "match-mode";
+    
     const ALIAS = "alias";
     const POSITION = "pos";
 }
