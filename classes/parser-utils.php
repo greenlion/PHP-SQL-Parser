@@ -128,4 +128,22 @@ class PHPSQLParserUtils extends PHPSQLParserConstants {
         return trim($trim);
     }
 
+    public function getLastOf($array) {
+        // $array is a copy of the original array, so we can change it without sideeffects
+        if (!is_array($array)) {
+            return false;
+        }
+        return array_pop($array);
+    }
+
+    /**
+     * translates an array of objects into an associative array
+     */
+    public function toArray($tokenList) {
+        $expr = array();
+        foreach ($tokenList as $token) {
+            $expr[] = $token->toArray();
+        }
+        return (empty($expr) ? false : $expr);
+    }
 }
