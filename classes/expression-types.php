@@ -50,7 +50,6 @@ class ExpressionType {
     const TABLE_EXPRESSION = "table_expression";
 
     const SUBQUERY = "subquery";
-    const TABLE = "table";
     const IN_LIST = "in-list";
     const OPERATOR = "operator";
     const SIGN = "sign";
@@ -61,4 +60,10 @@ class ExpressionType {
     
     const ALIAS = "alias";
     const POSITION = "pos";
+    
+    const TEMPORARY_TABLE = "temporary_table";
+    const TABLE = "table";
+    const VIEW = "view";
+    const DATABASE = "database";
+    const SCHEMA = "schema";
 }
