@@ -257,7 +257,6 @@ if (!defined('HAVE_PHP_SQL_PARSER')) {
                 case 'CALL':
                 case 'PROCEDURE':
                 case 'FUNCTION':
-                case 'DATABASE':
                 case 'SERVER':
                 case 'LOGFILE':
                 case 'DEFINER':
@@ -287,6 +286,14 @@ if (!defined('HAVE_PHP_SQL_PARSER')) {
                     $token_category = $upper;
                     break;
 
+                case 'DATABASE':
+                case 'SCHEMA':
+                    if ($prev_category === 'DROP') {
+                        continue;
+                    }    
+                    $token_category = $upper;
+                    break;
+                    
                 case 'EVENT':
                 # issue 71
                     if ($prev_category === 'DROP' || $prev_category === 'ALTER' || $prev_category === 'CREATE') {
@@ -403,7 +410,6 @@ if (!defined('HAVE_PHP_SQL_PARSER')) {
                 case 'DROP':
                     if ($token_category !== 'ALTER') {
                         $token_category = $upper;
-                        $out[$upper][0] = $upper;
                         continue 2;
                     }
                     break;
@@ -554,6 +560,9 @@ if (!defined('HAVE_PHP_SQL_PARSER')) {
             }
             if (!empty($out['INTO'])) {
                 $out = $this->process_into($out);
+            }
+            if (!empty($out['DROP'])) {
+                $out['DROP'] = $this->processDrop($out['DROP']);
             }
             return $out;
         }
@@ -1555,6 +1564,67 @@ if (!defined('HAVE_PHP_SQL_PARSER')) {
             }
             $tokens['INTO'] = array_values($unparsed);
             return $tokens;
+        }
+        
+        private function processDrop($tokenList) {
+            
+            $skip = false;
+            $warning = true;
+            $base_expr = "";
+            $expr_type = false;
+            $option = false;
+            $resultList = array();
+            
+            foreach($tokenList as $k => $v) {
+                $token = new ExpressionToken($k, $v);
+                
+                if ($token->isWhitespaceToken()) {
+                    continue;
+                }
+                
+                if ($skip === true) {
+                    $skip = false;
+                    continue;
+                }
+                
+                switch ($token->getUpper()) {
+                    case 'VIEW':
+                    case 'SCHEMA':
+                    case 'DATABASE':
+                    case 'TABLE':
+                        $expr_type = strtolower($token->getTrim());
+                        break;
+                        
+                    case 'IF':
+                        $warning = false;
+                        $skip = true;
+                        break;
+                        
+                    case 'TEMPORARY':
+                        $expr_type = ExpressionType::TEMPORARY_TABLE;
+                        $skip = true;
+                        break;
+                          
+                    case 'RESTRICT':
+                    case 'CASCADE':
+                        $option = $token->getUpper();
+                        break;
+
+                    case ',':
+                        $resultList[] = array('expr_type' => $expr_type, 'base_expr' => $base_expr);
+                        $base_expr = "";
+                        break;
+                        
+                    default:
+                        $base_expr .= $token->getToken();
+                }                        
+            }
+            
+            if ($base_expr !== "") {
+                $resultList[] = array('expr_type' => $expr_type, 'base_expr' => $base_expr);
+            }
+            
+            return array('option' => $option, 'warning' => $warning, 'object_list' => $resultList);
         }
     }
     define('HAVE_PHP_SQL_PARSER', 1);
