@@ -1505,7 +1505,7 @@ if (!defined('HAVE_PHP_SQL_PARSER')) {
             }
 
             unset($tokens['INTO']);
-            $tokens[$token_category] = array('table' => $table, 'columns' => $cols, 'base_expr' => $table);
+            $tokens[$token_category][0] = array('table' => $table, 'columns' => $cols, 'base_expr' => $table);
             return $tokens;
         }
 
