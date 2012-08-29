@@ -290,10 +290,10 @@ if (!defined('HAVE_PHP_SQL_PARSER')) {
                 case 'SCHEMA':
                     if ($prev_category === 'DROP') {
                         continue;
-                    }    
+                    }
                     $token_category = $upper;
                     break;
-                    
+
                 case 'EVENT':
                 # issue 71
                     if ($prev_category === 'DROP' || $prev_category === 'ALTER' || $prev_category === 'CREATE') {
@@ -520,7 +520,7 @@ if (!defined('HAVE_PHP_SQL_PARSER')) {
                 $out['USING'] = $this->process_from($out['USING']);
             }
             if (!empty($out['UPDATE'])) {
-                $out['UPDATE'] = $this->process_from($out['UPDATE']);
+                $out['UPDATE'] = $this->processUpdate($out['UPDATE']);
             }
             if (!empty($out['GROUP'])) {
                 # set empty array if we have partial SQL statement 
@@ -547,10 +547,10 @@ if (!defined('HAVE_PHP_SQL_PARSER')) {
                 unset($out['DUPLICATE']);
             }
             if (!empty($out['INSERT'])) {
-                $out = $this->process_insert($out);
+                $out = $this->processInsert($out);
             }
             if (!empty($out['REPLACE'])) {
-                $out = $this->process_insert($out, 'REPLACE');
+                $out = $this->processReplace($out);
             }
             if (!empty($out['DELETE'])) {
                 $out = $this->process_delete($out);
@@ -559,7 +559,7 @@ if (!defined('HAVE_PHP_SQL_PARSER')) {
                 $out = $this->process_values($out);
             }
             if (!empty($out['INTO'])) {
-                $out = $this->process_into($out);
+                $out = $this->processInto($out);
             }
             if (!empty($out['DROP'])) {
                 $out['DROP'] = $this->processDrop($out['DROP']);
@@ -1447,10 +1447,9 @@ if (!defined('HAVE_PHP_SQL_PARSER')) {
 
         /**
          * This method processes UPDATE statements
-         * Nothing to do here.
          */
-        private function process_update($tokens) {
-
+        private function processUpdate($tokenList) {
+            return $this->process_from($tokenList);
         }
 
         /**
@@ -1477,13 +1476,27 @@ if (!defined('HAVE_PHP_SQL_PARSER')) {
         }
 
         /**
+         * This method handles REPLACE statements.
+         */
+        private function processReplace($tokenList) {
+            return $this->processInsert($tokenList, 'REPLACE');
+        }
+
+        /**
+         * This method handles INSERT statements.
+         */
+        private function processInsert($tokenList) {
+            return $this->processInsertOrReplace($tokenList, 'INSERT');
+        }
+
+        /**
          * This method handles INSERT and REPLACE statements.
          */
-        private function process_insert($tokens, $token_category = 'INSERT') {
+        private function processInsertOrReplace($tokenList, $token_category) {
             $table = "";
             $cols = array();
 
-            $into = $tokens['INTO'];
+            $into = $tokenList['INTO'];
             foreach ($into as $token) {
                 if ($this->isWhitespaceToken($token))
                     continue;
@@ -1504,9 +1517,9 @@ if (!defined('HAVE_PHP_SQL_PARSER')) {
                 }
             }
 
-            unset($tokens['INTO']);
-            $tokens[$token_category][0] = array('table' => $table, 'columns' => $cols, 'base_expr' => $table);
-            return $tokens;
+            unset($tokenList['INTO']);
+            $tokenList[$token_category][0] = array('table' => $table, 'columns' => $cols, 'base_expr' => $table);
+            return $tokenList;
         }
 
         private function process_record($unparsed) {
@@ -1555,75 +1568,75 @@ if (!defined('HAVE_PHP_SQL_PARSER')) {
          * TODO: This is a dummy function, we cannot parse INTO as part of SELECT
          * at the moment
          */
-        private function process_into($tokens) {
-            $unparsed = $tokens['INTO'];
+        private function processInto($tokenList) {
+            $unparsed = $tokenList['INTO'];
             foreach ($unparsed as $k => $token) {
                 if ($this->isWhitespaceToken($token) || $this->isCommaToken($token)) {
                     unset($unparsed[$k]);
                 }
             }
-            $tokens['INTO'] = array_values($unparsed);
-            return $tokens;
+            $tokenList['INTO'] = array_values($unparsed);
+            return $tokenList;
         }
-        
+
         private function processDrop($tokenList) {
-            
+
             $skip = false;
             $warning = true;
             $base_expr = "";
             $expr_type = false;
             $option = false;
             $resultList = array();
-            
-            foreach($tokenList as $k => $v) {
+
+            foreach ($tokenList as $k => $v) {
                 $token = new ExpressionToken($k, $v);
-                
+
                 if ($token->isWhitespaceToken()) {
                     continue;
                 }
-                
+
                 if ($skip === true) {
                     $skip = false;
                     continue;
                 }
-                
-                switch ($token->getUpper()) {
-                    case 'VIEW':
-                    case 'SCHEMA':
-                    case 'DATABASE':
-                    case 'TABLE':
-                        $expr_type = strtolower($token->getTrim());
-                        break;
-                        
-                    case 'IF':
-                        $warning = false;
-                        $skip = true;
-                        break;
-                        
-                    case 'TEMPORARY':
-                        $expr_type = ExpressionType::TEMPORARY_TABLE;
-                        $skip = true;
-                        break;
-                          
-                    case 'RESTRICT':
-                    case 'CASCADE':
-                        $option = $token->getUpper();
-                        break;
 
-                    case ',':
-                        $resultList[] = array('expr_type' => $expr_type, 'base_expr' => $base_expr);
-                        $base_expr = "";
-                        break;
-                        
-                    default:
-                        $base_expr .= $token->getToken();
-                }                        
+                switch ($token->getUpper()) {
+                case 'VIEW':
+                case 'SCHEMA':
+                case 'DATABASE':
+                case 'TABLE':
+                    $expr_type = strtolower($token->getTrim());
+                    break;
+
+                case 'IF':
+                    $warning = false;
+                    $skip = true;
+                    break;
+
+                case 'TEMPORARY':
+                    $expr_type = ExpressionType::TEMPORARY_TABLE;
+                    $skip = true;
+                    break;
+
+                case 'RESTRICT':
+                case 'CASCADE':
+                    $option = $token->getUpper();
+                    break;
+
+                case ',':
+                    $resultList[] = array('expr_type' => $expr_type, 'base_expr' => $base_expr);
+                    $base_expr = "";
+                    break;
+
+                default:
+                    $base_expr .= $token->getToken();
+                }
             }
-            
+
             if ($base_expr !== "") {
                 $resultList[] = array('expr_type' => $expr_type, 'base_expr' => $base_expr);
             }
-            
+
             return array('option' => $option, 'warning' => $warning, 'object_list' => $resultList);
         }
     }
