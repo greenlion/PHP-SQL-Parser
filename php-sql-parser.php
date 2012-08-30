@@ -308,13 +308,6 @@ if (!defined('HAVE_PHP_SQL_PARSER')) {
                     }
                     break;
 
-                case 'PASSWORD':
-                # prevent wrong handling of PASSWORD as keyword
-                    if ($prev_category === 'SET') {
-                        $token_category = $upper;
-                    }
-                    break;
-
                 case 'INTO':
                 # prevent wrong handling of CACHE within LOAD INDEX INTO CACHE...
                     if ($prev_category === 'LOAD') {
@@ -1239,6 +1232,7 @@ if (!defined('HAVE_PHP_SQL_PARSER')) {
 
                         $curr->setSubTree($tmpToken);
                         $curr->setTokenType(ExpressionType::MATCH_ARGUMENTS);
+                        $prev->setTokenType(ExpressionType::SIMPLE_FUNCTION);
 
                     } elseif ($prev->isColumnReference() || $prev->isFunction() || $prev->isAggregateFunction()) {
 
@@ -1398,37 +1392,24 @@ if (!defined('HAVE_PHP_SQL_PARSER')) {
                 if (!$curr->isOperator() && !$curr->isInList() && !$curr->isFunction() && !$curr->isAggregateFunction()
                         && in_array($curr->getUpper(), parent::$reserved)) {
 
-                    switch ($curr->getUpper()) {
-                    case 'AVG':
-                    case 'SUM':
-                    case 'COUNT':
-                    case 'MIN':
-                    case 'MAX':
-                    case 'STDDEV':
-                    case 'STDDEV_SAMP':
-                    case 'STDDEV_POP':
-                    case 'VARIANCE':
-                    case 'VAR_SAMP':
-                    case 'VAR_POP':
-                    case 'GROUP_CONCAT':
-                    case 'BIT_AND':
-                    case 'BIT_OR':
-                    case 'BIT_XOR':
+                    if (in_array($curr->getUpper(), parent::$aggregateFunctions)) {
                         $curr->setTokenType(ExpressionType::AGGREGATE_FUNCTION);
-                        break;
 
-                    case 'NULL':
-                    // it is a reserved word, but we would like to set it as constant
+                    } elseif ($curr->getUpper() === 'NULL') {
+                        // it is a reserved word, but we would like to set it as constant
                         $curr->setTokenType(ExpressionType::CONSTANT);
-                        break;
 
-                    default:
-                        if (in_array($curr->getUpper(), parent::$functions)) {
+                    } else {
+                        if (in_array($curr->getUpper(), parent::$parameterizedFunctions)) {
+                            // issue 60: check functions with parameters 
+                            // -> colref (we check parameters later)
+                            // -> if there is no parameter, we leave the colref
+                            $curr->setTokenType(ExpressionType::COLREF);
+                        } elseif (in_array($curr->getUpper(), parent::$functions)) {
                             $curr->setTokenType(ExpressionType::SIMPLE_FUNCTION);
                         } else {
                             $curr->setTokenType(ExpressionType::RESERVED);
                         }
-                        break;
                     }
                 }
 
