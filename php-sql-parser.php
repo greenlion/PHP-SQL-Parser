@@ -250,7 +250,6 @@ if (!defined('HAVE_PHP_SQL_PARSER')) {
                 case 'DUPLICATE':
                 case 'VALUES':
                 case 'GROUP':
-                case 'ORDER':
                 case 'HAVING':
                 case 'WHERE':
                 case 'RENAME':
