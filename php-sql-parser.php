@@ -762,6 +762,9 @@ if (!defined('HAVE_PHP_SQL_PARSER')) {
 
             $tokens = $this->splitSQLIntoTokens($expression);
             $token_count = count($tokens);
+            if ($token_count === 0) {
+                return null;
+            }
 
             /* Determine if there is an explicit alias after the AS clause.
              If AS is found, then the next non-whitespace token is captured as the alias.
@@ -1284,7 +1287,7 @@ if (!defined('HAVE_PHP_SQL_PARSER')) {
                         # then * is an operator
                         # but if the previous colref ends with a dot, the * is the all-columns-alias
                         if (!$prev->isColumnReference() && !$prev->isConstant() && !$prev->isExpression()
-                                && !$prev->isBracketExpression()) {
+                                && !$prev->isBracketExpression() && !$prev->isAggregateFunction()) {
                             $curr->setTokenType(ExpressionType::COLREF);
                             break;
                         }
