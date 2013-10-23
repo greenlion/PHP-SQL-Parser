@@ -22,4 +22,5 @@ require_once(dirname(__FILE__) . '/tests/creator/left.php');
 require_once(dirname(__FILE__) . '/tests/creator/tableexpr.php');
 require_once(dirname(__FILE__) . '/tests/creator/update.php');
 require_once(dirname(__FILE__) . '/tests/creator/where.php');
+require_once(dirname(__FILE__) . '/tests/creator/magnus.php');
 echo "processing tests within: " .  (microtime(true) - $start) . " seconds\n";
