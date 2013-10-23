@@ -414,6 +414,8 @@ if (!defined('HAVE_PHP_SQL_CREATOR')) {
                 $sql .= $this->processConstant($v);
                 $sql .= $this->processColRef($v);
                 $sql .= $this->processReserved($v);
+                $sql .= $this->processSelectBracketExpression($v);
+                $sql .= $this->processSelectExpression($v);
 
                 if ($len == strlen($sql)) {
                     throw new UnableToCreateSQLException('function subtree', $k, $v, 'expr_type');
