@@ -444,6 +444,7 @@ if (!defined('HAVE_PHP_SQL_CREATOR')) {
             $sql = "";
             foreach ($parsed['sub_tree'] as $k => $v) {
                 $len = strlen($sql);
+                $sql .= $this->processColRef($v);
                 $sql .= $this->processFunction($v);
                 $sql .= $this->processOperator($v);
                 $sql .= $this->processConstant($v);
