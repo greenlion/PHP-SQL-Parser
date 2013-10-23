@@ -117,6 +117,7 @@ if (!defined('HAVE_PHP_SQL_CREATOR')) {
             foreach ($parsed as $k => $v) {
                 $len = strlen($sql);
                 $sql .= $this->processColRef($v);
+                $sql .= $this->processSelectBracketExpression($v);
                 $sql .= $this->processSelectExpression($v);
                 $sql .= $this->processFunction($v);
                 $sql .= $this->processConstant($v);
