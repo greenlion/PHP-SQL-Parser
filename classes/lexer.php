@@ -296,7 +296,7 @@ class PHPSQLLexer extends PHPSQLParserUtils {
                 }
             }
 
-            if ($this->endsWith($tokens[$i], '.')) {
+            if ($this->endsWith($tokens[$i], '.') && !is_numeric($tokens[$i])) {
 
                 // concat the next tokens, till the token has been changed
                 $k = $i + 1;
