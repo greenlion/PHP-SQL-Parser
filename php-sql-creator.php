@@ -179,6 +179,7 @@ if (!defined('HAVE_PHP_SQL_CREATOR')) {
             foreach ($parsed as $k => $v) {
                 $len = strlen($sql);
                 $sql .= $this->processColRef($v);
+                $sql .= $this->processPosition($v);
 
                 if ($len == strlen($sql)) {
                     throw new UnableToCreateSQLException('GROUP', $k, $v, 'expr_type');
@@ -598,6 +599,13 @@ if (!defined('HAVE_PHP_SQL_CREATOR')) {
             return $sql;
         }
 
+        protected function processPosition($parsed) {
+            if ($parsed['expr_type'] !== ExpressionType::POSITION) {
+                return "";
+            }
+            return $parsed['base_expr'];
+        }
+                
         protected function processDirection($parsed) {
             $sql = ($parsed ? " " . $parsed : "");
             return $sql;
