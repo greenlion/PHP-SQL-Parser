@@ -421,7 +421,7 @@ if (!defined('HAVE_PHP_SQL_CREATOR')) {
 
                 $sql .= ($this->isReserved($v) ? " " : ",");
             }
-            return $parsed['base_expr'] . "(" . substr($sql, 0, -1) . ")";
+            return $parsed['base_expr'] . "(" . substr($sql, 0, -1) . ")" . $this->processAlias($parsed['alias']);
         }
 
         protected function processSelectExpression($parsed) {
