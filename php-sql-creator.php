@@ -70,7 +70,10 @@ if (!defined('HAVE_PHP_SQL_CREATOR')) {
         }
 
         protected function processSelectStatement($parsed) {
-            $sql = $this->processSELECT($parsed['SELECT']) . " " . $this->processFROM($parsed['FROM']);
+            $sql = $this->processSELECT($parsed['SELECT']);
+            if (isset($parsed['FROM'])) {
+                $sql .= " " . $this->processFROM($parsed['FROM']);
+            }
             if (isset($parsed['WHERE'])) {
                 $sql .= " " . $this->processWHERE($parsed['WHERE']);
             }
