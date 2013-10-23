@@ -50,6 +50,7 @@ require_once(dirname(__FILE__) . '/tests/parser/issue70.php');
 require_once(dirname(__FILE__) . '/tests/parser/issue71.php');
 require_once(dirname(__FILE__) . '/tests/parser/issue72.php');
 require_once(dirname(__FILE__) . '/tests/parser/issue74.php');
+require_once(dirname(__FILE__) . '/tests/parser/issue97.php');
 require_once(dirname(__FILE__) . '/tests/parser/left.php');
 require_once(dirname(__FILE__) . '/tests/parser/nested.php');
 require_once(dirname(__FILE__) . '/tests/parser/positions.php');
