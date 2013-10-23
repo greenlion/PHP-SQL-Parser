@@ -13,6 +13,8 @@ require_once(dirname(__FILE__) . '/tests/creator/issue57.php');
 require_once(dirname(__FILE__) . '/tests/creator/issue58.php');
 require_once(dirname(__FILE__) . '/tests/creator/issue63.php');
 require_once(dirname(__FILE__) . '/tests/creator/issue66.php');
+require_once(dirname(__FILE__) . '/tests/creator/issue76.php');
+require_once(dirname(__FILE__) . '/tests/creator/issue83.php');
 require_once(dirname(__FILE__) . '/tests/creator/issue85.php');
 require_once(dirname(__FILE__) . '/tests/creator/issue86.php');
 require_once(dirname(__FILE__) . '/tests/creator/issue88.php');
