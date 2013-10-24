@@ -90,7 +90,8 @@ if (!defined('HAVE_PHP_SQL_CREATOR')) {
         }
 
         protected function processInsertStatement($parsed) {
-            return $this->processINSERT($parsed['INSERT']) . " " . $this->processVALUES($parsed['VALUES']);
+        	# TODO: are there more than one tables possible (like [INSERT][1])
+            return $this->processINSERT($parsed['INSERT'][0]) . " " . $this->processVALUES($parsed['VALUES']);
             # TODO: subquery?
         }
 
@@ -380,7 +381,7 @@ if (!defined('HAVE_PHP_SQL_CREATOR')) {
             if ($parsed['expr_type'] !== ExpressionType::ALIAS) {
                 return "";
             }
-            return $parsed['base_expr'] . $this->processDirection($parsed['direction']);
+            return $parsed['base_expr'] . $this->processDirection($parsed);
         }
 
         protected function processLimitRowCount($key, $value) {
@@ -423,15 +424,19 @@ if (!defined('HAVE_PHP_SQL_CREATOR')) {
 
                 $sql .= ($this->isReserved($v) ? " " : ",");
             }
-            return $parsed['base_expr'] . "(" . substr($sql, 0, -1) . ")" . $this->processAlias($parsed['alias']);
+            return $parsed['base_expr'] . "(" . substr($sql, 0, -1) . ")" . $this->processAlias($parsed);
         }
 
+        protected function hasAlias($parsed) {
+        	return isset($parsed['alias']);
+        }
+        
         protected function processSelectExpression($parsed) {
             if ($parsed['expr_type'] !== ExpressionType::EXPRESSION) {
                 return "";
             }
             $sql = $this->processSubTree($parsed, " ");
-            $sql .= $this->processAlias($parsed['alias']);
+            $sql .= $this->processAlias($parsed);
             return $sql;
         }
 
@@ -457,6 +462,7 @@ if (!defined('HAVE_PHP_SQL_CREATOR')) {
                 $sql .= $this->processConstant($v);
                 $sql .= $this->processSubQuery($v);
                 $sql .= $this->processSelectBracketExpression($v);
+                $sql .= $this->processReserved($v);
 
                 if ($len == strlen($sql)) {
                     throw new UnableToCreateSQLException('expression subtree', $k, $v, 'expr_type');
@@ -489,14 +495,14 @@ if (!defined('HAVE_PHP_SQL_CREATOR')) {
         }
 
         protected function processAlias($parsed) {
-            if ($parsed === false) {
+            if (!isset($parsed['alias']) || $parsed['alias'] === false) {
                 return "";
             }
             $sql = "";
-            if ($parsed['as']) {
+            if ($parsed['alias']['as']) {
                 $sql .= " as";
             }
-            $sql .= " " . $parsed['name'];
+            $sql .= " " . $parsed['alias']['name'];
             return $sql;
         }
 
@@ -537,7 +543,7 @@ if (!defined('HAVE_PHP_SQL_CREATOR')) {
             }
 
             $sql = $parsed['table'];
-            $sql .= $this->processAlias($parsed['alias']);
+            $sql .= $this->processAlias($parsed);
 
             if ($index !== 0) {
                 $sql = $this->processJoin($parsed['join_type']) . " " . $sql;
@@ -553,7 +559,7 @@ if (!defined('HAVE_PHP_SQL_CREATOR')) {
             }
             $sql = substr($this->processFROM($parsed['sub_tree']), 5); // remove FROM keyword
             $sql = "(" . $sql . ")";
-            $sql .= $this->processAlias($parsed['alias']);
+            $sql .= $this->processAlias($parsed);
 
             if ($index !== 0) {
                 $sql = $this->processJoin($parsed['join_type']) . " " . $sql;
@@ -570,10 +576,7 @@ if (!defined('HAVE_PHP_SQL_CREATOR')) {
 
             $sql = $this->processSelectStatement($parsed['sub_tree']);
             $sql = "(" . $sql . ")";
-
-            if (isset($parsed['alias'])) {
-                $sql .= $this->processAlias($parsed['alias']);
-            }
+            $sql .= $this->processAlias($parsed);
 
             if ($index !== 0) {
                 $sql = $this->processJoin($parsed['join_type']) . " " . $sql;
@@ -595,12 +598,8 @@ if (!defined('HAVE_PHP_SQL_CREATOR')) {
                 return "";
             }
             $sql = $parsed['base_expr'];
-            if (isset($parsed['alias'])) {
-                $sql .= $this->processAlias($parsed['alias']);
-            }
-            if (isset($parsed['direction'])) {
-                $sql .= $this->processDirection($parsed['direction']);
-            }
+            $sql .= $this->processAlias($parsed);
+            $sql .= $this->processDirection($parsed);
             return $sql;
         }
 
@@ -612,8 +611,10 @@ if (!defined('HAVE_PHP_SQL_CREATOR')) {
         }
                 
         protected function processDirection($parsed) {
-            $sql = ($parsed ? " " . $parsed : "");
-            return $sql;
+        	if (!isset($parsed['direction']) || $parsed['direction'] === false) {
+        		return "";
+        	}
+            return (" " . $parsed['direction']);
         }
 
         protected function processReserved($parsed) {
