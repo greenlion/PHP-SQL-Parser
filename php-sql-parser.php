@@ -1457,6 +1457,15 @@ if (!defined('HAVE_PHP_SQL_PARSER')) {
                     }
                 }
 
+                # issue 94, INTERVAL 1 MONTH
+                if ($curr->isConstant() && in_array($prev->getUpper(), parent::$parameterizedFunctions)) {
+                	$prev->setTokenType(ExpressionType::RESERVED);
+                }
+                
+                if ($prev->isConstant() && in_array($curr->getUpper(), parent::$parameterizedFunctions)) {
+                	$curr->setTokenType(ExpressionType::RESERVED);
+                }
+                
                 if ($curr->isUnspecified()) {
                     $curr->setTokenType(ExpressionType::EXPRESSION);
                     $curr->setSubTree($this->process_expr_list($this->splitSQLIntoTokens($curr->getTrim())));
