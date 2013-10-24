@@ -1,1 +1,1 @@
-SELECT SUM(10) FROM account
+SELECT SUM(10) as test FROM account
