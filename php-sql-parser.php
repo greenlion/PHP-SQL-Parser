@@ -1241,7 +1241,8 @@ if (!defined('HAVE_PHP_SQL_PARSER')) {
                         # if we have a colref followed by a parenthesis pair,
                         # it isn't a colref, it is a user-function
                         $localExpr = new ExpressionToken();
-                        
+                        $tmpExprList = array();
+                         
                         foreach ($localTokenList as $k => $v) {
                             $tmpToken = new ExpressionToken($k, $v);
                             if (!$tmpToken->isCommaToken()) {
@@ -1250,7 +1251,6 @@ if (!defined('HAVE_PHP_SQL_PARSER')) {
                             } else {                                
                                 # an expression could have multiple parts split by operands
                                 # if we have a comma, it is a split-point for expressions
-
                                 $tmpExprList = array_values($tmpExprList);
                                 $localExprList = $this->process_expr_list($tmpExprList);
                                 
@@ -1259,16 +1259,16 @@ if (!defined('HAVE_PHP_SQL_PARSER')) {
                                     $localExpr->setTokenType(ExpressionType::EXPRESSION);
                                     $localExprList = $localExpr->toArray();
                                     $localExprList['alias'] = false;
+                                    $localExprList = array($localExprList);
                                 }
                                 
                                 if (!$curr->getSubTree()) {
-                                    $curr->setSubTree(array($localExprList));
+                                    $curr->setSubTree($localExprList);
                                 } else {
                                     $tmpExprList = $curr->getSubTree();
                                     $curr->setSubTree(array_merge($tmpExprList, $localExprList));
                                 }
                                 
-                                unset($localTokenList[$k]);
                                 $tmpExprList = array();
                                 $localExpr = new ExpressionToken();
                             }
@@ -1282,16 +1282,16 @@ if (!defined('HAVE_PHP_SQL_PARSER')) {
                             $localExpr->setTokenType(ExpressionType::EXPRESSION);
                             $localExprList = $localExpr->toArray();
                             $localExprList['alias'] = false;
+                            $localExprList = array($localExprList);
                         }
                         
                         if (!$curr->getSubTree()) {
-                            $curr->setSubTree(array($localExprList));
+                            $curr->setSubTree($localExprList);
                         } else {
                             $tmpExprList = $curr->getSubTree();
                             $curr->setSubTree(array_merge($tmpExprList, $localExprList));
                         }
                 
-
                         $prev->setSubTree($curr->getSubTree());
                         if ($prev->isColumnReference()) {
                             $prev->setTokenType(ExpressionType::SIMPLE_FUNCTION);
