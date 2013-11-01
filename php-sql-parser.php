@@ -1052,7 +1052,8 @@ if (!defined('HAVE_PHP_SQL_PARSER')) {
                 return false;
             }
 
-            $parseInfo['expr'] = trim($this->revokeEscaping($parseInfo['expr']));
+            // removed because of issue 80
+            //$parseInfo['expr'] = trim($this->revokeEscaping($parseInfo['expr']));
 
             if (is_numeric($parseInfo['expr'])) {
                 $parseInfo['type'] = ExpressionType::POSITION;
@@ -1062,7 +1063,7 @@ if (!defined('HAVE_PHP_SQL_PARSER')) {
                     if (!$clause['alias']) {
                         continue;
                     }
-                    if ($clause['alias']['name'] === $parseInfo['expr']) {
+                    if ($clause['alias']['base_expr'] === $parseInfo['expr']) {
                         $parseInfo['type'] = ExpressionType::ALIAS;
                     }
                 }
@@ -1240,6 +1241,10 @@ if (!defined('HAVE_PHP_SQL_PARSER')) {
 
                         # if we have a colref followed by a parenthesis pair,
                         # it isn't a colref, it is a user-function
+                        
+                        # TODO: this should be a method, because we need the same code
+                        # below for unspecified tokens (expressions).
+                        
                         $localExpr = new ExpressionToken();
                         $tmpExprList = array();
                          
@@ -1303,6 +1308,12 @@ if (!defined('HAVE_PHP_SQL_PARSER')) {
 
                     # we have parenthesis, but it seems to be an expression
                     if ($curr->isUnspecified()) {
+                        
+                        
+                        # TODO: the localTokenList could contain commas and further expressions,
+                        # we must handle that like function parameters (see above)! 
+                        # this should solve issue 51
+                        
                         $curr->setSubTree($this->process_expr_list($localTokenList));
                         $curr->setTokenType(ExpressionType::BRACKET_EXPRESSION);
                     }
