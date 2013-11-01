@@ -584,7 +584,7 @@ if (!defined('HAVE_PHP_SQL_PARSER')) {
         /**
          * It can be UPDATE SET or SET alone
          */
-        private function process_set_list($tokens, $isUpdate) {
+        private function process_set_list($tokens, $isUpdate = false) {
             $result = array();
             $baseExpr = "";
             $assignment = false;
