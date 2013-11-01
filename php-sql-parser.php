@@ -446,22 +446,11 @@ if (!defined('HAVE_PHP_SQL_PARSER')) {
                     break;
 
                 /* These tokens set particular options for the statement.  They never stand alone.*/
-                case 'DISTINCTROW':
-                    $trim = 'DISTINCT';
-                case 'DISTINCT':
-                case 'HIGH_PRIORITY':
                 case 'LOW_PRIORITY':
                 case 'DELAYED':
                 case 'IGNORE':
                 case 'FORCE':
-                case 'STRAIGHT_JOIN':
-                case 'SQL_SMALL_RESULT':
-                case 'SQL_BIG_RESULT':
                 case 'QUICK':
-                case 'SQL_BUFFER_RESULT':
-                case 'SQL_CACHE':
-                case 'SQL_NO_CACHE':
-                case 'SQL_CALC_FOUND_ROWS':
                     $out['OPTIONS'][] = $upper;
                     continue 2;
                     break;
@@ -700,7 +689,26 @@ if (!defined('HAVE_PHP_SQL_PARSER')) {
                     $expressionList[] = $this->process_select_expr(trim($expression));
                     $expression = "";
                 } else {
-                    $expression .= $token;
+                	switch ($token) {
+
+                		# add more SELECT options here
+                		case 'DISTINCT':
+                		case 'DISTINCTROW':
+                		case 'HIGH_PRIORITY':
+                		case 'SQL_CACHE':
+                		case 'SQL_NO_CACHE':
+                		case 'SQL_CALC_FOUND_ROWS':
+                		case 'STRAIGHT_JOIN':
+                		case 'SQL_SMALL_RESULT':
+                		case 'SQL_BIG_RESULT':
+                		case 'SQL_BUFFER_RESULT':
+                			$expressionList[] = $this->process_select_expr(trim($token));
+                			$expression = "";
+                			break;
+                			
+                		default:
+                			$expression .= $token;
+                	}
                 }
             }
             if ($expression) {
