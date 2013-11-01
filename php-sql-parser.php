@@ -1052,8 +1052,7 @@ if (!defined('HAVE_PHP_SQL_PARSER')) {
                 return false;
             }
 
-            // removed because of issue 80
-            //$parseInfo['expr'] = trim($this->revokeEscaping($parseInfo['expr']));
+            $parseInfo['no_quote'] = trim($this->revokeEscaping($parseInfo['expr']));
 
             if (is_numeric($parseInfo['expr'])) {
                 $parseInfo['type'] = ExpressionType::POSITION;
@@ -1063,7 +1062,8 @@ if (!defined('HAVE_PHP_SQL_PARSER')) {
                     if (!$clause['alias']) {
                         continue;
                     }
-                    if ($clause['alias']['base_expr'] === $parseInfo['expr']) {
+                    
+                    if ($clause['alias']['name'] === $parseInfo['no_quote']) {
                         $parseInfo['type'] = ExpressionType::ALIAS;
                     }
                 }
