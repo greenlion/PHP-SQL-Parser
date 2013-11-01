@@ -315,6 +315,7 @@ if (!defined('HAVE_PHP_SQL_CREATOR')) {
                 $sql .= $this->processFunction($v);
                 $sql .= $this->processWhereExpression($v);
                 $sql .= $this->processWhereBracketExpression($v);
+                $sql .= $this->processUserVariable($v);
 
                 if (strlen($sql) == $len) {
                     throw new UnableToCreateSQLException('WHERE', $k, $v, 'expr_type');
@@ -339,7 +340,8 @@ if (!defined('HAVE_PHP_SQL_CREATOR')) {
                 $sql .= $this->processFunction($v);
                 $sql .= $this->processWhereExpression($v);
                 $sql .= $this->processWhereBracketExpression($v);
-
+                $sql .= $this->processUserVariable($v);
+                
                 if ($len == strlen($sql)) {
                     throw new UnableToCreateSQLException('WHERE expression subtree', $k, $v, 'expr_type');
                 }
@@ -351,6 +353,13 @@ if (!defined('HAVE_PHP_SQL_CREATOR')) {
             return $sql;
         }
 
+        protected function processUserVariable($parsed) {
+            if ($parsed['expr_type'] !== ExpressionType::USER_VARIABLE) {
+                return "";
+            }
+            return $parsed['base_expr'];
+        }
+        
         protected function processWhereBracketExpression($parsed) {
             if ($parsed['expr_type'] !== ExpressionType::BRACKET_EXPRESSION) {
                 return "";
@@ -365,6 +374,7 @@ if (!defined('HAVE_PHP_SQL_CREATOR')) {
                 $sql .= $this->processFunction($v);
                 $sql .= $this->processWhereExpression($v);
                 $sql .= $this->processWhereBracketExpression($v);
+                $sql .= $this->processUserVariable($v);
 
                 if ($len == strlen($sql)) {
                     throw new UnableToCreateSQLException('WHERE expression subtree', $k, $v, 'expr_type');
