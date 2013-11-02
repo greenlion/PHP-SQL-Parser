@@ -9,4 +9,4 @@ $parser = new PHPSQLParser($sql, true);
 $creator = new PHPSQLCreator($parser->parsed);
 $created = $creator->created;
 $expected = getExpectedValue(dirname(__FILE__), 'issue79a.sql', false);
-ok($created === $expected, 'User variable widthin WHERE clause');
+ok($created === $expected, 'User variable within WHERE clause');
