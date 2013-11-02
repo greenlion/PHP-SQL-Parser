@@ -252,7 +252,6 @@ if (!defined('HAVE_PHP_SQL_PARSER')) {
                 case 'GROUP':
                 case 'HAVING':
                 case 'WHERE':
-                case 'RENAME':
                 case 'CALL':
                 case 'PROCEDURE':
                 case 'FUNCTION':
@@ -285,6 +284,12 @@ if (!defined('HAVE_PHP_SQL_PARSER')) {
                     $token_category = $upper;
                     break;
 
+                case 'RENAME':
+                	// jump over TABLE keyword
+                	$token_category = $upper;
+                	$skip_next = true;
+                	continue 2;
+                	    
                 case 'DATABASE':
                 case 'SCHEMA':
                     if ($prev_category === 'DROP') {
@@ -430,11 +435,14 @@ if (!defined('HAVE_PHP_SQL_PARSER')) {
                     break;
 
                 /* These tokens are ignored. */
+                case 'TO':
+                	if ($token_category === 'RENAME') {
+                		break;
+                	}    
                 case 'BY':
                 case 'ALL':
                 case 'SHARE':
                 case 'MODE':
-                case 'TO':
                 case ';':
                     continue 2;
                     break;
@@ -544,6 +552,9 @@ if (!defined('HAVE_PHP_SQL_PARSER')) {
             }
             if (!empty($out['DROP'])) {
                 $out['DROP'] = $this->processDrop($out['DROP']);
+            }
+            if (!empty($out['RENAME'])) {
+            	$out['RENAME'] = $this->processRenameTable($out['RENAME']);
             }
             return $out;
         }
@@ -844,7 +855,7 @@ if (!defined('HAVE_PHP_SQL_PARSER')) {
                 $base_expr = join("", $tokens);
             } else {
                 /* remove escape from the alias */
-                $alias['name'] = $this->revokeEscaping(trim($alias['name']));
+                $alias['name'] = $this->revokeQouting(trim($alias['name']));
                 $alias['base_expr'] = trim($alias['base_expr']);
             }
 
@@ -1060,7 +1071,7 @@ if (!defined('HAVE_PHP_SQL_PARSER')) {
                 return false;
             }
 
-            $parseInfo['no_quote'] = trim($this->revokeEscaping($parseInfo['expr']));
+            $parseInfo['no_quote'] = trim($this->revokeQouting($parseInfo['expr']));
 
             if (is_numeric($parseInfo['expr'])) {
                 $parseInfo['type'] = ExpressionType::POSITION;
@@ -1632,6 +1643,51 @@ if (!defined('HAVE_PHP_SQL_PARSER')) {
             return $tokenList;
         }
 
+        private function processRenameTable($tokenList) {
+        	 
+            $base_expr = "";
+            $resultList = array();
+            $tablePair = array();
+        	
+        	foreach ($tokenList as $k => $v) {
+            	$token = new ExpressionToken($k, $v);
+            	
+            	if ($token->isWhitespaceToken()) {
+            		continue;
+            	}
+
+            	switch ($token->getUpper()) {
+            		case 'TO':
+            			# separate source table from destination
+            			$tabName = trim($this->revokeQouting($base_expr));
+            			$tablePair['source'] = array('expr_type' => ExpressionType::TABLE, 'table' => $tabName, 'base_expr' => $base_expr);
+            			$base_expr = "";
+            			break;
+            			
+            		case ',':
+						# split rename operations 
+            			$tabName = trim($this->revokeQouting($base_expr));
+            			$tablePair['destination'] = array('expr_type' => ExpressionType::TABLE, 'table' => $tabName, 'base_expr' => $base_expr);
+            			$resultList[] = $tablePair;
+            			$tablePair = array();
+            			$base_expr = "";
+            			break;
+            			
+            		default:
+            			$base_expr .= $token->getToken();
+            			break;
+            	}
+            }
+
+            if ($base_expr !== "") {
+            	$tabName = trim($this->revokeQouting($base_expr));
+            	$tablePair['destination'] = array('expr_type' => ExpressionType::TABLE, 'table' => $tabName, 'base_expr' => $base_expr);
+            	$resultList[] = $tablePair;
+            }
+            
+            return $resultList;
+        }
+            
         private function processDrop($tokenList) {
 
             $skip = false;
