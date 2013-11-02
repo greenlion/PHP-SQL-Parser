@@ -18,6 +18,7 @@ require_once(dirname(__FILE__) . '/tests/creator/issue79.php');
 require_once(dirname(__FILE__) . '/tests/creator/issue83.php');
 require_once(dirname(__FILE__) . '/tests/creator/issue85.php');
 require_once(dirname(__FILE__) . '/tests/creator/issue86.php');
+require_once(dirname(__FILE__) . '/tests/creator/issue87.php');
 require_once(dirname(__FILE__) . '/tests/creator/issue88.php');
 require_once(dirname(__FILE__) . '/tests/creator/issue92.php');
 require_once(dirname(__FILE__) . '/tests/creator/issue94.php');
