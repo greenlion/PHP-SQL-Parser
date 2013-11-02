@@ -62,6 +62,9 @@ if (!defined('HAVE_PHP_SQL_CREATOR')) {
             case "UPDATE":
                 $this->created = $this->processUpdateStatement($parsed);
                 break;
+            case "RENAME":
+            	$this->created = $this->processRenameTableStatement($parsed);
+            	break;
             default:
                 throw new UnsupportedFeatureException($k);
                 break;
@@ -69,6 +72,30 @@ if (!defined('HAVE_PHP_SQL_CREATOR')) {
             return $this->created;
         }
 
+        protected function processRenameTableStatement($parsed) {
+        	$rename = $parsed['RENAME'];
+        	$sql = "";
+        	foreach ($rename as $k => $v) {
+        		$len = strlen($sql);
+        		$sql .= $this->processSourceAndDestTable($v);
+        	
+        		if ($len == strlen($sql)) {
+        			throw new UnableToCreateSQLException('RENAME', $k, $v, 'expr_type');
+        		}
+        	
+        		$sql .= ",";
+        	}
+        	$sql = substr($sql, 0, -1);
+        	return "RENAME TABLE " . $sql;
+        }
+
+        protected function processSourceAndDestTable($v) {
+        	if (!isset($v['source']) || !isset($v['destination'])) {
+        		return "";
+        	}
+        	return $v['source']['base_expr']." TO ".$v['destination']['base_expr'];
+        }
+        
         protected function processSelectStatement($parsed) {
             $sql = $this->processSELECT($parsed['SELECT']);
             if (isset($parsed['FROM'])) {
