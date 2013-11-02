@@ -73,9 +73,9 @@ class PHPSQLParserUtils extends PHPSQLParserConstants {
     }
 
     /**
-     * Revokes the escaping characters from an expression
+     * Revokes the quoting characters from an expression
      */
-    protected function revokeEscaping($sql) {
+    protected function revokeQouting($sql) {
         $result = trim($sql);
         if (($result[0] === '`') && ($result[strlen($result) - 1] === '`')) {
             $result = substr($result, 1, -1);
