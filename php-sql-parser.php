@@ -855,7 +855,7 @@ if (!defined('HAVE_PHP_SQL_PARSER')) {
                 $base_expr = join("", $tokens);
             } else {
                 /* remove escape from the alias */
-                $alias['name'] = $this->revokeQouting(trim($alias['name']));
+                $alias['name'] = $this->revokeQuotation(trim($alias['name']));
                 $alias['base_expr'] = trim($alias['base_expr']);
             }
 
@@ -1071,7 +1071,7 @@ if (!defined('HAVE_PHP_SQL_PARSER')) {
                 return false;
             }
 
-            $parseInfo['no_quote'] = trim($this->revokeQouting($parseInfo['expr']));
+            $parseInfo['no_quote'] = trim($this->revokeQuotation($parseInfo['expr']));
 
             if (is_numeric($parseInfo['expr'])) {
                 $parseInfo['type'] = ExpressionType::POSITION;
@@ -1659,14 +1659,14 @@ if (!defined('HAVE_PHP_SQL_PARSER')) {
             	switch ($token->getUpper()) {
             		case 'TO':
             			# separate source table from destination
-            			$tabName = trim($this->revokeQouting($base_expr));
+            			$tabName = trim($this->revokeQuotation($base_expr));
             			$tablePair['source'] = array('expr_type' => ExpressionType::TABLE, 'table' => $tabName, 'base_expr' => $base_expr);
             			$base_expr = "";
             			break;
             			
             		case ',':
 						# split rename operations 
-            			$tabName = trim($this->revokeQouting($base_expr));
+            			$tabName = trim($this->revokeQuotation($base_expr));
             			$tablePair['destination'] = array('expr_type' => ExpressionType::TABLE, 'table' => $tabName, 'base_expr' => $base_expr);
             			$resultList[] = $tablePair;
             			$tablePair = array();
@@ -1680,7 +1680,7 @@ if (!defined('HAVE_PHP_SQL_PARSER')) {
             }
 
             if ($base_expr !== "") {
-            	$tabName = trim($this->revokeQouting($base_expr));
+            	$tabName = trim($this->revokeQuotation($base_expr));
             	$tablePair['destination'] = array('expr_type' => ExpressionType::TABLE, 'table' => $tabName, 'base_expr' => $base_expr);
             	$resultList[] = $tablePair;
             }
