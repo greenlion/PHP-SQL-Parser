@@ -66,4 +66,8 @@ class ExpressionType {
     const VIEW = "view";
     const DATABASE = "database";
     const SCHEMA = "schema";
+    
+    const PROCEDURE = "procedure";
+    const ENGINE = "engine";
+    const USER = "user";
 }
