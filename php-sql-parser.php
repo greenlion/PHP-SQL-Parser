@@ -160,6 +160,9 @@ if (! defined('HAVE_PHP_SQL_PARSER')) {
          *
          *
          *
+         *
+         *
+         *
          * ..)
          * union
          * (select ...)
@@ -216,8 +219,8 @@ if (! defined('HAVE_PHP_SQL_PARSER')) {
             return false;
         }
         
-        // his function splits up a SQL statement into easy to "parse"
-        // okens for the SQL processor
+        // this function splits up a SQL statement into easy to "parse"
+        // tokens for the SQL processor
         private function splitSQLIntoTokens($sql)
         {
             return $this->lexer->split($sql);
@@ -266,7 +269,6 @@ if (! defined('HAVE_PHP_SQL_PARSER')) {
                     /* Tokens that get their own sections. These keywords have subclauses. */
                     case 'SELECT':
                     case 'ORDER':
-                    case 'LIMIT':
                     case 'SET':
                     case 'DUPLICATE':
                     case 'VALUES':
@@ -283,12 +285,9 @@ if (! defined('HAVE_PHP_SQL_PARSER')) {
                     case 'TABLESPACE':
                     case 'TRIGGER':
                     case 'DO':
-                    case 'PLUGIN':
-                    case 'FROM':
                     case 'FLUSH':
                     case 'KILL':
                     case 'RESET':
-                    case 'START':
                     case 'STOP':
                     case 'PURGE':
                     case 'EXECUTE':
@@ -297,16 +296,33 @@ if (! defined('HAVE_PHP_SQL_PARSER')) {
                         if ($trim === 'DEALLOCATE') {
                             $skip_next = true;
                         }
+                        $token_category = $upper;
+                        break;
+                    
+                    case 'LIMIT':
+                    case 'PLUGIN':
+                        // no separate section
+                        if ($token_category === 'SHOW') {
+                            continue;
+                        }
+                        $token_category = $upper;
+                        break;
+                    
+                    case 'FROM':
                         /* this FROM is different from FROM in other DML (not join related) */
-                        if ($token_category === 'PREPARE' && $upper === 'FROM') {
+                        if ($token_category === 'PREPARE') {
                             continue 2;
                         }
-                        
+                        // no separate section
+                        if ($token_category === 'SHOW') {
+                            continue;
+                        }
                         $token_category = $upper;
                         break;
                     
                     case 'EXPLAIN':
                     case 'DESCRIBE':
+                    case 'SHOW':
                         $token_category = $upper;
                         break;
                     
@@ -319,6 +335,9 @@ if (! defined('HAVE_PHP_SQL_PARSER')) {
                     case 'DATABASE':
                     case 'SCHEMA':
                         if ($prev_category === 'DROP') {
+                            continue;
+                        }
+                        if ($prev_category === 'SHOW') {
                             continue;
                         }
                         $token_category = $upper;
@@ -369,12 +388,9 @@ if (! defined('HAVE_PHP_SQL_PARSER')) {
                     case 'INSERT':
                     case 'REPLACE':
                     case 'TRUNCATE':
-                    case 'CREATE':
-                    case 'TRUNCATE':
                     case 'OPTIMIZE':
                     case 'GRANT':
                     case 'REVOKE':
-                    case 'SHOW':
                     case 'HANDLER':
                     case 'LOAD':
                     case 'ROLLBACK':
@@ -390,9 +406,18 @@ if (! defined('HAVE_PHP_SQL_PARSER')) {
                     case 'RESTORE':
                     case 'USE':
                     case 'HELP':
-                        $token_category = $upper; /*
-                                                   * set the category in case these get subclauses in a future version of MySQL
-                                                   */
+                        $token_category = $upper;
+                        // set the category in case these get subclauses in a future version of MySQL
+                        $out[$upper][0] = $upper;
+                        continue 2;
+                        break;
+                    
+                    case 'CREATE':
+                        if ($prev_category === 'SHOW') {
+                            continue;
+                        }
+                        $token_category = $upper;
+                        // set the category in case these get subclauses in a future version of MySQL
                         $out[$upper][0] = $upper;
                         continue 2;
                         break;
@@ -437,6 +462,9 @@ if (! defined('HAVE_PHP_SQL_PARSER')) {
                         break;
                     
                     case 'FOR':
+                        if ($prev_category === 'SHOW') {
+                            continue;
+                        }
                         $skip_next = true;
                         $out['OPTIONS'][] = 'FOR UPDATE';
                         continue 2;
@@ -587,6 +615,9 @@ if (! defined('HAVE_PHP_SQL_PARSER')) {
             if (! empty($out['RENAME'])) {
                 $out['RENAME'] = $this->processRenameTable($out['RENAME']);
             }
+            if (! empty($out['SHOW'])) {
+                $out['SHOW'] = $this->processShow($out['SHOW']);
+            }
             return $out;
         }
 
@@ -628,12 +659,152 @@ if (! defined('HAVE_PHP_SQL_PARSER')) {
             return $type;
         }
 
+        private function processShow($tokens)
+        {
+            $resultList = array();
+            $category = "";
+            $prev = "";
+
+            foreach ($tokens as $k => $token) {
+                $upper = strtoupper(trim($token));
+                
+                if ($this->isWhitespaceToken($token)) {
+                    continue;
+                }
+                
+                switch ($upper) {
+                    
+                    case 'FROM':
+                        $resultList[] = array(
+                            'expr_type' => ExpressionType::RESERVED,
+                            'base_expr' => trim($token)
+                        );
+                        if ($prev === 'INDEX' || $prev === 'COLUMNS') {
+                            continue;
+                        }
+                        $category = $upper;
+                        break;
+                    
+                    case 'CREATE':
+                    case 'DATABASE':
+                    case 'FUNCTION':
+                    case 'PROCEDURE':
+                    case 'ENGINE':
+                    case 'TABLE':
+                    case 'FOR':
+                    case 'LIKE':
+                    case 'INDEX':
+                    case 'COLUMNS':
+                    case 'PLUGIN':
+                    case 'PRIVILEGES':
+                    case 'PROCESSLIST':
+                    case 'LOGS':
+                    case 'STATUS':
+                    case 'GLOBAL':
+                    case 'SESSION':
+                    case 'FULL':
+                    case 'GRANTS':
+                    case 'INNODB':
+                    case 'STORAGE':
+                    case 'ENGINES':
+                    case 'OPEN':
+                    case 'BDB':
+                    case 'TRIGGERS':
+                    case 'VARIABLES':
+                    case 'DATABASES':
+                    case 'ERRORS':
+                    case 'TABLES':
+                    case 'WARNINGS':
+                    case 'CHARACTER':
+                    case 'SET':
+                    case 'COLLATION':
+                        $resultList[] = array(
+                            'expr_type' => ExpressionType::RESERVED,
+                            'base_expr' => trim($token)
+                        );
+                        $category = $upper;
+                        break;
+                    
+                    default:
+                        switch ($prev) {
+                            case 'LIKE':
+                                $resultList[] = array(
+                                    'expr_type' => ExpressionType::CONSTANT,
+                                    'base_expr' => $token
+                                );
+                                break;
+                            case 'LIMIT':
+                                $limit = array_pop($resultList);
+                                $limit['sub_tree'] = $this->process_limit(array_slice($tokens, $k));
+                                $resultList[] = $limit;
+                                break;
+                            case 'FROM':
+                            case 'DATABASE':
+                                $resultList[] = array(
+                                    'expr_type' => ExpressionType::DATABASE,
+                                    'name' => $this->revokeQuotation($token),
+                                    'base_expr' => $token
+                                );
+                                break;
+                            case 'FOR':
+                                $resultList[] = array(
+                                    'expr_type' => ExpressionType::USER,
+                                    'name' => $this->revokeQuotation($token),
+                                    'base_expr' => $token
+                                );
+                                break;
+                            case 'INDEX':
+                            case 'COLUMNS':
+                            case 'TABLE':
+                                $resultList[] = array(
+                                    'expr_type' => ExpressionType::TABLE,
+                                    'table' => $this->revokeQuotation($token),
+                                    'base_expr' => $token
+                                );
+                                $category = "TABLENAME";
+                                break;
+                            case 'FUNCTION':
+                                if (in_array($upper, parent::$aggregateFunctions)) {
+                                    $expr_type = ExpressionType::AGGREGATE_FUNCTION;
+                                } else {
+                                    $expr_type = ExpressionType::SIMPLE_FUNCTION;
+                                }
+                                $resultList[] = array(
+                                    'expr_type' => expr_type,
+                                    'name' => $this->revokeQuotation($token),
+                                    'base_expr' => $token
+                                );
+                                break;
+                            case 'PROCEDURE':
+                                $resultList[] = array(
+                                    'expr_type' => ExpressionType::PROCEDURE,
+                                    'name' => $this->revokeQuotation($token),
+                                    'base_expr' => $token
+                                );
+                                break;
+                            case 'ENGINE':
+                                $resultList[] = array(
+                                    'expr_type' => ExpressionType::ENGINE,
+                                    'name' => $this->revokeQuotation($token),
+                                    'base_expr' => $token
+                                );
+                                break;
+                            default:
+                                // ignore
+                                break;
+                        }
+                        break;
+                }
+                $prev = $category;
+            }
+            return $resultList;
+        }
+
         private function processExplain($tokens, $isSelect = false)
         {
             if ($isSelect) {
                 foreach ($tokens as $token) {
-                    $upper = strtoupper(trim($token));
-                    switch ($token) {
+                    switch (strtoupper(trim($token))) {
                         case 'EXTENDED':
                         case 'PARTITIONS':
                             return array(
@@ -778,7 +949,7 @@ if (! defined('HAVE_PHP_SQL_PARSER')) {
                     $expressionList[] = $this->process_select_expr(trim($expression));
                     $expression = "";
                 } else {
-                    switch ($token) {
+                    switch (strtoupper($token)) {
                         
                         // add more SELECT options here
                         case 'DISTINCT':
