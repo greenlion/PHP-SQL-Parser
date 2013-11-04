@@ -154,16 +154,7 @@ if (! defined('HAVE_PHP_SQL_PARSER')) {
 
         /**
          * MySQL supports a special form of UNION:
-         * (select .
-         *
-         *
-         *
-         *
-         *
-         *
-         *
-         *
-         * ..)
+         * (select ...)
          * union
          * (select ...)
          *
@@ -1657,7 +1648,7 @@ if (! defined('HAVE_PHP_SQL_PARSER')) {
                             // if the last token is colref, const or expression
                             // then * is an operator
                             // but if the previous colref ends with a dot, the * is the all-columns-alias
-                            if (! $prev->isColumnReference() && ! $prev->isConstant() && ! $prev->isExpression() && ! $prev->isBracketExpression() && ! $prev->isAggregateFunction()) {
+                            if (! $prev->isColumnReference() && ! $prev->isConstant() && ! $prev->isExpression() && ! $prev->isBracketExpression() && ! $prev->isAggregateFunction() && ! $prev->isVariable()) {
                                 $curr->setTokenType(ExpressionType::COLREF);
                                 break;
                             }
@@ -1670,6 +1661,7 @@ if (! defined('HAVE_PHP_SQL_PARSER')) {
                             $curr->setTokenType(ExpressionType::OPERATOR);
                             break;
                         
+                        case ':=':
                         case 'AND':
                         case '&&':
                         case 'BETWEEN':
@@ -1717,7 +1709,7 @@ if (! defined('HAVE_PHP_SQL_PARSER')) {
                             // differ between preceding sign and operator
                             $curr->setSubTree(false);
                             
-                            if ($prev->isColumnReference() || $prev->isFunction() || $prev->isAggregateFunction() || $prev->isConstant() || $prev->isSubQuery() || $prev->isExpression() || $prev->isBracketExpression()) {
+                            if ($prev->isColumnReference() || $prev->isFunction() || $prev->isAggregateFunction() || $prev->isConstant() || $prev->isSubQuery() || $prev->isExpression() || $prev->isBracketExpression() || $prev->isVariable()) {
                                 $curr->setTokenType(ExpressionType::OPERATOR);
                             } else {
                                 $curr->setTokenType(ExpressionType::SIGN);
