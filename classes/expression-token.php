@@ -105,6 +105,10 @@ class ExpressionToken {
         return ($this->tokenType === false);
     }
 
+    public function isVariable() {
+        return $this->tokenType === ExpressionType::GLOBAL_VARIABLE || $this->tokenType === ExpressionType::LOCAL_VARIABLE || $this->tokenType === ExpressionType::USER_VARIABLE;
+    }
+    
     public function isAggregateFunction() {
         return $this->tokenType === ExpressionType::AGGREGATE_FUNCTION;
     }
