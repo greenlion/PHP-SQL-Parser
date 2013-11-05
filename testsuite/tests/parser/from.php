@@ -29,7 +29,7 @@ $p=$parser->parsed;
 ok(count($p['SELECT']) == 8, 'seven selects');
 ok($p['SELECT'][0]['base_expr'] == 'DISTINCT');
 ok($p['SELECT'][1]['alias']['name'] == 'c1');
-ok($p['SELECT'][2]['alias']['name'] == 'c2');
+ok($p['SELECT'][2]['alias']['name'] == '`c2`');
 ok($p['SELECT'][3]['alias']['name'] == '', 'no alias on sum(c2)');
 ok($p['SELECT'][4]['alias']['name'] == 'sum_c3');
 ok($p['SELECT'][5]['alias']['name'] == 'case_statement', 'case statement');
