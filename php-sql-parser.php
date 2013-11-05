@@ -733,14 +733,16 @@ if (! defined('HAVE_PHP_SQL_PARSER')) {
                             case 'DATABASE':
                                 $resultList[] = array(
                                     'expr_type' => ExpressionType::DATABASE,
-                                    'name' => $this->revokeQuotation($token),
+                                    'name' => $token,
+                                    'no_quotes' => $this->revokeQuotation($token),
                                     'base_expr' => $token
                                 );
                                 break;
                             case 'FOR':
                                 $resultList[] = array(
                                     'expr_type' => ExpressionType::USER,
-                                    'name' => $this->revokeQuotation($token),
+                                	'name' => $token,
+                                    'no_quotes' => $this->revokeQuotation($token),
                                     'base_expr' => $token
                                 );
                                 break;
@@ -749,7 +751,8 @@ if (! defined('HAVE_PHP_SQL_PARSER')) {
                             case 'TABLE':
                                 $resultList[] = array(
                                     'expr_type' => ExpressionType::TABLE,
-                                    'table' => $this->revokeQuotation($token),
+                                	'table' => $token,
+                                    'no_quotes' => $this->revokeQuotation($token),
                                     'base_expr' => $token
                                 );
                                 $category = "TABLENAME";
@@ -762,21 +765,24 @@ if (! defined('HAVE_PHP_SQL_PARSER')) {
                                 }
                                 $resultList[] = array(
                                     'expr_type' => expr_type,
-                                    'name' => $this->revokeQuotation($token),
+                                	'name' => $token,
+                                    'no_quotes' => $this->revokeQuotation($token),
                                     'base_expr' => $token
                                 );
                                 break;
                             case 'PROCEDURE':
                                 $resultList[] = array(
                                     'expr_type' => ExpressionType::PROCEDURE,
-                                    'name' => $this->revokeQuotation($token),
+                                    'name' => $token,
+                                    'no_quotes' => $this->revokeQuotation($token),
                                     'base_expr' => $token
                                 );
                                 break;
                             case 'ENGINE':
                                 $resultList[] = array(
                                     'expr_type' => ExpressionType::ENGINE,
-                                    'name' => $this->revokeQuotation($token),
+                                	'name' => $token,
+                                    'no_quotes' => $this->revokeQuotation($token),
                                     'base_expr' => $token
                                 );
                                 break;
@@ -815,10 +821,10 @@ if (! defined('HAVE_PHP_SQL_PARSER')) {
                 if ($this->isWhitespaceToken($token)) {
                     continue;
                 }
-                $tableName = trim($this->revokeQuotation($token));
                 return array(
                     'expr_type' => ExpressionType::TABLE,
-                    'table' => $tableName,
+                    'table' => $token,
+                	'no_quotes' => $this->revokeQuotation($token),
                     'base_expr' => $token
                 );
             }
@@ -1098,9 +1104,10 @@ if (! defined('HAVE_PHP_SQL_PARSER')) {
                     $alias = array(
                         'as' => false,
                         'name' => trim($last['base_expr']),
+                    	'no_quotes' => $this->revokeQuotation($last['base_expr']),                    
                         'base_expr' => trim($last['base_expr'])
                     );
-                    // emove the last token
+                    // remove the last token
                     array_pop($tokens);
                     $base_expr = join("", $tokens);
                 }
@@ -1110,7 +1117,8 @@ if (! defined('HAVE_PHP_SQL_PARSER')) {
                 $base_expr = join("", $tokens);
             } else {
                 /* remove escape from the alias */
-                $alias['name'] = $this->revokeQuotation(trim($alias['name']));
+                $alias['no_quotes'] = $this->revokeQuotation($alias['name']);
+                $alias['name'] = trim($alias['name']);
                 $alias['base_expr'] = trim($alias['base_expr']);
             }
             
@@ -1120,20 +1128,27 @@ if (! defined('HAVE_PHP_SQL_PARSER')) {
             // if there is only one part, we copy the expr_type
             // in all other cases we use "expression" as global type
             $type = ExpressionType::EXPRESSION;
+            $no_quotes = $this->revokeQuotation(trim($base_expr));
+            
             if (count($processed) === 1) {
                 if (! $this->isSubQuery($processed[0])) {
                     $type = $processed[0]['expr_type'];
                     $base_expr = $processed[0]['base_expr'];
+                    $no_quotes = isset($processed[0]['no_quotes']) ? $processed[0]['no_quotes'] : null;
                     $processed = $processed[0]['sub_tree']; // it can be FALSE
                 }
             }
             
-            return array(
-                'expr_type' => $type,
-                'alias' => $alias,
-                'base_expr' => trim($base_expr),
-                'sub_tree' => $processed
-            );
+            
+            $result = array();
+            $result['expr_type'] = $type;
+            $result['alias'] = $alias;
+            $result['base_expr'] = trim($base_expr);
+            if (!empty($no_quotes)) {
+                $result['no_quotes'] = $no_quotes;   
+            }
+            $result['sub_tree'] = $processed;
+            return $result;
         }
 
         /**
@@ -1195,6 +1210,7 @@ if (! defined('HAVE_PHP_SQL_PARSER')) {
                             ++ $n;
                         }
                         $parseInfo['alias']['name'] = $str;
+                        $parseInfo['alias']['no_quotes'] = $this->revokeQuotation($str);
                         $parseInfo['alias']['base_expr'] = trim($parseInfo['alias']['base_expr']);
                         continue;
                     
@@ -1260,6 +1276,7 @@ if (! defined('HAVE_PHP_SQL_PARSER')) {
                                 $parseInfo['alias'] = array(
                                     'as' => false,
                                     'name' => trim($token),
+                                    'no_quotes' => $this->revokeQuotation($token),
                                     'base_expr' => trim($token)
                                 );
                             }
@@ -1335,6 +1352,7 @@ if (! defined('HAVE_PHP_SQL_PARSER')) {
             } else {
                 $res['expr_type'] = ExpressionType::TABLE;
                 $res['table'] = $parseInfo['table'];
+                $res['no_quotes'] = $this->revokeQuotation($parseInfo['table']);
             }
             
             $res['alias'] = $parseInfo['alias'];
@@ -1354,7 +1372,7 @@ if (! defined('HAVE_PHP_SQL_PARSER')) {
                 return false;
             }
             
-            $parseInfo['no_quote'] = trim($this->revokeQuotation($parseInfo['expr']));
+            $parseInfo['no_quotes'] = $this->revokeQuotation($parseInfo['expr']);
             
             if (is_numeric($parseInfo['expr'])) {
                 $parseInfo['type'] = ExpressionType::POSITION;
@@ -1365,7 +1383,7 @@ if (! defined('HAVE_PHP_SQL_PARSER')) {
                         continue;
                     }
                     
-                    if ($clause['alias']['name'] === $parseInfo['no_quote']) {
+                    if ($clause['alias']['no_quotes'] === $parseInfo['no_quotes']) {
                         $parseInfo['type'] = ExpressionType::ALIAS;
                     }
                 }
@@ -1495,6 +1513,7 @@ if (! defined('HAVE_PHP_SQL_PARSER')) {
                     
                     $curr->setSubTree($this->parse($this->removeParenthesisFromStart($curr->getTrim())));
                     $curr->setTokenType(ExpressionType::SUBQUERY);
+                    
                 } elseif ($curr->isEnclosedWithinParenthesis()) {
                     /* is it an in-list? */
                     
@@ -1545,6 +1564,7 @@ if (! defined('HAVE_PHP_SQL_PARSER')) {
                         $curr->setSubTree($tmpToken);
                         $curr->setTokenType(ExpressionType::MATCH_ARGUMENTS);
                         $prev->setTokenType(ExpressionType::SIMPLE_FUNCTION);
+                        
                     } elseif ($prev->isColumnReference() || $prev->isFunction() || $prev->isAggregateFunction()) {
                         
                         // if we have a colref followed by a parenthesis pair,
@@ -1629,9 +1649,14 @@ if (! defined('HAVE_PHP_SQL_PARSER')) {
                         $curr->setTokenType(ExpressionType::BRACKET_EXPRESSION);
                     }
                 } elseif ($curr->isVariableToken()) {
-                    // a variable
+                    
+                    # a variable
+                    # it can be quoted
+                    
                     $curr->setTokenType($this->getVariableType($curr->getUpper()));
                     $curr->setSubTree(false);
+                    $curr->setNoQuotes(trim(trim($curr->getToken()), '@'), "`'\"");
+                    
                 } else {
                     /* it is either an operator, a colref or a constant */
                     switch ($curr->getUpper()) {
@@ -1728,6 +1753,7 @@ if (! defined('HAVE_PHP_SQL_PARSER')) {
                                 case '`':
                                     // it is an escaped colum name
                                     $curr->setTokenType(ExpressionType::COLREF);
+                                    $curr->setNoQuotes($curr->getToken());
                                     break;
                                 
                                 default:
@@ -1743,6 +1769,7 @@ if (! defined('HAVE_PHP_SQL_PARSER')) {
                                         }
                                     } else {
                                         $curr->setTokenType(ExpressionType::COLREF);
+                                        $curr->setNoQuotes($curr->getToken());
                                     }
                                     break;
                             }
@@ -1754,9 +1781,11 @@ if (! defined('HAVE_PHP_SQL_PARSER')) {
                     
                     if (in_array($curr->getUpper(), parent::$aggregateFunctions)) {
                         $curr->setTokenType(ExpressionType::AGGREGATE_FUNCTION);
+                        
                     } elseif ($curr->getUpper() === 'NULL') {
                         // it is a reserved word, but we would like to set it as constant
                         $curr->setTokenType(ExpressionType::CONSTANT);
+                        
                     } else {
                         if (in_array($curr->getUpper(), parent::$parameterizedFunctions)) {
                             // issue 60: check functions with parameters
@@ -1869,7 +1898,8 @@ if (! defined('HAVE_PHP_SQL_PARSER')) {
                 foreach ($columns as $k => $v) {
                     $cols[] = array(
                         'expr_type' => ExpressionType::COLREF,
-                        'base_expr' => trim($v)
+                        'base_expr' => trim($v),
+                        'no_quotes' => $this->revokeQuotation($v)
                     );
                 }
             }
@@ -1878,7 +1908,8 @@ if (! defined('HAVE_PHP_SQL_PARSER')) {
             $tokenList[$token_category][0] = array(
                 'table' => $table,
                 'columns' => $cols,
-                'base_expr' => $table
+                'base_expr' => $table,
+                'no_quotes' => $this->revokeQuotation($table)
             );
             return $tokenList;
         }
@@ -1960,10 +1991,10 @@ if (! defined('HAVE_PHP_SQL_PARSER')) {
                 switch ($token->getUpper()) {
                     case 'TO':
                         // separate source table from destination
-                        $tabName = trim($this->revokeQuotation($base_expr));
                         $tablePair['source'] = array(
                             'expr_type' => ExpressionType::TABLE,
-                            'table' => $tabName,
+                            'table' => trim($base_expr),
+                            'no_quotes' => $this->revokeQuotation($base_expr),
                             'base_expr' => $base_expr
                         );
                         $base_expr = "";
@@ -1971,10 +2002,10 @@ if (! defined('HAVE_PHP_SQL_PARSER')) {
                     
                     case ',':
                         // split rename operations
-                        $tabName = trim($this->revokeQuotation($base_expr));
                         $tablePair['destination'] = array(
                             'expr_type' => ExpressionType::TABLE,
-                            'table' => $tabName,
+                            'table' => trim($base_expr),
+                        	'no_quotes' => $this->revokeQuotation($base_expr),
                             'base_expr' => $base_expr
                         );
                         $resultList[] = $tablePair;
@@ -1989,10 +2020,10 @@ if (! defined('HAVE_PHP_SQL_PARSER')) {
             }
             
             if ($base_expr !== "") {
-                $tabName = trim($this->revokeQuotation($base_expr));
                 $tablePair['destination'] = array(
                     'expr_type' => ExpressionType::TABLE,
-                    'table' => $tabName,
+                    'table' => trim($base_expr),
+                   	'no_quotes' => $this->revokeQuotation($base_expr),
                     'base_expr' => $base_expr
                 );
                 $resultList[] = $tablePair;
