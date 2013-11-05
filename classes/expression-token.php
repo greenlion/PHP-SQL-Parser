@@ -11,6 +11,7 @@ class ExpressionToken {
     private $tokenType;
     private $trim;
     private $upper;
+    private $noQuotes;
 
     public function __construct($key = "", $token = "") {
         $this->subTree = false;
@@ -20,6 +21,7 @@ class ExpressionToken {
         $this->tokenType = false;
         $this->trim = trim($token);
         $this->upper = strtoupper($this->trim);
+        $this->noQuotes = null;
     }
 
     # TODO: we could replace it with a constructor new ExpressionToken(this, "*")
@@ -51,6 +53,10 @@ class ExpressionToken {
         return $idx !== false ? $this->token[$idx] : $this->token;
     }
 
+    public function setNoQuotes($token, $qchars = '`') {
+        $this->noQuotes = $this->revokeQuotation($token, $qchars);
+    }
+    
     public function setTokenType($type) {
         $this->tokenType = $type;
     }
@@ -129,7 +135,26 @@ class ExpressionToken {
         return $this->tokenType === ExpressionType::SUBQUERY;
     }
 
+    private function revokeQuotation($token, $qchars = '`') {
+        $result = trim($token);
+        for ($i = 0; $i < strlen($qchars); $i++) {
+            $quote = $qchars[$i];
+            if (($result[0] === $quote) && ($result[strlen($result) - 1] === $quote)) {
+                $result = substr($result, 1, -1);
+                return trim(str_replace($quote.$quote, $quote, $result));
+            }
+        }
+        return $token;
+    }
+    
     public function toArray() {
-        return array('expr_type' => $this->tokenType, 'base_expr' => $this->token, 'sub_tree' => $this->subTree);
+        $result = array();
+        $result['expr_type'] = $this->tokenType;
+        $result['base_expr'] = $this->token;
+        if (!empty($this->noQuotes)) {
+            $result['no_quotes'] = $this->noQuotes;   
+        }
+        $result['sub_tree'] = $this->subTree;
+        return $result;
     }
 }
