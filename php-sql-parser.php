@@ -1270,6 +1270,7 @@ if (! defined('HAVE_PHP_SQL_PARSER')) {
                         if ($parseInfo['token_count'] === 0) {
                             if ($parseInfo['table'] === "") {
                                 $parseInfo['table'] = $token;
+                                $parseInfo['no_quotes'] = $this->revokeQuotation($token);
                             }
                         } else 
                             if ($parseInfo['token_count'] === 1) {
@@ -1304,6 +1305,7 @@ if (! defined('HAVE_PHP_SQL_PARSER')) {
                 'expression' => "",
                 'token_count' => 0,
                 'table' => "",
+                'no_quotes' => "",
                 'alias' => false,
                 'join_type' => "",
                 'next_join_type' => "",
