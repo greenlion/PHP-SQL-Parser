@@ -79,8 +79,9 @@ class PHPSQLParserUtils extends PHPSQLParserConstants {
         $result = trim($sql);
         if (($result[0] === '`') && ($result[strlen($result) - 1] === '`')) {
             $result = substr($result, 1, -1);
+            return trim(str_replace('``', '`', $result));
         }
-        return str_replace('``', '`', $result);
+        return $sql;
     }
 
     /**
