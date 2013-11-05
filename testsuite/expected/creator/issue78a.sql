@@ -1,1 +1,1 @@
-SHOW columns from foo.bar
+SHOW columns from `foo.bar`
