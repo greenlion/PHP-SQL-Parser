@@ -32,9 +32,9 @@
 if (!defined('HAVE_EXPR_LIST_PROCESSOR')) {
 
     require_once(dirname(__FILE__) . '/abstract-processor.php');
+    require_once(dirname(__FILE__) . '/default-processor.php');
     require_once(dirname(__FILE__) . '/../expression-token.php');
     require_once(dirname(__FILE__) . '/../expression-types.php');
-    require_once(dirname(__FILE__) . '/../../php-sql-parser.php');
 
     /**
      * 
@@ -44,12 +44,6 @@ if (!defined('HAVE_EXPR_LIST_PROCESSOR')) {
      * 
      */
     class ExpressionListProcessor extends AbstractProcessor {
-
-        private $parser; # TODO: can we change that (move parse into a processor?)
-
-        public function __construct() {
-            $this->parser = new PHPSQLParser();
-        }
 
         public function process($tokens) {
             $resultList = array();
@@ -73,7 +67,8 @@ if (!defined('HAVE_EXPR_LIST_PROCESSOR')) {
                 /* is it a subquery? */
                 if ($curr->isSubQueryToken()) {
 
-                    $curr->setSubTree($this->parser->parse($this->removeParenthesisFromStart($curr->getTrim())));
+                    $processor = new DefaultProcessor();
+                    $curr->setSubTree($processor->parse($this->removeParenthesisFromStart($curr->getTrim())));
                     $curr->setTokenType(ExpressionType::SUBQUERY);
 
                 } elseif ($curr->isEnclosedWithinParenthesis()) {
