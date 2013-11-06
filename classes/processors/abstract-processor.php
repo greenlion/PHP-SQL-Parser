@@ -178,6 +178,17 @@ if (!defined('HAVE_ABSTRACT_PROCESSOR')) {
             return (isset($out['expr_type']) && $out['expr_type'] === ExpressionType::SUBQUERY);
         }
 
+        /**
+         * translates an array of objects into an associative array
+         * TODO: this is a copy of the PHPSQLParserUtils::toArray()
+         */
+        public function toArray($tokenList) {
+            $expr = array();
+            foreach ($tokenList as $token) {
+                $expr[] = $token->toArray();
+            }
+            return (empty($expr) ? false : $expr);
+        }
     }
     define('HAVE_ABSTRACT_PROCESSOR', 1);
 }
