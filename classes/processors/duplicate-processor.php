@@ -30,7 +30,8 @@
  * DAMAGE.
  */
 if (!defined('HAVE_DUPLICATE_PROCESSOR')) {
-    require_once(dirname(__FILE__) . '/exceptions.php');
+    
+    require_once(dirname(__FILE__) . '/set-processor.php');
 
     /**
      * 

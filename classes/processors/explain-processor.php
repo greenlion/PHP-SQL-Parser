@@ -30,8 +30,8 @@
  * DAMAGE.
  */
 if (!defined('HAVE_EXPLAIN_PROCESSOR')) {
-    require_once(dirname(__FILE__) . '../abstract-processor.php');
-    require_once(dirname(__FILE__) . '../expression-type.php');
+    require_once(dirname(__FILE__) . '/abstract-processor.php');
+    require_once(dirname(__FILE__) . '/../expression-types.php');
 
     /**
      * 
