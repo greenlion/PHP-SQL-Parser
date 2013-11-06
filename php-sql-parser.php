@@ -44,7 +44,7 @@ if (!defined('HAVE_PHP_SQL_PARSER')) {
      */
     class PHPSQLParser {
 
-        private $parsed;
+        public $parsed;
         
         public function __construct($sql = false, $calcPositions = false) {
             if ($sql) {
