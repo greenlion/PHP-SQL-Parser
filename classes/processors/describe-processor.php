@@ -31,7 +31,7 @@
  */
 if (!defined('HAVE_DESCRIBE_PROCESSOR')) {
 
-    require_once(dirname(__FILE__) . '/../explain-processor.php');
+    require_once(dirname(__FILE__) . '/explain-processor.php');
 
     /**
      * 

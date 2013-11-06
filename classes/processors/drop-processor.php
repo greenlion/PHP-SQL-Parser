@@ -32,7 +32,7 @@
 if (!defined('HAVE_DROP_PROCESSOR')) {
 
     require_once(dirname(__FILE__) . '/../expression-token.php');
-    require_once(dirname(__FILE__) . '/../expression-type.php');
+    require_once(dirname(__FILE__) . '/../expression-types.php');
     require_once(dirname(__FILE__) . '/abstract-processor.php');
 
     /**
