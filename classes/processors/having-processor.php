@@ -30,6 +30,7 @@
  * DAMAGE.
  */
 if (!defined('HAVE_HAVING_PROCESSOR')) {
+    
     require_once(dirname(__FILE__) . '/expression-list-processor.php');
 
     /**
