@@ -112,7 +112,7 @@ if (!defined('HAVE_FROM_PROCESSOR')) {
             return $res;
         }
 
-        public function process_from(&$tokens) {
+        public function process(&$tokens) {
             $parseInfo = $this->initParseInfo();
             $expr = array();
 
