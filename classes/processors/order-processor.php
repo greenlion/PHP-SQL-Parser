@@ -61,11 +61,11 @@ if (!defined('HAVE_ORDERBY_PROCESSOR')) {
                 return false;
             }
 
-            $parseInfo['no_quotes'] = $this->revokeQuotation($parseInfo['expr']);
 
             if (is_numeric($parseInfo['expr'])) {
                 $parseInfo['type'] = ExpressionType::POSITION;
             } else {
+                $parseInfo['no_quotes'] = $this->revokeQuotation($parseInfo['expr']);
                 // search to see if the expression matches an alias
                 foreach ($select as $clause) {
                     if (!$clause['alias']) {
@@ -74,6 +74,7 @@ if (!defined('HAVE_ORDERBY_PROCESSOR')) {
 
                     if ($clause['alias']['no_quotes'] === $parseInfo['no_quotes']) {
                         $parseInfo['type'] = ExpressionType::ALIAS;
+                        break;
                     }
                 }
             }
@@ -85,8 +86,14 @@ if (!defined('HAVE_ORDERBY_PROCESSOR')) {
                 return $expr;
             }
 
-            return array('expr_type' => $parseInfo['type'], 'base_expr' => $parseInfo['expr'],
-                         'direction' => $parseInfo['dir']);
+            $result = array();
+            $result['expr_type'] = $parseInfo['type'];
+            $result['base_expr'] = $parseInfo['expr'];
+            if (isset($parseInfo['no_quotes'])) {
+                $result['no_quotes'] = $parseInfo['no_quotes'];
+            }
+            $result['direction'] = $parseInfo['dir'];
+            return $result;
         }
 
         public function process($tokens, $select) {
