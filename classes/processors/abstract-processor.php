@@ -30,8 +30,9 @@
  * DAMAGE.
  */
 if (!defined('HAVE_ABSTRACT_PROCESSOR')) {
-    require_once(dirname(__FILE__) . '../expression-type.php');
-    require_once(dirname(__FILE__) . '../lexer.php');
+    
+    require_once(dirname(__FILE__) . '/../expression-types.php');
+    require_once(dirname(__FILE__) . '/../lexer.php');
 
     /**
      * 
