@@ -32,7 +32,7 @@
 if (!defined('HAVE_INSERT_PROCESSOR')) {
 
     require_once(dirname(__FILE__) . '/abstract-processor.php');
-    require_once(dirname(__FILE__) . '../expression-types.php');
+    require_once(dirname(__FILE__) . '/../expression-types.php');
 
     /**
      * 
