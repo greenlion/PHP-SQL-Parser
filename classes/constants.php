@@ -164,4 +164,20 @@ class PHPSQLParserConstants {
     protected static $aggregateFunctions = array('AVG', 'SUM', 'COUNT', 'MIN', 'MAX', 'STDDEV', 'STDDEV_SAMP',
                                                  'STDDEV_POP', 'VARIANCE', 'VAR_SAMP', 'VAR_POP', 'GROUP_CONCAT',
                                                  'BIT_AND', 'BIT_OR', 'BIT_XOR');
+
+    public static function isAggregateFunction($token) {
+        return in_array($token, $aggregateFunctions);
+    }
+
+    public static function isReserved($token) {
+        return in_array($token, $reserved);
+    }
+    
+    public static function isFunction($token) {
+        return in_array($token, $functions);
+    }
+    
+    public static function isParameterizedFunction($token) {
+        return in_array($token, $parameterizedFunctions);
+    }
 }
