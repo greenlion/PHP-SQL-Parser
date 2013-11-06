@@ -32,7 +32,7 @@
 if (!defined('HAVE_SQL_PROCESSOR')) {
 
     require_once(dirname(__FILE__) . '/abstract-processor.php');
-    require_once(dirname(__FILE__) . '/sql-part-processor.php');
+    require_once(dirname(__FILE__) . '/sql-expression-processor.php');
     
     /**
      * 
@@ -41,7 +41,7 @@ if (!defined('HAVE_SQL_PROCESSOR')) {
      * @author arothe
      * 
      */
-    class SQLProcessor extends SQLPartProcessor {
+    class SQLProcessor extends SQLExpressionProcessor {
 
         /*
          * This function breaks up the SQL statement into logical sections. 
