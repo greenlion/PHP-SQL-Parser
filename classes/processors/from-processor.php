@@ -33,8 +33,8 @@ if (!defined('HAVE_FROM_PROCESSOR')) {
 
     require_once(dirname(__FILE__) . '/abstract-processor.php');
     require_once(dirname(__FILE__) . '/expression-list-processor.php');
+    require_once(dirname(__FILE__) . '/default-processor.php');
     require_once(dirname(__FILE__) . '/../expression-types.php');
-    require_once(dirname(__FILE__) . '/../../php-sql-parser.php');
 
     /**
      * 
@@ -44,14 +44,6 @@ if (!defined('HAVE_FROM_PROCESSOR')) {
      * 
      */
     class FromProcessor extends AbstractProcessor {
-
-        private $expressionListProcessor;
-        private $parser; # TODO: can we change that (move parse into a processor?)
-
-        public function __construct() {
-            $this->expressionListProcessor = new ExpressionListProcessor();
-            $this->parser = new PHPSQLParser();
-        }
 
         protected function initParseInfo($parseInfo = false) {
             // first init
@@ -82,7 +74,8 @@ if (!defined('HAVE_FROM_PROCESSOR')) {
                         $unparsed[$k] = "";
                     }
                 }
-                $parseInfo['ref_expr'] = $this->expressionListProcessor->process($unparsed);
+                $processor = new ExpressionListProcessor();
+                $parseInfo['ref_expr'] = $processor->process($unparsed);
             }
 
             // there is an expression, we have to parse it
@@ -90,7 +83,8 @@ if (!defined('HAVE_FROM_PROCESSOR')) {
                 $parseInfo['expression'] = $this->removeParenthesisFromStart($parseInfo['table']);
 
                 if (preg_match("/^\\s*select/i", $parseInfo['expression'])) {
-                    $parseInfo['sub_tree'] = $this->parser->parse($parseInfo['expression']);
+                    $processor = new DefaultProcessor();
+                    $parseInfo['sub_tree'] = $processor->parse($parseInfo['expression']);
                     $res['expr_type'] = ExpressionType::SUBQUERY;
                 } else {
                     $tmp = $this->splitSQLIntoTokens($parseInfo['expression']);

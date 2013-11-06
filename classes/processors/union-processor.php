@@ -33,8 +33,9 @@ if (!defined('HAVE_UNION_PROCESSOR')) {
 
     require_once(dirname(__FILE__) . '/abstract-processor.php');
     require_once(dirname(__FILE__) . '/sql-processor.php');
+    require_once(dirname(__FILE__) . '/default-processor.php');
     require_once(dirname(__FILE__) . '/../expression-types.php');
-    require_once(dirname(__FILE__) . '/../../php-sql-parser.php');
+    
 
     /**
      * 
@@ -44,12 +45,6 @@ if (!defined('HAVE_UNION_PROCESSOR')) {
      * 
      */
     class UnionProcessor extends AbstractProcessor {
-
-        private $parser; # TODO: can we change that (move parse() into a processor?)
-
-        public function __construct() {
-            $this->parser = new PHPSQLParser();
-        }
 
         public function isUnion($queries) {
             $unionTypes = array('UNION', 'UNION ALL');
@@ -88,7 +83,8 @@ if (!defined('HAVE_UNION_PROCESSOR')) {
 
                         // starts with "(select"
                         if (preg_match("/^\\(\\s*select\\s*/i", $token)) {
-                            $queries[$unionType][$key] = $this->parser->parse($this->removeParenthesisFromStart($token));
+                            $processor = new DefaultProcessor();
+                            $queries[$unionType][$key] = $processor->process($this->removeParenthesisFromStart($token));
                             break;
                         }
 
