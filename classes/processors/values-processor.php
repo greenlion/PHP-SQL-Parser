@@ -30,6 +30,7 @@
  * DAMAGE.
  */
 if (!defined('HAVE_VALUES_PROCESSOR')) {
+    
     require_once(dirname(__FILE__) . '/expression-type.php');
     require_once(dirname(__FILE__) . '/record-processor.php');
     require_once(dirname(__FILE__) . '/abstract-processor.php');
