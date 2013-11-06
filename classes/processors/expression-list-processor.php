@@ -68,7 +68,7 @@ if (!defined('HAVE_EXPR_LIST_PROCESSOR')) {
                 if ($curr->isSubQueryToken()) {
 
                     $processor = new DefaultProcessor();
-                    $curr->setSubTree($processor->parse($this->removeParenthesisFromStart($curr->getTrim())));
+                    $curr->setSubTree($processor->process($this->removeParenthesisFromStart($curr->getTrim())));
                     $curr->setTokenType(ExpressionType::SUBQUERY);
 
                 } elseif ($curr->isEnclosedWithinParenthesis()) {
