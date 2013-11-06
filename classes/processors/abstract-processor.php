@@ -48,7 +48,7 @@ if (!defined('HAVE_ABSTRACT_PROCESSOR')) {
          * tokens for the SQL processor
          * TODO: this method is a copy of PHPSQLParser::splitSQLIntoTokens, can we delete one version?
          */
-        protected function splitSQLIntoTokens($sql) {
+        public function splitSQLIntoTokens($sql) {
             $lexer = new PHPSQLLexer();
             return $lexer->split($sql);
         }
