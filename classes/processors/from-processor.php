@@ -90,7 +90,7 @@ if (!defined('HAVE_FROM_PROCESSOR')) {
                 $parseInfo['expression'] = $this->removeParenthesisFromStart($parseInfo['table']);
 
                 if (preg_match("/^\\s*select/i", $parseInfo['expression'])) {
-                    $parseInfo['sub_tree'] = $this->parse($parseInfo['expression']);
+                    $parseInfo['sub_tree'] = $this->parser->parse($parseInfo['expression']);
                     $res['expr_type'] = ExpressionType::SUBQUERY;
                 } else {
                     $tmp = $this->splitSQLIntoTokens($parseInfo['expression']);
