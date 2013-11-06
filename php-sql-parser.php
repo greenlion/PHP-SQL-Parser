@@ -33,8 +33,7 @@
 if (!defined('HAVE_PHP_SQL_PARSER')) {
 
     require_once(dirname(__FILE__) . '/classes/position-calculator.php');
-    require_once(dirname(__FILE__) . '/classes/processors/sql-processor.php');
-    require_once(dirname(__FILE__) . '/classes/processors/union-processor.php');
+    require_once(dirname(__FILE__) . '/classes/processors/default-processor.php');
 
     /**
      * This class implements the parser functionality.
@@ -54,21 +53,9 @@ if (!defined('HAVE_PHP_SQL_PARSER')) {
         
         public function parse($sql, $calcPositions = false) {
             
-            $processor = new AbstractProcessor();
-            $inputArray = $processor->splitSQLIntoTokens($sql);
-
-            // this is the highest level lexical analysis. This is the part of the
-            // ode which finds UNION and UNION ALL query parts
-            $processor = new UnionProcessor();
-            $queries = $processor->process($inputArray);
-
-            // If there was no UNION or UNION ALL in the query, then the query is
-            // stored at $queries[0].
-            if (!$processor->isUnion($queries)) {
-                $processor = new SQLProcessor();
-                $queries = $processor->process($queries[0]);
-            }
-
+            $processor = new DefaultProcessor();
+            $queries = $processor->process($sql);
+                        
             // calc the positions of some important tokens
             if ($calcPositions) {
                 $calculator = new PositionCalculator();
