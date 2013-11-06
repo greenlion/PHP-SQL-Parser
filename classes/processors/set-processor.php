@@ -33,7 +33,7 @@ if (!defined('HAVE_SET_PROCESSOR')) {
 
     require_once(dirname(__FILE__) . '/abstract-processor.php');
     require_once(dirname(__FILE__) . '/expression-list-processor.php');
-    require_once(dirname(__FILE__) . '../expression-types.php');
+    require_once(dirname(__FILE__) . '/../expression-types.php');
 
     /**
      * 

@@ -31,8 +31,8 @@
  */
 if (!defined('HAVE_SHOW_PROCESSOR')) {
 
-    require_once(dirname(__FILE__) . '../constants.php');
-    require_once(dirname(__FILE__) . '../expression-types.php');
+    require_once(dirname(__FILE__) . '/../constants.php');
+    require_once(dirname(__FILE__) . '/../expression-types.php');
     require_once(dirname(__FILE__) . '/limit-processor.php');
     require_once(dirname(__FILE__) . '/abstract-processor.php');
 

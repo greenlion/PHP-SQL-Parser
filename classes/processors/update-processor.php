@@ -30,7 +30,8 @@
  * DAMAGE.
  */
 if (!defined('HAVE_UPDATE_PROCESSOR')) {
-    require_once(dirname(__FILE__) . '../from-processor.php');
+    
+    require_once(dirname(__FILE__) . '/from-processor.php');
 
     /**
      * 
