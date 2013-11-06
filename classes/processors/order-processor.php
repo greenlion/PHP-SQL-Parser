@@ -79,7 +79,7 @@ if (!defined('HAVE_ORDERBY_PROCESSOR')) {
             }
 
             if ($parseInfo['type'] === ExpressionType::EXPRESSION) {
-                $expr = $this->selectExpressionProcessor - process($parseInfo['expr']);
+                $expr = $this->selectExpressionProcessor->process($parseInfo['expr']);
                 $expr['direction'] = $parseInfo['dir'];
                 unset($expr['alias']);
                 return $expr;
