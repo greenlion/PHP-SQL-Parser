@@ -32,8 +32,8 @@
 if (!defined('HAVE_RENAME_PROCESSOR')) {
 
     require_once(dirname(__FILE__) . '/abstract-processor.php');
-    require_once(dirname(__FILE__) . '/expression-token.php');
-    require_once(dirname(__FILE__) . '/expression-types.php');
+    require_once(dirname(__FILE__) . '/../expression-token.php');
+    require_once(dirname(__FILE__) . '/../expression-types.php');
 
     /**
      * 
