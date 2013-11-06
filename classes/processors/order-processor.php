@@ -29,7 +29,7 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
  * DAMAGE.
  */
-if (!defined('HAVE_SELECT_EXPR_PROCESSOR')) {
+if (!defined('HAVE_ORDERBY_PROCESSOR')) {
 
     require_once(dirname(__FILE__) . '/abstract-processor.php');
     require_once(dirname(__FILE__) . '/select-expression-processor.php');
@@ -123,5 +123,5 @@ if (!defined('HAVE_SELECT_EXPR_PROCESSOR')) {
         }
     }
 
-    define('HAVE_SELECT_EXPR_PROCESSOR', 1);
+    define('HAVE_ORDERBY_PROCESSOR', 1);
 }
