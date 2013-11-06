@@ -166,18 +166,18 @@ class PHPSQLParserConstants {
                                                  'BIT_AND', 'BIT_OR', 'BIT_XOR');
 
     public static function isAggregateFunction($token) {
-        return in_array($token, $aggregateFunctions);
+        return in_array($token, PHPSQLParserConstants::$aggregateFunctions);
     }
 
     public static function isReserved($token) {
-        return in_array($token, $reserved);
+        return in_array($token, PHPSQLParserConstants::$reserved);
     }
     
     public static function isFunction($token) {
-        return in_array($token, $functions);
+        return in_array($token, PHPSQLParserConstants::$functions);
     }
     
     public static function isParameterizedFunction($token) {
-        return in_array($token, $parameterizedFunctions);
+        return in_array($token, PHPSQLParserConstants::$parameterizedFunctions);
     }
 }
