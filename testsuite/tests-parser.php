@@ -20,6 +20,7 @@ require_once(dirname(__FILE__) . '/tests/parser/issue25.php');
 require_once(dirname(__FILE__) . '/tests/parser/issue30.php');
 require_once(dirname(__FILE__) . '/tests/parser/issue31.php');
 require_once(dirname(__FILE__) . '/tests/parser/issue32.php');
+require_once(dirname(__FILE__) . '/tests/parser/issue33.php');
 require_once(dirname(__FILE__) . '/tests/parser/issue34.php');
 require_once(dirname(__FILE__) . '/tests/parser/issue36.php');
 require_once(dirname(__FILE__) . '/tests/parser/issue37.php');

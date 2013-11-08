@@ -33,7 +33,7 @@ if (!defined('HAVE_SQL_PROCESSOR')) {
 
     require_once(dirname(__FILE__) . '/abstract-processor.php');
     require_once(dirname(__FILE__) . '/sql-expression-processor.php');
-    
+
     /**
      * 
      * This class processes the base SQL statements.
@@ -50,7 +50,7 @@ if (!defined('HAVE_SQL_PROCESSOR')) {
         public function process(&$tokens) {
             $prev_category = "";
             $token_category = "";
-            $skip_next = false;
+            $skip_next = 0;
             $out = false;
 
             $tokenCount = count($tokens);
@@ -67,17 +67,20 @@ if (!defined('HAVE_SQL_PROCESSOR')) {
                 /*
                  * If it isn't obvious, when $skip_next is set, then we ignore the next real token, that is we ignore whitespace.
                  */
-                if ($skip_next) {
+                if ($skip_next > 0) {
                     if ($trim === "") {
-                        if ($token_category !== "") { // is this correct??
+                        if ($token_category !== "") { # is this correct??
                             $out[$token_category][] = $token;
                         }
                         continue;
                     }
-                    // o skip the token we replace it with whitespace
+                    #to skip the token we replace it with whitespace
                     $trim = "";
                     $token = "";
-                    $skip_next = false;
+                    $skip_next--;
+                    if ($skip_next > 0) {
+                        continue;
+                    }
                 }
 
                 $upper = strtoupper($trim);
@@ -111,22 +114,22 @@ if (!defined('HAVE_SQL_PROCESSOR')) {
                 case 'PREPARE':
                 case 'DEALLOCATE':
                     if ($trim === 'DEALLOCATE') {
-                        $skip_next = true;
+                        $skip_next = 1;
                     }
                     $token_category = $upper;
                     break;
 
                 case 'LIMIT':
                 case 'PLUGIN':
-                    # no separate section
+                # no separate section
                     if ($token_category === 'SHOW') {
                         continue;
                     }
                     $token_category = $upper;
                     break;
 
-                case 'FROM': 
-                    # this FROM is different from FROM in other DML (not join related)
+                case 'FROM':
+                # this FROM is different from FROM in other DML (not join related)
                     if ($token_category === 'PREPARE') {
                         continue 2;
                     }
@@ -146,7 +149,7 @@ if (!defined('HAVE_SQL_PROCESSOR')) {
                 case 'RENAME':
                 // jump over TABLE keyword
                     $token_category = $upper;
-                    $skip_next = true;
+                    $skip_next = 1;
                     continue 2;
 
                 case 'DATABASE':
@@ -234,10 +237,29 @@ if (!defined('HAVE_SQL_PROCESSOR')) {
                         continue;
                     }
                     $token_category = $upper;
-                    // set the category in case these get subclauses in a future version of MySQL
-                    $out[$upper][0] = $upper;
-                    continue 2;
                     break;
+
+                case 'TABLE':
+                    if ($prev_category === 'CREATE') {
+                        $out[$prev_category][] = $upper;
+                        $token_category = $upper;
+                        continue 2;
+                    }
+                    break;
+
+                case 'TEMPORARY':
+                    if ($prev_category === 'CREATE') {
+                        $out[$prev_category][] = $upper;
+                        continue 2;
+                    }
+                    break;
+
+                case 'IF':
+                    if ($prev_category === 'TABLE') {
+                        $out['CREATE'][] = 'IF NOT EXISTS';
+                        $skip_next = 2;
+                        continue 2;
+                    }
 
                 case 'CACHE':
                     if ($prev_category === "" || $prev_category === 'RESET' || $prev_category === 'FLUSH'
@@ -254,7 +276,7 @@ if (!defined('HAVE_SQL_PROCESSOR')) {
                         $out[$upper][0] = $upper;
                     } else {
                         $trim = 'LOCK IN SHARE MODE';
-                        $skip_next = true;
+                        $skip_next = 3;
                         $out['OPTIONS'][] = $trim;
                     }
                     continue 2;
@@ -283,7 +305,7 @@ if (!defined('HAVE_SQL_PROCESSOR')) {
                     if ($prev_category === 'SHOW') {
                         continue;
                     }
-                    $skip_next = true;
+                    $skip_next = 1;
                     $out['OPTIONS'][] = 'FOR UPDATE';
                     continue 2;
                     break;
@@ -301,7 +323,7 @@ if (!defined('HAVE_SQL_PROCESSOR')) {
                 case 'START':
                     $trim = "BEGIN";
                     $out[$upper][0] = $upper;
-                    $skip_next = true;
+                    $skip_next = 1;
                     break;
 
                 /* These tokens are ignored. */
@@ -335,7 +357,7 @@ if (!defined('HAVE_SQL_PROCESSOR')) {
 
                 case 'WITH':
                     if ($token_category === 'GROUP') {
-                        $skip_next = true;
+                        $skip_next = 1;
                         $out['OPTIONS'][] = 'WITH ROLLUP';
                         continue 2;
                     }
