@@ -118,18 +118,19 @@ if (!defined('HAVE_SQL_PROCESSOR')) {
 
                 case 'LIMIT':
                 case 'PLUGIN':
-                // no separate section
+                    # no separate section
                     if ($token_category === 'SHOW') {
                         continue;
                     }
                     $token_category = $upper;
                     break;
 
-                case 'FROM': /* this FROM is different from FROM in other DML (not join related) */
+                case 'FROM': 
+                    # this FROM is different from FROM in other DML (not join related)
                     if ($token_category === 'PREPARE') {
                         continue 2;
                     }
-                    // no separate section
+                    # no separate section
                     if ($token_category === 'SHOW') {
                         continue;
                     }
