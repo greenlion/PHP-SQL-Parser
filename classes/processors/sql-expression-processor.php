@@ -56,6 +56,9 @@ if (!defined('HAVE_SQL_EXPR_PROCESSOR')) {
     require_once(dirname(__FILE__) . '/expression-list-processor.php');
     require_once(dirname(__FILE__) . '/order-processor.php');
     require_once(dirname(__FILE__) . '/show-processor.php');
+    require_once(dirname(__FILE__) . '/create-processor.php');
+    require_once(dirname(__FILE__) . '/table-processor.php');
+    
 
     /**
      * 
@@ -69,6 +72,14 @@ if (!defined('HAVE_SQL_EXPR_PROCESSOR')) {
         public function process($out) {
             if (!$out) {
                 return false;
+            }
+            if (!empty($out['CREATE'])) {
+                $processor = new CreateProcessor();
+                $out['CREATE'] = $processor->process($out['CREATE']);
+            }
+            if (!empty($out['TABLE'])) {
+                $processor = new TableProcessor();
+                $out['TABLE'] = $processor->process($out['TABLE']);
             }
             if (!empty($out['EXPLAIN'])) {
                 $processor = new ExplainProcessor();
