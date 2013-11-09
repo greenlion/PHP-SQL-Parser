@@ -31,6 +31,7 @@
  */
 if (!defined('HAVE_TABLE_PROCESSOR')) {
     require_once(dirname(__FILE__) . '/abstract-processor.php');
+    require_once(dirname(__FILE__) . '/col-def-processor.php');
     require_once(dirname(__FILE__) . '/../expression-types.php');
 
     /**
@@ -43,7 +44,50 @@ if (!defined('HAVE_TABLE_PROCESSOR')) {
     class TableProcessor extends AbstractProcessor {
 
         public function process($tokens) {
-            return $tokens;
+            
+            $token_count = 0;
+            $expr = array();
+            
+            foreach ($tokens as $token) {
+                $trim = trim($token);
+
+                if ($trim === "") {
+                    continue;
+                }
+
+                $upper = strtoupper($trim);
+
+                if ($token_count === 0) {
+                    $expr['base_expr'] = $expr['name'] = $trim;
+                    $expr['no_quotes'] = $this->revokeQuotation($trim);
+                    $token_count++;
+                    continue;
+                }
+
+                if ($upper[0] === '(' && substr($upper, -1) === ')') {
+                    $unparsed = $this->splitSQLIntoTokens($this->removeParenthesisFromStart($trim));
+                    $processor = new ColDefProcessor();
+                    $coldef = $processor->process($unparsed);
+
+                    foreach ($coldef as $k => $v) {
+                        if (isset($v['type'])) {
+                            $type = $v['type'];
+                            unset($v['type']);
+                            if ($type === ExpressionType::COLDEF) {
+                                $expr[$type][] = $v;
+                            } else {
+                                if (!isset($expr[$type])) {
+                                    $expr[$type] = array();
+                                }
+                                $expr[$type][] = $v;
+                            }
+                        }
+                    }
+                }
+
+                $token_count++;
+            }
+            return $expr;
         }
     }
     define('HAVE_TABLE_PROCESSOR', 1);
