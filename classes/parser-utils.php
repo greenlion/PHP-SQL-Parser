@@ -30,14 +30,12 @@
  * DAMAGE.
  */
 
-require_once(dirname(__FILE__) . '/constants.php');
-
 /**
  * This class implements some helper functions.
  * @author arothe
  *
  */
-class PHPSQLParserUtils extends PHPSQLParserConstants {
+class PHPSQLParserUtils {
 
     /**
      * Prints an array only if debug mode is on.
