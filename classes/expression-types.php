@@ -38,6 +38,7 @@ class ExpressionType {
     const GLOBAL_VARIABLE = "global_variable";
     const LOCAL_VARIABLE = "local_variable";
 
+    const COLDEF = "coldef";
     const COLREF = "colref";
     const RESERVED = "reserved";
     const CONSTANT = "const";
