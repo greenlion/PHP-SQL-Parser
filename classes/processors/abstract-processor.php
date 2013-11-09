@@ -46,7 +46,6 @@ if (!defined('HAVE_ABSTRACT_PROCESSOR')) {
         /**
          * this function splits up a SQL statement into easy to "parse"
          * tokens for the SQL processor
-         * TODO: this method is a copy of PHPSQLParser::splitSQLIntoTokens, can we delete one version?
          */
         public function splitSQLIntoTokens($sql) {
             $lexer = new PHPSQLLexer();
@@ -59,10 +58,22 @@ if (!defined('HAVE_ABSTRACT_PROCESSOR')) {
          */
         protected function revokeQuotation($sql) {
             $result = trim($sql);
+            
             if (($result[0] === '`') && ($result[strlen($result) - 1] === '`')) {
                 $result = substr($result, 1, -1);
                 return trim(str_replace('``', '`', $result));
             }
+            
+            if (($result[0] === "'") && ($result[strlen($result) - 1] === "'")) {
+                $result = substr($result, 1, -1);
+                return trim(str_replace("''", "'", $result));
+            }
+            
+            if (($result[0] === "\"") && ($result[strlen($result) - 1] === "\"")) {
+                $result = substr($result, 1, -1);
+                return trim(str_replace("\"\"", "\"", $result));
+            }
+            
             return $sql;
         }
 
