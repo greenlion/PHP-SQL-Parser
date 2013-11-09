@@ -43,7 +43,7 @@ if (!defined('HAVE_COL_DEF_PROCESSOR')) {
     class ColDefProcessor extends AbstractProcessor {
 
         public function process($tokens) {
-            return $tokens;
+            return array();
         }
     }
     define('HAVE_COL_DEF_PROCESSOR', 1);
