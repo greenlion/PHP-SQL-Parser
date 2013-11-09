@@ -44,10 +44,10 @@ if (!defined('HAVE_TABLE_PROCESSOR')) {
     class TableProcessor extends AbstractProcessor {
 
         public function process($tokens) {
-            
-            $token_count = 0;
+
+            $curr = "TABLENAME";
             $expr = array();
-            
+
             foreach ($tokens as $token) {
                 $trim = trim($token);
 
@@ -57,13 +57,25 @@ if (!defined('HAVE_TABLE_PROCESSOR')) {
 
                 $upper = strtoupper($trim);
 
-                if ($token_count === 0) {
-                    $expr['base_expr'] = $expr['name'] = $trim;
-                    $expr['no_quotes'] = $this->revokeQuotation($trim);
-                    $token_count++;
+                if ($upper === 'LIKE') {
+                    # like without parenthesis
+                    $curr = $upper;
                     continue;
                 }
 
+                if ($curr === "TABLENAME") {
+                    $expr['base_expr'] = $expr['name'] = $trim;
+                    $expr['no_quotes'] = $this->revokeQuotation($trim);
+                    $curr = "";
+                    continue;
+                }
+
+                if ($curr === "LIKE") {
+                    $expr['like'] = array('table' => $trim, 'base_expr' => $trim, 'no_quotes' => $this->revokeQuotation($trim));
+                    $curr = "";
+                    continue;
+                }
+                
                 if ($upper[0] === '(' && substr($upper, -1) === ')') {
                     $unparsed = $this->splitSQLIntoTokens($this->removeParenthesisFromStart($trim));
                     $processor = new ColDefProcessor();
@@ -83,9 +95,12 @@ if (!defined('HAVE_TABLE_PROCESSOR')) {
                             }
                         }
                     }
+
+                    # TODO:
+                    # after a () we can have multiple table_options and a select_statement
+                    # but only if we don't have set $expr['like'] inside the parenthesis
                 }
 
-                $token_count++;
             }
             return $expr;
         }
