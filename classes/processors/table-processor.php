@@ -81,7 +81,7 @@ if (!defined('HAVE_TABLE_PROCESSOR')) {
 
                 case 'UNION':
                     if ($prevCategory === 'CREATE_DEF') {
-                        $expr[] = getReservedType($trim);
+                        $expr[] = $this->getReservedType($trim);
                         $currCategory = 'UNION';
                         continue 2;
                     }
@@ -97,19 +97,19 @@ if (!defined('HAVE_TABLE_PROCESSOR')) {
 
                 case '=':
                     if ($prevCategory === 'TABLE_OPTION') {
-                        $expr[] = getOperatorType($trim);
+                        $expr[] = $this->getOperatorType($trim);
                         continue 2; # don't change the category
                     }
                     break;
 
                 case 'CHARACTER':
                     if ($prevCategory === 'CREATE_DEF') {
-                        $expr[] = getReservedType($trim);
+                        $expr[] = $this->getReservedType($trim);
                         $currCategory = 'TABLE_OPTION';
                     }
                     if ($prevCategory === 'TABLE_OPTION') {
                         # add it to the previous DEFAULT
-                        $expr[] = getReservedType($trim);
+                        $expr[] = $this->getReservedType($trim);
                         continue 2;
                     }
                     break;
@@ -117,7 +117,7 @@ if (!defined('HAVE_TABLE_PROCESSOR')) {
                 case 'SET':
                     if ($prevCategory === 'TABLE_OPTION') {
                         # add it to a previous CHARACTER
-                        $expr[] = getReservedType($trim);
+                        $expr[] = $this->getReservedType($trim);
                         $currCategory = 'CHARSET';
                         continue 2;
                     }
@@ -126,7 +126,7 @@ if (!defined('HAVE_TABLE_PROCESSOR')) {
                 case 'COLLATE':
                     if ($currCategory === 'CHARSET') {
                         # after character set
-                        $expr[] = getReservedType($trim);
+                        $expr[] = $this->getReservedType($trim);
                         $currCategory = 'COLLATE';
                         continue 2;
                     }
@@ -135,14 +135,14 @@ if (!defined('HAVE_TABLE_PROCESSOR')) {
                 case 'DIRECTORY':
                     if ($currCategory === 'INDEX_DIRECTORY' || $currCategory === 'DATA_DIRECTORY') {
                         # after INDEX or DATA
-                        $expr[] = getReservedType($trim);
+                        $expr[] = $this->getReservedType($trim);
                         continue 2;
                     }
                     break;
 
                 case 'INDEX':
                     if ($prevCategory === 'CREATE_DEF') {
-                        $expr[] = getReservedType($trim);
+                        $expr[] = $this->getReservedType($trim);
                         $currCategory = 'INDEX_DIRECTORY';
                         continue 2;
                     }
@@ -150,7 +150,7 @@ if (!defined('HAVE_TABLE_PROCESSOR')) {
 
                 case 'DATA':
                     if ($prevCategory === 'CREATE_DEF') {
-                        $expr[] = getReservedType($trim);
+                        $expr[] = $this->getReservedType($trim);
                         $currCategory = 'DATA_DIRECTORY';
                         continue 2;
                     }
@@ -171,7 +171,7 @@ if (!defined('HAVE_TABLE_PROCESSOR')) {
                 case 'ENGINE':
                 case 'TYPE':
                     if ($prevCategory === 'CREATE_DEF') {
-                        $expr[] = getReservedType($trim);
+                        $expr[] = $this->getReservedType($trim);
                         $currCategory = 'TABLE_OPTION';
                     }
                     break;
@@ -187,15 +187,15 @@ if (!defined('HAVE_TABLE_PROCESSOR')) {
                 case 'DEFAULT':
                     if ($prevCategory === 'CREATE_DEF') {
                         # DEFAULT before CHARACTER SET
-                        $expr[] = getReservedType($trim);
+                        $expr[] = $this->getReservedType($trim);
                         $currCategory = 'TABLE_OPTION';
                     }
                     if ($prevCategory === 'TABLE_OPTION') {
                         # all assignments with the keywords
-                        $expr[] = getReservedType($trim);
+                        $expr[] = $this->getReservedType($trim);
                         $result['options'][] = array('type' => ExpressionType::EXPRESSION,
                                                      'base_expr' => trim($base_expr), 'sub_tree' => $expr);
-                        clear($expr, $base_expr, $currCategory);
+                        $this->clear($expr, $base_expr, $currCategory);
                     }
                     break;
 
@@ -204,48 +204,48 @@ if (!defined('HAVE_TABLE_PROCESSOR')) {
 
                     case 'CHARSET':
                     # charset name
-                        $expr[] = getConstantType($trim);
+                        $expr[] = $this->getConstantType($trim);
                         $result['options'][] = array('type' => ExpressionType::CHARSET, 'base_expr' => $base_expr,
                                                      'sub_tree' => $expr);
-                        clear($expr, $base_expr, $prevCategory);
+                        $this->clear($expr, $base_expr, $prevCategory);
                         continue 3;
 
                     case 'COLLATE':
                     # we have the collate name
-                        $expr[] = getConstantType($trim);
+                        $expr[] = $this->getConstantType($trim);
                         $last = array_pop($result['options']);
                         $last['base_expr'] .= $base_expr;
                         array_merge($last['sub_tree'], $expr);
                         $result['options'][] = $last;
-                        clear($expr, $base_expr, $prevCategory);
+                        $this->clear($expr, $base_expr, $prevCategory);
                         continue 3;
 
                     case 'DATA_DIRECTORY':
                     # we have the directory name
-                        $expr[] = getConstantType($trim);
+                        $expr[] = $this->getConstantType($trim);
                         $result['options'][] = array('type' => ExpressionType::DIRECTORY, 'kind' => 'DATA',
                                                      'base_expr' => $base_expr, 'sub_tree' => $expr);
-                        clear($expr, $base_expr, $prevCategory);
+                        $this->clear($expr, $base_expr, $prevCategory);
                         continue 3;
 
                     case 'INDEX_DIRECTORY':
                     # we have the directory name
-                        $expr[] = getConstantType($trim);
+                        $expr[] = $this->getConstantType($trim);
                         $result['options'][] = array('type' => ExpressionType::DIRECTORY, 'kind' => 'INDEX',
                                                      'base_expr' => $base_expr, 'sub_tree' => $expr);
-                        clear($expr, $base_expr, $prevCategory);
+                        $this->clear($expr, $base_expr, $prevCategory);
                         continue 3;
 
                     case 'TABLE_NAME':
                         $result['base_expr'] = $result['name'] = $trim;
                         $result['no_quotes'] = $this->revokeQuotation($trim);
-                        clear($expr, $base_expr, $prevCategory);
+                        $this->clear($expr, $base_expr, $prevCategory);
                         break;
 
                     case 'LIKE':
                         $result['like'] = array('table' => $trim, 'base_expr' => $trim,
                                                 'no_quotes' => $this->revokeQuotation($trim));
-                        clear($expr, $base_expr, $currCategory);
+                        $this->clear($expr, $base_expr, $currCategory);
                         break;
 
                     case '':
@@ -287,15 +287,15 @@ if (!defined('HAVE_TABLE_PROCESSOR')) {
                                         'sub_tree' => '***TODO***');
                         $result['options'][] = array('type' => ExpressionType::UNION, 'base_expr' => trim($base_expr),
                                                      'sub_tree' => $expr);
-                        clear($expr, $base_expr, $currCategory);
+                        $this->clear($expr, $base_expr, $currCategory);
                         break;
 
                     default:
                     # strings and numeric constants
-                        $expr[] = getConstantType($trim);
+                        $expr[] = $this->getConstantType($trim);
                         $result['options'][] = array('type' => ExpressionType::EXPRESSION,
                                                      'base_expr' => trim($base_expr), 'sub_tree' => $expr);
-                        clear($expr, $base_expr, $currCategory);
+                        $this->clear($expr, $base_expr, $currCategory);
                         break;
                     }
                     break;
