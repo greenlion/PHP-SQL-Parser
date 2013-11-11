@@ -24,7 +24,7 @@ $sql = "CREATE TABLE \"cachetable01\" (
 \"ro\" varchar(240) DEFAULT NULL,
 \"balance\" varchar(240) DEFAULT NULL,
 \"last_cache_timestamp\" varchar(25) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=latin1";
+) ENGINE=InnoDB DEFAULT CHARACTER SET=latin1";
 $parser->parse($sql);
 $p = $parser->parsed;
 print_r($p);
