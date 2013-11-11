@@ -89,7 +89,6 @@ if (!defined('HAVE_SQL_PROCESSOR')) {
                 /* Tokens that get their own sections. These keywords have subclauses. */
                 case 'SELECT':
                 case 'ORDER':
-                case 'SET':
                 case 'DUPLICATE':
                 case 'VALUES':
                 case 'GROUP':
@@ -119,6 +118,12 @@ if (!defined('HAVE_SQL_PROCESSOR')) {
                     $token_category = $upper;
                     break;
 
+                case 'SET':
+                    if ($token_category !== 'TABLE') {
+                        $token_category = $upper;
+                    }    
+                    break;
+                    
                 case 'LIMIT':
                 case 'PLUGIN':
                 # no separate section
