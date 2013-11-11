@@ -98,6 +98,7 @@ if (!defined('HAVE_TABLE_PROCESSOR')) {
                 case '=':
                     if ($prevCategory === 'TABLE_OPTION') {
                         $expr[] = $this->getOperatorType($trim);
+                        $currCategory = 'ASSIGNMENT';
                         continue 2; # don't change the category
                     }
                     break;
@@ -172,7 +173,8 @@ if (!defined('HAVE_TABLE_PROCESSOR')) {
                 case 'TYPE':
                     if ($prevCategory === 'CREATE_DEF') {
                         $expr[] = $this->getReservedType($trim);
-                        $currCategory = 'TABLE_OPTION';
+                        $currCategory = $prevCategory = 'TABLE_OPTION';
+                        continue 2;
                     }
                     break;
 
@@ -205,11 +207,11 @@ if (!defined('HAVE_TABLE_PROCESSOR')) {
                     case 'CHARSET':
                     # charset name
                         $expr[] = $this->getConstantType($trim);
-                        $result['options'][] = array('type' => ExpressionType::CHARSET, 'base_expr' => $base_expr,
+                        $result['options'][] = array('type' => ExpressionType::CHARSET, 'base_expr' => trim($base_expr),
                                                      'sub_tree' => $expr);
-                        $this->clear($expr, $base_expr, $prevCategory);
-                        continue 3;
-
+                        $this->clear($expr, $base_expr, $currCategory);
+                        break;
+                        
                     case 'COLLATE':
                     # we have the collate name
                         $expr[] = $this->getConstantType($trim);
@@ -224,7 +226,7 @@ if (!defined('HAVE_TABLE_PROCESSOR')) {
                     # we have the directory name
                         $expr[] = $this->getConstantType($trim);
                         $result['options'][] = array('type' => ExpressionType::DIRECTORY, 'kind' => 'DATA',
-                                                     'base_expr' => $base_expr, 'sub_tree' => $expr);
+                                                     'base_expr' => trim($base_expr), 'sub_tree' => $expr);
                         $this->clear($expr, $base_expr, $prevCategory);
                         continue 3;
 
@@ -232,7 +234,7 @@ if (!defined('HAVE_TABLE_PROCESSOR')) {
                     # we have the directory name
                         $expr[] = $this->getConstantType($trim);
                         $result['options'][] = array('type' => ExpressionType::DIRECTORY, 'kind' => 'INDEX',
-                                                     'base_expr' => $base_expr, 'sub_tree' => $expr);
+                                                     'base_expr' => trim($base_expr), 'sub_tree' => $expr);
                         $this->clear($expr, $base_expr, $prevCategory);
                         continue 3;
 
@@ -251,7 +253,6 @@ if (!defined('HAVE_TABLE_PROCESSOR')) {
                     case '':
                     # after table name
                         if ($upper[0] === '(' && substr($upper, -1) === ')') {
-                            $currCategory = 'CREATE_DEF';
                             $unparsed = $this->splitSQLIntoTokens($this->removeParenthesisFromStart($trim));
                             $processor = new ColDefProcessor();
                             $coldef = $processor->process($unparsed);
@@ -275,6 +276,10 @@ if (!defined('HAVE_TABLE_PROCESSOR')) {
                             # after a () we can have a select_statement
                             # but only if we don't have set $expr['like'] inside the parenthesis
                             # stop processing if 'like' is set
+
+                            $expr = array();
+                            $base_expr = '';
+                            $currCategory = 'CREATE_DEF';
                         }
                         break;
 
@@ -304,7 +309,7 @@ if (!defined('HAVE_TABLE_PROCESSOR')) {
                 $prevCategory = $currCategory;
                 $currCategory = "";
             }
-            return $expr;
+            return $result;
         }
     }
     define('HAVE_TABLE_PROCESSOR', 1);
