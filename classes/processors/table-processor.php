@@ -287,6 +287,8 @@ if (!defined('HAVE_TABLE_PROCESSOR')) {
                     # TODO: this token starts and ends with parenthesis
                     # and contains a list of table names (comma-separated)
                     # split the token and add the list as subtree
+                    # we must change the DefaultProcessor
+                    
                         $unparsed = $this->splitSQLIntoTokens($this->removeParenthesisFromStart($trim));
                         $expr[] = array('type' => ExpressionType::BRACKET_EXPRESSION, 'base_expr' => $trim,
                                         'sub_tree' => '***TODO***');
