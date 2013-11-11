@@ -54,7 +54,7 @@ if (!defined('HAVE_TABLE_PROCESSOR')) {
         protected function getOperatorType($token) {
             return array('type' => ExpressionType::OPERATOR, 'base_expr' => $token);
         }
-        
+
         protected function clear(&$expr, &$base_expr, &$category) {
             $expr = array();
             $base_expr = '';
@@ -207,11 +207,11 @@ if (!defined('HAVE_TABLE_PROCESSOR')) {
                     case 'CHARSET':
                     # charset name
                         $expr[] = $this->getConstantType($trim);
-                        $result['options'][] = array('type' => ExpressionType::CHARSET, 'base_expr' => trim($base_expr),
-                                                     'sub_tree' => $expr);
+                        $result['options'][] = array('type' => ExpressionType::CHARSET,
+                                                     'base_expr' => trim($base_expr), 'sub_tree' => $expr);
                         $this->clear($expr, $base_expr, $currCategory);
                         break;
-                        
+
                     case 'COLLATE':
                     # we have the collate name
                         $expr[] = $this->getConstantType($trim);
