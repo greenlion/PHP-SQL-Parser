@@ -777,7 +777,9 @@ if (! defined('HAVE_PHP_SQL_CREATOR')) {
             if ($parsed['expr_type'] !== ExpressionType::CONSTANT) {
                 return "";
             }
-            return $parsed['base_expr'];
+            $sql = $parsed['base_expr'];
+            $sql .= $this->processAlias($parsed);
+            return $sql;
         }
 
         protected function processInList($parsed)
