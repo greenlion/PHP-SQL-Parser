@@ -251,8 +251,9 @@ if (!defined('HAVE_TABLE_PROCESSOR')) {
                         break;
 
                     case '':
+                        
                     # after table name
-                        if ($upper[0] === '(' && substr($upper, -1) === ')') {
+                        if ($prevCategory === 'TABLE_NAME' && $upper[0] === '(' && substr($upper, -1) === ')') {
                             $unparsed = $this->splitSQLIntoTokens($this->removeParenthesisFromStart($trim));
                             $processor = new ColDefProcessor();
                             $coldef = $processor->process($unparsed);
