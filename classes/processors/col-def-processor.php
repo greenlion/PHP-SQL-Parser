@@ -44,7 +44,7 @@ if (!defined('HAVE_COL_DEF_PROCESSOR')) {
 
         public function process($tokens) {
 
-            $createDef = array();
+            $base_expr = "";
             $prevCategory = "";
             $currCategory = "";
             $expr = array();
@@ -53,8 +53,9 @@ if (!defined('HAVE_COL_DEF_PROCESSOR')) {
             foreach ($tokens as $k => $token) {
 
                 $trim = trim($token);
+                $base_expr .= $token;
+
                 if ($trim === "") {
-                    $createDef[] = $token;
                     continue;
                 }
 
@@ -65,6 +66,7 @@ if (!defined('HAVE_COL_DEF_PROCESSOR')) {
                 case 'CONSTRAINT':
                 case 'LIKE':
                     $currCategory = $prevCategory = $upper;
+                    $expr[] = array('type' => ExpressionType::RESERVED, 'base_expr' => $trim);
                     continue 2;
 
                 case 'FOREIGN':
@@ -104,9 +106,14 @@ if (!defined('HAVE_COL_DEF_PROCESSOR')) {
 
                 case 'PARSER':
                     break;
-                    
+
                 case ',':
-                    # this starts the next definition
+                # this starts the next definition
+                    $result['create-def'][] = array('type' => ExpressionType::EXPRESSION,
+                                                    'base_expr' => trim(substr($base_expr, 0, strlen($base_expr) - 1)),
+                                                    'sub_tree' => $expr);
+                    $base_expr = "";
+                    $expr = array();
                     break;
 
                 default:
@@ -114,9 +121,8 @@ if (!defined('HAVE_COL_DEF_PROCESSOR')) {
 
                     case 'LIKE':
                     # this is the tablename after LIKE
-                        $result['like'] = array('table' => $trim, 'base_expr' => $trim,
+                        $expr[] = array('table' => $trim, 'base_expr' => $trim,
                                                 'no_quotes' => $this->revokeQuotation($trim));
-
                         break;
 
                     case 'PRIMARY':
@@ -154,10 +160,14 @@ if (!defined('HAVE_COL_DEF_PROCESSOR')) {
                     }
                     break;
                 }
-                $prevCategory = currCategory;
+                $prevCategory = $currCategory;
                 $currCategory = "";
 
             }
+
+            $result['create-def'][] = array('type' => ExpressionType::EXPRESSION,
+                                                    'base_expr' => trim($base_expr),
+                                                    'sub_tree' => $expr);
             return $result;
         }
     }
