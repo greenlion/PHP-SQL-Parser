@@ -75,4 +75,13 @@ class ExpressionType {
     const UNION = "union";
     const CHARSET = "character_set";
     
+    const LIKE = "like";
+    const CONSTRAINT = "constraint";
+    const PRIMARY_KEY = "primary-key";
+    const FOREIGN_KEY = "foreign-key";
+    const UNIQUE_IDX = "unique-index";
+    const INDEX = "index";
+    const FULLTEXT_IDX = "fulltext-index";
+    const SPATIAL_IDX = "spatial-index";
+    const INDEX_TYPE = "index-type";
 }
