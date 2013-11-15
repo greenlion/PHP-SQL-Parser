@@ -29,7 +29,7 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
  * DAMAGE.
  */
-if (!defined('HAVE_COL_DEF_PROCESSOR')) {
+if (!defined('HAVE_CREATE_DEF_PROCESSOR')) {
     require_once(dirname(__FILE__) . '/abstract-processor.php');
     require_once(dirname(__FILE__) . '/../expression-types.php');
 
@@ -40,12 +40,12 @@ if (!defined('HAVE_COL_DEF_PROCESSOR')) {
      * @author arothe
      * 
      */
-    class ColDefProcessor extends AbstractProcessor {
+    class CreateDefProcessor extends AbstractProcessor {
 
         protected function isIndexType($upper) {
             return ($upper === 'BTREE' || $upper === 'HASH');
         }
-                
+
         public function process($tokens) {
 
             $base_expr = "";
@@ -68,22 +68,42 @@ if (!defined('HAVE_COL_DEF_PROCESSOR')) {
                 switch ($upper) {
 
                 case 'CONSTRAINT':
+                    $expr[] = array('type' => ExpressionType::CONSTRAINT, 'base_expr' => $trim);
+                    $currCategory = $prevCategory = $upper;
+                    continue 2;
+
                 case 'LIKE':
-                    $expr[] = array('type' => ExpressionType::RESERVED, 'base_expr' => $trim);
+                    $expr[] = array('type' => ExpressionType::LIKE, 'base_expr' => $trim);
                     $currCategory = $prevCategory = $upper;
                     continue 2;
 
                 case 'FOREIGN':
+                    if ($prevCategory === "" || $prevCategory === "CONSTRAINT") {
+                        $expr[] = array('type' => ExpressionType::FOREIGN, 'base_expr' => $trim);
+                        $currCategory = $upper;
+                        continue 2;
+                    }
+                    # what means that?
+                    break;
+
                 case 'PRIMARY':
-                case 'UNIQUE':
-                    
-                    # we should set the type of the first $exp[] to $Upper
-                    # to see, what the constraint is
-                    
-                    $expr[] = array('type' => ExpressionType::RESERVED, 'base_expr' => $trim);
-                    $currCategory = $upper;
                     if ($prevCategory === "" || $prevCategory === "CONSTRAINT") {
                         # next one is KEY
+                        $expr[] = array('type' => ExpressionType::PRIMARY_KEY, 'base_expr' => $trim);
+                        $currCategory = $upper;
+                        continue 2;
+                    }
+                    # what means that?
+                    break;
+
+                case 'UNIQUE':
+                # we should set the type of the first $exp[] to $Upper
+                # to see, what the constraint is
+
+                    if ($prevCategory === "" || $prevCategory === "CONSTRAINT") {
+                        # next one is KEY
+                        $expr[] = array('type' => ExpressionType::UNIQUE, 'base_expr' => $trim);
+                        $currCategory = $upper;
                         continue 2;
                     }
                     break;
@@ -102,7 +122,7 @@ if (!defined('HAVE_COL_DEF_PROCESSOR')) {
                     $expr[] = array('type' => ExpressionType::CHECK, 'base_expr' => trim);
                     $currCategory = $upper;
                     continue 2;
-                    
+
                 case 'INDEX':
                     if ($currCategory === 'UNIQUE' || $currCategory === 'FULLTEXT' || $currCategory === 'SPATIAL') {
                         $expr[] = array('type' => ExpressionType::RESERVED, 'base_expr' => trim);
@@ -116,7 +136,7 @@ if (!defined('HAVE_COL_DEF_PROCESSOR')) {
                     $expr[] = array('type' => ExpressionType::FULLTEXT_IDX, 'base_expr' => trim);
                     $currCategory = $prevCategory = $upper;
                     continue 2;
-                    
+
                 case 'SPATIAL':
                     $expr[] = array('type' => ExpressionType::SPATIAL_IDX, 'base_expr' => trim);
                     $currCategory = $prevCategory = $upper;
@@ -147,49 +167,64 @@ if (!defined('HAVE_COL_DEF_PROCESSOR')) {
                         break;
 
                     case 'PRIMARY':
-                    # this could be the index_type BTREE or HASH
-                    # or if we have parenthesis, then we have the list of index_columns
+                    # TODO: should we change the category?
                         if ($upper[0] === '(' && substr($upper, -1) === ')') {
-
+                            # TODO: parse the col-list
+                        }
+                        if ($this->isIndexType($upper)) {
+                            $expr[] = array('type' => ExpressionType::INDEX_TYPE, 'base_expr' => $trim);
                         }
                         break;
 
                     case 'FOREIGN':
-                    # this could be the index_name
-                    # or if we have parenthesis, then we have the list of index_columns
+                    # TODO: should we change the category?
                         if ($upper[0] === '(' && substr($upper, -1) === ')') {
-
+                            # TODO: parse the col-list
+                        }
+                        if ($this->isIndexType($upper)) {
+                            $expr[] = array('type' => ExpressionType::INDEX_TYPE, 'base_expr' => $trim);
                         }
                         break;
 
                     case 'CONSTRAINT':
-                    # this is the constraint symbol
-                        break;
+                    # constraint name
+                        $expr[] = array('type' => ExpressionType::CONSTANT, 'base_expr' => $trim);
+                        continue 3;
 
                     case 'INDEX':
-                    # this is the index name (after SPATIAL, FULLTEXT, INDEX)
+                    # TODO: should we change the category?
+                        if ($upper[0] === '(' && substr($upper, -1) === ')') {
+                            # TODO: parse the col-list
+                        }
+                        if ($this->isIndexType($upper)) {
+                            $expr[] = array('type' => ExpressionType::INDEX_TYPE, 'base_expr' => $trim);
+                        }
+                        # index name                        
+                        $expr[] = array('type' => ExpressionType::CONSTANT, 'base_expr' => $trim);
                         break;
 
                     case 'CHECK':
-                    # if we have parenthesis, then we have the check expression
                         if ($upper[0] === '(' && substr($upper, -1) === ')') {
                             $parser = new ExpressionListProcessor();
                             $expr[] = array('type' => ExpressionType::BRACKET_EXPRESSION, 'base_expr' => $trim,
                                             'sub_tree' => $parser->parse($this->removeParenthesisFromStart($trim)));
                         }
+                        # else?
                         break;
 
                     case 'KEY':
                     case 'UNIQUE':
-                    # this could be the index_name or index_type (BTREE or HASH)
+                    # TODO: should we change the category?
+                        if ($upper[0] === '(' && substr($upper, -1) === ')') {
+                            # TODO: parse the col-list
+                        }
                         if ($this->isIndexType($upper)) {
                             $expr[] = array('type' => ExpressionType::INDEX_TYPE, 'base_expr' => $trim);
-                            $currCategory = "INDEX_COL_LIST";
                             break;
                         }
                         # we have the index name
                         $expr[] = array('type' => ExpressionType::CONSTANT, 'base_expr' => $trim);
-                        continue 3; 
+                        continue 3;
 
                     default:
                         break;
@@ -206,5 +241,5 @@ if (!defined('HAVE_COL_DEF_PROCESSOR')) {
             return $result;
         }
     }
-    define('HAVE_COL_DEF_PROCESSOR', 1);
+    define('HAVE_CREATE_DEF_PROCESSOR', 1);
 }

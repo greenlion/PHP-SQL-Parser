@@ -255,7 +255,7 @@ if (!defined('HAVE_TABLE_PROCESSOR')) {
                     # after table name
                         if ($prevCategory === 'TABLE_NAME' && $upper[0] === '(' && substr($upper, -1) === ')') {
                             $unparsed = $this->splitSQLIntoTokens($this->removeParenthesisFromStart($trim));
-                            $processor = new ColDefProcessor();
+                            $processor = new CreateDefProcessor();
                             $coldef = $processor->process($unparsed);
                             $result['create-def'] = array('type' => ExpressionType::BRACKET_EXPRESSION, 'base_expr' => $base_expr, 'sub_tree' => $coldef['create-def']);
                             
