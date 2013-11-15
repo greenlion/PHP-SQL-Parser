@@ -31,7 +31,7 @@
  */
 if (!defined('HAVE_TABLE_PROCESSOR')) {
     require_once(dirname(__FILE__) . '/abstract-processor.php');
-    require_once(dirname(__FILE__) . '/col-def-processor.php');
+    require_once(dirname(__FILE__) . '/create-def-processor.php');
     require_once(dirname(__FILE__) . '/../expression-types.php');
 
     /**
