@@ -79,7 +79,7 @@ if (!defined('HAVE_CREATE_DEF_PROCESSOR')) {
 
                 case 'FOREIGN':
                     if ($prevCategory === "" || $prevCategory === "CONSTRAINT") {
-                        $expr[] = array('type' => ExpressionType::FOREIGN, 'base_expr' => $trim);
+                        $expr[] = array('type' => ExpressionType::FOREIGN_KEY, 'base_expr' => $trim);
                         $currCategory = $upper;
                         continue 2;
                     }
@@ -102,7 +102,7 @@ if (!defined('HAVE_CREATE_DEF_PROCESSOR')) {
 
                     if ($prevCategory === "" || $prevCategory === "CONSTRAINT") {
                         # next one is KEY
-                        $expr[] = array('type' => ExpressionType::UNIQUE, 'base_expr' => $trim);
+                        $expr[] = array('type' => ExpressionType::UNIQUE_IDX, 'base_expr' => $trim);
                         $currCategory = $upper;
                         continue 2;
                     }
