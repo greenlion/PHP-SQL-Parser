@@ -6,7 +6,6 @@ $parser = new PHPSQLParser();
 $sql = "CREATE TABLE hohoho (LIKE xyz)";
 $parser->parse($sql);
 $p = $parser->parsed;
-print_r($p);
 $expected = getExpectedValue(dirname(__FILE__), 'issue33a.serialized');
 eq_array($p, $expected, 'CREATE TABLE statement with (LIKE)');
 
