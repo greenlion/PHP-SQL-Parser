@@ -257,22 +257,8 @@ if (!defined('HAVE_TABLE_PROCESSOR')) {
                             $unparsed = $this->splitSQLIntoTokens($this->removeParenthesisFromStart($trim));
                             $processor = new ColDefProcessor();
                             $coldef = $processor->process($unparsed);
-
-                            foreach ($coldef as $k => $v) {
-                                if (isset($v['type'])) {
-                                    $type = $v['type'];
-                                    unset($v['type']);
-                                    if ($type === ExpressionType::COLDEF) {
-                                        $expr[$type][] = $v;
-                                    } else {
-                                        if (!isset($expr[$type])) {
-                                            $expr[$type] = array();
-                                        }
-                                        $expr[$type][] = $v;
-                                    }
-                                }
-                            }
-
+                            $result['create-def'] = array('type' => ExpressionType::BRACKET_EXPRESSION, 'base_expr' => $base_expr, 'sub_tree' => $coldef['create-def']);
+                            
                             # TODO:
                             # after a () we can have a select_statement
                             # but only if we don't have set $expr['like'] inside the parenthesis
