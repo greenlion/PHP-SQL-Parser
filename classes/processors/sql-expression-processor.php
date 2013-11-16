@@ -58,7 +58,6 @@ if (!defined('HAVE_SQL_EXPR_PROCESSOR')) {
     require_once(dirname(__FILE__) . '/show-processor.php');
     require_once(dirname(__FILE__) . '/create-processor.php');
     require_once(dirname(__FILE__) . '/table-processor.php');
-    
 
     /**
      * 
@@ -80,6 +79,10 @@ if (!defined('HAVE_SQL_EXPR_PROCESSOR')) {
             if (!empty($out['TABLE'])) {
                 $processor = new TableProcessor();
                 $out['TABLE'] = $processor->process($out['TABLE']);
+                if (isset($out['TABLE']['like'])) {
+                    $out = $this->array_insert_after($out, 'TABLE', array('LIKE' => $out['TABLE']['like']));
+                    unset($out['TABLE']['like']);
+                }
             }
             if (!empty($out['EXPLAIN'])) {
                 $processor = new ExplainProcessor();
