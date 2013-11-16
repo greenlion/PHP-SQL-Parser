@@ -30,7 +30,7 @@
  * DAMAGE.
  */
 if (!defined('HAVE_ABSTRACT_PROCESSOR')) {
-    
+
     require_once(dirname(__FILE__) . '/../expression-types.php');
     require_once(dirname(__FILE__) . '/../lexer/lexer.php');
 
@@ -58,22 +58,22 @@ if (!defined('HAVE_ABSTRACT_PROCESSOR')) {
          */
         protected function revokeQuotation($sql) {
             $result = trim($sql);
-            
+
             if (($result[0] === '`') && ($result[strlen($result) - 1] === '`')) {
                 $result = substr($result, 1, -1);
                 return trim(str_replace('``', '`', $result));
             }
-            
+
             if (($result[0] === "'") && ($result[strlen($result) - 1] === "'")) {
                 $result = substr($result, 1, -1);
                 return trim(str_replace("''", "'", $result));
             }
-            
+
             if (($result[0] === "\"") && ($result[strlen($result) - 1] === "\"")) {
                 $result = substr($result, 1, -1);
                 return trim(str_replace("\"\"", "\"", $result));
             }
-            
+
             return $sql;
         }
 
@@ -200,6 +200,13 @@ if (!defined('HAVE_ABSTRACT_PROCESSOR')) {
                 $expr[] = $token->toArray();
             }
             return (empty($expr) ? false : $expr);
+        }
+
+        protected function array_insert_after($array, $key, $entry) {
+            $idx = array_search($key, array_keys($array));
+            $array = array_slice($array, 0, $idx + 1, true) + $entry
+                    + array_slice($array, $idx + 1, count($array) - 1, true);
+            return $array;
         }
     }
     define('HAVE_ABSTRACT_PROCESSOR', 1);
