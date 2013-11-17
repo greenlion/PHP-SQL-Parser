@@ -80,6 +80,9 @@ if (!defined('HAVE_CREATE_DEF_PROCESSOR')) {
                 case 'FOREIGN':
                     if ($prevCategory === "" || $prevCategory === "CONSTRAINT") {
                         $expr[] = array('type' => ExpressionType::FOREIGN_KEY, 'base_expr' => $trim);
+                        if ($prevCategory === "CONSTRAINT") {
+                            $expr[0]['for'] = ExpressionType::FOREIGN_KEY;
+                        }
                         $currCategory = $upper;
                         continue 2;
                     }
@@ -90,6 +93,9 @@ if (!defined('HAVE_CREATE_DEF_PROCESSOR')) {
                     if ($prevCategory === "" || $prevCategory === "CONSTRAINT") {
                         # next one is KEY
                         $expr[] = array('type' => ExpressionType::PRIMARY_KEY, 'base_expr' => $trim);
+                        if ($prevCategory === "CONSTRAINT") {
+                            $expr[0]['for'] = ExpressionType::PRIMARY_KEY;
+                        }
                         $currCategory = $upper;
                         continue 2;
                     }
@@ -97,12 +103,12 @@ if (!defined('HAVE_CREATE_DEF_PROCESSOR')) {
                     break;
 
                 case 'UNIQUE':
-                # we should set the type of the first $exp[] to $Upper
-                # to see, what the constraint is
-
                     if ($prevCategory === "" || $prevCategory === "CONSTRAINT") {
                         # next one is KEY
                         $expr[] = array('type' => ExpressionType::UNIQUE_IDX, 'base_expr' => $trim);
+                        if ($prevCategory === "CONSTRAINT") {
+                            $expr[0]['for'] = ExpressionType::UNIQUE_IDX;
+                        }
                         $currCategory = $upper;
                         continue 2;
                     }
