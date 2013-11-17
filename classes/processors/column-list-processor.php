@@ -1,8 +1,8 @@
 <?php
 /**
- * insert-processor.php
+ * column-list-processor.php
  *
- * This file implements the processor for the INSERT statements.
+ * This file implements the processor for column lists like in INSERT statements.
  *
  * Copyright (c) 2010-2012, Justin Swanhart
  * with contributions by André Rothe <arothe@phosco.info, phosco@gmx.de>
@@ -29,50 +29,28 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
  * DAMAGE.
  */
-if (!defined('HAVE_INSERT_PROCESSOR')) {
-
+if (!defined('HAVE_COLUMN_LIST_PROCESSOR')) {
     require_once(dirname(__FILE__) . '/abstract-processor.php');
-    require_once(dirname(__FILE__) . '/column-list-processor.php');
     require_once(dirname(__FILE__) . '/../expression-types.php');
 
     /**
      * 
-     * This class processes the INSERT statements.
+     * This class processes column-lists.
      * 
      * @author arothe
      * 
      */
-    class InsertProcessor extends AbstractProcessor {
+    class ColumnListProcessor extends AbstractProcessor {
 
-        public function process($tokenList, $token_category = 'INSERT') {
-            $table = "";
+        public function process($token) {
+            $columns = explode(",", $token);
             $cols = array();
-
-            $into = $tokenList['INTO'];
-            foreach ($into as $token) {
-                if ($this->isWhitespaceToken($token))
-                    continue;
-                if ($table === "") {
-                    $table = $token;
-                } elseif (empty($cols)) {
-                    $cols[] = $token;
-                }
+            foreach ($columns as $k => $v) {
+                $cols[] = array('expr_type' => ExpressionType::COLREF, 'base_expr' => trim($v),
+                                'no_quotes' => $this->revokeQuotation($v));
             }
-
-            if (empty($cols)) {
-                $cols = false;
-            } else {
-                $processor  = new ColumnListProcessor();
-                $cols = $processor->process($this->removeParenthesisFromStart($cols[0]));
-            }
-
-            unset($tokenList['INTO']);
-            $tokenList[$token_category][0] = array('table' => $table, 'columns' => $cols, 'base_expr' => $table,
-                                                   'no_quotes' => $this->revokeQuotation($table));
-            return $tokenList;
+            return $cols;
         }
-
     }
-    define('HAVE_INSERT_PROCESSOR', 1);
+    define('HAVE_COLUMN_LIST_PROCESSOR', 1);
 }
-
