@@ -83,7 +83,7 @@ if (!defined('HAVE_CREATE_DEF_PROCESSOR')) {
                         $currCategory = $upper;
                         continue 2;
                     }
-                    # what means that?
+                    # else ?
                     break;
 
                 case 'PRIMARY':
@@ -93,7 +93,7 @@ if (!defined('HAVE_CREATE_DEF_PROCESSOR')) {
                         $currCategory = $upper;
                         continue 2;
                     }
-                    # what means that?
+                    # else ?
                     break;
 
                 case 'UNIQUE':
@@ -106,39 +106,40 @@ if (!defined('HAVE_CREATE_DEF_PROCESSOR')) {
                         $currCategory = $upper;
                         continue 2;
                     }
+                    # else ?
                     break;
 
                 case 'KEY':
                 # the next one is an index name
                     if ($currCategory === 'PRIMARY' || $currCategory === 'FOREIGN' || $currCategory === 'UNIQUE') {
-                        $expr[] = array('type' => ExpressionType::RESERVED, 'base_expr' => trim);
+                        $expr[] = array('type' => ExpressionType::RESERVED, 'base_expr' => $trim);
                         continue 2;
                     }
-                    $expr[] = array('type' => ExpressionType::INDEX, 'base_expr' => trim);
+                    $expr[] = array('type' => ExpressionType::INDEX, 'base_expr' => $trim);
                     $currCategory = $upper;
                     continue 2;
 
                 case 'CHECK':
-                    $expr[] = array('type' => ExpressionType::CHECK, 'base_expr' => trim);
+                    $expr[] = array('type' => ExpressionType::CHECK, 'base_expr' => $trim);
                     $currCategory = $upper;
                     continue 2;
 
                 case 'INDEX':
                     if ($currCategory === 'UNIQUE' || $currCategory === 'FULLTEXT' || $currCategory === 'SPATIAL') {
-                        $expr[] = array('type' => ExpressionType::RESERVED, 'base_expr' => trim);
+                        $expr[] = array('type' => ExpressionType::RESERVED, 'base_expr' => $trim);
                         continue 2;
                     }
-                    $expr[] = array('type' => ExpressionType::INDEX, 'base_expr' => trim);
+                    $expr[] = array('type' => ExpressionType::INDEX, 'base_expr' => $trim);
                     $currCategory = $upper;
                     continue 2;
 
                 case 'FULLTEXT':
-                    $expr[] = array('type' => ExpressionType::FULLTEXT_IDX, 'base_expr' => trim);
+                    $expr[] = array('type' => ExpressionType::FULLTEXT_IDX, 'base_expr' => $trim);
                     $currCategory = $prevCategory = $upper;
                     continue 2;
 
                 case 'SPATIAL':
-                    $expr[] = array('type' => ExpressionType::SPATIAL_IDX, 'base_expr' => trim);
+                    $expr[] = array('type' => ExpressionType::SPATIAL_IDX, 'base_expr' => $trim);
                     $currCategory = $prevCategory = $upper;
                     continue 2;
 
@@ -205,9 +206,10 @@ if (!defined('HAVE_CREATE_DEF_PROCESSOR')) {
 
                     case 'CHECK':
                         if ($upper[0] === '(' && substr($upper, -1) === ')') {
-                            $parser = new ExpressionListProcessor();
-                            $expr[] = array('type' => ExpressionType::BRACKET_EXPRESSION, 'base_expr' => $trim,
-                                            'sub_tree' => $parser->parse($this->removeParenthesisFromStart($trim)));
+                            # TODO: this doesn't work
+                            //$parser = new ExpressionListProcessor();
+                            //$expr[] = array('type' => ExpressionType::BRACKET_EXPRESSION, 'base_expr' => $trim,
+                            //                'sub_tree' => $parser->process(array($this->removeParenthesisFromStart($trim))));
                         }
                         # else?
                         break;
