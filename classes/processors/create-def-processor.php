@@ -46,6 +46,27 @@ if (!defined('HAVE_CREATE_DEF_PROCESSOR')) {
             return ($upper === 'BTREE' || $upper === 'HASH');
         }
 
+        protected function correctExpressionType(&$expr) {
+            $type = ExpressionType::EXPRESSION;
+            if (!isset($expr[0]) || !isset($expr[0]['type'])) {
+                return $type;
+            }
+            $type = $expr[0]['type'];
+            $expr[0]['type'] = ExpressionType::RESERVED;
+
+            # replace the constraint type with a more descriptive one
+            if ($type === ExpressionType::CONSTRAINT) {
+                if ($expr[1]['type'] === ExpressionType::CONSTANT) {
+                    $type = $expr[2]['type'];
+                    $expr[2]['type'] = ExpressionType::RESERVED;
+                } else {
+                    $type = $expr[1]['type'];
+                    $expr[1]['type'] = ExpressionType::RESERVED;
+                }
+            }
+            return $type;
+        }
+
         public function process($tokens) {
 
             $base_expr = "";
@@ -157,7 +178,8 @@ if (!defined('HAVE_CREATE_DEF_PROCESSOR')) {
 
                 case ',':
                 # this starts the next definition
-                    $result['create-def'][] = array('type' => ExpressionType::EXPRESSION,
+                    $type = $this->correctExpressionType($expr);
+                    $result['create-def'][] = array('type' => $type,
                                                     'base_expr' => trim(substr($base_expr, 0, strlen($base_expr) - 1)),
                                                     'sub_tree' => $expr);
                     $base_expr = "";
@@ -244,8 +266,8 @@ if (!defined('HAVE_CREATE_DEF_PROCESSOR')) {
 
             }
 
-            $result['create-def'][] = array('type' => ExpressionType::EXPRESSION, 'base_expr' => trim($base_expr),
-                                            'sub_tree' => $expr);
+            $type = $this->correctExpressionType($expr);
+            $result['create-def'][] = array('type' => $type, 'base_expr' => trim($base_expr), 'sub_tree' => $expr);
             return $result;
         }
     }
