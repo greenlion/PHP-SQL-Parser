@@ -245,12 +245,11 @@ if (!defined('HAVE_CREATE_DEF_PROCESSOR')) {
 
                     case 'CHECK':
                         if ($upper[0] === '(' && substr($upper, -1) === ')') {
-                            # TODO: this doesn't work, maybe we have to split the tokens first
                             $processor = new ExpressionListProcessor();
-                            $parsed = $processor->process($this->removeParenthesisFromStart($trim));
-
-                            //$expr[] = array('type' => ExpressionType::BRACKET_EXPRESSION, 'base_expr' => $trim,
-                            //                'sub_tree' => $parser->process(array($this->removeParenthesisFromStart($trim))));
+                            $unparsed = $this->splitSQLIntoTokens($this->removeParenthesisFromStart($trim));
+                            $parsed = $processor->process($unparsed);
+                            $expr[] = array('type' => ExpressionType::BRACKET_EXPRESSION, 'base_expr' => $trim,
+                                            'sub_tree' => $parsed);
                         }
                         # else?
                         break;
