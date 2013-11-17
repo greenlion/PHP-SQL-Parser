@@ -31,6 +31,7 @@
  */
 if (!defined('HAVE_CREATE_DEF_PROCESSOR')) {
     require_once(dirname(__FILE__) . '/abstract-processor.php');
+    require_once(dirname(__FILE__) . '/column-list-processor.php');
     require_once(dirname(__FILE__) . '/../expression-types.php');
 
     /**
@@ -65,16 +66,6 @@ if (!defined('HAVE_CREATE_DEF_PROCESSOR')) {
                 }
             }
             return $type;
-        }
-
-        protected function parseColumnList($token) {
-            $columns = explode(",", $this->removeParenthesisFromStart($token));
-            $cols = array();
-            foreach ($columns as $k => $v) {
-                $cols[] = array('expr_type' => ExpressionType::COLREF, 'base_expr' => trim($v),
-                                'no_quotes' => $this->revokeQuotation($v));
-            }
-            return $cols;
         }
 
         public function process($tokens) {
@@ -208,9 +199,8 @@ if (!defined('HAVE_CREATE_DEF_PROCESSOR')) {
                     case 'PRIMARY':
                     # TODO: should we change the category?
                         if ($upper[0] === '(' && substr($upper, -1) === ')') {
-                            $expr[] = array('type' => ExpressionType::COLUMN_LIST, 'base_expr' => $trim,
-                                            'sub_tree' => $this->parseColumnList(
-                                            $this->removeParenthesisFromStart($trim)));
+                            $processor = new ColumnListProcessor();
+                            $expr[] = $processor->process($this->removeParenthesisFromStart($trim));
                             $currCategory = "PRIMARY-COLUMNS";
                             continue 3;
                         }
@@ -222,9 +212,8 @@ if (!defined('HAVE_CREATE_DEF_PROCESSOR')) {
                     case 'FOREIGN':
                     # TODO: should we change the category?
                         if ($upper[0] === '(' && substr($upper, -1) === ')') {
-                            $expr[] = array('type' => ExpressionType::COLUMN_LIST, 'base_expr' => $trim,
-                                            'sub_tree' => $this->parseColumnList(
-                                            $this->removeParenthesisFromStart($trim)));
+                            $processor = new ColumnListProcessor();
+                            $expr[] = $processor->process($this->removeParenthesisFromStart($trim));
                             $currCategory = "FOREIGN-COLUMNS";
                         }
                         if ($this->isIndexType($upper)) {
@@ -242,9 +231,8 @@ if (!defined('HAVE_CREATE_DEF_PROCESSOR')) {
                     case 'INDEX':
                     # TODO: should we change the category?
                         if ($upper[0] === '(' && substr($upper, -1) === ')') {
-                            $expr[] = array('type' => ExpressionType::COLUMN_LIST, 'base_expr' => $trim,
-                                            'sub_tree' => $this->parseColumnList(
-                                            $this->removeParenthesisFromStart($trim)));
+                            $processor = new ColumnListProcessor();
+                            $expr[] = $processor->process($this->removeParenthesisFromStart($trim));
                             $currCategory = "INDEX-COLUMNS";
                         }
                         if ($this->isIndexType($upper)) {
@@ -260,7 +248,7 @@ if (!defined('HAVE_CREATE_DEF_PROCESSOR')) {
                             # TODO: this doesn't work, maybe we have to split the tokens first
                             $processor = new ExpressionListProcessor();
                             $parsed = $processor->process($this->removeParenthesisFromStart($trim));
-                            
+
                             //$expr[] = array('type' => ExpressionType::BRACKET_EXPRESSION, 'base_expr' => $trim,
                             //                'sub_tree' => $parser->process(array($this->removeParenthesisFromStart($trim))));
                         }
