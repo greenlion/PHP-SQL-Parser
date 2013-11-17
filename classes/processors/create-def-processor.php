@@ -67,6 +67,16 @@ if (!defined('HAVE_CREATE_DEF_PROCESSOR')) {
             return $type;
         }
 
+        protected function parseColumnList($token) {
+            $columns = explode(",", $this->removeParenthesisFromStart($token));
+            $cols = array();
+            foreach ($columns as $k => $v) {
+                $cols[] = array('expr_type' => ExpressionType::COLREF, 'base_expr' => trim($v),
+                                'no_quotes' => $this->revokeQuotation($v));
+            }
+            return $cols;
+        }
+
         public function process($tokens) {
 
             $base_expr = "";
@@ -191,14 +201,18 @@ if (!defined('HAVE_CREATE_DEF_PROCESSOR')) {
 
                     case 'LIKE':
                     # this is the tablename after LIKE
-                        $expr[] = array('table' => $trim, 'base_expr' => $trim,
+                        $expr[] = array('type' => ExpressionType::TABLE, 'table' => $trim, 'base_expr' => $trim,
                                         'no_quotes' => $this->revokeQuotation($trim));
                         break;
 
                     case 'PRIMARY':
                     # TODO: should we change the category?
                         if ($upper[0] === '(' && substr($upper, -1) === ')') {
-                            # TODO: parse the col-list
+                            $expr[] = array('type' => ExpressionType::COLUMN_LIST, 'base_expr' => $trim,
+                                            'sub_tree' => $this->parseColumnList(
+                                            $this->removeParenthesisFromStart($trim)));
+                            $currCategory = "PRIMARY-COLUMNS";
+                            continue 3;
                         }
                         if ($this->isIndexType($upper)) {
                             $expr[] = array('type' => ExpressionType::INDEX_TYPE, 'base_expr' => $trim);
@@ -208,7 +222,10 @@ if (!defined('HAVE_CREATE_DEF_PROCESSOR')) {
                     case 'FOREIGN':
                     # TODO: should we change the category?
                         if ($upper[0] === '(' && substr($upper, -1) === ')') {
-                            # TODO: parse the col-list
+                            $expr[] = array('type' => ExpressionType::COLUMN_LIST, 'base_expr' => $trim,
+                                            'sub_tree' => $this->parseColumnList(
+                                            $this->removeParenthesisFromStart($trim)));
+                            $currCategory = "FOREIGN-COLUMNS";
                         }
                         if ($this->isIndexType($upper)) {
                             $expr[] = array('type' => ExpressionType::INDEX_TYPE, 'base_expr' => $trim);
@@ -220,41 +237,35 @@ if (!defined('HAVE_CREATE_DEF_PROCESSOR')) {
                         $expr[] = array('type' => ExpressionType::CONSTANT, 'base_expr' => $trim);
                         continue 3;
 
+                    case 'KEY':
+                    case 'UNIQUE':
                     case 'INDEX':
                     # TODO: should we change the category?
                         if ($upper[0] === '(' && substr($upper, -1) === ')') {
-                            # TODO: parse the col-list
+                            $expr[] = array('type' => ExpressionType::COLUMN_LIST, 'base_expr' => $trim,
+                                            'sub_tree' => $this->parseColumnList(
+                                            $this->removeParenthesisFromStart($trim)));
+                            $currCategory = "INDEX-COLUMNS";
                         }
                         if ($this->isIndexType($upper)) {
                             $expr[] = array('type' => ExpressionType::INDEX_TYPE, 'base_expr' => $trim);
                         }
                         # index name                        
                         $expr[] = array('type' => ExpressionType::CONSTANT, 'base_expr' => $trim);
+                        continue 3;
                         break;
 
                     case 'CHECK':
                         if ($upper[0] === '(' && substr($upper, -1) === ')') {
-                            # TODO: this doesn't work
-                            //$parser = new ExpressionListProcessor();
+                            # TODO: this doesn't work, maybe we have to split the tokens first
+                            $processor = new ExpressionListProcessor();
+                            $parsed = $processor->process($this->removeParenthesisFromStart($trim));
+                            
                             //$expr[] = array('type' => ExpressionType::BRACKET_EXPRESSION, 'base_expr' => $trim,
                             //                'sub_tree' => $parser->process(array($this->removeParenthesisFromStart($trim))));
                         }
                         # else?
                         break;
-
-                    case 'KEY':
-                    case 'UNIQUE':
-                    # TODO: should we change the category?
-                        if ($upper[0] === '(' && substr($upper, -1) === ')') {
-                            # TODO: parse the col-list
-                        }
-                        if ($this->isIndexType($upper)) {
-                            $expr[] = array('type' => ExpressionType::INDEX_TYPE, 'base_expr' => $trim);
-                            break;
-                        }
-                        # we have the index name
-                        $expr[] = array('type' => ExpressionType::CONSTANT, 'base_expr' => $trim);
-                        continue 3;
 
                     default:
                         break;
@@ -263,7 +274,6 @@ if (!defined('HAVE_CREATE_DEF_PROCESSOR')) {
                 }
                 $prevCategory = $currCategory;
                 $currCategory = "";
-
             }
 
             $type = $this->correctExpressionType($expr);
