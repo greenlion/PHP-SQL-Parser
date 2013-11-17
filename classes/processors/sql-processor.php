@@ -225,7 +225,6 @@ if (!defined('HAVE_SQL_PROCESSOR')) {
                 case 'UNINSTALL':
                 case 'ANALZYE':
                 case 'BACKUP':
-                case 'CHECK':
                 case 'CHECKSUM':
                 case 'REPAIR':
                 case 'RESTORE':
@@ -235,8 +234,16 @@ if (!defined('HAVE_SQL_PROCESSOR')) {
                     // set the category in case these get subclauses in a future version of MySQL
                     $out[$upper][0] = $upper;
                     continue 2;
-                    break;
 
+                case 'CHECK':
+                    if ($prev_category === 'TABLE') {
+                        $out[$prev_category][] = $upper;
+                        continue 2;
+                    }
+                    $token_category = $upper;
+                    $out[$upper][0] = $upper;
+                    continue 2;
+                    
                 case 'CREATE':
                     if ($prev_category === 'SHOW') {
                         continue;
