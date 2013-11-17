@@ -17,13 +17,20 @@ $expected = getExpectedValue(dirname(__FILE__), 'issue33b.serialized');
 eq_array($p, $expected, 'CREATE TABLE statement with LIKE');
 
 $parser = new PHPSQLParser();
-$sql = "CREATE TABLE hohoho (a varchar(1000), PRIMARY KEY (a), CHECK(a > 5))";
+$sql = "CREATE TABLE hohoho (a varchar(1000) NOT NULL, CONSTRAINT hohoho_pk PRIMARY KEY (a), CHECK(a > 5))";
 $parser->parse($sql);
 $p = $parser->parsed;
 print_r($p);
 $expected = getExpectedValue(dirname(__FILE__), 'issue33c.serialized');
-eq_array($p, $expected, 'CREATE TABLE statement with primary key and check');
+eq_array($p, $expected, 'CREATE TABLE statement with named primary key and check');
 
+$parser = new PHPSQLParser();
+$sql = "CREATE TABLE hohoho (a varchar(1000), CONSTRAINT PRIMARY KEY (a), CHECK(a > 5))";
+$parser->parse($sql);
+$p = $parser->parsed;
+print_r($p);
+$expected = getExpectedValue(dirname(__FILE__), 'issue33d.serialized');
+eq_array($p, $expected, 'CREATE TABLE statement with primary key and check');
 
 $parser = new PHPSQLParser();
 $sql = "CREATE TABLE \"cachetable01\" (
@@ -35,5 +42,5 @@ $sql = "CREATE TABLE \"cachetable01\" (
 $parser->parse($sql);
 $p = $parser->parsed;
 print_r($p);
-$expected = getExpectedValue(dirname(__FILE__), 'issue33d.serialized');
+$expected = getExpectedValue(dirname(__FILE__), 'issue33e.serialized');
 eq_array($p, $expected, 'CREATE TABLE statement');
