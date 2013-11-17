@@ -84,5 +84,7 @@ class ExpressionType {
     const FULLTEXT_IDX = "fulltext-index";
     const SPATIAL_IDX = "spatial-index";
     const INDEX_TYPE = "index-type";
-    CONST CHECK =  "check";
+    const CHECK =  "check";
+    const COLUMN_LIST = "column-list";
+    
 }
