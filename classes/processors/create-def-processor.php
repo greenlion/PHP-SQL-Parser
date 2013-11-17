@@ -52,18 +52,14 @@ if (!defined('HAVE_CREATE_DEF_PROCESSOR')) {
             if (!isset($expr[0]) || !isset($expr[0]['type'])) {
                 return $type;
             }
-            $type = $expr[0]['type'];
-            $expr[0]['type'] = ExpressionType::RESERVED;
 
             # replace the constraint type with a more descriptive one
+            $type = $expr[0]['type'];
             if ($type === ExpressionType::CONSTRAINT) {
-                if ($expr[1]['type'] === ExpressionType::CONSTANT) {
-                    $type = $expr[2]['type'];
-                    $expr[2]['type'] = ExpressionType::RESERVED;
-                } else {
-                    $type = $expr[1]['type'];
-                    $expr[1]['type'] = ExpressionType::RESERVED;
-                }
+                $type = $expr[1]['type'];
+                $expr[1]['type'] = ExpressionType::RESERVED;
+            } else {
+                $expr[0]['type'] = ExpressionType::RESERVED;
             }
             return $type;
         }
@@ -90,7 +86,7 @@ if (!defined('HAVE_CREATE_DEF_PROCESSOR')) {
                 switch ($upper) {
 
                 case 'CONSTRAINT':
-                    $expr[] = array('type' => ExpressionType::CONSTRAINT, 'base_expr' => $trim);
+                    $expr[] = array('type' => ExpressionType::CONSTRAINT, 'base_expr' => $trim, 'sub_tree' => false);
                     $currCategory = $prevCategory = $upper;
                     continue 2;
 
@@ -102,9 +98,6 @@ if (!defined('HAVE_CREATE_DEF_PROCESSOR')) {
                 case 'FOREIGN':
                     if ($prevCategory === "" || $prevCategory === "CONSTRAINT") {
                         $expr[] = array('type' => ExpressionType::FOREIGN_KEY, 'base_expr' => $trim);
-                        if ($prevCategory === "CONSTRAINT") {
-                            $expr[0]['for'] = ExpressionType::FOREIGN_KEY;
-                        }
                         $currCategory = $upper;
                         continue 2;
                     }
@@ -115,9 +108,6 @@ if (!defined('HAVE_CREATE_DEF_PROCESSOR')) {
                     if ($prevCategory === "" || $prevCategory === "CONSTRAINT") {
                         # next one is KEY
                         $expr[] = array('type' => ExpressionType::PRIMARY_KEY, 'base_expr' => $trim);
-                        if ($prevCategory === "CONSTRAINT") {
-                            $expr[0]['for'] = ExpressionType::PRIMARY_KEY;
-                        }
                         $currCategory = $upper;
                         continue 2;
                     }
@@ -128,9 +118,6 @@ if (!defined('HAVE_CREATE_DEF_PROCESSOR')) {
                     if ($prevCategory === "" || $prevCategory === "CONSTRAINT") {
                         # next one is KEY
                         $expr[] = array('type' => ExpressionType::UNIQUE_IDX, 'base_expr' => $trim);
-                        if ($prevCategory === "CONSTRAINT") {
-                            $expr[0]['for'] = ExpressionType::UNIQUE_IDX;
-                        }
                         $currCategory = $upper;
                         continue 2;
                     }
@@ -200,7 +187,8 @@ if (!defined('HAVE_CREATE_DEF_PROCESSOR')) {
                     # TODO: should we change the category?
                         if ($upper[0] === '(' && substr($upper, -1) === ')') {
                             $processor = new ColumnListProcessor();
-                            $expr[] = $processor->process($this->removeParenthesisFromStart($trim));
+                            $expr[] = array('type' => ExpressionType::COLUMN_LIST, 'base_expr' => $trim,
+                                            'sub_tree' => $processor->process($this->removeParenthesisFromStart($trim)));
                             $currCategory = "PRIMARY-COLUMNS";
                             continue 3;
                         }
@@ -213,7 +201,8 @@ if (!defined('HAVE_CREATE_DEF_PROCESSOR')) {
                     # TODO: should we change the category?
                         if ($upper[0] === '(' && substr($upper, -1) === ')') {
                             $processor = new ColumnListProcessor();
-                            $expr[] = $processor->process($this->removeParenthesisFromStart($trim));
+                            $expr[] = array('type' => ExpressionType::COLUMN_LIST, 'base_expr' => $trim,
+                                            'sub_tree' => $processor->process($this->removeParenthesisFromStart($trim)));
                             $currCategory = "FOREIGN-COLUMNS";
                         }
                         if ($this->isIndexType($upper)) {
@@ -223,7 +212,10 @@ if (!defined('HAVE_CREATE_DEF_PROCESSOR')) {
 
                     case 'CONSTRAINT':
                     # constraint name
-                        $expr[] = array('type' => ExpressionType::CONSTANT, 'base_expr' => $trim);
+                        $last = array_pop($expr);
+                        $last['base_expr'] = $base_expr;
+                        $last['sub_tree'] = array('type' => ExpressionType::CONSTANT, 'base_expr' => $trim);
+                        $expr[] = $last;
                         continue 3;
 
                     case 'KEY':
@@ -232,7 +224,8 @@ if (!defined('HAVE_CREATE_DEF_PROCESSOR')) {
                     # TODO: should we change the category?
                         if ($upper[0] === '(' && substr($upper, -1) === ')') {
                             $processor = new ColumnListProcessor();
-                            $expr[] = $processor->process($this->removeParenthesisFromStart($trim));
+                            $expr[] = array('type' => ExpressionType::COLUMN_LIST, 'base_expr' => $trim,
+                                            'sub_tree' => $processor->process($this->removeParenthesisFromStart($trim)));
                             $currCategory = "INDEX-COLUMNS";
                         }
                         if ($this->isIndexType($upper)) {
