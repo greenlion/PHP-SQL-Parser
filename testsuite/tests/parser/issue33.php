@@ -33,6 +33,14 @@ $expected = getExpectedValue(dirname(__FILE__), 'issue33d.serialized');
 eq_array($p, $expected, 'CREATE TABLE statement with primary key and check');
 
 $parser = new PHPSQLParser();
+$sql = "CREATE TABLE hohoho (a varchar(1000), PRIMARY KEY USING btree (a), CHECK(a > 5))";
+$parser->parse($sql);
+$p = $parser->parsed;
+print_r($p);
+$expected = getExpectedValue(dirname(__FILE__), 'issue33e.serialized');
+eq_array($p, $expected, 'CREATE TABLE statement with primary key and check');
+
+$parser = new PHPSQLParser();
 $sql = "CREATE TABLE \"cachetable01\" (
 \"sp_id\" varchar(240) DEFAULT NULL,
 \"ro\" varchar(240) DEFAULT NULL,
@@ -42,5 +50,5 @@ $sql = "CREATE TABLE \"cachetable01\" (
 $parser->parse($sql);
 $p = $parser->parsed;
 print_r($p);
-$expected = getExpectedValue(dirname(__FILE__), 'issue33e.serialized');
+$expected = getExpectedValue(dirname(__FILE__), 'issue33f.serialized');
 eq_array($p, $expected, 'CREATE TABLE statement');
