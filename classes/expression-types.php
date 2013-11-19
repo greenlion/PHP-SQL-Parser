@@ -74,7 +74,8 @@ class ExpressionType {
     const DIRECTORY = "directory";
     const UNION = "union";
     const CHARSET = "character_set";
-    
+    const COLLATE = "collation";
+        
     const LIKE = "like";
     const CONSTRAINT = "constraint";
     const PRIMARY_KEY = "primary-key";
@@ -89,6 +90,6 @@ class ExpressionType {
     const INDEX_COLUMN = "index-column";
     const INDEX_SIZE = "index-size";
     const INDEX_PARSER = "index-parser";
-    
+
     
 }
