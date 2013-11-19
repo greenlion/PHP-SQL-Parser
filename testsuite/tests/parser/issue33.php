@@ -52,3 +52,11 @@ $p = $parser->parsed;
 print_r($p);
 $expected = getExpectedValue(dirname(__FILE__), 'issue33f.serialized');
 eq_array($p, $expected, 'CREATE TABLE statement');
+
+$parser = new PHPSQLParser();
+$sql = "CREATE TABLE hohoho (a varchar(1000), PRIMARY KEY USING btree (a(5) ASC) key_block_size 4 with parser haha, CHECK(a > 5))";
+$parser->parse($sql);
+$p = $parser->parsed;
+print_r($p);
+$expected = getExpectedValue(dirname(__FILE__), 'issue33g.serialized');
+eq_array($p, $expected, 'CREATE TABLE statement with primary key with index options and check');
