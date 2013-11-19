@@ -60,3 +60,11 @@ $p = $parser->parsed;
 print_r($p);
 $expected = getExpectedValue(dirname(__FILE__), 'issue33g.serialized');
 eq_array($p, $expected, 'CREATE TABLE statement with primary key with index options and check');
+
+$parser = new PHPSQLParser();
+$sql = "CREATE TABLE hohoho (a varchar(1000)) ENGINE=xyz,COMMENT='haha'";
+$parser->parse($sql);
+$p = $parser->parsed;
+print_r($p);
+$expected = getExpectedValue(dirname(__FILE__), 'issue33g.serialized');
+eq_array($p, $expected, 'CREATE TABLE statement with primary key with index options and check');
