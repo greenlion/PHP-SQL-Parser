@@ -79,6 +79,14 @@ if (!defined('HAVE_TABLE_PROCESSOR')) {
                 $upper = strtoupper($trim);
                 switch ($upper) {
 
+                case ',':
+                    # TODO: it is possible to separate the table options with comma!
+                    # how I can store that within the output array?
+                    if ($prevCategory === 'CREATE_DEF') {
+                        $base_expr = "";
+                    }
+                    continue 2;
+
                 case 'UNION':
                     if ($prevCategory === 'CREATE_DEF') {
                         $expr[] = $this->getReservedType($trim);
@@ -251,14 +259,15 @@ if (!defined('HAVE_TABLE_PROCESSOR')) {
                         break;
 
                     case '':
-                        
                     # after table name
                         if ($prevCategory === 'TABLE_NAME' && $upper[0] === '(' && substr($upper, -1) === ')') {
                             $unparsed = $this->splitSQLIntoTokens($this->removeParenthesisFromStart($trim));
                             $processor = new CreateDefProcessor();
                             $coldef = $processor->process($unparsed);
-                            $result['create-def'] = array('type' => ExpressionType::BRACKET_EXPRESSION, 'base_expr' => $base_expr, 'sub_tree' => $coldef['create-def']);
-                            
+                            $result['create-def'] = array('type' => ExpressionType::BRACKET_EXPRESSION,
+                                                          'base_expr' => $base_expr,
+                                                          'sub_tree' => $coldef['create-def']);
+
                             # TODO:
                             # after a () we can have a select_statement
                             # but only if we don't have set $expr['like'] inside the parenthesis
@@ -275,7 +284,7 @@ if (!defined('HAVE_TABLE_PROCESSOR')) {
                     # and contains a list of table names (comma-separated)
                     # split the token and add the list as subtree
                     # we must change the DefaultProcessor
-                    
+
                         $unparsed = $this->splitSQLIntoTokens($this->removeParenthesisFromStart($trim));
                         $expr[] = array('type' => ExpressionType::BRACKET_EXPRESSION, 'base_expr' => $trim,
                                         'sub_tree' => '***TODO***');
