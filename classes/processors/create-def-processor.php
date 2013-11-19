@@ -31,7 +31,7 @@
  */
 if (!defined('HAVE_CREATE_DEF_PROCESSOR')) {
     require_once(dirname(__FILE__) . '/abstract-processor.php');
-    require_once(dirname(__FILE__) . '/column-list-processor.php');
+    require_once(dirname(__FILE__) . '/index-column-list-processor.php');
     require_once(dirname(__FILE__) . '/../expression-types.php');
 
     /**
@@ -42,14 +42,6 @@ if (!defined('HAVE_CREATE_DEF_PROCESSOR')) {
      * 
      */
     class CreateDefProcessor extends AbstractProcessor {
-
-        protected function isIndexType($upper) {
-            return ($upper === 'BTREE' || $upper === 'HASH');
-        }
-
-        protected function hasIndexType($upper) {
-            return ($upper === 'USING');
-        }
 
         protected function correctExpressionType(&$expr) {
             $type = ExpressionType::EXPRESSION;
@@ -163,9 +155,75 @@ if (!defined('HAVE_CREATE_DEF_PROCESSOR')) {
                     continue 2;
 
                 case 'WITH':
+                # starts an index option
+                    if ($prevCategory === 'INDEX_COL_LIST') {
+                        $option = array('type' => ExpressionType::RESERVED, 'base_expr' => $trim);
+                        $expr[] = array('type' => ExpressionType::INDEX_PARSER,
+                                        'base_expr' => substr($base_expr, 0, -strlen($token)), 'sub_tree' => array($option));
+                        $base_expr = $token;
+                        $currCategory = 'INDEX_PARSER';
+                        continue 2;
+                    }
+                    break;
+
+                case 'KEY_BLOCK_SIZE':
+                # starts an index option
+                    if ($prevCategory === 'INDEX_COL_LIST') {
+                        $option = array('type' => ExpressionType::RESERVED, 'base_expr' => $trim);
+                        $expr[] = array('type' => ExpressionType::INDEX_SIZE,
+                                        'base_expr' => substr($base_expr, 0, -strlen($token)),
+                                        'sub_tree' => array($option));
+                        $base_expr = $token;
+                        $currCategory = 'INDEX_SIZE';
+                        continue 2;
+                    }
+                    break;
+
+                case 'USING':
+                # starts an index option
+                    if ($prevCategory === 'INDEX_COL_LIST' || $currCategory === 'PRIMARY') {
+                        $option = array('type' => ExpressionType::RESERVED, 'base_expr' => $trim);
+                        $expr[] = array('base_expr' => substr($base_expr, 0, -strlen($token)), 'trim' => $trim,
+                                        'category' => $currCategory, 'sub_tree' => array($option));
+                        $base_expr = $token;
+                        $currCategory = 'INDEX_TYPE';
+                        continue 2;
+                    }
+                    # else ?
+                    break;
+
+                case 'BTREE':
+                case 'HASH':
+                    if ($currCategory === 'INDEX_TYPE') {
+                        $last = array_pop($expr);
+                        $last['sub_tree'][] = array('type' => ExpressionType::RESERVED, 'base_expr' => $trim);
+                        $expr[] = array('type' => ExpressionType::INDEX_TYPE, 'base_expr' => $base_expr,
+                                        'sub_tree' => $last['sub_tree']);
+                        $base_expr = $last['base_expr'] . $base_expr;
+                        $currCategory = $last['category'];
+                        continue 2;
+                    }
+                    #else
+                    break;
+
+                case '=':
+                    if ($currCategory === 'INDEX_SIZE') {
+                        # the optional character between KEY_BLOCK_SIZE and the numeric constant
+                        $last = array_pop($expr);
+                        $last['sub_tree'][] = array('type' => ExpressionType::RESERVED, 'base_expr' => $trim);
+                        $expr[] = $last;
+                        continue 2;
+                    }
                     break;
 
                 case 'PARSER':
+                    if ($currCategory === 'INDEX_PARSER') {
+                        $last = array_pop($expr);
+                        $last['sub_tree'][] = array('type' => ExpressionType::RESERVED, 'base_expr' => $trim);
+                        $expr[] = $last;
+                        continue 2;
+                    }
+                    # else?
                     break;
 
                 case ',':
@@ -189,39 +247,43 @@ if (!defined('HAVE_CREATE_DEF_PROCESSOR')) {
 
                     case 'PRIMARY':
                         if ($upper[0] === '(' && substr($upper, -1) === ')') {
-                            $processor = new ColumnListProcessor();
+                            # the column list
+                            $processor = new IndexColumnListProcessor();
+                            $cols = $processor->process($this->removeParenthesisFromStart($trim));
                             $expr[] = array('type' => ExpressionType::COLUMN_LIST, 'base_expr' => $trim,
-                                            'sub_tree' => $processor->process($this->removeParenthesisFromStart($trim)));
-                            $currCategory = "PRIMARY-COLUMNS";
-                            continue 3;
-                        }
-                        if ($upper === 'USING') {
-                            $expr[] = array('base_expr' => substr($base_expr, 0, -strlen($token)), 'trim' => $trim,
-                                            'category' => $currCategory);
-                            $base_expr = $token;
-                            $currCategory = 'INDEX_TYPE';
-                            continue 3;
+                                            'sub_tree' => $cols);
+                            $currCategory = "INDEX_COL_LIST";
+                            break;
                         }
                         # else?
                         break;
 
                     case 'FOREIGN':
                         if ($upper[0] === '(' && substr($upper, -1) === ')') {
-                            $processor = new ColumnListProcessor();
+                            $processor = new IndexColumnListProcessor();
+                            $cols = $processor->process($this->removeParenthesisFromStart($trim));
                             $expr[] = array('type' => ExpressionType::COLUMN_LIST, 'base_expr' => $trim,
-                                            'sub_tree' => $processor->process($this->removeParenthesisFromStart($trim)));
-                            $currCategory = "FOREIGN-COLUMNS";
-                            continue 3;
-                        }
-                        if ($upper === 'USING') {
-                            $expr[] = array('base_expr' => substr($base_expr, 0, -strlen($token)), 'trim' => $trim,
-                                            'category' => $currCategory);
-                            $base_expr = $token;
-                            $currCategory = 'INDEX_TYPE';
-                            continue 3;
+                                            'sub_tree' => $cols);
+                            $currCategory = "INDEX_COL_LIST";
+                            break;
                         }
                         # else ?
                         break;
+
+                    case 'KEY':
+                    case 'UNIQUE':
+                    case 'INDEX':
+                        if ($upper[0] === '(' && substr($upper, -1) === ')') {
+                            $processor = new IndexColumnListProcessor();
+                            $cols = $processor->process($this->removeParenthesisFromStart($trim));
+                            $expr[] = array('type' => ExpressionType::COLUMN_LIST, 'base_expr' => $trim,
+                                            'sub_tree' => $cols);
+                            $currCategory = "INDEX_COL_LIST";
+                            break;
+                        }
+                        # index name                        
+                        $expr[] = array('type' => ExpressionType::CONSTANT, 'base_expr' => $trim);
+                        continue 3;
 
                     case 'CONSTRAINT':
                     # constraint name
@@ -231,36 +293,22 @@ if (!defined('HAVE_CREATE_DEF_PROCESSOR')) {
                         $expr[] = $last;
                         continue 3;
 
-                    case 'KEY':
-                    case 'UNIQUE':
-                    case 'INDEX':
-                        if ($upper[0] === '(' && substr($upper, -1) === ')') {
-                            $processor = new ColumnListProcessor();
-                            $expr[] = array('type' => ExpressionType::COLUMN_LIST, 'base_expr' => $trim,
-                                            'sub_tree' => $processor->process($this->removeParenthesisFromStart($trim)));
-                            $currCategory = "INDEX-COLUMNS";
-                            continue 3;
-                        }
-                        if ($upper === 'USING') {
-                            $expr[] = array('base_expr' => substr($base_expr, 0, -strlen($token)), 'trim' => $trim,
-                                            'category' => $currCategory);
-                            $base_expr = $token;
-                            $currCategory = 'INDEX_TYPE';
-                            continue 3;
-                        }
-                        # index name                        
-                        $expr[] = array('type' => ExpressionType::CONSTANT, 'base_expr' => $trim);
+                    case 'INDEX_PARSER':
+                    # index parser name
+                        $last = array_pop($expr);
+                        $last['sub_tree'][] = array('type' => ExpressionType::CONSTANT, 'base_expr' => $trim);
+                        $expr[] = array('type' => ExpressionType::INDEX_PARSER, 'base_expr' => $base_expr,
+                                        'sub_tree' => $last['sub_tree']);
+                        $base_expr = $last['base_expr'] . $base_expr;
                         continue 3;
 
-                    case 'INDEX_TYPE':
+                    case 'INDEX_SIZE':
+                    # index key block size numeric constant
                         $last = array_pop($expr);
-                        $idxType = array();
-                        $idxType[] = array('type' => ExpressionType::RESERVED, 'base_expr' => $last['trim']);
-                        $idxType[] = array('type' => ExpressionType::RESERVED, 'base_expr' => $trim);
-                        $expr[] = array('type' => ExpressionType::INDEX_TYPE, 'base_expr' => $base_expr,
-                                        'sub_tree' => $idxType);
+                        $last['sub_tree'][] = array('type' => ExpressionType::CONSTANT, 'base_expr' => $trim);
+                        $expr[] = array('type' => ExpressionType::INDEX_SIZE, 'base_expr' => $base_expr,
+                                        'sub_tree' => $last['sub_tree']);
                         $base_expr = $last['base_expr'] . $base_expr;
-                        $currCategory = $last['category'];
                         continue 3;
 
                     case 'CHECK':
