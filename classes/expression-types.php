@@ -87,6 +87,8 @@ class ExpressionType {
     const CHECK =  "check";
     const COLUMN_LIST = "column-list";
     const INDEX_COLUMN = "index-column";
+    const INDEX_SIZE = "index-size";
+    const INDEX_PARSER = "index-parser";
     
     
 }
