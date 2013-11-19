@@ -55,9 +55,10 @@ if (!defined('HAVE_TABLE_PROCESSOR')) {
             return array('type' => ExpressionType::OPERATOR, 'base_expr' => $token);
         }
 
-        protected function clear(&$expr, &$base_expr, &$category) {
+        protected function clear(&$expr, &$base_expr, &$separator, &$category) {
             $expr = array();
             $base_expr = '';
+            $separator = ' ';
             $category = 'CREATE_DEF';
         }
 
@@ -66,7 +67,8 @@ if (!defined('HAVE_TABLE_PROCESSOR')) {
             $currCategory = "TABLE_NAME";
             $result = array();
             $expr = array();
-            $base_expr = "";
+            $base_expr = '';
+            $separator = false; # first option has no separator
 
             foreach ($tokens as $token) {
                 $trim = trim($token);
@@ -80,9 +82,9 @@ if (!defined('HAVE_TABLE_PROCESSOR')) {
                 switch ($upper) {
 
                 case ',':
-                    # TODO: it is possible to separate the table options with comma!
-                    # how I can store that within the output array?
+                # it is possible to separate the table options with comma!
                     if ($prevCategory === 'CREATE_DEF') {
+                        $separator = ',';
                         $base_expr = "";
                     }
                     continue 2;
@@ -104,9 +106,9 @@ if (!defined('HAVE_TABLE_PROCESSOR')) {
                     break;
 
                 case '=':
+                # the optional operator
                     if ($prevCategory === 'TABLE_OPTION') {
                         $expr[] = $this->getOperatorType($trim);
-                        $currCategory = 'ASSIGNMENT';
                         continue 2; # don't change the category
                     }
                     break;
@@ -133,8 +135,8 @@ if (!defined('HAVE_TABLE_PROCESSOR')) {
                     break;
 
                 case 'COLLATE':
-                    if ($currCategory === 'CHARSET') {
-                        # after character set
+                    if ($prevCategory === 'TABLE_OPTION') {
+                        # add it to the previous DEFAULT
                         $expr[] = $this->getReservedType($trim);
                         $currCategory = 'COLLATE';
                         continue 2;
@@ -196,7 +198,7 @@ if (!defined('HAVE_TABLE_PROCESSOR')) {
                 case 'LAST':
                 case 'DEFAULT':
                     if ($prevCategory === 'CREATE_DEF') {
-                        # DEFAULT before CHARACTER SET
+                        # DEFAULT before CHARACTER SET and COLLATE
                         $expr[] = $this->getReservedType($trim);
                         $currCategory = 'TABLE_OPTION';
                     }
@@ -204,8 +206,9 @@ if (!defined('HAVE_TABLE_PROCESSOR')) {
                         # all assignments with the keywords
                         $expr[] = $this->getReservedType($trim);
                         $result['options'][] = array('type' => ExpressionType::EXPRESSION,
-                                                     'base_expr' => trim($base_expr), 'sub_tree' => $expr);
-                        $this->clear($expr, $base_expr, $currCategory);
+                                                     'base_expr' => trim($base_expr), 'separator' => $separator,
+                                                     'sub_tree' => $expr);
+                        $this->clear($expr, $base_expr, $separator, $currCategory);
                     }
                     break;
 
@@ -213,49 +216,51 @@ if (!defined('HAVE_TABLE_PROCESSOR')) {
                     switch ($currCategory) {
 
                     case 'CHARSET':
-                    # charset name
+                    # the charset name
                         $expr[] = $this->getConstantType($trim);
                         $result['options'][] = array('type' => ExpressionType::CHARSET,
-                                                     'base_expr' => trim($base_expr), 'sub_tree' => $expr);
-                        $this->clear($expr, $base_expr, $currCategory);
+                                                     'base_expr' => trim($base_expr), 'separator' => $separator,
+                                                     'sub_tree' => $expr);
+                        $this->clear($expr, $base_expr, $separator, $currCategory);
                         break;
 
                     case 'COLLATE':
-                    # we have the collate name
+                    # the collate name
                         $expr[] = $this->getConstantType($trim);
-                        $last = array_pop($result['options']);
-                        $last['base_expr'] .= $base_expr;
-                        array_merge($last['sub_tree'], $expr);
-                        $result['options'][] = $last;
-                        $this->clear($expr, $base_expr, $prevCategory);
-                        continue 3;
+                        $result['options'][] = array('type' => ExpressionType::COLLATE,
+                                                     'base_expr' => trim($base_expr), 'separator' => $separator,
+                                                     'sub_tree' => $expr);
+                        $this->clear($expr, $base_expr, $separator, $currCategory);
+                        break;
 
                     case 'DATA_DIRECTORY':
                     # we have the directory name
                         $expr[] = $this->getConstantType($trim);
                         $result['options'][] = array('type' => ExpressionType::DIRECTORY, 'kind' => 'DATA',
-                                                     'base_expr' => trim($base_expr), 'sub_tree' => $expr);
-                        $this->clear($expr, $base_expr, $prevCategory);
+                                                     'base_expr' => trim($base_expr), 'separator' => $separator,
+                                                     'sub_tree' => $expr);
+                        $this->clear($expr, $base_expr, $separator, $prevCategory);
                         continue 3;
 
                     case 'INDEX_DIRECTORY':
                     # we have the directory name
                         $expr[] = $this->getConstantType($trim);
                         $result['options'][] = array('type' => ExpressionType::DIRECTORY, 'kind' => 'INDEX',
-                                                     'base_expr' => trim($base_expr), 'sub_tree' => $expr);
-                        $this->clear($expr, $base_expr, $prevCategory);
+                                                     'base_expr' => trim($base_expr), 'separator' => $separator,
+                                                     'sub_tree' => $expr);
+                        $this->clear($expr, $base_expr, $separator, $prevCategory);
                         continue 3;
 
                     case 'TABLE_NAME':
                         $result['base_expr'] = $result['name'] = $trim;
                         $result['no_quotes'] = $this->revokeQuotation($trim);
-                        $this->clear($expr, $base_expr, $prevCategory);
+                        $this->clear($expr, $base_expr, $separator, $prevCategory);
                         break;
 
                     case 'LIKE':
                         $result['like'] = array('table' => $trim, 'base_expr' => $trim,
                                                 'no_quotes' => $this->revokeQuotation($trim));
-                        $this->clear($expr, $base_expr, $currCategory);
+                        $this->clear($expr, $base_expr, $separator, $currCategory);
                         break;
 
                     case '':
@@ -274,6 +279,7 @@ if (!defined('HAVE_TABLE_PROCESSOR')) {
                             # stop processing if 'like' is set
 
                             $expr = array();
+                            $separator = ' ';
                             $base_expr = '';
                             $currCategory = 'CREATE_DEF';
                         }
@@ -289,16 +295,17 @@ if (!defined('HAVE_TABLE_PROCESSOR')) {
                         $expr[] = array('type' => ExpressionType::BRACKET_EXPRESSION, 'base_expr' => $trim,
                                         'sub_tree' => '***TODO***');
                         $result['options'][] = array('type' => ExpressionType::UNION, 'base_expr' => trim($base_expr),
-                                                     'sub_tree' => $expr);
-                        $this->clear($expr, $base_expr, $currCategory);
+                                                     'separator' => $separator, 'sub_tree' => $expr);
+                        $this->clear($expr, $base_expr, $separator, $currCategory);
                         break;
 
                     default:
                     # strings and numeric constants
                         $expr[] = $this->getConstantType($trim);
                         $result['options'][] = array('type' => ExpressionType::EXPRESSION,
-                                                     'base_expr' => trim($base_expr), 'sub_tree' => $expr);
-                        $this->clear($expr, $base_expr, $currCategory);
+                                                     'base_expr' => trim($base_expr), 'separator' => $separator,
+                                                     'sub_tree' => $expr);
+                        $this->clear($expr, $base_expr, $separator, $currCategory);
                         break;
                     }
                     break;
