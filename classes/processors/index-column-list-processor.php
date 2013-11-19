@@ -70,7 +70,7 @@ if (!defined('HAVE_IDX_COL_LIST_PROCESSOR')) {
 
                 case ',':
                 # the next column
-                    $result[] = array('type' => ExpressionType::INDEX_COLUMN, 'base_expr' => substr(base_expr, 0, -1),
+                    $result[] = array('type' => ExpressionType::INDEX_COLUMN, 'base_expr' => $base_expr,
                                       'sub_tree' => $expr);
                     $expr = array();
                     $base_expr = "";
@@ -91,7 +91,7 @@ if (!defined('HAVE_IDX_COL_LIST_PROCESSOR')) {
                     break;
                 }
             }
-            $result[] = array('type' => ExpressionType::INDEX_COLUMN, 'base_expr' => substr(base_expr, 0, -1),
+            $result[] = array('type' => ExpressionType::INDEX_COLUMN, 'base_expr' => $base_expr,
                               'sub_tree' => $expr);
             return $result;
         }
