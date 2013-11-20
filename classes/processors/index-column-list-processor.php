@@ -42,10 +42,14 @@ if (!defined('HAVE_IDX_COL_LIST_PROCESSOR')) {
      */
     class IndexColumnListProcessor extends AbstractProcessor {
 
+        protected function initExpression() {
+            return array('name' => false, 'no_quotes' => false, 'length' => false, 'dir' => false);
+        }
+
         public function process($sql) {
             $tokens = $this->splitSQLIntoTokens($sql);
 
-            $expr = array();
+            $expr = $this->initExpression();
             $result = array();
             $base_expr = "";
 
@@ -65,34 +69,30 @@ if (!defined('HAVE_IDX_COL_LIST_PROCESSOR')) {
                 case 'ASC':
                 case 'DESC':
                 # the optional order
-                    $expr[] = array('type' => ExpressionType::RESERVED, 'base_expr' => $trim);
+                    $expr['dir'] = $trim;
                     break;
 
                 case ',':
                 # the next column
-                    $result[] = array('type' => ExpressionType::INDEX_COLUMN, 'base_expr' => $base_expr,
-                                      'sub_tree' => $expr);
-                    $expr = array();
+                    $result[] = array_merge(array('type' => ExpressionType::INDEX_COLUMN, 'base_expr' => $base_expr),
+                            $expr);
+                    $expr = $this->initExpression();
                     $base_expr = "";
                     break;
 
                 default:
                     if ($upper[0] === '(' && substr($upper, -1) === ')') {
                         # the optional length
-                        $length = array('type' => ExpressionType::CONSTANT,
-                                        'base_expr' => $this->removeParenthesisFromStart($trim));
-                        $expr[] = array('type' => ExpressionType::BRACKET_EXPRESSION, 'base_expr' => $trim,
-                                        'sub-tree' => $length);
+                        $expr['length'] = $this->removeParenthesisFromStart($trim);
                         continue 2;
                     }
                     # the col name
-                    $expr[] = array('type' => ExpressionType::COLREF, 'base_expr' => $trim,
-                                    'no_quotes' => $this->revokeQuotation($trim));
+                    $expr['name'] = $trim;
+                    $expr['no_quotes'] = $this->revokeQuotation($trim);
                     break;
                 }
             }
-            $result[] = array('type' => ExpressionType::INDEX_COLUMN, 'base_expr' => $base_expr,
-                              'sub_tree' => $expr);
+            $result[] = array_merge(array('type' => ExpressionType::INDEX_COLUMN, 'base_expr' => $base_expr), $expr);
             return $result;
         }
     }
