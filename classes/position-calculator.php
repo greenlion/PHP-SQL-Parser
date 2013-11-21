@@ -165,7 +165,7 @@ class PositionCalculator extends PHPSQLParserUtils {
             } else {
                 # move the current pos after the keyword
                 # SELECT, WHERE, INSERT etc.
-                if (in_array($key, parent::$reserved)) {
+                if (PHPSQLParserConstants::isReserved($key)) {
                     $charPos = stripos($sql, $key, $charPos);
                     $charPos += strlen($key);
                 }
