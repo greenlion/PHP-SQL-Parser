@@ -84,7 +84,7 @@ if (!defined('HAVE_FROM_PROCESSOR')) {
 
                 if (preg_match("/^\\s*select/i", $parseInfo['expression'])) {
                     $processor = new DefaultProcessor();
-                    $parseInfo['sub_tree'] = $processor->parse($parseInfo['expression']);
+                    $parseInfo['sub_tree'] = $processor->process($parseInfo['expression']);
                     $res['expr_type'] = ExpressionType::SUBQUERY;
                 } else {
                     $tmp = $this->splitSQLIntoTokens($parseInfo['expression']);
