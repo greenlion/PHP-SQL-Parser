@@ -11,7 +11,7 @@ $expected = getExpectedValue(dirname(__FILE__), 'issue40a.serialized');
 eq_array($p, $expected, 'escaped characters 1');
 
 
-$q2 = "select a from t where x = \"abcd\" and y = 'efgh'";
+$sql = "select a from t where x = \"abcd\" and y = 'efgh'";
 $parser->parse($sql);
 $p = $parser->parsed;
 $expected = getExpectedValue(dirname(__FILE__), 'issue40b.serialized');
