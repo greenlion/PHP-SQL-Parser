@@ -55,19 +55,19 @@ class ExpressionType {
     const OPERATOR = "operator";
     const SIGN = "sign";
     const RECORD = "record";
-    
+
     const MATCH_ARGUMENTS = "match-arguments";
     const MATCH_MODE = "match-mode";
-    
+
     const ALIAS = "alias";
     const POSITION = "pos";
-    
+
     const TEMPORARY_TABLE = "temporary_table";
     const TABLE = "table";
     const VIEW = "view";
     const DATABASE = "database";
     const SCHEMA = "schema";
-    
+
     const PROCEDURE = "procedure";
     const ENGINE = "engine";
     const USER = "user";
@@ -75,7 +75,7 @@ class ExpressionType {
     const UNION = "union";
     const CHARSET = "character_set";
     const COLLATE = "collation";
-        
+
     const LIKE = "like";
     const CONSTRAINT = "constraint";
     const PRIMARY_KEY = "primary-key";
@@ -85,13 +85,13 @@ class ExpressionType {
     const FULLTEXT_IDX = "fulltext-index";
     const SPATIAL_IDX = "spatial-index";
     const INDEX_TYPE = "index-type";
-    const CHECK =  "check";
+    const CHECK = "check";
     const COLUMN_LIST = "column-list";
     const INDEX_COLUMN = "index-column";
     const INDEX_SIZE = "index-size";
     const INDEX_PARSER = "index-parser";
     const REFERENCE = "foreign-ref";
-    
+
     const DATA_TYPE = "data-type";
-    
+
 }

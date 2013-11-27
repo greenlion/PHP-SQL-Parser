@@ -76,14 +76,14 @@ if (!defined('HAVE_TABLE_PROCESSOR')) {
                 $base_expr .= $token;
 
                 if ($skip > 0) {
-                	$skip --;
-                	continue;
+                    $skip--;
+                    continue;
                 }
-                
+
                 if ($skip < 0) {
-                	break;
+                    break;
                 }
-                
+
                 if ($trim === "") {
                     continue;
                 }
@@ -226,9 +226,9 @@ if (!defined('HAVE_TABLE_PROCESSOR')) {
                     break;
 
                 case 'PARTITION':
-                	# TODO: parse partition options
-                	$skip = -1;    
-                    
+                # TODO: parse partition options
+                    $skip = -1;
+
                 default:
                     switch ($currCategory) {
 
