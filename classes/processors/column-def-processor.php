@@ -30,383 +30,395 @@
  * DAMAGE.
  */
 if (!defined('HAVE_COL_DEF_PROCESSOR')) {
-	require_once(dirname(__FILE__) . '/abstract-processor.php');
-	require_once(dirname(__FILE__) . '/reference-def-processor.php');
-	require_once(dirname(__FILE__) . '/../expression-types.php');
+    require_once(dirname(__FILE__) . '/abstract-processor.php');
+    require_once(dirname(__FILE__) . '/reference-def-processor.php');
+    require_once(dirname(__FILE__) . '/../expression-types.php');
 
-	/**
-	 *
-	 * This class processes the column definition part of a CREATE TABLE statement.
-	 *
-	 * @author arothe
-	 *
-	*/
-	class ColumnDefinitionProcessor extends AbstractProcessor {
+    /**
+     *
+     * This class processes the column definition part of a CREATE TABLE statement.
+     *
+     * @author arothe
+     *
+     */
+    class ColumnDefinitionProcessor extends AbstractProcessor {
 
-		protected function buildColDef($expr, $base_expr, $options, $refs, $key) {
-			$expr = array('type' => ExpressionType::DATA_TYPE, 'base_expr' => $base_expr, 'sub_tree' => $expr);
-			
-			# add options first
-			$expr['sub_tree'] = array_merge($expr['sub_tree'], $options['sub_tree']);
-			unset($options['sub_tree']);
-			$expr = array_merge($expr, $options);
-			
-			# followed by references
-			if (sizeof($refs) !== 0) {
-				$expr['sub_tree'] = array_merge($expr['sub_tree'], $refs);
-			}
-			
-			$expr['till'] = $key;
-			return $expr;
-		}
+        protected function buildColDef($expr, $base_expr, $options, $refs, $key) {
+            $expr = array('type' => ExpressionType::DATA_TYPE, 'base_expr' => $base_expr, 'sub_tree' => $expr);
 
-		public function process($tokens) {
+            # add options first
+            $expr['sub_tree'] = array_merge($expr['sub_tree'], $options['sub_tree']);
+            unset($options['sub_tree']);
+            $expr = array_merge($expr, $options);
 
-			$trim = '';
-			$base_expr = '';
-			$currCategory = '';
-			$expr = array();
-			$refs = array();
-			$options = array('unique' => false, 'nullable' => true, 'auto_inc' => false, 'primary' => false, 'sub_tree' => array());
-			$skip = 0;
+            # followed by references
+            if (sizeof($refs) !== 0) {
+                $expr['sub_tree'] = array_merge($expr['sub_tree'], $refs);
+            }
 
-			foreach ($tokens as $key => $token) {
+            $expr['till'] = $key;
+            return $expr;
+        }
 
-				$trim = trim($token);
-				$base_expr .= $token;
+        public function process($tokens) {
 
-				if ($skip > 0) {
-					$skip --;
-					continue;
-				}
+            $trim = '';
+            $base_expr = '';
+            $currCategory = '';
+            $expr = array();
+            $refs = array();
+            $options = array('unique' => false, 'nullable' => true, 'auto_inc' => false, 'primary' => false,
+                             'sub_tree' => array());
+            $skip = 0;
 
-				if ($skip < 0) {
-					break;
-				}
+            foreach ($tokens as $key => $token) {
 
-				if ($trim === '') {
-					continue;
-				}
+                $trim = trim($token);
+                $base_expr .= $token;
 
-				$upper = strtoupper($trim);
+                if ($skip > 0) {
+                    $skip--;
+                    continue;
+                }
 
-				switch ($upper) {
+                if ($skip < 0) {
+                    break;
+                }
 
-					case ',':
-						# we stop on a single comma and return
-						# the $expr entry and the index $key
-						$expr = $this->buildColDef($expr, trim(substr($base_expr, 0, -strlen($token))), $options, $refs, $key - 1);
-						break 2;
+                if ($trim === '') {
+                    continue;
+                }
 
-					case 'VARCHAR':
-						$expr[] = array('type'=>ExpressionType::RESERVED, 'base_expr' => $trim, 'length' => false, 'sub_tree' => false);
-						$prevCategory = 'TEXT';
-						$currCategory = 'SINGLE_PARAM_PARENTHESIS';
-						continue 2;
+                $upper = strtoupper($trim);
 
-					case 'VARBINARY':
-						$expr[] = array('type'=>ExpressionType::RESERVED, 'base_expr' => $trim, 'length' => false, 'sub_tree' => false);
-						$prevCategory = $upper;
-						$currCategory = 'SINGLE_PARAM_PARENTHESIS';
-						continue 2;
-							
-					case 'UNSIGNED':
-						$last = array_pop($expr);
-						$last['unsigned'] = true;
-						$expr[] = $last;
-						continue 2;
+                switch ($upper) {
 
-					case 'ZEROFILL':
-						$last = array_pop($expr);
-						$last['zerofill'] = true;
-						$expr[] = $last;
-						continue 2;
+                case ',':
+                # we stop on a single comma and return
+                # the $expr entry and the index $key
+                    $expr = $this->buildColDef($expr, trim(substr($base_expr, 0, -strlen($token))), $options, $refs,
+                            $key - 1);
+                    break 2;
 
-					case 'BIT':
-					case 'TINYBIT':
-					case 'SMALLINT':
-					case 'MEDIUMINT':
-					case 'INT':
-					case 'INTEGER':
-					case 'BIGINT':
-						$expr[] = array('type'=>ExpressionType::RESERVED, 'base_expr' => $trim, 'unsigned' => false, 'zerofill' => false, 'length' => false, 'sub_tree' => false);
-						$currCategory = 'SINGLE_PARAM_PARENTHESIS';
-						$prevCategory = $upper;
-						continue 2;
+                case 'VARCHAR':
+                    $expr[] = array('type' => ExpressionType::RESERVED, 'base_expr' => $trim, 'length' => false,
+                                    'sub_tree' => false);
+                    $prevCategory = 'TEXT';
+                    $currCategory = 'SINGLE_PARAM_PARENTHESIS';
+                    continue 2;
 
-					case 'BINARY':
-						if ($currCategory === 'TEXT') {
-							$expr[] = array('type'=>ExpressionType::RESERVED, 'base_expr' => $trim);
-							continue 2;
-						}
-						$expr[] = array('type'=>ExpressionType::RESERVED, 'base_expr' => $trim, 'length' => false, 'sub_tree' => false);
-						$currCategory = 'SINGLE_PARAM_PARENTHESIS';
-						$prevCategory = $upper;
-						break;
+                case 'VARBINARY':
+                    $expr[] = array('type' => ExpressionType::RESERVED, 'base_expr' => $trim, 'length' => false,
+                                    'sub_tree' => false);
+                    $prevCategory = $upper;
+                    $currCategory = 'SINGLE_PARAM_PARENTHESIS';
+                    continue 2;
 
-					case 'CHAR':
-						$expr[] = array('type'=>ExpressionType::RESERVED, 'base_expr' => $trim, 'length' => false, 'sub_tree' => false);
-						$currCategory = 'SINGLE_PARAM_PARENTHESIS';
-						$prevCategory = 'TEXT';
-						break;
+                case 'UNSIGNED':
+                    $last = array_pop($expr);
+                    $last['unsigned'] = true;
+                    $expr[] = $last;
+                    continue 2;
 
-					case 'REAL':
-					case 'DOUBLE':
-					case 'FLOAT':
-						$expr[] = array('type'=>ExpressionType::RESERVED, 'base_expr' => $trim, 'unsigned' => false, 'zerofill' => false, 'sub_tree' => false);
-						$currCategory = 'TWO_PARAM_PARENTHESIS';
-						$prevCategory = $upper;
-						break;
+                case 'ZEROFILL':
+                    $last = array_pop($expr);
+                    $last['zerofill'] = true;
+                    $expr[] = $last;
+                    continue 2;
 
-					case 'DECIMAL':
-					case 'NUMERIC':
-						$expr[] = array('type'=>ExpressionType::RESERVED, 'base_expr' => $trim, 'unsigned' => false, 'zerofill' => false, 'sub_tree' => false);
-						$currCategory = 'TWO_PARAM_PARENTHESIS';
-						$prevCategory = $upper;
-						break;
+                case 'BIT':
+                case 'TINYBIT':
+                case 'SMALLINT':
+                case 'MEDIUMINT':
+                case 'INT':
+                case 'INTEGER':
+                case 'BIGINT':
+                    $expr[] = array('type' => ExpressionType::RESERVED, 'base_expr' => $trim, 'unsigned' => false,
+                                    'zerofill' => false, 'length' => false, 'sub_tree' => false);
+                    $currCategory = 'SINGLE_PARAM_PARENTHESIS';
+                    $prevCategory = $upper;
+                    continue 2;
 
-					case 'DATE':
-					case 'TIME':
-					case 'TIMESTAMP':
-					case 'DATETIME':
-					case 'YEAR':
-					case 'TINYBLOB':
-					case 'BLOB':
-					case 'MEDIUMBLOB':
-					case 'LONGBLOB':
-						$expr[] = array('type' => ExpressionType::RESERVED,
-						'base_expr' => $trim);
-						$prevCategory = $currCategory = $upper;
-						break;
+                case 'BINARY':
+                    if ($currCategory === 'TEXT') {
+                        $expr[] = array('type' => ExpressionType::RESERVED, 'base_expr' => $trim);
+                        continue 2;
+                    }
+                    $expr[] = array('type' => ExpressionType::RESERVED, 'base_expr' => $trim, 'length' => false,
+                                    'sub_tree' => false);
+                    $currCategory = 'SINGLE_PARAM_PARENTHESIS';
+                    $prevCategory = $upper;
+                    break;
 
-					case 'TINYTEXT':
-					case 'TEXT':
-					case 'MEDIUMTEXT':
-					case 'LONGTEXT':
-						$prevCategory = $currCategory = 'TEXT';
-						$expr[] = array('type' => ExpressionType::RESERVED,
-								'base_expr' => $trim, 'binary'=>false, 'sub_tree'=>false);
-						continue 2;
+                case 'CHAR':
+                    $expr[] = array('type' => ExpressionType::RESERVED, 'base_expr' => $trim, 'length' => false,
+                                    'sub_tree' => false);
+                    $currCategory = 'SINGLE_PARAM_PARENTHESIS';
+                    $prevCategory = 'TEXT';
+                    break;
 
-					case 'ENUM':
-					case 'SET':
-						$currCategory = 'MULTIPLE_PARAM_PARENTHESIS';
-						$prevCategory = 'TEXT';
-						$expr[] = array('type'=>ExpressionType::RESERVED, 'base_expr' => $trim, 'sub_tree' => false);
-						continue 2;
-							
-					case 'GEOMETRY':
-					case 'POINT':
-					case 'LINESTRING':
-					case 'POLYGON':
-					case 'MULTIPOINT':
-					case 'MULTILINESTRING':
-					case 'MULTIPOLYGON':
-					case 'GEOMETRYCOLLECTION':
-						$expr[] = array('type' => ExpressionType::RESERVED,
-						'base_expr' => $trim);
-						$prevCategory = $currCategory = $upper;
-						# TODO: is it right?
-						# spatial types
-						break;
+                case 'REAL':
+                case 'DOUBLE':
+                case 'FLOAT':
+                    $expr[] = array('type' => ExpressionType::RESERVED, 'base_expr' => $trim, 'unsigned' => false,
+                                    'zerofill' => false, 'sub_tree' => false);
+                    $currCategory = 'TWO_PARAM_PARENTHESIS';
+                    $prevCategory = $upper;
+                    break;
 
-					case 'CHARACTER':
-						if ($prevCategory === 'TEXT') {
-							$parsed = array('type' => ExpressionType::RESERVED, 'base_expr' => $trim);
-							$expr[] = array('type' => ExpressionType::CHARSET, 'base_expr' => substr($base_expr, 0, -1), 'sub_tree' => $parsed);
-							$base_expr = $token;
-							$currCategory = 'CHARSET';
-							continue 2;
-						}
-						# else ?
-						break;
+                case 'DECIMAL':
+                case 'NUMERIC':
+                    $expr[] = array('type' => ExpressionType::RESERVED, 'base_expr' => $trim, 'unsigned' => false,
+                                    'zerofill' => false, 'sub_tree' => false);
+                    $currCategory = 'TWO_PARAM_PARENTHESIS';
+                    $prevCategory = $upper;
+                    break;
 
-					case 'SET':
-						if ($currCategory === 'CHARSET') {
-							$parsed = array('type' => ExpressionType::RESERVED, 'base_expr' => $trim);
-							$last = array_pop($expr);
-							$last['sub_tree'][] = $parsed;
-							$expr[] = $last;
-							continue 2;
-						}
-						# else ?
-						break;
+                case 'DATE':
+                case 'TIME':
+                case 'TIMESTAMP':
+                case 'DATETIME':
+                case 'YEAR':
+                case 'TINYBLOB':
+                case 'BLOB':
+                case 'MEDIUMBLOB':
+                case 'LONGBLOB':
+                    $expr[] = array('type' => ExpressionType::RESERVED, 'base_expr' => $trim);
+                    $prevCategory = $currCategory = $upper;
+                    break;
 
-					case 'COLLATE':
-						if ($prevCategory === 'TEXT') {
-							$parsed = array('type' => ExpressionType::RESERVED, 'base_expr' => $trim);
-							$expr[] = array('type' => ExpressionType::COLLATE, 'base_expr' => substr($base_expr, 0, -1), 'sub_tree' => $parsed);
-							$base_expr = $token;
-							$currCategory = 'COLLATION';
-							continue 2;
-						}
-						# else ?
-						break;
+                case 'TINYTEXT':
+                case 'TEXT':
+                case 'MEDIUMTEXT':
+                case 'LONGTEXT':
+                    $prevCategory = $currCategory = 'TEXT';
+                    $expr[] = array('type' => ExpressionType::RESERVED, 'base_expr' => $trim, 'binary' => false,
+                                    'sub_tree' => false);
+                    continue 2;
 
-					case 'NOT':
-					case 'NULL':
-						$options['sub_tree'][] = array('type' => ExpressionType::RESERVED, 'base_expr' => $trim);
-						if ($options['nullable']) {
-							$options['nullable'] = ($upper === 'NOT' ? false : true);
-						}
-						continue 2;
+                case 'ENUM':
+                case 'SET':
+                    $currCategory = 'MULTIPLE_PARAM_PARENTHESIS';
+                    $prevCategory = 'TEXT';
+                    $expr[] = array('type' => ExpressionType::RESERVED, 'base_expr' => $trim, 'sub_tree' => false);
+                    continue 2;
 
-					case 'DEFAULT':
-					case 'COMMENT':
-						$currCategory = $upper;
-						$options['sub_tree'][] = array('type' => ExpressionType::RESERVED, 'base_expr' => $trim);
-						continue 2;
+                case 'GEOMETRY':
+                case 'POINT':
+                case 'LINESTRING':
+                case 'POLYGON':
+                case 'MULTIPOINT':
+                case 'MULTILINESTRING':
+                case 'MULTIPOLYGON':
+                case 'GEOMETRYCOLLECTION':
+                    $expr[] = array('type' => ExpressionType::RESERVED, 'base_expr' => $trim);
+                    $prevCategory = $currCategory = $upper;
+                    # TODO: is it right?
+                    # spatial types
+                    break;
 
-					case 'AUTO_INCREMENT':
-						$options['sub_tree'][] = array('type' => ExpressionType::RESERVED, 'base_expr' => $trim);
-						$options['auto_inc'] = true;
-						continue 2;
+                case 'CHARACTER':
+                    if ($prevCategory === 'TEXT') {
+                        $parsed = array('type' => ExpressionType::RESERVED, 'base_expr' => $trim);
+                        $expr[] = array('type' => ExpressionType::CHARSET, 'base_expr' => substr($base_expr, 0, -1),
+                                        'sub_tree' => $parsed);
+                        $base_expr = $token;
+                        $currCategory = 'CHARSET';
+                        continue 2;
+                    }
+                    # else ?
+                    break;
 
-					case 'COLUMN_FORMAT':
-					case 'STORAGE':
-						$currCategory = $upper;
-						$options['sub_tree'][] = array('type' => ExpressionType::RESERVED, 'base_expr' => $trim);
-						continue 2;
+                case 'SET':
+                    if ($currCategory === 'CHARSET') {
+                        $parsed = array('type' => ExpressionType::RESERVED, 'base_expr' => $trim);
+                        $last = array_pop($expr);
+                        $last['sub_tree'][] = $parsed;
+                        $expr[] = $last;
+                        continue 2;
+                    }
+                    # else ?
+                    break;
 
-					case 'UNIQUE':
-						# it can follow a KEY word
-						$currCategory = $upper;
-						$options['sub_tree'][] = array('type' => ExpressionType::RESERVED, 'base_expr' => $trim);
-						$options['unique'] = true;
-						continue 2;
+                case 'COLLATE':
+                    if ($prevCategory === 'TEXT') {
+                        $parsed = array('type' => ExpressionType::RESERVED, 'base_expr' => $trim);
+                        $expr[] = array('type' => ExpressionType::COLLATE, 'base_expr' => substr($base_expr, 0, -1),
+                                        'sub_tree' => $parsed);
+                        $base_expr = $token;
+                        $currCategory = 'COLLATION';
+                        continue 2;
+                    }
+                    # else ?
+                    break;
 
-					case 'PRIMARY':
-						# it must follow a KEY word
-						$options['sub_tree'][] = array('type' => ExpressionType::RESERVED, 'base_expr' => $trim);
-						continue 2;
+                case 'NOT':
+                case 'NULL':
+                    $options['sub_tree'][] = array('type' => ExpressionType::RESERVED, 'base_expr' => $trim);
+                    if ($options['nullable']) {
+                        $options['nullable'] = ($upper === 'NOT' ? false : true);
+                    }
+                    continue 2;
 
-					case 'KEY':
-						$options['sub_tree'][] = array('type' => ExpressionType::RESERVED, 'base_expr' => $trim);
-						if ($currCategory !== 'UNIQUE') {
-							$options['primary'] = true;
-						}
-						continue 2;
+                case 'DEFAULT':
+                case 'COMMENT':
+                    $currCategory = $upper;
+                    $options['sub_tree'][] = array('type' => ExpressionType::RESERVED, 'base_expr' => $trim);
+                    continue 2;
 
-					case 'REFERENCES':
-						$processor = new ReferenceDefinitionProcessor();
-						$refs = $processor->process(array_splice($tokens, $key-1, null, true));
-						$skip = $refs['till'] - $key;
-						unset($refs['till']);
-						# TODO: check this, we need the last comma
-						continue 2;
+                case 'AUTO_INCREMENT':
+                    $options['sub_tree'][] = array('type' => ExpressionType::RESERVED, 'base_expr' => $trim);
+                    $options['auto_inc'] = true;
+                    continue 2;
 
-					default:
-						switch ($currCategory) {
+                case 'COLUMN_FORMAT':
+                case 'STORAGE':
+                    $currCategory = $upper;
+                    $options['sub_tree'][] = array('type' => ExpressionType::RESERVED, 'base_expr' => $trim);
+                    continue 2;
 
-							case 'STORAGE':
-								if ($upper === 'DISK' || $upper === 'MEMORY' || $upper === 'DEFAULT') {
-									$options['sub_tree'][] = array('type' => ExpressionType::RESERVED, 'base_expr' => $trim);
-									$options['storage'] = $trim;
-									continue 3;
-								}
-								# else ?
-								break;
-									
-							case 'COLUMN_FORMAT':
-								if ($upper === 'FIXED' || $upper === 'DYNAMIC' || $upper === 'DEFAULT') {
-									$options['sub_tree'][] = array('type' => ExpressionType::RESERVED, 'base_expr' => $trim);
-									$options['col_format'] = $trim;
-									continue 3;
-								}
-								# else ?
-								break;
-									
-							case 'COMMENT':
-								# this is the comment string
-								$options['sub_tree'][] = array('type' => ExpressionType::COMMENT, 'base_expr' => $trim);
-								$options['comment'] = $trim;
-								$currCategory = $prevCategory;
-								break;
-									
-							case 'DEFAULT':
-								# this is the default value
-								$options['sub_tree'][] = array('type' => ExpressionType::DEF_VALUE, 'base_expr' => $trim);
-								$options['default'] = $trim;
-								$currCategory = $prevCategory;
-								break;
+                case 'UNIQUE':
+                # it can follow a KEY word
+                    $currCategory = $upper;
+                    $options['sub_tree'][] = array('type' => ExpressionType::RESERVED, 'base_expr' => $trim);
+                    $options['unique'] = true;
+                    continue 2;
 
-							case 'COLLATE':
-								# this is the collation name
-								$parsed = array('type' => ExpressionType::CONSTANT, 'base_expr' => $trim);
-								$last = array_pop($expr);
-								$last['sub_tree'][] = $parsed;
-								$t = $base_expr;
-								$base_expr = $last['base_expr'].$base_expr;
-								$last['base_expr'] = $t;
-								$currCategory = $prevCategory;
-								break;
+                case 'PRIMARY':
+                # it must follow a KEY word
+                    $options['sub_tree'][] = array('type' => ExpressionType::RESERVED, 'base_expr' => $trim);
+                    continue 2;
 
-							case 'CHARSET':
-								# this is the character set name
-								$parsed = array('type' => ExpressionType::CONSTANT, 'base_expr' => $trim);
-								$last = array_pop($expr);
-								$last['sub_tree'][] = $parsed;
-								$t = $base_expr;
-								$base_expr = $last['base_expr'].$base_expr;
-								$last['base_expr'] = $t;
-								$currCategory = $prevCategory;
-								break;
-									
-							case 'SINGLE_PARAM_PARENTHESIS':
-								$parsed = $this->removeParenthesisFromStart($trim);
-								$parsed = array('type' => ExpressionType::CONSTANT, 'base_expr' => trim($parsed));
-								$last = array_pop($expr);
-								$last['length'] = $parsed['base_expr'];
-								$last['sub_tree'] = array('type' => ExpressionType::BRACKET_EXPRESSION, 'base_expr'  => $trim, 'sub_tree' => $parsed);
-								$expr[] = $last;
-								$currCategory = $prevCategory;
-								break;
+                case 'KEY':
+                    $options['sub_tree'][] = array('type' => ExpressionType::RESERVED, 'base_expr' => $trim);
+                    if ($currCategory !== 'UNIQUE') {
+                        $options['primary'] = true;
+                    }
+                    continue 2;
 
-							case 'TWO_PARAM_PARENTHESIS':
-								# maximum of two parameters
-								$parsed = $this->removeParenthesisFromStart($trim);
-								$parsed = $this->splitSQLIntoTokens($parsed);
-								$processor = new ExpressionListProcessor();
-								$parsed = $processor->process($parsed);
+                case 'REFERENCES':
+                    $processor = new ReferenceDefinitionProcessor();
+                    $refs = $processor->process(array_splice($tokens, $key - 1, null, true));
+                    $skip = $refs['till'] - $key;
+                    unset($refs['till']);
+                    # TODO: check this, we need the last comma
+                    continue 2;
 
-								# TODO: check that
+                default:
+                    switch ($currCategory) {
 
-								$last = array_pop($expr);
-								$last['length'] = $parsed[0]['base_expr'];
-								$last['decimals'] = isset($parsed[1]) ? $parsed[1]['base_expr'] : false;
-								$last['sub_tree'] = array('type' => ExpressionType::BRACKET_EXPRESSION, 'base_expr'  => $trim, 'sub_tree' => $parsed);
-								$expr[] = $last;
-								$currCategory = $prevCategory;
-								break;
+                    case 'STORAGE':
+                        if ($upper === 'DISK' || $upper === 'MEMORY' || $upper === 'DEFAULT') {
+                            $options['sub_tree'][] = array('type' => ExpressionType::RESERVED, 'base_expr' => $trim);
+                            $options['storage'] = $trim;
+                            continue 3;
+                        }
+                        # else ?
+                        break;
 
-							case 'MULTIPLE_PARAM_PARENTHESIS':
-								# some parameters
-								$parsed = $this->removeParenthesisFromStart($trim);
-								$parsed = $this->splitSQLIntoTokens($parsed);
-								$processor = new ExpressionListProcessor();
-								$parsed = $processor->process($parsed);
+                    case 'COLUMN_FORMAT':
+                        if ($upper === 'FIXED' || $upper === 'DYNAMIC' || $upper === 'DEFAULT') {
+                            $options['sub_tree'][] = array('type' => ExpressionType::RESERVED, 'base_expr' => $trim);
+                            $options['col_format'] = $trim;
+                            continue 3;
+                        }
+                        # else ?
+                        break;
 
-								$last = array_pop($expr);
-								$last['sub_tree'] = array('type' => ExpressionType::BRACKET_EXPRESSION, 'base_expr'  => $trim, 'sub_tree' => $parsed);
-								$expr[] = $last;
-								$currCategory = $prevCategory;
-								break;
+                    case 'COMMENT':
+                    # this is the comment string
+                        $options['sub_tree'][] = array('type' => ExpressionType::COMMENT, 'base_expr' => $trim);
+                        $options['comment'] = $trim;
+                        $currCategory = $prevCategory;
+                        break;
 
-							default:
-								break;
-						}
+                    case 'DEFAULT':
+                    # this is the default value
+                        $options['sub_tree'][] = array('type' => ExpressionType::DEF_VALUE, 'base_expr' => $trim);
+                        $options['default'] = $trim;
+                        $currCategory = $prevCategory;
+                        break;
 
-				}
-				$prevCategory = $currCategory;
-				$currCategory = '';
-			}
+                    case 'COLLATE':
+                    # this is the collation name
+                        $parsed = array('type' => ExpressionType::CONSTANT, 'base_expr' => $trim);
+                        $last = array_pop($expr);
+                        $last['sub_tree'][] = $parsed;
+                        $t = $base_expr;
+                        $base_expr = $last['base_expr'] . $base_expr;
+                        $last['base_expr'] = $t;
+                        $currCategory = $prevCategory;
+                        break;
 
-			if (!isset($expr['till'])) {
-				# end of $tokens array
-				$expr = $this->buildColDef($expr, trim($base_expr), $options, $refs, -1);
-			}
-			return $expr;
-		}
-	}
-	define('HAVE_COL_DEF_PROCESSOR', 1);
+                    case 'CHARSET':
+                    # this is the character set name
+                        $parsed = array('type' => ExpressionType::CONSTANT, 'base_expr' => $trim);
+                        $last = array_pop($expr);
+                        $last['sub_tree'][] = $parsed;
+                        $t = $base_expr;
+                        $base_expr = $last['base_expr'] . $base_expr;
+                        $last['base_expr'] = $t;
+                        $currCategory = $prevCategory;
+                        break;
+
+                    case 'SINGLE_PARAM_PARENTHESIS':
+                        $parsed = $this->removeParenthesisFromStart($trim);
+                        $parsed = array('type' => ExpressionType::CONSTANT, 'base_expr' => trim($parsed));
+                        $last = array_pop($expr);
+                        $last['length'] = $parsed['base_expr'];
+                        $last['sub_tree'] = array('type' => ExpressionType::BRACKET_EXPRESSION, 'base_expr' => $trim,
+                                                  'sub_tree' => $parsed);
+                        $expr[] = $last;
+                        $currCategory = $prevCategory;
+                        break;
+
+                    case 'TWO_PARAM_PARENTHESIS':
+                    # maximum of two parameters
+                        $parsed = $this->removeParenthesisFromStart($trim);
+                        $parsed = $this->splitSQLIntoTokens($parsed);
+                        $processor = new ExpressionListProcessor();
+                        $parsed = $processor->process($parsed);
+
+                        # TODO: check that
+
+                        $last = array_pop($expr);
+                        $last['length'] = $parsed[0]['base_expr'];
+                        $last['decimals'] = isset($parsed[1]) ? $parsed[1]['base_expr'] : false;
+                        $last['sub_tree'] = array('type' => ExpressionType::BRACKET_EXPRESSION, 'base_expr' => $trim,
+                                                  'sub_tree' => $parsed);
+                        $expr[] = $last;
+                        $currCategory = $prevCategory;
+                        break;
+
+                    case 'MULTIPLE_PARAM_PARENTHESIS':
+                    # some parameters
+                        $parsed = $this->removeParenthesisFromStart($trim);
+                        $parsed = $this->splitSQLIntoTokens($parsed);
+                        $processor = new ExpressionListProcessor();
+                        $parsed = $processor->process($parsed);
+
+                        $last = array_pop($expr);
+                        $last['sub_tree'] = array('type' => ExpressionType::BRACKET_EXPRESSION, 'base_expr' => $trim,
+                                                  'sub_tree' => $parsed);
+                        $expr[] = $last;
+                        $currCategory = $prevCategory;
+                        break;
+
+                    default:
+                        break;
+                    }
+
+                }
+                $prevCategory = $currCategory;
+                $currCategory = '';
+            }
+
+            if (!isset($expr['till'])) {
+                # end of $tokens array
+                $expr = $this->buildColDef($expr, trim($base_expr), $options, $refs, -1);
+            }
+            return $expr;
+        }
+    }
+    define('HAVE_COL_DEF_PROCESSOR', 1);
 }
