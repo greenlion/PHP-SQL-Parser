@@ -41,7 +41,7 @@ if (!defined('HAVE_ABSTRACT_PROCESSOR')) {
      * @author arothe
      * 
      */
-    class AbstractProcessor {
+    abstract class AbstractProcessor {
 
         /**
          * this function splits up a SQL statement into easy to "parse"
