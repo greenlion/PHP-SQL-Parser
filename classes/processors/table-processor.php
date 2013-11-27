@@ -68,12 +68,22 @@ if (!defined('HAVE_TABLE_PROCESSOR')) {
             $result = array();
             $expr = array();
             $base_expr = '';
+            $skip = 0;
             $separator = false; # first option has no separator
 
             foreach ($tokens as $token) {
                 $trim = trim($token);
                 $base_expr .= $token;
 
+                if ($skip > 0) {
+                	$skip --;
+                	continue;
+                }
+                
+                if ($skip < 0) {
+                	break;
+                }
+                
                 if ($trim === "") {
                     continue;
                 }
@@ -181,6 +191,9 @@ if (!defined('HAVE_TABLE_PROCESSOR')) {
                 case 'AVG_ROW_LENGTH':
                 case 'ENGINE':
                 case 'TYPE':
+                case 'STATS_AUTO_RECALC':
+                case 'STATS_PERSISTENT':
+                case 'KEY_BLOCK_SIZE':
                     if ($prevCategory === 'CREATE_DEF') {
                         $expr[] = $this->getReservedType($trim);
                         $currCategory = $prevCategory = 'TABLE_OPTION';
@@ -212,6 +225,10 @@ if (!defined('HAVE_TABLE_PROCESSOR')) {
                     }
                     break;
 
+                case 'PARTITION':
+                	# TODO: parse partition options
+                	$skip = -1;    
+                    
                 default:
                     switch ($currCategory) {
 
