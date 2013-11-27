@@ -92,4 +92,6 @@ class ExpressionType {
     const INDEX_PARSER = "index-parser";
     const REFERENCE = "foreign-ref";
     
+    const DATA_TYPE = "data-type";
+    
 }
