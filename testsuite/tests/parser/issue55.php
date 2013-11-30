@@ -3,7 +3,7 @@ require_once(dirname(__FILE__) . '/../../../php-sql-parser.php');
 require_once(dirname(__FILE__) . '/../../test-more.php');
 
 # partial SQL statements
-
+# TODO: table.c should be handled as table and c
 $parser = new PHPSQLParser();
 $sql = "GROUP BY a, b, table.c";
 $parser->parse($sql);
