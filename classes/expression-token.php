@@ -54,7 +54,7 @@ class ExpressionToken {
     }
 
     public function setNoQuotes($token, $qchars = '`') {
-        $this->noQuotes = $this->revokeQuotation($token, $qchars);
+        $this->noQuotes = ($token === null) ? null : $this->revokeQuotation($token, $qchars);
     }
     
     public function setTokenType($type) {
