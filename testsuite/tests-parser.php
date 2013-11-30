@@ -62,6 +62,7 @@ require_once(dirname(__FILE__) . '/tests/parser/issue94.php');
 require_once(dirname(__FILE__) . '/tests/parser/issue95.php');
 require_once(dirname(__FILE__) . '/tests/parser/issue97.php');
 require_once(dirname(__FILE__) . '/tests/parser/issue98.php');
+require_once(dirname(__FILE__) . '/tests/parser/issue102.php');
 require_once(dirname(__FILE__) . '/tests/parser/left.php');
 require_once(dirname(__FILE__) . '/tests/parser/manual.php');
 require_once(dirname(__FILE__) . '/tests/parser/nested.php');
