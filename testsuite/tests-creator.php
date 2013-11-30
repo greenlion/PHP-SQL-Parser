@@ -26,6 +26,7 @@ require_once(dirname(__FILE__) . '/tests/creator/issue94.php');
 require_once(dirname(__FILE__) . '/tests/creator/issue98.php');
 require_once(dirname(__FILE__) . '/tests/creator/issue100.php');
 require_once(dirname(__FILE__) . '/tests/creator/issue101.php');
+require_once(dirname(__FILE__) . '/tests/creator/issue102.php');
 require_once(dirname(__FILE__) . '/tests/creator/join.php');
 require_once(dirname(__FILE__) . '/tests/creator/left.php');
 require_once(dirname(__FILE__) . '/tests/creator/magnus.php');
