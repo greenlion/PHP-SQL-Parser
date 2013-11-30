@@ -185,6 +185,7 @@ if (!defined('HAVE_EXPR_LIST_PROCESSOR')) {
                         $prev->setSubTree($curr->getSubTree());
                         if ($prev->isColumnReference()) {
                             $prev->setTokenType(ExpressionType::SIMPLE_FUNCTION);
+                            $prev->setNoQuotes(null);
                         }
 
                         array_pop($resultList);
@@ -339,6 +340,7 @@ if (!defined('HAVE_EXPR_LIST_PROCESSOR')) {
 
                     if (PHPSQLParserConstants::isAggregateFunction($curr->getUpper())) {
                         $curr->setTokenType(ExpressionType::AGGREGATE_FUNCTION);
+                        $curr->setNoQuotes(null);
 
                     } elseif ($curr->getUpper() === 'NULL') {
                         // it is a reserved word, but we would like to set it as constant
@@ -353,9 +355,11 @@ if (!defined('HAVE_EXPR_LIST_PROCESSOR')) {
 
                         } elseif (PHPSQLParserConstants::isFunction($curr->getUpper())) {
                             $curr->setTokenType(ExpressionType::SIMPLE_FUNCTION);
+                            $curr->setNoQuotes(null);
 
                         } else {
                             $curr->setTokenType(ExpressionType::RESERVED);
+                            $curr->setNoQuotes(null);
                         }
                     }
                 }
@@ -363,14 +367,17 @@ if (!defined('HAVE_EXPR_LIST_PROCESSOR')) {
                 // issue 94, INTERVAL 1 MONTH
                 if ($curr->isConstant() && PHPSQLParserConstants::isParameterizedFunction($prev->getUpper())) {
                     $prev->setTokenType(ExpressionType::RESERVED);
+                    $prev->setNoQuotes(null);
                 }
 
                 if ($prev->isConstant() && PHPSQLParserConstants::isParameterizedFunction($curr->getUpper())) {
                     $curr->setTokenType(ExpressionType::RESERVED);
+                    $curr->setNoQuotes(null);
                 }
 
                 if ($curr->isUnspecified()) {
                     $curr->setTokenType(ExpressionType::EXPRESSION);
+                    $curr->setNoQuotes(null);
                     $curr->setSubTree($this->process($this->splitSQLIntoTokens($curr->getTrim())));
                 }
 
