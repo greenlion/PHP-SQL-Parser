@@ -11,4 +11,4 @@ try {
 
 $p = $parser->parsed;
 $expected = getExpectedValue(dirname(__FILE__), 'issue95.serialized');
-eq_array($p, $expected, 'incomplete floating point numbers');
+eq_array($p, $expected, 'union within the from clause');
