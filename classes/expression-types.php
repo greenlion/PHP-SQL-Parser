@@ -73,7 +73,7 @@ class ExpressionType {
     const USER = "user";
     const DIRECTORY = "directory";
     const UNION = "union";
-    const CHARSET = "character_set";
+    const CHARSET = "character-set";
     const COLLATE = "collation";
 
     const LIKE = "like";
