@@ -86,14 +86,15 @@ if (!defined('HAVE_CREATE_DEF_PROCESSOR')) {
                 $trim = trim($token);
                 $base_expr .= $token;
 
-                if ($skip > 0) {
+                if ($skip !== 0) {
                     $skip--;
                     continue;
                 }
 
-                if ($skip < 0) {
-                    break;
-                }
+                # we go through the tokens till the end
+#                if ($skip < 0) {
+#                    break;
+#                }
 
                 if ($trim === "") {
                     continue;
