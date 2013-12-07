@@ -1,7 +1,7 @@
 <?php
 require_once(dirname(__FILE__) . '/../../../php-sql-parser.php');
 require_once(dirname(__FILE__) . '/../../test-more.php');
-/*
+
 $parser = new PHPSQLParser();
 $sql = "CREATE TABLE hohoho (LIKE xyz)";
 $parser->parse($sql);
@@ -15,7 +15,7 @@ $parser->parse($sql);
 $p = $parser->parsed;
 $expected = getExpectedValue(dirname(__FILE__), 'issue33b.serialized');
 eq_array($p, $expected, 'CREATE TABLE statement with LIKE');
-*/
+
 $parser = new PHPSQLParser();
 $sql = "CREATE TABLE hohoho (a varchar(1000) NOT NULL, CONSTRAINT hohoho_pk PRIMARY KEY (a), CHECK(a > 5))";
 $parser->parse($sql);
@@ -36,7 +36,7 @@ $parser->parse($sql);
 $p = $parser->parsed;
 $expected = getExpectedValue(dirname(__FILE__), 'issue33e.serialized');
 eq_array($p, $expected, 'CREATE TABLE statement with primary key and check');
-/*
+
 $parser = new PHPSQLParser();
 $sql = "CREATE TABLE \"cachetable01\" (
 \"sp_id\" varchar(240) DEFAULT NULL,
@@ -46,10 +46,10 @@ $sql = "CREATE TABLE \"cachetable01\" (
 ) ENGINE=InnoDB DEFAULT CHARACTER SET=latin1";
 $parser->parse($sql);
 $p = $parser->parsed;
-print_r($p);
 $expected = getExpectedValue(dirname(__FILE__), 'issue33f.serialized');
 eq_array($p, $expected, 'CREATE TABLE statement');
 
+/*
 $parser = new PHPSQLParser();
 $sql = "CREATE TABLE hohoho (a varchar(1000), PRIMARY KEY USING btree (a(5) ASC) key_block_size 4 with parser haha, CHECK(a > 5))";
 $parser->parse($sql);
@@ -73,7 +73,7 @@ $p = $parser->parsed;
 print_r($p);
 $expected = getExpectedValue(dirname(__FILE__), 'issue33i.serialized');
 eq_array($p, $expected, 'CREATE TABLE statement with foreign key references');
-
+*/
 $parser = new PHPSQLParser();
 $sql = "CREATE TABLE turma(id text NOT NULL ,
 nome text NOT NULL ,
@@ -82,7 +82,6 @@ nota2 int NOT NULL
 )";
 $parser->parse($sql);
 $p = $parser->parsed;
-print_r($p);
 $expected = getExpectedValue(dirname(__FILE__), 'issue33j.serialized');
 eq_array($p, $expected, 'simple CREATE TABLE statement');
-*/
+
