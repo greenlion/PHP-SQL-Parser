@@ -101,15 +101,13 @@ if (!defined('HAVE_COL_DEF_PROCESSOR')) {
                     break 2;
 
                 case 'VARCHAR':
-                    $expr[] = array('type' => ExpressionType::DATA_TYPE, 'base_expr' => $trim, 'length' => false,
-                                    'sub_tree' => false);
+                    $expr[] = array('type' => ExpressionType::DATA_TYPE, 'base_expr' => $trim, 'length' => false);
                     $prevCategory = 'TEXT';
                     $currCategory = 'SINGLE_PARAM_PARENTHESIS';
                     continue 2;
 
                 case 'VARBINARY':
-                    $expr[] = array('type' => ExpressionType::DATA_TYPE, 'base_expr' => $trim, 'length' => false,
-                                    'sub_tree' => false);
+                    $expr[] = array('type' => ExpressionType::DATA_TYPE, 'base_expr' => $trim, 'length' => false);
                     $prevCategory = $upper;
                     $currCategory = 'SINGLE_PARAM_PARENTHESIS';
                     continue 2;
@@ -134,7 +132,7 @@ if (!defined('HAVE_COL_DEF_PROCESSOR')) {
                 case 'INTEGER':
                 case 'BIGINT':
                     $expr[] = array('type' => ExpressionType::DATA_TYPE, 'base_expr' => $trim, 'unsigned' => false,
-                                    'zerofill' => false, 'length' => false, 'sub_tree' => false);
+                                    'zerofill' => false, 'length' => false);
                     $currCategory = 'SINGLE_PARAM_PARENTHESIS';
                     $prevCategory = $upper;
                     continue 2;
@@ -147,15 +145,13 @@ if (!defined('HAVE_COL_DEF_PROCESSOR')) {
                         $expr[] = $last;
                         continue 2;
                     }
-                    $expr[] = array('type' => ExpressionType::DATA_TYPE, 'base_expr' => $trim, 'length' => false,
-                                    'sub_tree' => false);
+                    $expr[] = array('type' => ExpressionType::DATA_TYPE, 'base_expr' => $trim, 'length' => false);
                     $currCategory = 'SINGLE_PARAM_PARENTHESIS';
                     $prevCategory = $upper;
                     break;
 
                 case 'CHAR':
-                    $expr[] = array('type' => ExpressionType::DATA_TYPE, 'base_expr' => $trim, 'length' => false,
-                                    'sub_tree' => false);
+                    $expr[] = array('type' => ExpressionType::DATA_TYPE, 'base_expr' => $trim, 'length' => false);
                     $currCategory = 'SINGLE_PARAM_PARENTHESIS';
                     $prevCategory = 'TEXT';
                     break;
@@ -164,7 +160,7 @@ if (!defined('HAVE_COL_DEF_PROCESSOR')) {
                 case 'DOUBLE':
                 case 'FLOAT':
                     $expr[] = array('type' => ExpressionType::DATA_TYPE, 'base_expr' => $trim, 'unsigned' => false,
-                                    'zerofill' => false, 'sub_tree' => false);
+                                    'zerofill' => false);
                     $currCategory = 'TWO_PARAM_PARENTHESIS';
                     $prevCategory = $upper;
                     break;
@@ -172,7 +168,7 @@ if (!defined('HAVE_COL_DEF_PROCESSOR')) {
                 case 'DECIMAL':
                 case 'NUMERIC':
                     $expr[] = array('type' => ExpressionType::DATA_TYPE, 'base_expr' => $trim, 'unsigned' => false,
-                                    'zerofill' => false, 'sub_tree' => false);
+                                    'zerofill' => false);
                     $currCategory = 'TWO_PARAM_PARENTHESIS';
                     $prevCategory = $upper;
                     break;
@@ -196,8 +192,7 @@ if (!defined('HAVE_COL_DEF_PROCESSOR')) {
                 case 'MEDIUMTEXT':
                 case 'LONGTEXT':
                     $prevCategory = $currCategory = 'TEXT';
-                    $expr[] = array('type' => ExpressionType::DATA_TYPE, 'base_expr' => $trim, 'binary' => false,
-                                    'sub_tree' => false);
+                    $expr[] = array('type' => ExpressionType::DATA_TYPE, 'base_expr' => $trim, 'binary' => false);
                     continue 2;
 
                 case 'ENUM':
@@ -373,7 +368,8 @@ if (!defined('HAVE_COL_DEF_PROCESSOR')) {
                         $last['length'] = $parsed['base_expr'];
                         //$last['sub_tree'] = array('type' => ExpressionType::BRACKET_EXPRESSION, 'base_expr' => $trim, 'sub_tree' => $parsed);
                         $expr[] = $last;
-                        $expr[] = array('type' => ExpressionType::BRACKET_EXPRESSION, 'base_expr' => $trim, 'sub_tree' => $parsed);
+                        $expr[] = array('type' => ExpressionType::BRACKET_EXPRESSION, 'base_expr' => $trim,
+                                        'sub_tree' => $parsed);
                         $currCategory = $prevCategory;
                         break;
 
@@ -391,7 +387,8 @@ if (!defined('HAVE_COL_DEF_PROCESSOR')) {
                         $last['decimals'] = isset($parsed[1]) ? $parsed[1]['base_expr'] : false;
                         //$last['sub_tree'] = array('type' => ExpressionType::BRACKET_EXPRESSION, 'base_expr' => $trim, 'sub_tree' => $parsed);
                         $expr[] = $last;
-                        $expr[] = array('type' => ExpressionType::BRACKET_EXPRESSION, 'base_expr' => $trim, 'sub_tree' => $parsed);
+                        $expr[] = array('type' => ExpressionType::BRACKET_EXPRESSION, 'base_expr' => $trim,
+                                        'sub_tree' => $parsed);
                         $currCategory = $prevCategory;
                         break;
 
