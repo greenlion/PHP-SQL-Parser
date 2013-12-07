@@ -190,7 +190,7 @@ if (!defined('HAVE_COL_DEF_PROCESSOR')) {
                     $prevCategory = $currCategory = $upper;
                     break;
 
-                    // the next token can be BINARY
+                // the next token can be BINARY
                 case 'TINYTEXT':
                 case 'TEXT':
                 case 'MEDIUMTEXT':
@@ -235,6 +235,7 @@ if (!defined('HAVE_COL_DEF_PROCESSOR')) {
 
                 case 'SET':
                     if ($currCategory === 'CHARSET') {
+                        // TODO: is it necessary to set special properties like the name or collation?
                         $parsed = array('type' => ExpressionType::RESERVED, 'base_expr' => $trim);
                         $last = array_pop($expr);
                         $last['sub_tree'][] = $parsed;
