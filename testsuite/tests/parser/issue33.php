@@ -49,7 +49,7 @@ $p = $parser->parsed;
 $expected = getExpectedValue(dirname(__FILE__), 'issue33f.serialized');
 eq_array($p, $expected, 'CREATE TABLE statement');
 
-/*
+// FIXME: the keywords "with parser" have been loose
 $parser = new PHPSQLParser();
 $sql = "CREATE TABLE hohoho (a varchar(1000), PRIMARY KEY USING btree (a(5) ASC) key_block_size 4 with parser haha, CHECK(a > 5))";
 $parser->parse($sql);
@@ -62,7 +62,6 @@ $parser = new PHPSQLParser();
 $sql = "CREATE TABLE hohoho (a varchar(1000)) ENGINE=xyz,COMMENT='haha' DEFAULT COLLATE = latin1_german2_ci";
 $parser->parse($sql);
 $p = $parser->parsed;
-print_r($p);
 $expected = getExpectedValue(dirname(__FILE__), 'issue33h.serialized');
 eq_array($p, $expected, 'CREATE TABLE statement with table options separated by different characters');
 
@@ -70,10 +69,9 @@ $parser = new PHPSQLParser();
 $sql = "CREATE TABLE hohoho (a varchar(1000), b integer, FOREIGN KEY haha (b) references xyz (id) match full on delete cascade) ";
 $parser->parse($sql);
 $p = $parser->parsed;
-print_r($p);
 $expected = getExpectedValue(dirname(__FILE__), 'issue33i.serialized');
 eq_array($p, $expected, 'CREATE TABLE statement with foreign key references');
-*/
+
 $parser = new PHPSQLParser();
 $sql = "CREATE TABLE turma(id text NOT NULL ,
 nome text NOT NULL ,
