@@ -38,7 +38,7 @@ class ExpressionType {
     const GLOBAL_VARIABLE = "global_variable";
     const LOCAL_VARIABLE = "local_variable";
 
-    const COLDEF = "coldef";
+    const COLDEF = "column-def";
     const COLREF = "colref";
     const RESERVED = "reserved";
     const CONSTANT = "const";
@@ -62,7 +62,7 @@ class ExpressionType {
     const ALIAS = "alias";
     const POSITION = "pos";
 
-    const TEMPORARY_TABLE = "temporary_table";
+    const TEMPORARY_TABLE = "temporary-table";
     const TABLE = "table";
     const VIEW = "view";
     const DATABASE = "database";
@@ -93,5 +93,6 @@ class ExpressionType {
     const REFERENCE = "foreign-ref";
 
     const DATA_TYPE = "data-type";
+    const COLUMN_TYPE = "column-type";
 
 }

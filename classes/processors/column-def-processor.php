@@ -44,7 +44,7 @@ if (!defined('HAVE_COL_DEF_PROCESSOR')) {
     class ColumnDefinitionProcessor extends AbstractProcessor {
 
         protected function buildColDef($expr, $base_expr, $options, $refs, $key) {
-            $expr = array('type' => ExpressionType::DATA_TYPE, 'base_expr' => $base_expr, 'sub_tree' => $expr);
+            $expr = array('type' => ExpressionType::COLUMN_TYPE, 'base_expr' => $base_expr, 'sub_tree' => $expr);
 
             # add options first
             $expr['sub_tree'] = array_merge($expr['sub_tree'], $options['sub_tree']);
@@ -101,14 +101,14 @@ if (!defined('HAVE_COL_DEF_PROCESSOR')) {
                     break 2;
 
                 case 'VARCHAR':
-                    $expr[] = array('type' => ExpressionType::RESERVED, 'base_expr' => $trim, 'length' => false,
+                    $expr[] = array('type' => ExpressionType::DATA_TYPE, 'base_expr' => $trim, 'length' => false,
                                     'sub_tree' => false);
                     $prevCategory = 'TEXT';
                     $currCategory = 'SINGLE_PARAM_PARENTHESIS';
                     continue 2;
 
                 case 'VARBINARY':
-                    $expr[] = array('type' => ExpressionType::RESERVED, 'base_expr' => $trim, 'length' => false,
+                    $expr[] = array('type' => ExpressionType::DATA_TYPE, 'base_expr' => $trim, 'length' => false,
                                     'sub_tree' => false);
                     $prevCategory = $upper;
                     $currCategory = 'SINGLE_PARAM_PARENTHESIS';
@@ -133,7 +133,7 @@ if (!defined('HAVE_COL_DEF_PROCESSOR')) {
                 case 'INT':
                 case 'INTEGER':
                 case 'BIGINT':
-                    $expr[] = array('type' => ExpressionType::RESERVED, 'base_expr' => $trim, 'unsigned' => false,
+                    $expr[] = array('type' => ExpressionType::DATA_TYPE, 'base_expr' => $trim, 'unsigned' => false,
                                     'zerofill' => false, 'length' => false, 'sub_tree' => false);
                     $currCategory = 'SINGLE_PARAM_PARENTHESIS';
                     $prevCategory = $upper;
@@ -141,17 +141,20 @@ if (!defined('HAVE_COL_DEF_PROCESSOR')) {
 
                 case 'BINARY':
                     if ($currCategory === 'TEXT') {
-                        $expr[] = array('type' => ExpressionType::RESERVED, 'base_expr' => $trim);
+                        $last = array_pop($expr);
+                        $last['binary'] = true;
+                        $last['sub_tree'][] = array('type' => ExpressionType::RESERVED, 'base_expr' => $trim);
+                        $expr[] = $last;
                         continue 2;
                     }
-                    $expr[] = array('type' => ExpressionType::RESERVED, 'base_expr' => $trim, 'length' => false,
+                    $expr[] = array('type' => ExpressionType::DATA_TYPE, 'base_expr' => $trim, 'length' => false,
                                     'sub_tree' => false);
                     $currCategory = 'SINGLE_PARAM_PARENTHESIS';
                     $prevCategory = $upper;
                     break;
 
                 case 'CHAR':
-                    $expr[] = array('type' => ExpressionType::RESERVED, 'base_expr' => $trim, 'length' => false,
+                    $expr[] = array('type' => ExpressionType::DATA_TYPE, 'base_expr' => $trim, 'length' => false,
                                     'sub_tree' => false);
                     $currCategory = 'SINGLE_PARAM_PARENTHESIS';
                     $prevCategory = 'TEXT';
@@ -160,7 +163,7 @@ if (!defined('HAVE_COL_DEF_PROCESSOR')) {
                 case 'REAL':
                 case 'DOUBLE':
                 case 'FLOAT':
-                    $expr[] = array('type' => ExpressionType::RESERVED, 'base_expr' => $trim, 'unsigned' => false,
+                    $expr[] = array('type' => ExpressionType::DATA_TYPE, 'base_expr' => $trim, 'unsigned' => false,
                                     'zerofill' => false, 'sub_tree' => false);
                     $currCategory = 'TWO_PARAM_PARENTHESIS';
                     $prevCategory = $upper;
@@ -168,7 +171,7 @@ if (!defined('HAVE_COL_DEF_PROCESSOR')) {
 
                 case 'DECIMAL':
                 case 'NUMERIC':
-                    $expr[] = array('type' => ExpressionType::RESERVED, 'base_expr' => $trim, 'unsigned' => false,
+                    $expr[] = array('type' => ExpressionType::DATA_TYPE, 'base_expr' => $trim, 'unsigned' => false,
                                     'zerofill' => false, 'sub_tree' => false);
                     $currCategory = 'TWO_PARAM_PARENTHESIS';
                     $prevCategory = $upper;
@@ -183,16 +186,17 @@ if (!defined('HAVE_COL_DEF_PROCESSOR')) {
                 case 'BLOB':
                 case 'MEDIUMBLOB':
                 case 'LONGBLOB':
-                    $expr[] = array('type' => ExpressionType::RESERVED, 'base_expr' => $trim);
+                    $expr[] = array('type' => ExpressionType::DATA_TYPE, 'base_expr' => $trim);
                     $prevCategory = $currCategory = $upper;
                     break;
 
+                    // the next token can be BINARY
                 case 'TINYTEXT':
                 case 'TEXT':
                 case 'MEDIUMTEXT':
                 case 'LONGTEXT':
                     $prevCategory = $currCategory = 'TEXT';
-                    $expr[] = array('type' => ExpressionType::RESERVED, 'base_expr' => $trim, 'binary' => false,
+                    $expr[] = array('type' => ExpressionType::DATA_TYPE, 'base_expr' => $trim, 'binary' => false,
                                     'sub_tree' => false);
                     continue 2;
 
@@ -211,7 +215,7 @@ if (!defined('HAVE_COL_DEF_PROCESSOR')) {
                 case 'MULTILINESTRING':
                 case 'MULTIPOLYGON':
                 case 'GEOMETRYCOLLECTION':
-                    $expr[] = array('type' => ExpressionType::RESERVED, 'base_expr' => $trim);
+                    $expr[] = array('type' => ExpressionType::DATA_TYPE, 'base_expr' => $trim);
                     $prevCategory = $currCategory = $upper;
                     # TODO: is it right?
                     # spatial types
@@ -219,7 +223,7 @@ if (!defined('HAVE_COL_DEF_PROCESSOR')) {
 
                 case 'CHARACTER':
                     if ($prevCategory === 'TEXT') {
-                        $parsed = array('type' => ExpressionType::RESERVED, 'base_expr' => $trim);
+                        $parsed = array('type' => ExpressionType::DATA_TYPE, 'base_expr' => $trim);
                         $expr[] = array('type' => ExpressionType::CHARSET, 'base_expr' => substr($base_expr, 0, -1),
                                         'sub_tree' => $parsed);
                         $base_expr = $token;
