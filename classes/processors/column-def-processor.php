@@ -371,9 +371,9 @@ if (!defined('HAVE_COL_DEF_PROCESSOR')) {
                         $parsed = array('type' => ExpressionType::CONSTANT, 'base_expr' => trim($parsed));
                         $last = array_pop($expr);
                         $last['length'] = $parsed['base_expr'];
-                        $last['sub_tree'] = array('type' => ExpressionType::BRACKET_EXPRESSION, 'base_expr' => $trim,
-                                                  'sub_tree' => $parsed);
+                        //$last['sub_tree'] = array('type' => ExpressionType::BRACKET_EXPRESSION, 'base_expr' => $trim, 'sub_tree' => $parsed);
                         $expr[] = $last;
+                        $expr[] = array('type' => ExpressionType::BRACKET_EXPRESSION, 'base_expr' => $trim, 'sub_tree' => $parsed);
                         $currCategory = $prevCategory;
                         break;
 
@@ -389,9 +389,9 @@ if (!defined('HAVE_COL_DEF_PROCESSOR')) {
                         $last = array_pop($expr);
                         $last['length'] = $parsed[0]['base_expr'];
                         $last['decimals'] = isset($parsed[1]) ? $parsed[1]['base_expr'] : false;
-                        $last['sub_tree'] = array('type' => ExpressionType::BRACKET_EXPRESSION, 'base_expr' => $trim,
-                                                  'sub_tree' => $parsed);
+                        //$last['sub_tree'] = array('type' => ExpressionType::BRACKET_EXPRESSION, 'base_expr' => $trim, 'sub_tree' => $parsed);
                         $expr[] = $last;
+                        $expr[] = array('type' => ExpressionType::BRACKET_EXPRESSION, 'base_expr' => $trim, 'sub_tree' => $parsed);
                         $currCategory = $prevCategory;
                         break;
 
