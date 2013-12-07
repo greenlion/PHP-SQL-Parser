@@ -52,13 +52,22 @@ if (!defined('HAVE_CREATE_DEF_PROCESSOR')) {
             }
 
             # replace the constraint type with a more descriptive one
-            $type = $expr[0]['type'];
-            if ($type === ExpressionType::CONSTRAINT) {
-                $type = $expr[1]['type'];
-                $expr[1]['type'] = ExpressionType::RESERVED;
-            } else {
-                # TODO: this doesn't work on col-defs!!
-                $expr[0]['type'] = ExpressionType::RESERVED;
+            switch ($expr[0]['type']) {
+                
+                case ExpressionType::CONSTRAINT:
+                    $type = $expr[1]['type'];
+                    $expr[1]['type'] = ExpressionType::RESERVED;
+                    break;
+                    
+                case ExpressionType::COLREF:
+                    $type = ExpressionType::COLDEF;
+                    break;
+                    
+                default:
+                    $type = $expr[0]['type'];
+                    $expr[0]['type'] = ExpressionType::RESERVED;
+                    break;
+                
             }
             return $type;
         }
