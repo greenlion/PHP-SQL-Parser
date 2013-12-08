@@ -91,11 +91,6 @@ if (!defined('HAVE_CREATE_DEF_PROCESSOR')) {
                     continue;
                 }
 
-                # we go through the tokens till the end
-#                if ($skip < 0) {
-#                    break;
-#                }
-
                 if ($trim === "") {
                     continue;
                 }
@@ -235,6 +230,8 @@ if (!defined('HAVE_CREATE_DEF_PROCESSOR')) {
                         $expr[] = array('type' => ExpressionType::INDEX_TYPE, 'base_expr' => $base_expr,
                                         'sub_tree' => $last['sub_tree']);
                         $base_expr = $last['base_expr'] . $base_expr;
+                        
+                        # FIXME: it could be wrong for index_type within index_option
                         $currCategory = $last['category'];
                         continue 2;
                     }
@@ -339,6 +336,7 @@ if (!defined('HAVE_CREATE_DEF_PROCESSOR')) {
                         $expr[] = array('type' => ExpressionType::INDEX_PARSER, 'base_expr' => $base_expr,
                                         'sub_tree' => $last['sub_tree']);
                         $base_expr = $last['base_expr'] . $base_expr;
+                        $currCategory = 'INDEX_COL_LIST';
                         continue 3;
 
                     case 'INDEX_SIZE':
@@ -348,6 +346,7 @@ if (!defined('HAVE_CREATE_DEF_PROCESSOR')) {
                         $expr[] = array('type' => ExpressionType::INDEX_SIZE, 'base_expr' => $base_expr,
                                         'sub_tree' => $last['sub_tree']);
                         $base_expr = $last['base_expr'] . $base_expr;
+                        $currCategory = 'INDEX_COL_LIST';
                         continue 3;
 
                     case 'CHECK':
