@@ -85,8 +85,9 @@ nome text NOT NULL ,
 nota1 int NOT NULL ,
 nota2 int NOT NULL
 )";
-$parser->parse($sql);
+$parser->parse($sql, true);
 $p = $parser->parsed;
+print_r($p);
 $expected = getExpectedValue(dirname(__FILE__), 'issue33j.serialized');
 eq_array($p, $expected, 'simple CREATE TABLE statement');
 
@@ -97,3 +98,11 @@ $parser->parse($sql);
 $p = $parser->parsed;
 $expected = getExpectedValue(dirname(__FILE__), 'issue33k.serialized');
 eq_array($p, $expected, 'CREATE TABLE statement with primary key and multiple index options and check');
+
+
+$parser = new PHPSQLParser();
+$sql = "CREATE TABLE hohoho (a integer not null) REPLACE AS SELECT DISTINCT * FROM abcd WHERE x<5";
+$parser->parse($sql);
+$p = $parser->parsed;
+$expected = getExpectedValue(dirname(__FILE__), 'issue33l.serialized');
+eq_array($p, $expected, 'CREATE TABLE statement with select statement, replace duplicates');
