@@ -121,9 +121,9 @@ if (!defined('HAVE_SQL_PROCESSOR')) {
                 case 'SET':
                     if ($token_category !== 'TABLE') {
                         $token_category = $upper;
-                    }    
+                    }
                     break;
-                    
+
                 case 'LIMIT':
                 case 'PLUGIN':
                 # no separate section
@@ -211,7 +211,6 @@ if (!defined('HAVE_SQL_PROCESSOR')) {
                 case 'DELETE':
                 case 'ALTER':
                 case 'INSERT':
-                case 'REPLACE':
                 case 'TRUNCATE':
                 case 'OPTIMIZE':
                 case 'GRANT':
@@ -235,6 +234,27 @@ if (!defined('HAVE_SQL_PROCESSOR')) {
                     $out[$upper][0] = $upper;
                     continue 2;
 
+                case 'REPLACE':
+                    if ($prev_category === 'TABLE') {
+                        # part of the CREATE TABLE statement
+                        $out[$prev_category][] = $upper;
+                        continue 2;
+                    }
+                    // set the category in case these get subclauses in a future version of MySQL
+                    $token_category = $upper;
+                    $out[$upper][0] = $upper;
+                    continue 2;
+
+                case 'IGNORE':
+                    if ($prev_category === 'TABLE') {
+                        # part of the CREATE TABLE statement
+                        $out[$prev_category][] = $upper;
+                        continue 2;
+                    }
+                    $out['OPTIONS'][] = $upper;
+                    continue 2;
+                    break;
+
                 case 'CHECK':
                     if ($prev_category === 'TABLE') {
                         $out[$prev_category][] = $upper;
@@ -243,7 +263,7 @@ if (!defined('HAVE_SQL_PROCESSOR')) {
                     $token_category = $upper;
                     $out[$upper][0] = $upper;
                     continue 2;
-                    
+
                 case 'CREATE':
                     if ($prev_category === 'SHOW') {
                         continue;
@@ -360,7 +380,6 @@ if (!defined('HAVE_SQL_PROCESSOR')) {
                 /* These tokens set particular options for the statement. They never stand alone. */
                 case 'LOW_PRIORITY':
                 case 'DELAYED':
-                case 'IGNORE':
                 case 'FORCE':
                 case 'QUICK':
                     $out['OPTIONS'][] = $upper;
