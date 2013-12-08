@@ -65,7 +65,7 @@ if (!defined('HAVE_TABLE_PROCESSOR')) {
         public function process($tokens) {
 
             $currCategory = "TABLE_NAME";
-            $result = array();
+            $result = array('base_expr' => false, 'name' => false, 'no_quotes' => false, 'create-def' => false, 'options' => false, 'like' => false, 'select' => false);
             $expr = array();
             $base_expr = '';
             $skip = 0;
@@ -225,9 +225,26 @@ if (!defined('HAVE_TABLE_PROCESSOR')) {
                     }
                     break;
 
+                case 'IGNORE':
+                case 'REPLACE':
+                    $expr[] = $this->getReservedType($trim);
+                    $result['select'] = array('base_expr' => trim($base_expr), 'duplicates' => $trim, 'as' => false, 'sub_tree' => $expr);
+                    continue 2;
+                                       
+                case 'AS':
+                    $expr[] = $this->getReservedType($trim);
+                    if (!isset($result['select']['duplicates'])) {
+                        $result['select']['duplicates'] = false;
+                    }
+                    $result['select']['as'] = true;
+                    $result['select']['base_expr'] = trim($base_expr);
+                    $result['select']['sub_tree'] = $expr;
+                    continue 2;    
+                    
                 case 'PARTITION':
                 # TODO: parse partition options
                     $skip = -1;
+                    break;
 
                 default:
                     switch ($currCategory) {
@@ -289,12 +306,6 @@ if (!defined('HAVE_TABLE_PROCESSOR')) {
                             $result['create-def'] = array('type' => ExpressionType::BRACKET_EXPRESSION,
                                                           'base_expr' => $base_expr,
                                                           'sub_tree' => $coldef['create-def']);
-
-                            # TODO:
-                            # after a () we can have a select_statement
-                            # but only if we don't have set $expr['like'] inside the parenthesis
-                            # stop processing if 'like' is set
-
                             $expr = array();
                             $separator = ' ';
                             $base_expr = '';
