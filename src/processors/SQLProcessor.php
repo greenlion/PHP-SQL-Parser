@@ -274,23 +274,43 @@ class SQLProcessor extends SQLChunkProcessor {
                 if ($prev_category === 'CREATE') {
                     $out[$prev_category][] = $upper;
                     $token_category = $upper;
-                    continue 2;
                 }
                 break;
 
             case 'TEMPORARY':
                 if ($prev_category === 'CREATE') {
                     $out[$prev_category][] = $upper;
+                    $token_category = $prev_category;
                     continue 2;
                 }
                 break;
 
             case 'IF':
                 if ($prev_category === 'TABLE') {
-                    $out['CREATE'][] = 'IF NOT EXISTS';
-                    $skip_next = 2;
+                    $token_category = 'CREATE';
+                    $out[$token_category] = array_merge($out[$token_category], $out[$prev_category]);
+                    $out[$prev_category] = array();
+                    $out[$token_category][] = $upper;
+                    $prev_category = $token_category;
                     continue 2;
                 }
+                break;
+
+            case 'NOT':
+                if ($prev_category === 'CREATE') {
+                    $token_category = $prev_category;
+                    $out[$prev_category][] = $upper;
+                    continue 2;
+                }
+                break;
+
+            case 'EXISTS':
+                if ($prev_category === 'CREATE') {
+                    $out[$prev_category][] = $upper;
+                    $prev_category = $token_category = 'TABLE';
+                    continue 2;
+                }
+                break;
 
             case 'CACHE':
                 if ($prev_category === "" || $prev_category === 'RESET' || $prev_category === 'FLUSH'
