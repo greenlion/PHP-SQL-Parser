@@ -1,7 +1,7 @@
 <?php
 
-require_once(dirname(__FILE__) . '/../../../php-sql-parser.php');
-require_once(dirname(__FILE__) . '/../../../php-sql-creator.php');
+require_once(dirname(__FILE__) . '/../../../src/PHPSQLParser.php');
+require_once(dirname(__FILE__) . '/../../../src/PHPSQLCreator.php');
 require_once(dirname(__FILE__) . '/../../test-more.php');
 
 
@@ -15,3 +15,4 @@ $creator = new PHPSQLCreator($parser->parsed);
 $created = $creator->created;
 $expected = getExpectedValue(dirname(__FILE__), 'left.sql', false);
 ok($created === $expected, 'left joins and table-expression');
+?>
