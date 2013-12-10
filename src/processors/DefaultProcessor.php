@@ -62,3 +62,4 @@ class DefaultProcessor extends AbstractProcessor {
         return $queries;
     }
 }
+?>
