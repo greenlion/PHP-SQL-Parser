@@ -1,6 +1,6 @@
 <?php
 /**
- * table-processor.php
+ * TableProcessor.php
  *
  * This file implements the processor for the TABLE statements.
  *
