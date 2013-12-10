@@ -1,8 +1,8 @@
 <?php
 /**
- * group-processor.php
+ * ExplainProcessor.php
  *
- * This file implements the processor for the GROUP-BY statements.
+ * This file implements the processor for the EXPLAIN statements.
  *
  * Copyright (c) 2010-2012, Justin Swanhart
  * with contributions by André Rothe <arothe@phosco.info, phosco@gmx.de>
@@ -29,48 +29,45 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
  * DAMAGE.
  */
-if (!defined('HAVE_GROUPBY_PROCESSOR')) {
-
-    require_once(dirname(__FILE__) . '/order-processor.php');
+if (!defined('HAVE_EXPLAIN_PROCESSOR')) {
+    require_once(dirname(__FILE__) . '/abstract-processor.php');
+    require_once(dirname(__FILE__) . '/../expression-types.php');
 
     /**
      * 
-     * This class processes the GROUP-BY statements.
+     * This class processes the EXPLAIN statements.
      * 
      * @author arothe
      * 
      */
-    class GroupByProcessor extends OrderByProcessor {
+    class ExplainProcessor extends AbstractProcessor {
 
-        public function process($tokens, $select) {
-            $out = array();
-            $parseInfo = $this->initParseInfo();
-
-            if (!$tokens) {
-                return false;
+        public function process($tokens, $isSelect = false) {
+            if ($isSelect) {
+                foreach ($tokens as $token) {
+                    switch (strtoupper(trim($token))) {
+                    case 'EXTENDED':
+                    case 'PARTITIONS':
+                        return array('expr_type' => ExpressionType::RESERVED, 'base_expr' => $token);
+                        break;
+                    default:
+                    // ignore the other stuff
+                        break;
+                    }
+                }
+                return null;
             }
 
             foreach ($tokens as $token) {
-                $trim = strtoupper(trim($token));
-                switch ($trim) {
-                case ',':
-                    $parsed = $this->processOrderExpression($parseInfo, $select);
-                    unset($parsed['direction']);
-
-                    $out[] = $parsed;
-                    $parseInfo = $this->initParseInfo();
-                    break;
-                default:
-                    $parseInfo['base_expr'] .= $token;
+                if ($this->isWhitespaceToken($token)) {
+                    continue;
                 }
+                return array('expr_type' => ExpressionType::TABLE, 'table' => $token,
+                             'no_quotes' => $this->revokeQuotation($token), 'base_expr' => $token);
             }
+            return null;
 
-            $parsed = $this->processOrderExpression($parseInfo, $select);
-            unset($parsed['direction']);
-            $out[] = $parsed;
-
-            return $out;
         }
     }
-    define('HAVE_GROUPBY_PROCESSOR', 1);
+    define('HAVE_EXPLAIN_PROCESSOR', 1);
 }

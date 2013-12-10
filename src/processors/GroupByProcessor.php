@@ -1,8 +1,8 @@
 <?php
 /**
- * having-processor.php
+ * GroupByProcessor.php
  *
- * This file implements the processor for the HAVING statements.
+ * This file implements the processor for the GROUP-BY statements.
  *
  * Copyright (c) 2010-2012, Justin Swanhart
  * with contributions by André Rothe <arothe@phosco.info, phosco@gmx.de>
@@ -29,20 +29,48 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
  * DAMAGE.
  */
-if (!defined('HAVE_HAVING_PROCESSOR')) {
-    
-    require_once(dirname(__FILE__) . '/expression-list-processor.php');
+if (!defined('HAVE_GROUPBY_PROCESSOR')) {
+
+    require_once(dirname(__FILE__) . '/order-processor.php');
 
     /**
      * 
-     * This class processes the HAVING statements.
+     * This class processes the GROUP-BY statements.
      * 
      * @author arothe
      * 
      */
-    class HavingProcessor extends ExpressionListProcessor {
+    class GroupByProcessor extends OrderByProcessor {
 
+        public function process($tokens, $select) {
+            $out = array();
+            $parseInfo = $this->initParseInfo();
+
+            if (!$tokens) {
+                return false;
+            }
+
+            foreach ($tokens as $token) {
+                $trim = strtoupper(trim($token));
+                switch ($trim) {
+                case ',':
+                    $parsed = $this->processOrderExpression($parseInfo, $select);
+                    unset($parsed['direction']);
+
+                    $out[] = $parsed;
+                    $parseInfo = $this->initParseInfo();
+                    break;
+                default:
+                    $parseInfo['base_expr'] .= $token;
+                }
+            }
+
+            $parsed = $this->processOrderExpression($parseInfo, $select);
+            unset($parsed['direction']);
+            $out[] = $parsed;
+
+            return $out;
+        }
     }
-    
-    define('HAVE_HAVING_PROCESSOR', 1);
+    define('HAVE_GROUPBY_PROCESSOR', 1);
 }

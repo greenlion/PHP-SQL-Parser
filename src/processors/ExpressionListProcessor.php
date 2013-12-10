@@ -1,6 +1,6 @@
 <?php
 /**
- * expression-list-processor.php
+ * ExpressionListProcessor.php
  *
  * This file implements the processor for expression lists.
  *
