@@ -96,3 +96,4 @@ class ExpressionType {
     const COLUMN_TYPE = "column-type";
 
 }
+?>

@@ -66,3 +66,4 @@ class PHPSQLParser {
         return $this->parsed;
     }
 }
+?>
