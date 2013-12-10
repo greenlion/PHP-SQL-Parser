@@ -30,8 +30,8 @@
  * DAMAGE.
  */
 
-require_once(dirname(__FILE__) . '/../PHPSQLParser.php');
-require_once(dirname(__FILE__) . '/../PHPSQLCreator.php');
+require_once(dirname(__FILE__) . '/../src/PHPSQLParser.php');
+require_once(dirname(__FILE__) . '/../src/PHPSQLCreator.php');
 include_once($rootdir . '/classes/adodb/adodb.inc.php');
 
 $_ENV['DEBUG'] = 1;
