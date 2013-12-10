@@ -71,3 +71,4 @@ class GroupByProcessor extends OrderByProcessor {
         return $out;
     }
 }
+?>

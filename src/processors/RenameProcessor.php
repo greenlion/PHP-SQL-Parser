@@ -91,3 +91,4 @@ class RenameProcessor extends AbstractProcessor {
     }
 
 }
+?>
