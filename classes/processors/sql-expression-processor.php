@@ -68,14 +68,10 @@ if (!defined('HAVE_SQL_EXPR_PROCESSOR')) {
      */
     class SQLExpressionProcessor extends AbstractProcessor {
 
-        protected function parseLIKE(&$out) {
-            if (!isset($out['TABLE']['like']['expr_type'])) {
+        protected function moveLIKE(&$out) {
+            if (!isset($out['TABLE']['like'])) {
                 return;
             }
-            if ($out['TABLE']['like']['expr_type'] === ExpressionType::BRACKET_EXPRESSION) {
-                return;
-            }
-            
             $out = $this->array_insert_after($out, 'TABLE', array('LIKE' => $out['TABLE']['like']));
             unset($out['TABLE']['like']);
         }
@@ -91,7 +87,7 @@ if (!defined('HAVE_SQL_EXPR_PROCESSOR')) {
             if (!empty($out['TABLE'])) {
                 $processor = new TableProcessor();
                 $out['TABLE'] = $processor->process($out['TABLE']);
-                $this->parseLike($out);
+                $this->moveLIKE($out);
             }
             if (!empty($out['EXPLAIN'])) {
                 $processor = new ExplainProcessor();
