@@ -52,3 +52,4 @@ class ColumnListProcessor extends AbstractProcessor {
         return $cols;
     }
 }
+?>

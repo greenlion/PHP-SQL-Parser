@@ -42,3 +42,4 @@ require_once(dirname(__FILE__) . '/ExplainProcessor.php');
 class DescribeProcessor extends ExplainProcessor {
 
 }
+?>
