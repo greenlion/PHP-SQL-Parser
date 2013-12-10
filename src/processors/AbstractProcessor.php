@@ -1,6 +1,6 @@
 <?php
 /**
- * abstract-processor.php
+ * AbstractProcessor.php
  *
  * This file implements an abstract processor, which implements some helper functions.
  *
