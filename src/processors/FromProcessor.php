@@ -1,6 +1,6 @@
 <?php
 /**
- * from-processor.php
+ * FromProcessor.php
  *
  * This file implements the processor for the FROM statements.
  *
