@@ -32,7 +32,7 @@
 
 require_once(dirname(__FILE__) . '/AbstractProcessor.php');
 require_once(dirname(__FILE__) . '/ReferenceDefinitionProcessor.php');
-require_once(dirname(__FILE__) . '/../ExpressionType.php');
+require_once(dirname(__FILE__) . '/../utils/ExpressionType.php');
 
 /**
  *
