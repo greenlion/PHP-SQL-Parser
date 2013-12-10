@@ -1,1 +1,0 @@
-SELECT u.`id` as userid,u.`user` as username,u.`firstname`,u.`lastname`,u.`email`,CONCAT(19,lastname,2013) as test FROM `user` u ORDER BY u.`user` DESC
