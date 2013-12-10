@@ -74,7 +74,7 @@ if (!defined('HAVE_IDX_COL_LIST_PROCESSOR')) {
 
                 case ',':
                 # the next column
-                    $result[] = array_merge(array('type' => ExpressionType::INDEX_COLUMN, 'base_expr' => $base_expr),
+                    $result[] = array_merge(array('expr_type' => ExpressionType::INDEX_COLUMN, 'base_expr' => $base_expr),
                             $expr);
                     $expr = $this->initExpression();
                     $base_expr = "";
@@ -92,7 +92,7 @@ if (!defined('HAVE_IDX_COL_LIST_PROCESSOR')) {
                     break;
                 }
             }
-            $result[] = array_merge(array('type' => ExpressionType::INDEX_COLUMN, 'base_expr' => $base_expr), $expr);
+            $result[] = array_merge(array('expr_type' => ExpressionType::INDEX_COLUMN, 'base_expr' => $base_expr), $expr);
             return $result;
         }
     }

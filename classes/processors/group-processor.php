@@ -61,7 +61,7 @@ if (!defined('HAVE_GROUPBY_PROCESSOR')) {
                     $parseInfo = $this->initParseInfo();
                     break;
                 default:
-                    $parseInfo['expr'] .= $token;
+                    $parseInfo['base_expr'] .= $token;
                 }
             }
 

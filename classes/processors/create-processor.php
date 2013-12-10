@@ -54,12 +54,12 @@ if (!defined('HAVE_CREATE_PROCESSOR')) {
                 switch ($trim) {
 
                 case 'TEMPORARY':
-                    $expr['type'] = ExpressionType::TEMPORARY_TABLE;
+                    $expr['expr_type'] = ExpressionType::TEMPORARY_TABLE;
                     $expr['exists'] = false;
                     break;
 
                 case 'TABLE':
-                    $expr['type'] = ExpressionType::TABLE;
+                    $expr['expr_type'] = ExpressionType::TABLE;
                     $expr['exists'] = false;
                     break;
 
