@@ -31,8 +31,8 @@
  * DAMAGE.
  */
 
-require_once(dirname(__FILE__) . '/parser-utils.php');
-require_once(dirname(__FILE__) . '/exceptions.php');
+require_once(dirname(__FILE__) . '/../utils/PHPSQLParserUtils.php');
+require_once(dirname(__FILE__) . '/../exceptions/UnableToCalculatePositionException.php');
 
 /**
  * 
