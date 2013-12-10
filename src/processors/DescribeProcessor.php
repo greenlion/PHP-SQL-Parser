@@ -1,6 +1,6 @@
 <?php
 /**
- * describe-processor.php
+ * DescribeProcessor.php
  *
  * This file implements the processor for the DESCRIBE statements.
  *

@@ -1,8 +1,8 @@
 <?php
 /**
- * create-processor.php
+ * CreateProcessor.php
  *
- * This file implements the processor for the CREATE statements.
+ * This file implements the processor for the CREATE TABLE statements.
  *
  * Copyright (c) 2010-2012, Justin Swanhart
  * with contributions by André Rothe <arothe@phosco.info, phosco@gmx.de>
