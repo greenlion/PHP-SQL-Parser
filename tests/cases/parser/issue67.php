@@ -1,6 +1,6 @@
 <?php
-require_once(dirname(__FILE__) . '/../../../php-sql-parser.php');
-require_once(dirname(__FILE__) . '/../../test-more.php');
+require_once(dirname(__FILE__) . "/../../../src/PHPSQLParser.php");
+require_once(dirname(__FILE__) . "/../../test-more.php");
 
 # the SET statement doesn't work completely, SESSION is not a colref!
 $sql = "SET SESSION group_concat_max_len = @@max_allowed_packet";

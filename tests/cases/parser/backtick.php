@@ -1,6 +1,6 @@
 <?php
-require_once(dirname(__FILE__) . '/../../../php-sql-parser.php');
-require_once(dirname(__FILE__) . '/../../test-more.php');
+require_once(dirname(__FILE__) . "/../../../src/PHPSQLParser.php");
+require_once(dirname(__FILE__) . "/../../test-more.php");
 
 # TODO: `c1`.`another_column` this quoting needs more work
 $parser = new PHPSQLParser();

@@ -1,5 +1,5 @@
 <?php
-require_once(dirname(__FILE__) . "/../../../php-sql-parser.php");
+require_once(dirname(__FILE__) . "/../../../src/PHPSQLParser.php");
 require_once(dirname(__FILE__) . "/../../test-more.php");
 
 $test    = str_repeat('0', 18000);
