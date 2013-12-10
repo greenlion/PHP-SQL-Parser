@@ -1,6 +1,6 @@
 <?php
 /**
- * union-processor.php
+ * UnionProcessor.php
  *
  * This file implements the processor for the UNION statements.
  *

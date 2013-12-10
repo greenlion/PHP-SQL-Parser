@@ -1,6 +1,6 @@
 <?php
 /**
- * sql-expression-processor.php
+ * SQLChunkProcessor.php
  *
  * This file implements the processor for the SQL chunks.
  *
@@ -29,7 +29,7 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
  * DAMAGE.
  */
-if (!defined('HAVE_SQL_EXPR_PROCESSOR')) {
+if (!defined('HAVE_SQL_CHUNK_PROCESSOR')) {
 
     require_once(dirname(__FILE__) . '/abstract-processor.php');
     require_once(dirname(__FILE__) . '/from-processor.php');
@@ -66,7 +66,7 @@ if (!defined('HAVE_SQL_EXPR_PROCESSOR')) {
      * @author arothe
      * 
      */
-    class SQLExpressionProcessor extends AbstractProcessor {
+    class SQLChunkProcessor extends AbstractProcessor {
 
         protected function moveLIKE(&$out) {
             if (!isset($out['TABLE']['like'])) {
@@ -179,5 +179,5 @@ if (!defined('HAVE_SQL_EXPR_PROCESSOR')) {
             return $out;
         }
     }
-    define('HAVE_SQL_EXPR_PROCESSOR', 1);
+    define('HAVE_SQL_CHUNK_PROCESSOR', 1);
 }

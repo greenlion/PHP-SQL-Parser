@@ -1,6 +1,6 @@
 <?php
 /**
- * sql-processor.php
+ * SQLProcessor.php
  *
  * This file implements the processor for the base SQL statements.
  *
