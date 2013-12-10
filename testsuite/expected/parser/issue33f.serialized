@@ -1,4 +1,4 @@
-a:2:{s:6:"CREATE";a:2:{s:4:"type";s:5:"table";s:6:"exists";b:0;}s:5:"TABLE";a:5:{s:4:"name";s:14:""cachetable01"";s:9:"base_expr";s:14:""cachetable01"";s:9:"no_quotes";s:12:"cachetable01";s:10:"create-def";a:3:{s:4:"type";s:18:"bracket_expression";s:9:"base_expr";s:156:" (
+a:2:{s:6:"CREATE";a:2:{s:4:"type";s:5:"table";s:6:"exists";b:0;}s:5:"TABLE";a:5:{s:9:"base_expr";s:14:""cachetable01"";s:4:"name";s:14:""cachetable01"";s:9:"no_quotes";s:12:"cachetable01";s:10:"create-def";a:3:{s:4:"type";s:18:"bracket_expression";s:9:"base_expr";s:156:" (
 "sp_id" varchar(240) DEFAULT NULL,
 "ro" varchar(240) DEFAULT NULL,
 "balance" varchar(240) DEFAULT NULL,
