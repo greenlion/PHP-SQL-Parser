@@ -369,3 +369,5 @@ class OracleSQLTranslator extends PHPSQLCreator {
 //$translator = new OracleSQLTranslator(false);
 //$translator->process("SELECT q.qid, question, gid FROM questions as q WHERE (select count(*) from answers as a where a.qid=q.qid and scale_id=0)=0 and sid=11929 AND type IN ('F', 'H', 'W', 'Z', '1') and q.parent_qid=0");
 //$translator->process("SELECT *, (SELECT a from xyz WHERE b>1) haha, (SELECT *, b from zks,abc WHERE d=1) hoho FROM blubb d, blibb c WHERE d.col = c.col");
+
+?>
