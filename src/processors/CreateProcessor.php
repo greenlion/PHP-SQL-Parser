@@ -42,10 +42,14 @@ require_once(dirname(__FILE__) . '/../utils/ExpressionType.php');
  */
 class CreateProcessor extends AbstractProcessor {
 
+    // TODO: should we provide a sub_tree to get positions for the keywords?
     public function process($tokens) {
-        $expr = array();
+        $result = array();
+        $base_expr = "";
+
         foreach ($tokens as $token) {
             $trim = strtoupper(trim($token));
+            $base_expr .= $token;
 
             if ($trim === "") {
                 continue;
@@ -54,24 +58,37 @@ class CreateProcessor extends AbstractProcessor {
             switch ($trim) {
 
             case 'TEMPORARY':
-                $expr['expr_type'] = ExpressionType::TEMPORARY_TABLE;
-                $expr['exists'] = false;
+                $result['expr_type'] = ExpressionType::TEMPORARY_TABLE;
+                $result['not-exists'] = false;
+                $expr[] = array('expr_type' => ExpressionType::RESERVED, 'base_expr' => $trim);
                 break;
 
             case 'TABLE':
-                $expr['expr_type'] = ExpressionType::TABLE;
-                $expr['exists'] = false;
+                $result['expr_type'] = ExpressionType::TABLE;
+                $result['not-exists'] = false;
+                $expr[] = array('expr_type' => ExpressionType::RESERVED, 'base_expr' => $trim);
                 break;
 
-            case 'IF NOT EXISTS':
-                $expr['exists'] = true;
+            case 'IF':
+                $expr[] = array('expr_type' => ExpressionType::RESERVED, 'base_expr' => $trim);
+                break;
+
+            case 'NOT':
+                $expr[] = array('expr_type' => ExpressionType::RESERVED, 'base_expr' => $trim);
+                break;
+
+            case 'EXISTS':
+                $result['not-exists'] = true;
+                $expr[] = array('expr_type' => ExpressionType::RESERVED, 'base_expr' => $trim);
                 break;
 
             default:
                 break;
             }
         }
-        return $expr;
+        $result['base_expr'] = trim($base_expr);
+        $result['sub_tree'] = $expr;
+        return $result;
     }
 }
 ?>
