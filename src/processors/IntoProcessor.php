@@ -1,8 +1,8 @@
 <?php
 /**
- * insert-processor.php
+ * IntoProcessor.php
  *
- * This file implements the processor for the INSERT statements.
+ * This file implements the processor for the INTO statements.
  *
  * Copyright (c) 2010-2012, Justin Swanhart
  * with contributions by André Rothe <arothe@phosco.info, phosco@gmx.de>
@@ -29,50 +29,34 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
  * DAMAGE.
  */
-if (!defined('HAVE_INSERT_PROCESSOR')) {
+if (!defined('HAVE_INTO_PROCESSOR')) {
 
     require_once(dirname(__FILE__) . '/abstract-processor.php');
-    require_once(dirname(__FILE__) . '/column-list-processor.php');
-    require_once(dirname(__FILE__) . '/../expression-types.php');
 
     /**
      * 
-     * This class processes the INSERT statements.
+     * This class processes the INTO statements.
      * 
      * @author arothe
      * 
      */
-    class InsertProcessor extends AbstractProcessor {
+    class IntoProcessor extends AbstractProcessor {
 
-        public function process($tokenList, $token_category = 'INSERT') {
-            $table = "";
-            $cols = array();
-
-            $into = $tokenList['INTO'];
-            foreach ($into as $token) {
-                if ($this->isWhitespaceToken($token))
-                    continue;
-                if ($table === "") {
-                    $table = $token;
-                } elseif (empty($cols)) {
-                    $cols[] = $token;
+        /**
+         * TODO: This is a dummy function, we cannot parse INTO as part of SELECT
+         * at the moment
+         */
+        public function process($tokenList) {
+            $unparsed = $tokenList['INTO'];
+            foreach ($unparsed as $k => $token) {
+                if ($this->isWhitespaceToken($token) || $this->isCommaToken($token)) {
+                    unset($unparsed[$k]);
                 }
             }
-
-            if (empty($cols)) {
-                $cols = false;
-            } else {
-                $processor  = new ColumnListProcessor();
-                $cols = $processor->process($this->removeParenthesisFromStart($cols[0]));
-            }
-
-            unset($tokenList['INTO']);
-            $tokenList[$token_category][0] = array('table' => $table, 'columns' => $cols, 'base_expr' => $table,
-                                                   'no_quotes' => $this->revokeQuotation($table));
+            $tokenList['INTO'] = array_values($unparsed);
             return $tokenList;
         }
-
     }
-    define('HAVE_INSERT_PROCESSOR', 1);
+    
+    define('HAVE_INTO_PROCESSOR', 1);
 }
-
