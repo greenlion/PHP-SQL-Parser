@@ -1,6 +1,6 @@
 <?php
 
-require_once(dirname(__FILE__) . '/expression-types.php');
+require_once(dirname(__FILE__) . '/ExpressionType.php');
 
 class ExpressionToken {
 
