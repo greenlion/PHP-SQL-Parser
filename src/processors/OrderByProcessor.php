@@ -31,7 +31,7 @@
  */
 
 require_once(dirname(__FILE__) . '/AbstractProcessor.php');
-require_once(dirname(__FILE__) . '/SelectChunkProcessor.php');
+require_once(dirname(__FILE__) . '/SelectExpressionProcessor.php');
 require_once(dirname(__FILE__) . '/../utils/ExpressionType.php');
 
 /**
