@@ -1,6 +1,6 @@
 <?php
-require_once(dirname(__FILE__) . '/../../../php-sql-parser.php');
-require_once(dirname(__FILE__) . '/../../../php-sql-creator.php');
+require_once(dirname(__FILE__) . '/../../../src/PHPSQLParser.php');
+require_once(dirname(__FILE__) . '/../../../src/PHPSQLCreator.php');
 require_once(dirname(__FILE__) . '/../../test-more.php');
 
 $sql = "SELECT
@@ -21,3 +21,4 @@ $creator = new PHPSQLCreator();
 $created = $creator->create($parsed);
 $expected = getExpectedValue(dirname(__FILE__), 'magnus.sql', false);
 ok($created === $expected, 'Aliases for functions.');
+?>
