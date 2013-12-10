@@ -1,6 +1,6 @@
 <?php
 /**
- * drop-processor.php
+ * DropProcessor.php
  *
  * This file implements the processor for the DROP statements.
  *
