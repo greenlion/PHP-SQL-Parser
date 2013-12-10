@@ -30,42 +30,39 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
  * DAMAGE.
  */
-if (!defined('HAVE_PHP_SQL_PARSER')) {
 
-    require_once(dirname(__FILE__) . '/classes/position-calculator.php');
-    require_once(dirname(__FILE__) . '/classes/processors/default-processor.php');
+require_once(dirname(__FILE__) . '/positions/PositionCalculator.php');
+require_once(dirname(__FILE__) . '/processors/DefaultProcessor.php');
 
-    /**
-     * This class implements the parser functionality.
-     *
-     * @author greenlion@gmail.com
-     * @author arothe@phosco.info
-     */
-    class PHPSQLParser {
+/**
+ * This class implements the parser functionality.
+ *
+ * @author greenlion@gmail.com
+ * @author arothe@phosco.info
+ */
+class PHPSQLParser {
 
-        public $parsed;
-        
-        public function __construct($sql = false, $calcPositions = false) {
-            if ($sql) {
-                $this->parse($sql, $calcPositions);
-            }
-        }
-        
-        public function parse($sql, $calcPositions = false) {
-            
-            $processor = new DefaultProcessor();
-            $queries = $processor->process($sql);
-                        
-            // calc the positions of some important tokens
-            if ($calcPositions) {
-                $calculator = new PositionCalculator();
-                $queries = $calculator->setPositionsWithinSQL($sql, $queries);
-            }
+    public $parsed;
 
-            // store the parsed queries
-            $this->parsed = $queries;
-            return $this->parsed;
+    public function __construct($sql = false, $calcPositions = false) {
+        if ($sql) {
+            $this->parse($sql, $calcPositions);
         }
     }
-    define('HAVE_PHP_SQL_PARSER', 1);
+
+    public function parse($sql, $calcPositions = false) {
+
+        $processor = new DefaultProcessor();
+        $queries = $processor->process($sql);
+
+        // calc the positions of some important tokens
+        if ($calcPositions) {
+            $calculator = new PositionCalculator();
+            $queries = $calculator->setPositionsWithinSQL($sql, $queries);
+        }
+
+        // store the parsed queries
+        $this->parsed = $queries;
+        return $this->parsed;
+    }
 }
