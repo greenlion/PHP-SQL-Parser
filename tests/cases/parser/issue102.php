@@ -1,6 +1,6 @@
 <?php
-require_once(dirname(__FILE__) . '/../../../php-sql-parser.php');
-require_once(dirname(__FILE__) . '/../../test-more.php');
+require_once(dirname(__FILE__) . "/../../../src/PHPSQLParser.php");
+require_once(dirname(__FILE__) . "/../../test-more.php");
 
 $sql = "SELECT IF(f = 0 || f = 1, 1, 0) FROM tbl";
 $parser = new PHPSQLParser($sql, true);

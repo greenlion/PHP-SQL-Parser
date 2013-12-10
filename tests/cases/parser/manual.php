@@ -1,7 +1,7 @@
 <?php
 
-require_once(dirname(__FILE__) . '/../../../php-sql-parser.php');
-require_once(dirname(__FILE__) . '/../../test-more.php');
+require_once(dirname(__FILE__) . "/../../../src/PHPSQLParser.php");
+require_once(dirname(__FILE__) . "/../../test-more.php");
 
 # thats an issue written as comment into the ParserManual...
 # TODO: the ON clause base_expr contains ")", which fails in PositionCalculator->findPositionWithinString()

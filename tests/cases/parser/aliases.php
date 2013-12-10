@@ -1,5 +1,5 @@
 <?php
-require_once(dirname(__FILE__) . "/../../../php-sql-parser.php");
+require_once(dirname(__FILE__) . "/../../../src/PHPSQLParser.php");
 require_once(dirname(__FILE__) . "/../../test-more.php");
 
 $parser = new PHPSQLParser();
@@ -23,3 +23,5 @@ $sql = 'SELECT (select colA AS a from testA) + (select colB b from testB) From t
 $p = $parser->parse($sql, true);
 $expected = getExpectedValue(dirname(__FILE__), 'alias4.serialized');
 eq_array($p, $expected, 'add two sub-query results');
+
+?>

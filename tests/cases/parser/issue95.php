@@ -1,6 +1,6 @@
 <?php
-require_once(dirname(__FILE__) . '/../../../php-sql-parser.php');
-require_once(dirname(__FILE__) . '/../../test-more.php');
+require_once(dirname(__FILE__) . "/../../../src/PHPSQLParser.php");
+require_once(dirname(__FILE__) . "/../../test-more.php");
 
 # TODO: not solved, the parser doesn't recognize the UNION
 $sql="SELECT * FROM ((SELECT 1 AS `ID`) UNION (SELECT 2 AS `ID`)) AS `Tmp`";

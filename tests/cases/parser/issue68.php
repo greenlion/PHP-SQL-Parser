@@ -1,6 +1,6 @@
 <?php
-require_once(dirname(__FILE__) . '/../../../php-sql-parser.php');
-require_once(dirname(__FILE__) . '/../../test-more.php');
+require_once(dirname(__FILE__) . "/../../../src/PHPSQLParser.php");
+require_once(dirname(__FILE__) . "/../../test-more.php");
 
 $sql = "select a.`admin_id` FROM admins a WHERE a.admin_username=? AND a.admin_password=?";
 $parser = new PHPSQLParser($sql, true);
