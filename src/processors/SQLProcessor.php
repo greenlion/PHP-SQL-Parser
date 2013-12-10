@@ -40,7 +40,7 @@ require_once(dirname(__FILE__) . '/SQLChunkProcessor.php');
  * @author arothe
  * 
  */
-class SQLProcessor extends SQLExpressionProcessor {
+class SQLProcessor extends SQLChunkProcessor {
 
     /*
      * This function breaks up the SQL statement into logical sections. 
