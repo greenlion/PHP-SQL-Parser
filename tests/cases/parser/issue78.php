@@ -23,3 +23,5 @@ $sql = "DESCRIBE foo.bar";
 $p = $parser->parse($sql, true);
 $expected = getExpectedValue(dirname(__FILE__), 'issue78d.serialized');
 eq_array($p, $expected, 'describe table');
+
+?>

@@ -9,3 +9,5 @@ $parser->parse($sql);
 $p = $parser->parsed;
 $expected = getExpectedValue(dirname(__FILE__), 'issue38.serialized');
 eq_array($p, $expected, 'function within WHERE and quoted table + quoted columns');
+
+?>

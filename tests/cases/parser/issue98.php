@@ -7,3 +7,5 @@ $parser = new PHPSQLParser($sql);
 $p = $parser->parsed;
 $expected = getExpectedValue(dirname(__FILE__), 'issue98.serialized');
 eq_array($p, $expected, 'alias with quotes');
+
+?>

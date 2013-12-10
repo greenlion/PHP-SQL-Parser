@@ -7,3 +7,5 @@ $parser = new PHPSQLParser($sql, true);
 $p = $parser->parsed;
 $expected = getExpectedValue(dirname(__FILE__), 'issue93.serialized');
 eq_array($p, $expected, 'simple query');
+
+?>

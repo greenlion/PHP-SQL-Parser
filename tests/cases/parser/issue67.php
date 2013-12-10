@@ -15,3 +15,5 @@ $parser = new PHPSQLParser($sql, true);
 $p = $parser->parsed;
 $expected = getExpectedValue(dirname(__FILE__), 'issue67b.serialized');
 eq_array($p, $expected, 'user defined variables should not fail');
+
+?>

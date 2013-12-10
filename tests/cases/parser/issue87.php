@@ -15,3 +15,5 @@ $parser->parse($sql, true);
 $p = $parser->parsed;
 $expected = getExpectedValue(dirname(__FILE__), 'issue87b.serialized');
 eq_array($p, $expected, 'rename multiple tables');
+
+?>

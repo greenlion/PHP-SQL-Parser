@@ -16,3 +16,5 @@ $expected = getExpectedValue(dirname(__FILE__), 'manual.serialized');
 eq_array($p, $expected, 'no select expression');
 
 
+
+?>

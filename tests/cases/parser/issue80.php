@@ -14,3 +14,5 @@ $p = $parser->parsed;
 $expected = getExpectedValue(dirname(__FILE__), 'issue80b.serialized');
 eq_array($p, $expected, 'quoted names and aliases');
 
+
+?>

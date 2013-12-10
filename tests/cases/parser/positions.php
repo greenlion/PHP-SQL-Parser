@@ -22,3 +22,5 @@ $sql = "SELECT a.*, c.*, u.users_name FROM SURVEYS as a  INNER JOIN SURVEYS_LANG
 $p = $parser->parse($sql, true);
 $expected = getExpectedValue(dirname(__FILE__), 'positions1.serialized');
 eq_array($p, $expected, 'a long query with join and order clauses');
+
+?>

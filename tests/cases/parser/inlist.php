@@ -10,3 +10,5 @@ $p = $parser->parse($sql);
 $expected = getExpectedValue(dirname(__FILE__), 'inlist1.serialized');
 eq_array($p, $expected, 'in list within WHERE clause');
 
+
+?>

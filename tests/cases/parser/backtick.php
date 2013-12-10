@@ -18,3 +18,5 @@ $parser->parse($sql);
 $p = $parser->parsed;
 $expected = getExpectedValue(dirname(__FILE__), 'backtick1.serialized');
 eq_array($p, $expected, "issue 35: ben's test");
+
+?>

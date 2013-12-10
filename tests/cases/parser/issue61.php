@@ -7,3 +7,5 @@ $parser = new PHPSQLParser($sql);
 $p = $parser->parsed;
 $expected = getExpectedValue(dirname(__FILE__), 'issue61.serialized');
 eq_array($p, $expected, 'functions/expressions within ORDER-BY');
+
+?>

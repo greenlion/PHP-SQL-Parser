@@ -17,3 +17,5 @@ $parser->parse($sql);
 $p = $parser->parsed;
 $expected = getExpectedValue(dirname(__FILE__), 'issue55b.serialized');
 eq_array($p, $expected, 'partial SQL statement - order by clause');
+
+?>

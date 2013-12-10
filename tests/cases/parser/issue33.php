@@ -112,3 +112,5 @@ $parser->parse($sql);
 $p = $parser->parsed;
 $expected = getExpectedValue(dirname(__FILE__), 'issue33l.serialized');
 eq_array($p, $expected, 'CREATE TABLE statement with select statement, replace duplicates');
+
+?>

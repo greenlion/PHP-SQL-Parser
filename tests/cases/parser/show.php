@@ -31,3 +31,5 @@ $parser = new PHPSQLParser($sql, true);
 $p = $parser->parsed;
 $expected = getExpectedValue(dirname(__FILE__), 'show5.serialized');
 eq_array($p, $expected, 'show full columns from like');
+
+?>

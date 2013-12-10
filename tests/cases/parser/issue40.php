@@ -16,3 +16,5 @@ $parser->parse($sql);
 $p = $parser->parsed;
 $expected = getExpectedValue(dirname(__FILE__), 'issue40b.serialized');
 eq_array($p, $expected, 'escaped characters 2');
+
+?>

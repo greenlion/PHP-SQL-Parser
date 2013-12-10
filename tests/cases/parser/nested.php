@@ -20,3 +20,5 @@ $parser->parse($sql);
 $p = $parser->parsed;
 $expected = getExpectedValue(dirname(__FILE__), 'nested2.serialized');
 eq_array($p, $expected, 'left joins with multiple tables');
+
+?>

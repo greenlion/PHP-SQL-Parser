@@ -13,3 +13,5 @@ $parser = new PHPSQLParser($sql);
 $p = $parser->parsed;
 $expected = getExpectedValue(dirname(__FILE__), 'variables2.serialized');
 eq_array($p, $expected, 'user variables');
+
+?>

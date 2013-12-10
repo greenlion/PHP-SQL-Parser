@@ -21,3 +21,5 @@ $parser->parse($sql);
 $p = $parser->parsed;
 $expected = getExpectedValue(dirname(__FILE__), 'issue56b.serialized');
 eq_array($p, $expected, 'inline comment should not fail, issue 56');
+
+?>

@@ -35,3 +35,5 @@ ok($p['SELECT'][4]['alias']['name'] == 'sum_c3');
 ok($p['SELECT'][5]['alias']['name'] == 'case_statement', 'case statement');
 ok($p['SELECT'][6]['alias']['name'] == '', 'no alias on t4.c1');
 ok($p['SELECT'][7]['alias']['name'] == 'subquery');
+
+?>

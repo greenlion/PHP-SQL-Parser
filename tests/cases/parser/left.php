@@ -28,3 +28,5 @@ $parser->parse($sql);
 $p = $parser->parsed;
 $expected = getExpectedValue(dirname(__FILE__), 'left2.serialized');
 eq_array($p, $expected, 'right and left outer joins');
+
+?>

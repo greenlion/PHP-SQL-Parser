@@ -14,3 +14,5 @@ $p = $parser->parsed;
 $expected = getExpectedValue(dirname(__FILE__), 'issue71b.serialized');
 eq_array($p, $expected, 'infinite loop on table alias "data"');
 
+
+?>

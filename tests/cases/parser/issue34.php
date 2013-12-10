@@ -14,3 +14,5 @@ $parser->parse($sql);
 $p = $parser->parsed;
 $expected = getExpectedValue(dirname(__FILE__), 'issue34b.serialized');
 eq_array($p, $expected, 'INSERT statement with keyword CACHE as tablename');
+
+?>

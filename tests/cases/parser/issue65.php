@@ -7,3 +7,5 @@ $parser = new PHPSQLParser($sql);
 $p = $parser->parsed;
 $expected = getExpectedValue(dirname(__FILE__), 'issue65.serialized');
 eq_array($p, $expected, 'It treats the alias as a colref.');
+
+?>

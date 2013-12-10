@@ -8,3 +8,5 @@ $parser = new PHPSQLParser();
 $p = $parser->parse($sql);
 $expected = getExpectedValue(dirname(__FILE__), 'issue90.serialized');
 eq_array($p, $expected, 'on duplicate key problem');
+
+?>
