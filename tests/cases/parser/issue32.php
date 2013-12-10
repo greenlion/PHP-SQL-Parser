@@ -8,3 +8,5 @@ $parser->parse($sql);
 $p = $parser->parsed;
 $expected = getExpectedValue(dirname(__FILE__), 'issue32.serialized');
 eq_array($p, $expected, 'update with keyword user as table');
+
+?>

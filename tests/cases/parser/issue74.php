@@ -36,3 +36,5 @@ $sql = "DROP TEMPORARY TABLE IF EXISTS blah1, blah2 CASCADE";
 $p = $parser->parse($sql, true);
 $expected = getExpectedValue(dirname(__FILE__), 'issue74f.serialized');
 eq_array($p, $expected, 'drop temporary table-list if exists statement');
+
+?>

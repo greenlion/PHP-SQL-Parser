@@ -11,3 +11,5 @@ $parser->parse($sql);
 $p = $parser->parsed;
 $expected = getExpectedValue(dirname(__FILE__), 'issue43.serialized');
 eq_array($p, $expected, 'problem with linefeed after tablename');
+
+?>

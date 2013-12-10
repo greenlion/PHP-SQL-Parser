@@ -8,3 +8,5 @@ $sql = "SELECT SQL_CALC_FOUND_ROWS SmTable.*, MATCH (SmTable.fulltextsearch_keyw
 $p = $parser->parse($sql, true);
 $expected = getExpectedValue(dirname(__FILE__), 'issue12.serialized');
 eq_array($p, $expected, 'issue 12');
+
+?>

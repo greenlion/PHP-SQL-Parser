@@ -15,3 +15,5 @@ $parser = new PHPSQLParser($sql, true);
 $p = $parser->parsed;
 ok($p['SET'][0]['sub_tree'][0]['expr_type'] === 'colref', 'set the password column of mysql.user');
 ok($p['SET'][0]['sub_tree'][2]['expr_type'] === 'function', 'set password value');
+
+?>

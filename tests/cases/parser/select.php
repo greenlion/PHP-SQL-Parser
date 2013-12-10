@@ -43,3 +43,5 @@ $p = $parser->parsed;
 $expected = getExpectedValue(dirname(__FILE__), 'select2.serialized');
 eq_array($p, $expected, 'select for update');
 
+
+?>

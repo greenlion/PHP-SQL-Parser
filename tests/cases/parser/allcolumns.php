@@ -33,3 +33,5 @@ $sql="SELECT a, * FROM tests";
 $p = $parser->parse($sql);
 $expected = getExpectedValue(dirname(__FILE__), 'allcolumns5.serialized');
 eq_array($p, $expected, 'column reference and a single all column alias');
+
+?>

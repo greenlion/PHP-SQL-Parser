@@ -9,3 +9,5 @@ $p = $parser->parse($sql);
 $expected = getExpectedValue(dirname(__FILE__), 'delete1.serialized');
 eq_array($p, $expected, 'simple delete statement');
 
+
+?>

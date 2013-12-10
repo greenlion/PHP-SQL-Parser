@@ -9,3 +9,5 @@ $parser->parse($sql, true);
 $p = $parser->parsed;
 $expected = getExpectedValue(dirname(__FILE__), 'issue42.serialized');
 eq_array($p, $expected, 'escaped quote in string constant');
+
+?>

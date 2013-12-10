@@ -23,3 +23,5 @@ $parser->parse($sql);
 $p = $parser->parsed;
 $expected = getExpectedValue(dirname(__FILE__), 'issue36c.serialized');
 eq_array($p, $expected, 'INSERT statement with escaped quotes and multiple records (2)');
+
+?>

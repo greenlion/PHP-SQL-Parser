@@ -10,3 +10,5 @@ $p = $parser->parsed;
 $expected = getExpectedValue(dirname(__FILE__), 'issue45.serialized');
 eq_array($p, $expected, 'issue 45 position problem');
 
+
+?>

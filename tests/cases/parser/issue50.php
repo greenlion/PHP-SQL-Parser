@@ -29,3 +29,5 @@ $sql = "SELECT _utf8 b'0001'";
 $sql = "SELECT _utf8 0b0001";
 
 
+
+?>

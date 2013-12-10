@@ -16,3 +16,5 @@ $p = $parser->parsed;
 print_r($p);
 $expected = getExpectedValue(dirname(__FILE__), 'tableoptions2.serialized');
 eq_array($p, $expected, 'CREATE TABLE statement with UNION table option');
+
+?>

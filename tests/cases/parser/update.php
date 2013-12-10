@@ -16,3 +16,5 @@ $parser->parse($sql);
 $p = $parser->parsed;
 $expected = getExpectedValue(dirname(__FILE__), 'update2.serialized');
 eq_array($p, $expected, 'simple update with strings');
+
+?>

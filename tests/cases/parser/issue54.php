@@ -17,3 +17,5 @@ $sql = "SELECT schema.`table`.c as b, sum(id + 5 * (5 + 5)) as p FROM schema.tab
 $parser->parse($sql);
 $p = $parser->parsed;
 ok($errorNumber === 0, 'No notice should be thrown');
+
+?>

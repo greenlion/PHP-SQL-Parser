@@ -7,3 +7,5 @@ $parser = new PHPSQLParser($sql, true);
 $p = $parser->parsed;
 $expected = getExpectedValue(dirname(__FILE__), 'issue102.serialized');
 eq_array($p, $expected, 'pipes as OR');
+
+?>

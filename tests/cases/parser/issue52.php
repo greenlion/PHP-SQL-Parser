@@ -10,3 +10,5 @@ $p = $parser->parsed;
 
 $expected = getExpectedValue(dirname(__FILE__), 'issue52.serialized');
 eq_array($p, $expected, 'should not die if query contains IN clause');
+
+?>

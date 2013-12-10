@@ -17,3 +17,5 @@ try {
 } catch (UnableToCalculatePositionException $e) {
     ok(true, $testname);
 }
+
+?>

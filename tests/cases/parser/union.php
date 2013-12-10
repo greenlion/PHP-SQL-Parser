@@ -19,3 +19,5 @@ $sql = '(SELECT colA From test a)
 $p = $parser->parse($sql, true);
 $expected = getExpectedValue(dirname(__FILE__), 'union2.serialized');
 eq_array($p, $expected, 'mysql union');
+
+?>

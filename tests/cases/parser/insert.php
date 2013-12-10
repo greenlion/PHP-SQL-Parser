@@ -19,3 +19,5 @@ VALUES ( 32225, 1, 'André', 'N', null, null, 'hello@zks.uni-leipzig.de', 'N', '
 $p = $parser->parse($sql);
 $expected = getExpectedValue(dirname(__FILE__), 'insert3.serialized');
 eq_array($p, $expected, 'insert with user-function');
+
+?>

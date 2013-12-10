@@ -15,3 +15,5 @@ print_r($p);
 $expected = getExpectedValue(dirname(__FILE__), 'issue79b.serialized');
 eq_array($p, $expected, 'user variables with alias and assignment');
 
+
+?>

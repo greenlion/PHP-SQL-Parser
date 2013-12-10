@@ -10,3 +10,5 @@ $p = $parser->parse($sql);
 $expected = getExpectedValue(dirname(__FILE__), 'issue25.serialized');
 eq_array($p, $expected, 'parenthesis problem on issue 25');
 
+
+?>

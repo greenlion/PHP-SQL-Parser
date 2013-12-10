@@ -35,3 +35,5 @@ $parser->parse($sql);
 $p = $parser->parsed;
 $expected = getExpectedValue(dirname(__FILE__), 'issue31.serialized');
 eq_array($p, $expected, 'very complex statement with keyword view as alias');
+
+?>

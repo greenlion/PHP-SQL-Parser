@@ -9,3 +9,5 @@ $parser = new PHPSQLParser();
 $p = $parser->parse($query);
 $expected = getExpectedValue(dirname(__FILE__), 'issue11.serialized');
 eq_array($p, $expected, 'very long statement');
+
+?>

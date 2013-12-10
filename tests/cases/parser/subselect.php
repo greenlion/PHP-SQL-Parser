@@ -13,3 +13,5 @@ $sql = 'SELECT a.uid, a.users_name FROM USERS AS a LEFT JOIN (SELECT uid AS id F
 $p = $parser->parse($sql);
 $expected = getExpectedValue(dirname(__FILE__), 'subselect2.serialized');
 eq_array($p, $expected, 'sub-select as table replacement with alias');
+
+?>

@@ -8,3 +8,5 @@ $parser = new PHPSQLParser();
 $p = $parser->parse($sql);
 $expected = getExpectedValue(dirname(__FILE__), 'issue91.serialized');
 eq_array($p, $expected, 'distinct select');
+
+?>
