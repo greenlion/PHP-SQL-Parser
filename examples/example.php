@@ -6,7 +6,8 @@
  * directly within a shell.
  */
 
-require_once('php-sql-parser.php');
+require_once(dirname(__FILE__) . '/../PHPSQLParser.php');
+
 $sql = 'SELECT 1';
 echo $sql . "\n";
 $start = microtime(true);
@@ -153,4 +154,4 @@ $start = microtime(true);
 $parser = new PHPSQLParser($sql);
 echo "Parse time highly complex statement: " . (microtime(true) - $start) . "\n";
 
-exit;
+?>
