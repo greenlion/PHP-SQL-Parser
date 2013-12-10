@@ -29,58 +29,54 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
  * DAMAGE.
  */
-if (!defined('HAVE_LIMIT_PROCESSOR')) {
 
-    require_once(dirname(__FILE__) . '/abstract-processor.php');
+require_once(dirname(__FILE__) . '/AbstractProcessor.php');
 
-    /**
-     * 
-     * This class processes the LIMIT statements.
-     * 
-     * @author arothe
-     * 
-     */
-    class LimitProcessor extends AbstractProcessor {
+/**
+ * 
+ * This class processes the LIMIT statements.
+ * 
+ * @author arothe
+ * 
+ */
+class LimitProcessor extends AbstractProcessor {
 
-        public function process($tokens) {
-            $rowcount = "";
-            $offset = "";
+    public function process($tokens) {
+        $rowcount = "";
+        $offset = "";
 
-            $comma = -1;
-            $exchange = false;
+        $comma = -1;
+        $exchange = false;
 
-            for ($i = 0; $i < count($tokens); ++$i) {
-                $trim = trim($tokens[$i]);
-                if ($trim === ",") {
-                    $comma = $i;
-                    break;
-                }
-                if ($trim === "OFFSET") {
-                    $comma = $i;
-                    $exchange = true;
-                    break;
-                }
+        for ($i = 0; $i < count($tokens); ++$i) {
+            $trim = trim($tokens[$i]);
+            if ($trim === ",") {
+                $comma = $i;
+                break;
             }
-
-            for ($i = 0; $i < $comma; ++$i) {
-                if ($exchange) {
-                    $rowcount .= $tokens[$i];
-                } else {
-                    $offset .= $tokens[$i];
-                }
+            if ($trim === "OFFSET") {
+                $comma = $i;
+                $exchange = true;
+                break;
             }
-
-            for ($i = $comma + 1; $i < count($tokens); ++$i) {
-                if ($exchange) {
-                    $offset .= $tokens[$i];
-                } else {
-                    $rowcount .= $tokens[$i];
-                }
-            }
-
-            return array('offset' => trim($offset), 'rowcount' => trim($rowcount));
         }
-    }
 
-    define('HAVE_LIMIT_PROCESSOR', 1);
+        for ($i = 0; $i < $comma; ++$i) {
+            if ($exchange) {
+                $rowcount .= $tokens[$i];
+            } else {
+                $offset .= $tokens[$i];
+            }
+        }
+
+        for ($i = $comma + 1; $i < count($tokens); ++$i) {
+            if ($exchange) {
+                $offset .= $tokens[$i];
+            } else {
+                $rowcount .= $tokens[$i];
+            }
+        }
+
+        return array('offset' => trim($offset), 'rowcount' => trim($rowcount));
+    }
 }

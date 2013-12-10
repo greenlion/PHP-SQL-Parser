@@ -29,50 +29,46 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
  * DAMAGE.
  */
-if (!defined('HAVE_INSERT_PROCESSOR')) {
 
-    require_once(dirname(__FILE__) . '/abstract-processor.php');
-    require_once(dirname(__FILE__) . '/column-list-processor.php');
-    require_once(dirname(__FILE__) . '/../expression-types.php');
+require_once(dirname(__FILE__) . '/AbstractProcessor.php');
+require_once(dirname(__FILE__) . '/ColumnListProcessor.php');
+require_once(dirname(__FILE__) . '/../utils/ExpressionType.php');
 
-    /**
-     * 
-     * This class processes the INSERT statements.
-     * 
-     * @author arothe
-     * 
-     */
-    class InsertProcessor extends AbstractProcessor {
+/**
+ * 
+ * This class processes the INSERT statements.
+ * 
+ * @author arothe
+ * 
+ */
+class InsertProcessor extends AbstractProcessor {
 
-        public function process($tokenList, $token_category = 'INSERT') {
-            $table = "";
-            $cols = array();
+    public function process($tokenList, $token_category = 'INSERT') {
+        $table = "";
+        $cols = array();
 
-            $into = $tokenList['INTO'];
-            foreach ($into as $token) {
-                if ($this->isWhitespaceToken($token))
-                    continue;
-                if ($table === "") {
-                    $table = $token;
-                } elseif (empty($cols)) {
-                    $cols[] = $token;
-                }
+        $into = $tokenList['INTO'];
+        foreach ($into as $token) {
+            if ($this->isWhitespaceToken($token))
+                continue;
+            if ($table === "") {
+                $table = $token;
+            } elseif (empty($cols)) {
+                $cols[] = $token;
             }
-
-            if (empty($cols)) {
-                $cols = false;
-            } else {
-                $processor  = new ColumnListProcessor();
-                $cols = $processor->process($this->removeParenthesisFromStart($cols[0]));
-            }
-
-            unset($tokenList['INTO']);
-            $tokenList[$token_category][0] = array('table' => $table, 'columns' => $cols, 'base_expr' => $table,
-                                                   'no_quotes' => $this->revokeQuotation($table));
-            return $tokenList;
         }
 
-    }
-    define('HAVE_INSERT_PROCESSOR', 1);
-}
+        if (empty($cols)) {
+            $cols = false;
+        } else {
+            $processor = new ColumnListProcessor();
+            $cols = $processor->process($this->removeParenthesisFromStart($cols[0]));
+        }
 
+        unset($tokenList['INTO']);
+        $tokenList[$token_category][0] = array('table' => $table, 'columns' => $cols, 'base_expr' => $table,
+                                               'no_quotes' => $this->revokeQuotation($table));
+        return $tokenList;
+    }
+
+}

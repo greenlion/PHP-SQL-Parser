@@ -29,20 +29,16 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
  * DAMAGE.
  */
-if (!defined('HAVE_HAVING_PROCESSOR')) {
-    
-    require_once(dirname(__FILE__) . '/expression-list-processor.php');
 
-    /**
-     * 
-     * This class processes the HAVING statements.
-     * 
-     * @author arothe
-     * 
-     */
-    class HavingProcessor extends ExpressionListProcessor {
+require_once(dirname(__FILE__) . '/ExpressionListProcessor.php');
 
-    }
-    
-    define('HAVE_HAVING_PROCESSOR', 1);
+/**
+ * 
+ * This class processes the HAVING statements.
+ * 
+ * @author arothe
+ * 
+ */
+class HavingProcessor extends ExpressionListProcessor {
+
 }

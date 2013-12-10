@@ -29,34 +29,30 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
  * DAMAGE.
  */
-if (!defined('HAVE_INTO_PROCESSOR')) {
 
-    require_once(dirname(__FILE__) . '/abstract-processor.php');
+require_once(dirname(__FILE__) . '/AbstractProcessor.php');
+
+/**
+ * 
+ * This class processes the INTO statements.
+ * 
+ * @author arothe
+ * 
+ */
+class IntoProcessor extends AbstractProcessor {
 
     /**
-     * 
-     * This class processes the INTO statements.
-     * 
-     * @author arothe
-     * 
+     * TODO: This is a dummy function, we cannot parse INTO as part of SELECT
+     * at the moment
      */
-    class IntoProcessor extends AbstractProcessor {
-
-        /**
-         * TODO: This is a dummy function, we cannot parse INTO as part of SELECT
-         * at the moment
-         */
-        public function process($tokenList) {
-            $unparsed = $tokenList['INTO'];
-            foreach ($unparsed as $k => $token) {
-                if ($this->isWhitespaceToken($token) || $this->isCommaToken($token)) {
-                    unset($unparsed[$k]);
-                }
+    public function process($tokenList) {
+        $unparsed = $tokenList['INTO'];
+        foreach ($unparsed as $k => $token) {
+            if ($this->isWhitespaceToken($token) || $this->isCommaToken($token)) {
+                unset($unparsed[$k]);
             }
-            $tokenList['INTO'] = array_values($unparsed);
-            return $tokenList;
         }
+        $tokenList['INTO'] = array_values($unparsed);
+        return $tokenList;
     }
-    
-    define('HAVE_INTO_PROCESSOR', 1);
 }
