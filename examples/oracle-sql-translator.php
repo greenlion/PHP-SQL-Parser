@@ -1,6 +1,6 @@
 <?php
 /**
- * OracleSQLTranslator
+ * OracleSQLTranslator.php
  *
  * A translator from MySQL dialect into Oracle dialect for Limesurvey
  * (http://www.limesurvey.org/)
@@ -35,6 +35,13 @@ include_once($rootdir . '/classes/adodb/adodb.inc.php');
 
 $_ENV['DEBUG'] = 1;
 
+/**
+ * This class enhances the PHPSQLCreator to translate incoming
+ * parser output into another SQL dialect (here: Oracle SQL).
+ * 
+ * @author arothe
+ *
+ */
 class OracleSQLTranslator extends PHPSQLCreator {
 
     private $con; # this is the database connection from LimeSurvey
