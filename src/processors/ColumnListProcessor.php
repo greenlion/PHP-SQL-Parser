@@ -29,28 +29,26 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
  * DAMAGE.
  */
-if (!defined('HAVE_COLUMN_LIST_PROCESSOR')) {
-    require_once(dirname(__FILE__) . '/abstract-processor.php');
-    require_once(dirname(__FILE__) . '/../expression-types.php');
 
-    /**
-     * 
-     * This class processes column-lists.
-     * 
-     * @author arothe
-     * 
-     */
-    class ColumnListProcessor extends AbstractProcessor {
+require_once(dirname(__FILE__) . '/AbstractProcessor.php');
+require_once(dirname(__FILE__) . '/../ExpressionType.php');
 
-        public function process($token) {
-            $columns = explode(",", $token);
-            $cols = array();
-            foreach ($columns as $k => $v) {
-                $cols[] = array('expr_type' => ExpressionType::COLREF, 'base_expr' => trim($v),
-                                'no_quotes' => $this->revokeQuotation($v));
-            }
-            return $cols;
+/**
+ * 
+ * This class processes column-lists.
+ * 
+ * @author arothe
+ * 
+ */
+class ColumnListProcessor extends AbstractProcessor {
+
+    public function process($token) {
+        $columns = explode(",", $token);
+        $cols = array();
+        foreach ($columns as $k => $v) {
+            $cols[] = array('expr_type' => ExpressionType::COLREF, 'base_expr' => trim($v),
+                            'no_quotes' => $this->revokeQuotation($v));
         }
+        return $cols;
     }
-    define('HAVE_COLUMN_LIST_PROCESSOR', 1);
 }
