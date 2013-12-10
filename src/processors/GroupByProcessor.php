@@ -29,48 +29,45 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
  * DAMAGE.
  */
-if (!defined('HAVE_GROUPBY_PROCESSOR')) {
 
-    require_once(dirname(__FILE__) . '/order-processor.php');
+require_once(dirname(__FILE__) . '/OrderByProcessor.php');
 
-    /**
-     * 
-     * This class processes the GROUP-BY statements.
-     * 
-     * @author arothe
-     * 
-     */
-    class GroupByProcessor extends OrderByProcessor {
+/**
+ * 
+ * This class processes the GROUP-BY statements.
+ * 
+ * @author arothe
+ * 
+ */
+class GroupByProcessor extends OrderByProcessor {
 
-        public function process($tokens, $select) {
-            $out = array();
-            $parseInfo = $this->initParseInfo();
+    public function process($tokens, $select) {
+        $out = array();
+        $parseInfo = $this->initParseInfo();
 
-            if (!$tokens) {
-                return false;
-            }
-
-            foreach ($tokens as $token) {
-                $trim = strtoupper(trim($token));
-                switch ($trim) {
-                case ',':
-                    $parsed = $this->processOrderExpression($parseInfo, $select);
-                    unset($parsed['direction']);
-
-                    $out[] = $parsed;
-                    $parseInfo = $this->initParseInfo();
-                    break;
-                default:
-                    $parseInfo['base_expr'] .= $token;
-                }
-            }
-
-            $parsed = $this->processOrderExpression($parseInfo, $select);
-            unset($parsed['direction']);
-            $out[] = $parsed;
-
-            return $out;
+        if (!$tokens) {
+            return false;
         }
+
+        foreach ($tokens as $token) {
+            $trim = strtoupper(trim($token));
+            switch ($trim) {
+            case ',':
+                $parsed = $this->processOrderExpression($parseInfo, $select);
+                unset($parsed['direction']);
+
+                $out[] = $parsed;
+                $parseInfo = $this->initParseInfo();
+                break;
+            default:
+                $parseInfo['base_expr'] .= $token;
+            }
+        }
+
+        $parsed = $this->processOrderExpression($parseInfo, $select);
+        unset($parsed['direction']);
+        $out[] = $parsed;
+
+        return $out;
     }
-    define('HAVE_GROUPBY_PROCESSOR', 1);
 }
