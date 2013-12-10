@@ -29,45 +29,43 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
  * DAMAGE.
  */
-if (!defined('HAVE_EXPLAIN_PROCESSOR')) {
-    require_once(dirname(__FILE__) . '/abstract-processor.php');
-    require_once(dirname(__FILE__) . '/../expression-types.php');
 
-    /**
-     * 
-     * This class processes the EXPLAIN statements.
-     * 
-     * @author arothe
-     * 
-     */
-    class ExplainProcessor extends AbstractProcessor {
+require_once(dirname(__FILE__) . '/AbstractProcessor.php');
+require_once(dirname(__FILE__) . '/../utils/ExpressionType.php');
 
-        public function process($tokens, $isSelect = false) {
-            if ($isSelect) {
-                foreach ($tokens as $token) {
-                    switch (strtoupper(trim($token))) {
-                    case 'EXTENDED':
-                    case 'PARTITIONS':
-                        return array('expr_type' => ExpressionType::RESERVED, 'base_expr' => $token);
-                        break;
-                    default:
-                    // ignore the other stuff
-                        break;
-                    }
-                }
-                return null;
-            }
+/**
+ * 
+ * This class processes the EXPLAIN statements.
+ * 
+ * @author arothe
+ * 
+ */
+class ExplainProcessor extends AbstractProcessor {
 
+    public function process($tokens, $isSelect = false) {
+        if ($isSelect) {
             foreach ($tokens as $token) {
-                if ($this->isWhitespaceToken($token)) {
-                    continue;
+                switch (strtoupper(trim($token))) {
+                case 'EXTENDED':
+                case 'PARTITIONS':
+                    return array('expr_type' => ExpressionType::RESERVED, 'base_expr' => $token);
+                    break;
+                default:
+                // ignore the other stuff
+                    break;
                 }
-                return array('expr_type' => ExpressionType::TABLE, 'table' => $token,
-                             'no_quotes' => $this->revokeQuotation($token), 'base_expr' => $token);
             }
             return null;
-
         }
+
+        foreach ($tokens as $token) {
+            if ($this->isWhitespaceToken($token)) {
+                continue;
+            }
+            return array('expr_type' => ExpressionType::TABLE, 'table' => $token,
+                         'no_quotes' => $this->revokeQuotation($token), 'base_expr' => $token);
+        }
+        return null;
+
     }
-    define('HAVE_EXPLAIN_PROCESSOR', 1);
 }

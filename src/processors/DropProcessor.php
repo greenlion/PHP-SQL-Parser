@@ -29,80 +29,77 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
  * DAMAGE.
  */
-if (!defined('HAVE_DROP_PROCESSOR')) {
 
-    require_once(dirname(__FILE__) . '/../expression-token.php');
-    require_once(dirname(__FILE__) . '/../expression-types.php');
-    require_once(dirname(__FILE__) . '/abstract-processor.php');
+require_once(dirname(__FILE__) . '/../utils/ExpressionToken.php');
+require_once(dirname(__FILE__) . '/../utils/ExpressionType.php');
+require_once(dirname(__FILE__) . '/AbstractProcessor.php');
 
-    /**
-     * 
-     * This class processes the DROP statements.
-     * 
-     * @author arothe
-     * 
-     */
-    class DropProcessor extends AbstractProcessor {
+/**
+ * 
+ * This class processes the DROP statements.
+ * 
+ * @author arothe
+ * 
+ */
+class DropProcessor extends AbstractProcessor {
 
-        public function process($tokenList) {
-            $skip = false;
-            $warning = true;
-            $base_expr = "";
-            $expr_type = false;
-            $option = false;
-            $resultList = array();
+    public function process($tokenList) {
+        $skip = false;
+        $warning = true;
+        $base_expr = "";
+        $expr_type = false;
+        $option = false;
+        $resultList = array();
 
-            foreach ($tokenList as $k => $v) {
-                $token = new ExpressionToken($k, $v);
+        foreach ($tokenList as $k => $v) {
+            $token = new ExpressionToken($k, $v);
 
-                if ($token->isWhitespaceToken()) {
-                    continue;
-                }
-
-                if ($skip === true) {
-                    $skip = false;
-                    continue;
-                }
-
-                switch ($token->getUpper()) {
-                case 'VIEW':
-                case 'SCHEMA':
-                case 'DATABASE':
-                case 'TABLE':
-                    $expr_type = strtolower($token->getTrim());
-                    break;
-
-                case 'IF':
-                    $warning = false;
-                    $skip = true;
-                    break;
-
-                case 'TEMPORARY':
-                    $expr_type = ExpressionType::TEMPORARY_TABLE;
-                    $skip = true;
-                    break;
-
-                case 'RESTRICT':
-                case 'CASCADE':
-                    $option = $token->getUpper();
-                    break;
-
-                case ',':
-                    $resultList[] = array('expr_type' => $expr_type, 'base_expr' => $base_expr);
-                    $base_expr = "";
-                    break;
-
-                default:
-                    $base_expr .= $token->getToken();
-                }
+            if ($token->isWhitespaceToken()) {
+                continue;
             }
 
-            if ($base_expr !== "") {
+            if ($skip === true) {
+                $skip = false;
+                continue;
+            }
+
+            switch ($token->getUpper()) {
+            case 'VIEW':
+            case 'SCHEMA':
+            case 'DATABASE':
+            case 'TABLE':
+                $expr_type = strtolower($token->getTrim());
+                break;
+
+            case 'IF':
+                $warning = false;
+                $skip = true;
+                break;
+
+            case 'TEMPORARY':
+                $expr_type = ExpressionType::TEMPORARY_TABLE;
+                $skip = true;
+                break;
+
+            case 'RESTRICT':
+            case 'CASCADE':
+                $option = $token->getUpper();
+                break;
+
+            case ',':
                 $resultList[] = array('expr_type' => $expr_type, 'base_expr' => $base_expr);
-            }
+                $base_expr = "";
+                break;
 
-            return array('option' => $option, 'warning' => $warning, 'object_list' => $resultList);
+            default:
+                $base_expr .= $token->getToken();
+            }
         }
+
+        if ($base_expr !== "") {
+            $resultList[] = array('expr_type' => $expr_type, 'base_expr' => $base_expr);
+        }
+
+        return array('option' => $option, 'warning' => $warning, 'object_list' => $resultList);
     }
-    define('HAVE_DROP_PROCESSOR', 1);
 }

@@ -29,23 +29,20 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
  * DAMAGE.
  */
-if (!defined('HAVE_DUPLICATE_PROCESSOR')) {
-    
-    require_once(dirname(__FILE__) . '/set-processor.php');
 
-    /**
-     * 
-     * This class processes the DUPLICATE statements.
-     * 
-     * @author arothe
-     * 
-     */
-    class DuplicateProcessor extends SetProcessor {
+require_once(dirname(__FILE__) . '/SetProcessor.php');
 
-        public function process($tokens) {
-            return parent::process($tokens, false);
-        }
+/**
+ * 
+ * This class processes the DUPLICATE statements.
+ * 
+ * @author arothe
+ * 
+ */
+class DuplicateProcessor extends SetProcessor {
 
+    public function process($tokens) {
+        return parent::process($tokens, false);
     }
-    define('HAVE_DUPLICATE_PROCESSOR', 1);
+
 }

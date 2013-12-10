@@ -29,50 +29,48 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
  * DAMAGE.
  */
-if (!defined('HAVE_CREATE_PROCESSOR')) {
-    require_once(dirname(__FILE__) . '/abstract-processor.php');
-    require_once(dirname(__FILE__) . '/../expression-types.php');
 
-    /**
-     * 
-     * This class processes the CREATE statements.
-     * 
-     * @author arothe
-     * 
-     */
-    class CreateProcessor extends AbstractProcessor {
+require_once(dirname(__FILE__) . '/AbstractProcessor.php');
+require_once(dirname(__FILE__) . '/../utils/ExpressionType.php');
 
-        public function process($tokens) {
-            $expr = array();
-            foreach ($tokens as $token) {
-                $trim = strtoupper(trim($token));
+/**
+ * 
+ * This class processes the CREATE statements.
+ * 
+ * @author arothe
+ * 
+ */
+class CreateProcessor extends AbstractProcessor {
 
-                if ($trim === "") {
-                    continue;
-                }
+    public function process($tokens) {
+        $expr = array();
+        foreach ($tokens as $token) {
+            $trim = strtoupper(trim($token));
 
-                switch ($trim) {
-
-                case 'TEMPORARY':
-                    $expr['expr_type'] = ExpressionType::TEMPORARY_TABLE;
-                    $expr['exists'] = false;
-                    break;
-
-                case 'TABLE':
-                    $expr['expr_type'] = ExpressionType::TABLE;
-                    $expr['exists'] = false;
-                    break;
-
-                case 'IF NOT EXISTS':
-                    $expr['exists'] = true;
-                    break;
-
-                default:
-                    break;
-                }
+            if ($trim === "") {
+                continue;
             }
-            return $expr;
+
+            switch ($trim) {
+
+            case 'TEMPORARY':
+                $expr['expr_type'] = ExpressionType::TEMPORARY_TABLE;
+                $expr['exists'] = false;
+                break;
+
+            case 'TABLE':
+                $expr['expr_type'] = ExpressionType::TABLE;
+                $expr['exists'] = false;
+                break;
+
+            case 'IF NOT EXISTS':
+                $expr['exists'] = true;
+                break;
+
+            default:
+                break;
+            }
         }
+        return $expr;
     }
-    define('HAVE_CREATE_PROCESSOR', 1);
 }
