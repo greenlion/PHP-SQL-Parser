@@ -31,7 +31,7 @@
  * DAMAGE.
  */
 
-require_once(dirname(__FILE__) . '/../utils/PHPSQLParserUtils.php');
+require_once(dirname(__FILE__) . '/../utils/PHPSQLParserConstants.php');
 require_once(dirname(__FILE__) . '/../exceptions/UnableToCalculatePositionException.php');
 
 /**
@@ -42,13 +42,13 @@ require_once(dirname(__FILE__) . '/../exceptions/UnableToCalculatePositionExcept
  * @author arothe
  * 
  */
-class PositionCalculator extends PHPSQLParserUtils {
+class PositionCalculator {
 
     private static $allowedOnOperator = array("\t", "\n", "\r", " ", ",", "(", ")", "_", "'", "\"");
     private static $allowedOnOther = array("\t", "\n", "\r", " ", ",", "(", ")", "<", ">", "*", "+", "-", "/", "|",
                                            "&", "=", "!", ";");
 
-    private function printPos($text, $sql, $charPos, $key, $parsed, $backtracking) {
+    private function printPoUtilss($text, $sql, $charPos, $key, $parsed, $backtracking) {
         if (!isset($_ENV['DEBUG'])) {
             return;
         }
