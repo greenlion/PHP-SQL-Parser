@@ -1,0 +1,1 @@
+SELECT SUM(10) as test FROM account
