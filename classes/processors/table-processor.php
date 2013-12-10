@@ -35,11 +35,11 @@ if (!defined('HAVE_TABLE_PROCESSOR')) {
     require_once(dirname(__FILE__) . '/../expression-types.php');
 
     /**
-     * 
+     *
      * This class processes the TABLE statements.
-     * 
+     *
      * @author arothe
-     * 
+     *
      */
     class TableProcessor extends AbstractProcessor {
 
@@ -65,7 +65,8 @@ if (!defined('HAVE_TABLE_PROCESSOR')) {
         public function process($tokens) {
 
             $currCategory = "TABLE_NAME";
-            $result = array('base_expr' => false, 'name' => false, 'no_quotes' => false, 'create-def' => false, 'options' => false, 'like' => false, 'select' => false);
+            $result = array('base_expr' => false, 'name' => false, 'no_quotes' => false, 'create-def' => false,
+                            'options' => false, 'like' => false, 'select' => false);
             $expr = array();
             $base_expr = '';
             $skip = 0;
@@ -228,9 +229,10 @@ if (!defined('HAVE_TABLE_PROCESSOR')) {
                 case 'IGNORE':
                 case 'REPLACE':
                     $expr[] = $this->getReservedType($trim);
-                    $result['select'] = array('base_expr' => trim($base_expr), 'duplicates' => $trim, 'as' => false, 'sub_tree' => $expr);
+                    $result['select'] = array('base_expr' => trim($base_expr), 'duplicates' => $trim, 'as' => false,
+                                              'sub_tree' => $expr);
                     continue 2;
-                                       
+
                 case 'AS':
                     $expr[] = $this->getReservedType($trim);
                     if (!isset($result['select']['duplicates'])) {
@@ -239,8 +241,8 @@ if (!defined('HAVE_TABLE_PROCESSOR')) {
                     $result['select']['as'] = true;
                     $result['select']['base_expr'] = trim($base_expr);
                     $result['select']['sub_tree'] = $expr;
-                    continue 2;    
-                    
+                    continue 2;
+
                 case 'PARTITION':
                 # TODO: parse partition options
                     $skip = -1;
@@ -303,9 +305,19 @@ if (!defined('HAVE_TABLE_PROCESSOR')) {
                             $unparsed = $this->splitSQLIntoTokens($this->removeParenthesisFromStart($trim));
                             $processor = new CreateDefProcessor();
                             $coldef = $processor->process($unparsed);
-                            $result['create-def'] = array('type' => ExpressionType::BRACKET_EXPRESSION,
-                                                          'base_expr' => $base_expr,
-                                                          'sub_tree' => $coldef['create-def']);
+                            
+                            if (isset($coldef['create-def'][0]['type'])
+                                    && $coldef['create-def'][0]['type'] === ExpressionType::LIKE) {
+
+                                $result['like'] = array('type' => ExpressionType::BRACKET_EXPRESSION,
+                                                        'base_expr' => $base_expr,
+                                                        'sub_tree' => $coldef['create-def'][0]);
+                            } else {
+                                $result['create-def'] = array('type' => ExpressionType::BRACKET_EXPRESSION,
+                                                              'base_expr' => $base_expr,
+                                                              'sub_tree' => $coldef['create-def']);
+                            }
+
                             $expr = array();
                             $separator = ' ';
                             $base_expr = '';
@@ -342,6 +354,14 @@ if (!defined('HAVE_TABLE_PROCESSOR')) {
                 $prevCategory = $currCategory;
                 $currCategory = "";
             }
+
+            if ($result['like'] === false) {
+                unset($result['like']);
+            }
+            if ($result['select'] === false) {
+                unset($result['select']);
+            }
+
             return $result;
         }
     }
