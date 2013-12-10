@@ -79,7 +79,7 @@ if (!defined('HAVE_SQL_EXPR_PROCESSOR')) {
             if (!empty($out['TABLE'])) {
                 $processor = new TableProcessor();
                 $out['TABLE'] = $processor->process($out['TABLE']);
-                if ($out['TABLE']['like'] !== false) {
+                if (isset($out['TABLE']['like']) && $out['TABLE']['like']['type'] !== ExpressionType::BRACKET_EXPRESSION) {
                     $out = $this->array_insert_after($out, 'TABLE', array('LIKE' => $out['TABLE']['like']));
                     unset($out['TABLE']['like']);
                 }
