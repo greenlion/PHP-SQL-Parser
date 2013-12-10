@@ -29,20 +29,16 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
  * DAMAGE.
  */
-if (!defined('HAVE_WHERE_PROCESSOR')) {
-    
-    require_once(dirname(__FILE__) . '/expression-list-processor.php');
 
-    /**
-     * 
-     * This class processes the WHERE statements.
-     * 
-     * @author arothe
-     * 
-     */
-    class WhereProcessor extends ExpressionListProcessor {
+require_once(dirname(__FILE__) . '/ExpressionListProcessor.php');
 
-    }
+/**
+ * 
+ * This class processes the WHERE statements.
+ * 
+ * @author arothe
+ * 
+ */
+class WhereProcessor extends ExpressionListProcessor {
 
-    define('HAVE_WHERE_PROCESSOR', 1);
 }

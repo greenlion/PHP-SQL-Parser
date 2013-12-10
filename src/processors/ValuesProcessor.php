@@ -29,55 +29,50 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
  * DAMAGE.
  */
-if (!defined('HAVE_VALUES_PROCESSOR')) {
-    
-    require_once(dirname(__FILE__) . '/../expression-types.php');
-    require_once(dirname(__FILE__) . '/record-processor.php');
-    require_once(dirname(__FILE__) . '/abstract-processor.php');
 
-    /**
-     * 
-     * This class processes the VALUES statements.
-     * 
-     * @author arothe
-     * 
-     */
-    class ValuesProcessor extends AbstractProcessor {
+require_once(dirname(__FILE__) . '/../utils/ExpressionType.php');
+require_once(dirname(__FILE__) . '/RecordProcessor.php');
+require_once(dirname(__FILE__) . '/AbstractProcessor.php');
 
-        private $recordProcessor;
+/**
+ * 
+ * This class processes the VALUES statements.
+ * 
+ * @author arothe
+ * 
+ */
+class ValuesProcessor extends AbstractProcessor {
 
-        public function __construct() {
-            $this->recordProcessor = new RecordProcessor();
-        }
+    private $recordProcessor;
 
-        public function process($tokens) {
-            $unparsed = "";
-            foreach ($tokens['VALUES'] as $k => $v) {
-                if ($this->isWhitespaceToken($v)) {
-                    continue;
-                }
-                $unparsed .= $v;
-            }
-
-            $values = $this->splitSQLIntoTokens($unparsed);
-
-            $parsed = array();
-            foreach ($values as $k => $v) {
-                if ($this->isCommaToken($v)) {
-                    unset($values[$k]);
-                } else {
-                    $processor = new RecordProcessor();
-                    $values[$k] = array('expr_type' => ExpressionType::RECORD, 'base_expr' => $v,
-                                        'data' => $this->recordProcessor->process($v));
-                }
-            }
-
-            $tokens['VALUES'] = array_values($values);
-            return $tokens;
-        }
-
+    public function __construct() {
+        $this->recordProcessor = new RecordProcessor();
     }
 
-    define('HAVE_VALUES_PROCESSOR', 1);
-}
+    public function process($tokens) {
+        $unparsed = "";
+        foreach ($tokens['VALUES'] as $k => $v) {
+            if ($this->isWhitespaceToken($v)) {
+                continue;
+            }
+            $unparsed .= $v;
+        }
 
+        $values = $this->splitSQLIntoTokens($unparsed);
+
+        $parsed = array();
+        foreach ($values as $k => $v) {
+            if ($this->isCommaToken($v)) {
+                unset($values[$k]);
+            } else {
+                $processor = new RecordProcessor();
+                $values[$k] = array('expr_type' => ExpressionType::RECORD, 'base_expr' => $v,
+                                    'data' => $this->recordProcessor->process($v));
+            }
+        }
+
+        $tokens['VALUES'] = array_values($values);
+        return $tokens;
+    }
+
+}

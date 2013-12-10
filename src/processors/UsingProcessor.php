@@ -29,20 +29,16 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
  * DAMAGE.
  */
-if (!defined('HAVE_USING_PROCESSOR')) {
-    
-    require_once(dirname(__FILE__) . '/from-processor.php');
 
-    /**
-     * 
-     * This class processes the USING statements.
-     * 
-     * @author arothe
-     * 
-     */
-    class UsingProcessor extends FromProcessor {
+require_once(dirname(__FILE__) . '/FromProcessor.php');
 
-    }
+/**
+ * 
+ * This class processes the USING statements.
+ * 
+ * @author arothe
+ * 
+ */
+class UsingProcessor extends FromProcessor {
 
-    define('HAVE_USING_PROCESSOR', 1);
 }

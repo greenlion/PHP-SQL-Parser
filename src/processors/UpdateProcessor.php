@@ -29,20 +29,16 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
  * DAMAGE.
  */
-if (!defined('HAVE_UPDATE_PROCESSOR')) {
-    
-    require_once(dirname(__FILE__) . '/from-processor.php');
 
-    /**
-     * 
-     * This class processes the UPDATE statements.
-     * 
-     * @author arothe
-     * 
-     */
-    class UpdateProcessor extends FromProcessor {
+require_once(dirname(__FILE__) . '/FromProcessor.php');
 
-    }
+/**
+ * 
+ * This class processes the UPDATE statements.
+ * 
+ * @author arothe
+ * 
+ */
+class UpdateProcessor extends FromProcessor {
 
-    define('HAVE_UPDATE_PROCESSOR', 1);
 }
