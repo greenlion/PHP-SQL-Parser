@@ -206,3 +206,5 @@ class PositionCalculator extends PHPSQLParserUtils {
         }
     }
 }
+
+?>

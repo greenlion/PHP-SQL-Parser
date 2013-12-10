@@ -364,3 +364,5 @@ class PHPSQLLexer extends PHPSQLParserUtils {
         return array_values($tokens);
     }
 }
+
+?>

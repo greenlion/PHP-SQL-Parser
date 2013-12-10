@@ -739,3 +739,4 @@ class PHPSQLCreator {
         return "(" . $sql . ")";
     }
 }
+?>
