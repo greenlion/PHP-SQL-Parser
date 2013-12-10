@@ -1,6 +1,6 @@
 <?php
 /**
- * where-processor.php
+ * WhereProcessor.php
  *
  * This file implements the processor for the WHERE statements.
  *
