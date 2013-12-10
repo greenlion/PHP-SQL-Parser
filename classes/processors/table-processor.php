@@ -305,19 +305,9 @@ if (!defined('HAVE_TABLE_PROCESSOR')) {
                             $unparsed = $this->splitSQLIntoTokens($this->removeParenthesisFromStart($trim));
                             $processor = new CreateDefProcessor();
                             $coldef = $processor->process($unparsed);
-
-                            if (isset($coldef['create-def'][0]['expr_type'])
-                                    && $coldef['create-def'][0]['expr_type'] === ExpressionType::LIKE) {
-
-                                $result['like'] = array('expr_type' => ExpressionType::BRACKET_EXPRESSION,
-                                                        'base_expr' => $base_expr,
-                                                        'sub_tree' => $coldef['create-def'][0]);
-                            } else {
-                                $result['create-def'] = array('expr_type' => ExpressionType::BRACKET_EXPRESSION,
-                                                              'base_expr' => $base_expr,
-                                                              'sub_tree' => $coldef['create-def']);
-                            }
-
+                            $result['create-def'] = array('expr_type' => ExpressionType::BRACKET_EXPRESSION,
+                                                          'base_expr' => $base_expr,
+                                                          'sub_tree' => $coldef['create-def']);
                             $expr = array();
                             $separator = ' ';
                             $base_expr = '';
