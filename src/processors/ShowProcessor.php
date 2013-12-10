@@ -1,6 +1,6 @@
 <?php
 /**
- * show-processor.php
+ * ShowProcessor.php
  *
  * This file implements the processor for the SHOW statements.
  *
