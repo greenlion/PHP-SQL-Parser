@@ -1,6 +1,6 @@
 <?php
 /**
- * replace-processor.php
+ * ReplaceProcessor.php
  *
  * This file implements the processor for the REPLACE statements.
  *

@@ -1,6 +1,6 @@
 <?php
 /**
- * set-processor.php
+ * SetProcessor.php
  *
  * This file implements the processor for the SET statements.
  *
