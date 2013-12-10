@@ -58,3 +58,5 @@ class UnableToCalculatePositionException extends Exception {
         return $this->haystack;
     }
 }
+
+?>
