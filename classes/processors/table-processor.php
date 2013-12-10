@@ -44,15 +44,15 @@ if (!defined('HAVE_TABLE_PROCESSOR')) {
     class TableProcessor extends AbstractProcessor {
 
         protected function getReservedType($token) {
-            return array('type' => ExpressionType::RESERVED, 'base_expr' => $token);
+            return array('expr_type' => ExpressionType::RESERVED, 'base_expr' => $token);
         }
 
         protected function getConstantType($token) {
-            return array('type' => ExpressionType::CONSTANT, 'base_expr' => $token);
+            return array('expr_type' => ExpressionType::CONSTANT, 'base_expr' => $token);
         }
 
         protected function getOperatorType($token) {
-            return array('type' => ExpressionType::OPERATOR, 'base_expr' => $token);
+            return array('expr_type' => ExpressionType::OPERATOR, 'base_expr' => $token);
         }
 
         protected function clear(&$expr, &$base_expr, &$separator, &$category) {
@@ -219,7 +219,7 @@ if (!defined('HAVE_TABLE_PROCESSOR')) {
                     if ($prevCategory === 'TABLE_OPTION') {
                         # all assignments with the keywords
                         $expr[] = $this->getReservedType($trim);
-                        $result['options'][] = array('type' => ExpressionType::EXPRESSION,
+                        $result['options'][] = array('expr_type' => ExpressionType::EXPRESSION,
                                                      'base_expr' => trim($base_expr), 'separator' => $separator,
                                                      'sub_tree' => $expr);
                         $this->clear($expr, $base_expr, $separator, $currCategory);
@@ -254,7 +254,7 @@ if (!defined('HAVE_TABLE_PROCESSOR')) {
                     case 'CHARSET':
                     # the charset name
                         $expr[] = $this->getConstantType($trim);
-                        $result['options'][] = array('type' => ExpressionType::CHARSET,
+                        $result['options'][] = array('expr_type' => ExpressionType::CHARSET,
                                                      'base_expr' => trim($base_expr), 'separator' => $separator,
                                                      'sub_tree' => $expr);
                         $this->clear($expr, $base_expr, $separator, $currCategory);
@@ -263,7 +263,7 @@ if (!defined('HAVE_TABLE_PROCESSOR')) {
                     case 'COLLATE':
                     # the collate name
                         $expr[] = $this->getConstantType($trim);
-                        $result['options'][] = array('type' => ExpressionType::COLLATE,
+                        $result['options'][] = array('expr_type' => ExpressionType::COLLATE,
                                                      'base_expr' => trim($base_expr), 'separator' => $separator,
                                                      'sub_tree' => $expr);
                         $this->clear($expr, $base_expr, $separator, $currCategory);
@@ -272,7 +272,7 @@ if (!defined('HAVE_TABLE_PROCESSOR')) {
                     case 'DATA_DIRECTORY':
                     # we have the directory name
                         $expr[] = $this->getConstantType($trim);
-                        $result['options'][] = array('type' => ExpressionType::DIRECTORY, 'kind' => 'DATA',
+                        $result['options'][] = array('expr_type' => ExpressionType::DIRECTORY, 'kind' => 'DATA',
                                                      'base_expr' => trim($base_expr), 'separator' => $separator,
                                                      'sub_tree' => $expr);
                         $this->clear($expr, $base_expr, $separator, $prevCategory);
@@ -281,7 +281,7 @@ if (!defined('HAVE_TABLE_PROCESSOR')) {
                     case 'INDEX_DIRECTORY':
                     # we have the directory name
                         $expr[] = $this->getConstantType($trim);
-                        $result['options'][] = array('type' => ExpressionType::DIRECTORY, 'kind' => 'INDEX',
+                        $result['options'][] = array('expr_type' => ExpressionType::DIRECTORY, 'kind' => 'INDEX',
                                                      'base_expr' => trim($base_expr), 'separator' => $separator,
                                                      'sub_tree' => $expr);
                         $this->clear($expr, $base_expr, $separator, $prevCategory);
@@ -305,15 +305,15 @@ if (!defined('HAVE_TABLE_PROCESSOR')) {
                             $unparsed = $this->splitSQLIntoTokens($this->removeParenthesisFromStart($trim));
                             $processor = new CreateDefProcessor();
                             $coldef = $processor->process($unparsed);
-                            
-                            if (isset($coldef['create-def'][0]['type'])
-                                    && $coldef['create-def'][0]['type'] === ExpressionType::LIKE) {
 
-                                $result['like'] = array('type' => ExpressionType::BRACKET_EXPRESSION,
+                            if (isset($coldef['create-def'][0]['expr_type'])
+                                    && $coldef['create-def'][0]['expr_type'] === ExpressionType::LIKE) {
+
+                                $result['like'] = array('expr_type' => ExpressionType::BRACKET_EXPRESSION,
                                                         'base_expr' => $base_expr,
                                                         'sub_tree' => $coldef['create-def'][0]);
                             } else {
-                                $result['create-def'] = array('type' => ExpressionType::BRACKET_EXPRESSION,
+                                $result['create-def'] = array('expr_type' => ExpressionType::BRACKET_EXPRESSION,
                                                               'base_expr' => $base_expr,
                                                               'sub_tree' => $coldef['create-def']);
                             }
@@ -332,17 +332,18 @@ if (!defined('HAVE_TABLE_PROCESSOR')) {
                     # we must change the DefaultProcessor
 
                         $unparsed = $this->splitSQLIntoTokens($this->removeParenthesisFromStart($trim));
-                        $expr[] = array('type' => ExpressionType::BRACKET_EXPRESSION, 'base_expr' => $trim,
+                        $expr[] = array('expr_type' => ExpressionType::BRACKET_EXPRESSION, 'base_expr' => $trim,
                                         'sub_tree' => '***TODO***');
-                        $result['options'][] = array('type' => ExpressionType::UNION, 'base_expr' => trim($base_expr),
-                                                     'separator' => $separator, 'sub_tree' => $expr);
+                        $result['options'][] = array('expr_type' => ExpressionType::UNION,
+                                                     'base_expr' => trim($base_expr), 'separator' => $separator,
+                                                     'sub_tree' => $expr);
                         $this->clear($expr, $base_expr, $separator, $currCategory);
                         break;
 
                     default:
                     # strings and numeric constants
                         $expr[] = $this->getConstantType($trim);
-                        $result['options'][] = array('type' => ExpressionType::EXPRESSION,
+                        $result['options'][] = array('expr_type' => ExpressionType::EXPRESSION,
                                                      'base_expr' => trim($base_expr), 'separator' => $separator,
                                                      'sub_tree' => $expr);
                         $this->clear($expr, $base_expr, $separator, $currCategory);

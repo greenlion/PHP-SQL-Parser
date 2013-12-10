@@ -51,21 +51,21 @@ if (!defined('HAVE_ORDERBY_PROCESSOR')) {
         }
 
         protected function initParseInfo() {
-            return array('expr' => "", 'dir' => "ASC", 'type' => ExpressionType::EXPRESSION);
+            return array('base_expr' => "", 'dir' => "ASC", 'expr_type' => ExpressionType::EXPRESSION);
         }
 
         protected function processOrderExpression(&$parseInfo, $select) {
-            $parseInfo['expr'] = trim($parseInfo['expr']);
+            $parseInfo['base_expr'] = trim($parseInfo['base_expr']);
 
-            if ($parseInfo['expr'] === "") {
+            if ($parseInfo['base_expr'] === "") {
                 return false;
             }
 
 
-            if (is_numeric($parseInfo['expr'])) {
-                $parseInfo['type'] = ExpressionType::POSITION;
+            if (is_numeric($parseInfo['base_expr'])) {
+                $parseInfo['expr_type'] = ExpressionType::POSITION;
             } else {
-                $parseInfo['no_quotes'] = $this->revokeQuotation($parseInfo['expr']);
+                $parseInfo['no_quotes'] = $this->revokeQuotation($parseInfo['base_expr']);
                 // search to see if the expression matches an alias
                 foreach ($select as $clause) {
                     if (!$clause['alias']) {
@@ -73,22 +73,22 @@ if (!defined('HAVE_ORDERBY_PROCESSOR')) {
                     }
 
                     if ($clause['alias']['no_quotes'] === $parseInfo['no_quotes']) {
-                        $parseInfo['type'] = ExpressionType::ALIAS;
+                        $parseInfo['expr_type'] = ExpressionType::ALIAS;
                         break;
                     }
                 }
             }
 
-            if ($parseInfo['type'] === ExpressionType::EXPRESSION) {
-                $expr = $this->selectExpressionProcessor->process($parseInfo['expr']);
+            if ($parseInfo['expr_type'] === ExpressionType::EXPRESSION) {
+                $expr = $this->selectExpressionProcessor->process($parseInfo['base_expr']);
                 $expr['direction'] = $parseInfo['dir'];
                 unset($expr['alias']);
                 return $expr;
             }
 
             $result = array();
-            $result['expr_type'] = $parseInfo['type'];
-            $result['base_expr'] = $parseInfo['expr'];
+            $result['expr_type'] = $parseInfo['expr_type'];
+            $result['base_expr'] = $parseInfo['base_expr'];
             if (isset($parseInfo['no_quotes'])) {
                 $result['no_quotes'] = $parseInfo['no_quotes'];
             }
@@ -121,7 +121,7 @@ if (!defined('HAVE_ORDERBY_PROCESSOR')) {
                     break;
 
                 default:
-                    $parseInfo['expr'] .= $token;
+                    $parseInfo['base_expr'] .= $token;
                 }
             }
 

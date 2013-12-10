@@ -202,7 +202,7 @@ class OracleSQLTranslator extends PHPSQLCreator {
     }
 
     protected function processOrderByExpression($parsed) {
-        if ($parsed['type'] !== 'expression') {
+        if ($parsed['expr_type'] !== 'expression') {
             return "";
         }
 
