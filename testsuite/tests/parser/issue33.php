@@ -85,11 +85,17 @@ nome text NOT NULL ,
 nota1 int NOT NULL ,
 nota2 int NOT NULL
 )";
-$parser->parse($sql, true);
-$p = $parser->parsed;
-print_r($p);
+try {
+	$parser->parse($sql, true);
+	$p = $parser->parsed;
+	print_r($p);
+	echo serialize($p);
+} catch (Exception $e) {
+	echo 'Exception: ',  $e->getMessage(), "\n";
+	$p = "";
+}
 $expected = getExpectedValue(dirname(__FILE__), 'issue33j.serialized');
-eq_array($p, $expected, 'simple CREATE TABLE statement');
+eq_array($p, $expected, 'simple CREATE TABLE statement with positions');
 
 
 $parser = new PHPSQLParser();
