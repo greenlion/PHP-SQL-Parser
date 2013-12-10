@@ -1,8 +1,8 @@
 <?php
 /**
- * UnableToCalculatePositionException.php
+ * InvalidParameterException.php
  *
- * This file implements the UnableToCalculatePositionException class which is used within the
+ * This file implements the InvalidParameterException class which is used within the
  * PHPSQLParser package.
  *
  * Copyright (c) 2010-2012, Justin Swanhart
@@ -32,29 +32,20 @@
  */
 
 /**
- * This exception will occur, if the PositionCalculator can not find the token 
- * defined by a base_expr field within the original SQL statement. Please create 
- * an issue in such a case, it is an application error.
  * 
  * @author arothe
  *
  */
-class UnableToCalculatePositionException extends Exception {
+class InvalidParameterException extends InvalidArgumentException {
 
-    protected $needle;
-    protected $haystack;
+    protected $argument;
 
-    public function __construct($needle, $haystack) {
-        $this->needle = $needle;
-        $this->haystack = $haystack;
-        parent::__construct("cannot calculate position of " . $needle . " within " . $haystack, 5);
+    public function __construct($argument) {
+        $this->argument = $argument;
+        parent::__construct("no SQL string to parse: \n" . $argument, 10);
     }
 
-    public function getNeedle() {
-        return $this->needle;
-    }
-
-    public function getHaystack() {
-        return $this->haystack;
+    public function getArgument() {
+        return $this->argument;
     }
 }
