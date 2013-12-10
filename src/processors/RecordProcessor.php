@@ -29,39 +29,36 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
  * DAMAGE.
  */
-if (!defined('HAVE_RECORD_PROCESSOR')) {
 
-    require_once(dirname(__FILE__) . '/abstract-processor.php');
-    require_once(dirname(__FILE__) . '/expression-list-processor.php');
+require_once(dirname(__FILE__) . '/AbstractProcessor.php');
+require_once(dirname(__FILE__) . '/ExpressionListProcessor.php');
 
-    /**
-     * 
-     * This class processes records.
-     * 
-     * @author arothe
-     * 
-     */
-    class RecordProcessor extends AbstractProcessor {
+/**
+ * 
+ * This class processes records.
+ * 
+ * @author arothe
+ * 
+ */
+class RecordProcessor extends AbstractProcessor {
 
-        private $expressionListProcessor;
+    private $expressionListProcessor;
 
-        public function __construct() {
-            $this->expressionListProcessor = new ExpressionListProcessor();
-        }
-
-        public function process($unparsed) {
-            $unparsed = $this->removeParenthesisFromStart($unparsed);
-            $values = $this->splitSQLIntoTokens($unparsed);
-
-            foreach ($values as $k => $v) {
-                if ($this->isCommaToken($v)) {
-                    $values[$k] = "";
-                }
-            }
-            return $this->expressionListProcessor->process($values);
-        }
-
+    public function __construct() {
+        $this->expressionListProcessor = new ExpressionListProcessor();
     }
 
-    define('HAVE_RECORD_PROCESSOR', 1);
+    public function process($unparsed) {
+        $unparsed = $this->removeParenthesisFromStart($unparsed);
+        $values = $this->splitSQLIntoTokens($unparsed);
+
+        foreach ($values as $k => $v) {
+            if ($this->isCommaToken($v)) {
+                $values[$k] = "";
+            }
+        }
+        return $this->expressionListProcessor->process($values);
+    }
+
 }
+
