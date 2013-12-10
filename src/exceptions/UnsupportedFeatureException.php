@@ -1,8 +1,8 @@
 <?php
 /**
- * UnableToCalculatePositionException.php
+ * UnsupportedFeatureException.php
  *
- * This file implements the UnableToCalculatePositionException class which is used within the
+ * This file implements the UnsupportedFeatureException class which is used within the
  * PHPSQLParser package.
  *
  * Copyright (c) 2010-2012, Justin Swanhart
@@ -32,29 +32,24 @@
  */
 
 /**
- * This exception will occur, if the PositionCalculator can not find the token 
- * defined by a base_expr field within the original SQL statement. Please create 
- * an issue in such a case, it is an application error.
+ * This exception will occur in the PHPSQLCreator, if the creator finds
+ * a field name, which is unknown. The developers have created some 
+ * additional output of the parser, but the creator class has not been 
+ * enhanced. Please open an issue in such a case.
  * 
  * @author arothe
  *
  */
-class UnableToCalculatePositionException extends Exception {
+class UnsupportedFeatureException extends Exception {
 
-    protected $needle;
-    protected $haystack;
+    protected $key;
 
-    public function __construct($needle, $haystack) {
-        $this->needle = $needle;
-        $this->haystack = $haystack;
-        parent::__construct("cannot calculate position of " . $needle . " within " . $haystack, 5);
+    public function __construct($key) {
+        $this->key = $key;
+        parent::__construct($key . " not implemented.", 20);
     }
 
-    public function getNeedle() {
-        return $this->needle;
-    }
-
-    public function getHaystack() {
-        return $this->haystack;
+    public function getKey() {
+        return $this->key;
     }
 }

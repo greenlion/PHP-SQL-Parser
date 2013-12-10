@@ -1,8 +1,8 @@
 <?php
 /**
- * UnableToCalculatePositionException.php
+ * UnableToCreateSQLException.php
  *
- * This file implements the UnableToCalculatePositionException class which is used within the
+ * This file implements the UnableToCreateSQLException class which is used within the
  * PHPSQLParser package.
  *
  * Copyright (c) 2010-2012, Justin Swanhart
@@ -32,29 +32,42 @@
  */
 
 /**
- * This exception will occur, if the PositionCalculator can not find the token 
- * defined by a base_expr field within the original SQL statement. Please create 
- * an issue in such a case, it is an application error.
- * 
+ * This exception will occur within the PHPSQLCreator, if the creator can not find a
+ * method, which can handle the current expr_type field. It could be an error within the parser
+ * output or a special case has not been modelled within the creator. Please create an issue
+ * in such a case.
+ *  
  * @author arothe
  *
  */
-class UnableToCalculatePositionException extends Exception {
+class UnableToCreateSQLException extends Exception {
 
-    protected $needle;
-    protected $haystack;
+    protected $part;
+    protected $partkey;
+    protected $entry;
+    protected $entrykey;
 
-    public function __construct($needle, $haystack) {
-        $this->needle = $needle;
-        $this->haystack = $haystack;
-        parent::__construct("cannot calculate position of " . $needle . " within " . $haystack, 5);
+    public function __construct($part, $partkey, $entry, $entrykey) {
+        $this->part = $part;
+        $this->partkey = $partkey;
+        $this->entry = $entry;
+        $this->entrykey = $entrykey;
+        parent::__construct("unknown " . $entrykey . " in " . $part . "[" . $partkey . "] " . $entry[$entrykey], 15);
     }
 
-    public function getNeedle() {
-        return $this->needle;
+    public function getEntry() {
+        return $this->entry;
     }
 
-    public function getHaystack() {
-        return $this->haystack;
+    public function getEntryKey() {
+        return $this->entrykey;
+    }
+
+    public function getSQLPart() {
+        return $this->part;
+    }
+
+    public function getSQLPartKey() {
+        return $this->partkey;
     }
 }
