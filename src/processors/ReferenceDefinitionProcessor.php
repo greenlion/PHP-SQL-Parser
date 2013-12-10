@@ -181,3 +181,4 @@ class ReferenceDefinitionProcessor extends AbstractProcessor {
         return $expr;
     }
 }
+?>
