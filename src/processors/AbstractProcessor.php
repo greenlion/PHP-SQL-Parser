@@ -30,7 +30,7 @@
  * DAMAGE.
  */
 
-require_once(dirname(__FILE__) . '/../ExpressionType.php');
+require_once(dirname(__FILE__) . '/../utils/ExpressionType.php');
 require_once(dirname(__FILE__) . '/../lexer/PHPSQLLexer.php');
 
 /**
