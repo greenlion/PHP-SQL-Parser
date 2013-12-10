@@ -32,6 +32,8 @@
  */
 
 /**
+ * This exception will occur in the parser, if the given SQL statement
+ * is not a String type.
  * 
  * @author arothe
  *
