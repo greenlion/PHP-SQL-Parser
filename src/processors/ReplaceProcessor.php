@@ -29,23 +29,20 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
  * DAMAGE.
  */
-if (!defined('HAVE_REPLACE_PROCESSOR')) {
 
-    require_once(dirname(__FILE__) . '/insert-processor.php');
+require_once(dirname(__FILE__) . '/InsertProcessor.php');
 
-    /**
-     * 
-     * This class processes the REPLACE statements.
-     * 
-     * @author arothe
-     * 
-     */
-    class ReplaceProcessor extends InsertProcessor {
+/**
+ * 
+ * This class processes the REPLACE statements.
+ * 
+ * @author arothe
+ * 
+ */
+class ReplaceProcessor extends InsertProcessor {
 
-        public function process($tokenList) {
-            return parent::process($tokenList, 'REPLACE');
-        }
-
+    public function process($tokenList) {
+        return parent::process($tokenList, 'REPLACE');
     }
-    define('HAVE_REPLACE_PROCESSOR', 1);
+
 }

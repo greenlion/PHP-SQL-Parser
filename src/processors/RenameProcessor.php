@@ -29,70 +29,65 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
  * DAMAGE.
  */
-if (!defined('HAVE_RENAME_PROCESSOR')) {
 
-    require_once(dirname(__FILE__) . '/abstract-processor.php');
-    require_once(dirname(__FILE__) . '/../expression-token.php');
-    require_once(dirname(__FILE__) . '/../expression-types.php');
+require_once(dirname(__FILE__) . '/AbstractProcessor.php');
+require_once(dirname(__FILE__) . '/../utils/ExpressionToken.php');
+require_once(dirname(__FILE__) . '/../utils/ExpressionType.php');
 
-    /**
-     * 
-     * This class processes the RENAME statements.
-     * 
-     * @author arothe
-     * 
-     */
-    class RenameProcessor extends AbstractProcessor {
+/**
+ * 
+ * This class processes the RENAME statements.
+ * 
+ * @author arothe
+ * 
+ */
+class RenameProcessor extends AbstractProcessor {
 
-        public function process($tokenList) {
-            $base_expr = "";
-            $resultList = array();
-            $tablePair = array();
+    public function process($tokenList) {
+        $base_expr = "";
+        $resultList = array();
+        $tablePair = array();
 
-            foreach ($tokenList as $k => $v) {
-                $token = new ExpressionToken($k, $v);
+        foreach ($tokenList as $k => $v) {
+            $token = new ExpressionToken($k, $v);
 
-                if ($token->isWhitespaceToken()) {
-                    continue;
-                }
-
-                switch ($token->getUpper()) {
-                case 'TO':
-                // separate source table from destination
-                    $tablePair['source'] = array('expr_type' => ExpressionType::TABLE, 'table' => trim($base_expr),
-                                                 'no_quotes' => $this->revokeQuotation($base_expr),
-                                                 'base_expr' => $base_expr);
-                    $base_expr = "";
-                    break;
-
-                case ',':
-                // split rename operations
-                    $tablePair['destination'] = array('expr_type' => ExpressionType::TABLE,
-                                                      'table' => trim($base_expr),
-                                                      'no_quotes' => $this->revokeQuotation($base_expr),
-                                                      'base_expr' => $base_expr);
-                    $resultList[] = $tablePair;
-                    $tablePair = array();
-                    $base_expr = "";
-                    break;
-
-                default:
-                    $base_expr .= $token->getToken();
-                    break;
-                }
+            if ($token->isWhitespaceToken()) {
+                continue;
             }
 
-            if ($base_expr !== "") {
+            switch ($token->getUpper()) {
+            case 'TO':
+            // separate source table from destination
+                $tablePair['source'] = array('expr_type' => ExpressionType::TABLE, 'table' => trim($base_expr),
+                                             'no_quotes' => $this->revokeQuotation($base_expr),
+                                             'base_expr' => $base_expr);
+                $base_expr = "";
+                break;
+
+            case ',':
+            // split rename operations
                 $tablePair['destination'] = array('expr_type' => ExpressionType::TABLE, 'table' => trim($base_expr),
                                                   'no_quotes' => $this->revokeQuotation($base_expr),
                                                   'base_expr' => $base_expr);
                 $resultList[] = $tablePair;
-            }
+                $tablePair = array();
+                $base_expr = "";
+                break;
 
-            return $resultList;
+            default:
+                $base_expr .= $token->getToken();
+                break;
+            }
         }
 
+        if ($base_expr !== "") {
+            $tablePair['destination'] = array('expr_type' => ExpressionType::TABLE, 'table' => trim($base_expr),
+                                              'no_quotes' => $this->revokeQuotation($base_expr),
+                                              'base_expr' => $base_expr);
+            $resultList[] = $tablePair;
+        }
+
+        return $resultList;
     }
 
-    define('HAVE_RENAME_PROCESSOR', 1);
 }

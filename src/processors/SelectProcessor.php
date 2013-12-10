@@ -29,54 +29,51 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
  * DAMAGE.
  */
-if (!defined('HAVE_SELECT_PROCESSOR')) {
 
-    require_once(dirname(__FILE__) . '/select-expression-processor.php');
+require_once(dirname(__FILE__) . '/SelectExpressionProcessor.php');
 
-    /**
-     * 
-     * This class processes the SELECT statements.
-     * 
-     * @author arothe
-     * 
-     */
-    class SelectProcessor extends SelectExpressionProcessor {
+/**
+ * 
+ * This class processes the SELECT statements.
+ * 
+ * @author arothe
+ * 
+ */
+class SelectProcessor extends SelectExpressionProcessor {
 
-        public function process(&$tokens) {
-            $expression = "";
-            $expressionList = array();
-            foreach ($tokens as $token) {
-                if ($this->isCommaToken($token)) {
-                    $expressionList[] = parent::process(trim($expression));
+    public function process(&$tokens) {
+        $expression = "";
+        $expressionList = array();
+        foreach ($tokens as $token) {
+            if ($this->isCommaToken($token)) {
+                $expressionList[] = parent::process(trim($expression));
+                $expression = "";
+            } else {
+                switch (strtoupper($token)) {
+
+                // add more SELECT options here
+                case 'DISTINCT':
+                case 'DISTINCTROW':
+                case 'HIGH_PRIORITY':
+                case 'SQL_CACHE':
+                case 'SQL_NO_CACHE':
+                case 'SQL_CALC_FOUND_ROWS':
+                case 'STRAIGHT_JOIN':
+                case 'SQL_SMALL_RESULT':
+                case 'SQL_BIG_RESULT':
+                case 'SQL_BUFFER_RESULT':
+                    $expressionList[] = parent::process(trim($token));
                     $expression = "";
-                } else {
-                    switch (strtoupper($token)) {
+                    break;
 
-                    // add more SELECT options here
-                    case 'DISTINCT':
-                    case 'DISTINCTROW':
-                    case 'HIGH_PRIORITY':
-                    case 'SQL_CACHE':
-                    case 'SQL_NO_CACHE':
-                    case 'SQL_CALC_FOUND_ROWS':
-                    case 'STRAIGHT_JOIN':
-                    case 'SQL_SMALL_RESULT':
-                    case 'SQL_BIG_RESULT':
-                    case 'SQL_BUFFER_RESULT':
-                        $expressionList[] = parent::process(trim($token));
-                        $expression = "";
-                        break;
-
-                    default:
-                        $expression .= $token;
-                    }
+                default:
+                    $expression .= $token;
                 }
             }
-            if ($expression) {
-                $expressionList[] = parent::process(trim($expression));
-            }
-            return $expressionList;
         }
+        if ($expression) {
+            $expressionList[] = parent::process(trim($expression));
+        }
+        return $expressionList;
     }
-    define('HAVE_SELECT_PROCESSOR', 1);
 }
