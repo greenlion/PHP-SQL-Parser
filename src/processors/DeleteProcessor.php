@@ -29,39 +29,35 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
  * DAMAGE.
  */
-if (!defined('HAVE_DELETE_PROCESSOR')) {
-    
-    require_once(dirname(__FILE__) . '/abstract-processor.php');
 
-    /**
-     * 
-     * This class processes the DELETE statements.
-     * 
-     * @author arothe
-     * 
-     */
-    class DeleteProcessor extends AbstractProcessor {
+require_once(dirname(__FILE__) . '/AbstractProcessor.php');
 
-        public function process($tokens) {
-            $tables = array();
-            $del = $tokens['DELETE'];
+/**
+ * 
+ * This class processes the DELETE statements.
+ * 
+ * @author arothe
+ * 
+ */
+class DeleteProcessor extends AbstractProcessor {
 
-            foreach ($tokens['DELETE'] as $expression) {
-                if ($expression !== 'DELETE' && trim($expression, ' .*') !== "" && !$this->isCommaToken($expression)) {
-                    $tables[] = trim($expression, '.* ');
-                }
+    public function process($tokens) {
+        $tables = array();
+        $del = $tokens['DELETE'];
+
+        foreach ($tokens['DELETE'] as $expression) {
+            if ($expression !== 'DELETE' && trim($expression, ' .*') !== "" && !$this->isCommaToken($expression)) {
+                $tables[] = trim($expression, '.* ');
             }
-
-            if (empty($tables)) {
-                foreach ($tokens['FROM'] as $table) {
-                    $tables[] = $table['table'];
-                }
-            }
-
-            $tokens['DELETE'] = array('TABLES' => $tables);
-            return $tokens;
         }
+
+        if (empty($tables)) {
+            foreach ($tokens['FROM'] as $table) {
+                $tables[] = $table['table'];
+            }
+        }
+
+        $tokens['DELETE'] = array('TABLES' => $tables);
+        return $tokens;
     }
-    
-    define('HAVE_DELETE_PROCESSOR', 1);
 }

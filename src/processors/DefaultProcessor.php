@@ -29,39 +29,36 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
  * DAMAGE.
  */
-if (!defined('HAVE_DEFAULT_PROCESSOR')) {
-    
-    require_once(dirname(__FILE__) . '/abstract-processor.php');
-    require_once(dirname(__FILE__) . '/union-processor.php');
-    require_once(dirname(__FILE__) . '/sql-processor.php');
 
-    /**
-     * 
-     * This class processes the incoming sql string.
-     * 
-     * @author arothe
-     * 
-     */
-    class DefaultProcessor extends AbstractProcessor {
+require_once(dirname(__FILE__) . '/AbstractProcessor.php');
+require_once(dirname(__FILE__) . '/UnionProcessor.php');
+require_once(dirname(__FILE__) . '/SQLProcessor.php');
 
-        public function process($sql) {
-        
-            $inputArray = $this->splitSQLIntoTokens($sql);
+/**
+ * 
+ * This class processes the incoming sql string.
+ * 
+ * @author arothe
+ * 
+ */
+class DefaultProcessor extends AbstractProcessor {
 
-            // this is the highest level lexical analysis. This is the part of the
-            // code which finds UNION and UNION ALL query parts
-            $processor = new UnionProcessor();
-            $queries = $processor->process($inputArray);
+    public function process($sql) {
 
-            // If there was no UNION or UNION ALL in the query, then the query is
-            // stored at $queries[0].
-            if (!$processor->isUnion($queries)) {
-                $processor = new SQLProcessor();
-                $queries = $processor->process($queries[0]);
-            }
-            
-            return $queries;
+        $inputArray = $this->splitSQLIntoTokens($sql);
+
+        // this is the highest level lexical analysis. This is the part of the
+        // code which finds UNION and UNION ALL query parts
+        $processor = new UnionProcessor();
+        $queries = $processor->process($inputArray);
+
+        // If there was no UNION or UNION ALL in the query, then the query is
+        // stored at $queries[0].
+        if (!$processor->isUnion($queries)) {
+            $processor = new SQLProcessor();
+            $queries = $processor->process($queries[0]);
         }
+
+        return $queries;
     }
-    define('HAVE_DEFAULT_PROCESSOR', 1);
 }

@@ -29,20 +29,16 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
  * DAMAGE.
  */
-if (!defined('HAVE_DESCRIBE_PROCESSOR')) {
 
-    require_once(dirname(__FILE__) . '/explain-processor.php');
+require_once(dirname(__FILE__) . 'ExplainProcessor.php');
 
-    /**
-     * 
-     * This class processes the DESCRIBE statements.
-     * 
-     * @author arothe
-     * 
-     */
-    class DescribeProcessor extends ExplainProcessor {
+/**
+ * 
+ * This class processes the DESCRIBE statements.
+ * 
+ * @author arothe
+ * 
+ */
+class DescribeProcessor extends ExplainProcessor {
 
-    }
-    
-    define('HAVE_DESCRIBE_PROCESSOR', 1);
 }
