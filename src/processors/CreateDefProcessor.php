@@ -1,6 +1,6 @@
 <?php
 /**
- * create-def-processor.php
+ * CreateDefProcessor.php
  *
  * This file implements the processor for the column definitions within the TABLE statements.
  *

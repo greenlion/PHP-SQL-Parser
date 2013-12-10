@@ -1,6 +1,6 @@
 <?php
 /**
- * default-processor.php
+ * DefaultProcessor.php
  *
  * This file implements the processor the unparsed sql string given by the user.
  *
