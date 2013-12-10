@@ -1,8 +1,8 @@
 <?php
 /**
- * using-processor.php
+ * ValuesProcessor.php
  *
- * This file implements the processor for the USING statements.
+ * This file implements the processor for the VALUES statements.
  *
  * Copyright (c) 2010-2012, Justin Swanhart
  * with contributions by André Rothe <arothe@phosco.info, phosco@gmx.de>
@@ -29,20 +29,55 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
  * DAMAGE.
  */
-if (!defined('HAVE_USING_PROCESSOR')) {
+if (!defined('HAVE_VALUES_PROCESSOR')) {
     
-    require_once(dirname(__FILE__) . '/from-processor.php');
+    require_once(dirname(__FILE__) . '/../expression-types.php');
+    require_once(dirname(__FILE__) . '/record-processor.php');
+    require_once(dirname(__FILE__) . '/abstract-processor.php');
 
     /**
      * 
-     * This class processes the USING statements.
+     * This class processes the VALUES statements.
      * 
      * @author arothe
      * 
      */
-    class UsingProcessor extends FromProcessor {
+    class ValuesProcessor extends AbstractProcessor {
+
+        private $recordProcessor;
+
+        public function __construct() {
+            $this->recordProcessor = new RecordProcessor();
+        }
+
+        public function process($tokens) {
+            $unparsed = "";
+            foreach ($tokens['VALUES'] as $k => $v) {
+                if ($this->isWhitespaceToken($v)) {
+                    continue;
+                }
+                $unparsed .= $v;
+            }
+
+            $values = $this->splitSQLIntoTokens($unparsed);
+
+            $parsed = array();
+            foreach ($values as $k => $v) {
+                if ($this->isCommaToken($v)) {
+                    unset($values[$k]);
+                } else {
+                    $processor = new RecordProcessor();
+                    $values[$k] = array('expr_type' => ExpressionType::RECORD, 'base_expr' => $v,
+                                        'data' => $this->recordProcessor->process($v));
+                }
+            }
+
+            $tokens['VALUES'] = array_values($values);
+            return $tokens;
+        }
 
     }
 
-    define('HAVE_USING_PROCESSOR', 1);
+    define('HAVE_VALUES_PROCESSOR', 1);
 }
+
