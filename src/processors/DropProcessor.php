@@ -43,8 +43,10 @@ require_once(dirname(__FILE__) . '/AbstractProcessor.php');
  */
 class DropProcessor extends AbstractProcessor {
 
+    // TODO: we should enhance it to get the positions for the IF EXISTS keywords
+    // look into the CreateProcessor to get an idea.
     public function process($tokenList) {
-        $skip = false;
+        $skip = 0;
         $warning = true;
         $base_expr = "";
         $expr_type = false;
@@ -58,8 +60,8 @@ class DropProcessor extends AbstractProcessor {
                 continue;
             }
 
-            if ($skip === true) {
-                $skip = false;
+            if ($skip > 0) {
+                $skip --;
                 continue;
             }
 
@@ -73,12 +75,12 @@ class DropProcessor extends AbstractProcessor {
 
             case 'IF':
                 $warning = false;
-                $skip = true;
+                $skip = 1;
                 break;
 
             case 'TEMPORARY':
                 $expr_type = ExpressionType::TEMPORARY_TABLE;
-                $skip = true;
+                $skip = 1;
                 break;
 
             case 'RESTRICT':
