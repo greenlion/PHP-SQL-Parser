@@ -1,8 +1,8 @@
 <?php
 
-require_once(dirname(__FILE__) . '/../../../src/PHPSQLParser.php');
-require_once(dirname(__FILE__) . '/../../../src/PHPSQLCreator.php');
-require_once(dirname(__FILE__) . '/../../test-more.php');
+require_once dirname(__FILE__) . '/../../../src/PHPSQLParser.php';
+require_once dirname(__FILE__) . '/../../../src/PHPSQLCreator.php';
+require_once dirname(__FILE__) . '/../../test-more.php';
 
 
 $sql = "SELECT col FROM table1 GROUP BY col";
