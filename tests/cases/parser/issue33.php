@@ -1,10 +1,11 @@
 <?php
-require_once(dirname(__FILE__) . "/../../../src/PHPSQLParser.php");
-require_once(dirname(__FILE__) . "/../../test-more.php");
-/*
+require_once dirname(__FILE__) . "/../../../src/PHPSQLParser.php";
+require_once dirname(__FILE__) . "/../../test-more.php";
+
+
 $parser = new PHPSQLParser();
 $sql = "CREATE TABLE hohoho (LIKE xyz)";
-$parser->parse($sql);
+$parser->parse($sql, true);
 $p = $parser->parsed;
 $expected = getExpectedValue(dirname(__FILE__), 'issue33a.serialized');
 eq_array($p, $expected, 'CREATE TABLE statement with (LIKE)');
@@ -12,7 +13,7 @@ eq_array($p, $expected, 'CREATE TABLE statement with (LIKE)');
 
 $parser = new PHPSQLParser();
 $sql = "CREATE TABLE hohoho LIKE xyz";
-$parser->parse($sql);
+$parser->parse($sql, true);
 $p = $parser->parsed;
 $expected = getExpectedValue(dirname(__FILE__), 'issue33b.serialized');
 eq_array($p, $expected, 'CREATE TABLE statement with LIKE');
@@ -65,7 +66,7 @@ eq_array($p, $expected, 'CREATE TABLE statement with primary key with index opti
 
 $parser = new PHPSQLParser();
 $sql = "CREATE TABLE hohoho (a varchar(1000)) ENGINE=xyz,COMMENT='haha' DEFAULT COLLATE = latin1_german2_ci";
-$parser->parse($sql);
+$parser->parse($sql, true);
 $p = $parser->parsed;
 $expected = getExpectedValue(dirname(__FILE__), 'issue33h.serialized');
 eq_array($p, $expected, 'CREATE TABLE statement with table options separated by different characters');
@@ -77,7 +78,7 @@ $parser->parse($sql);
 $p = $parser->parsed;
 $expected = getExpectedValue(dirname(__FILE__), 'issue33i.serialized');
 eq_array($p, $expected, 'CREATE TABLE statement with foreign key references');
-*/
+
 
 $parser = new PHPSQLParser();
 $sql = "CREATE TEMPORARY TABLE IF   NOT 
@@ -86,18 +87,11 @@ nome text NOT NULL ,
 nota1 int NOT NULL ,
 nota2 int NOT NULL
 )";
-try {
-	$parser->parse($sql, true);
-	$p = $parser->parsed;
-	print_r($p);
-	echo serialize($p);
-} catch (Exception $e) {
-	echo 'Exception: ',  $e->getMessage(), "\n";
-	$p = "";
-}
+$parser->parse($sql, true);
+$p = $parser->parsed;
 $expected = getExpectedValue(dirname(__FILE__), 'issue33j.serialized');
 eq_array($p, $expected, 'simple CREATE TABLE statement with positions');
-/*
+
 
 $parser = new PHPSQLParser();
 $sql = "CREATE TABLE hohoho (a varchar(1000), PRIMARY KEY (a(5) ASC) key_block_size 4 using btree with parser haha, CHECK(a > 5))";
@@ -109,9 +103,9 @@ eq_array($p, $expected, 'CREATE TABLE statement with primary key and multiple in
 
 $parser = new PHPSQLParser();
 $sql = "CREATE TABLE hohoho (a integer not null) REPLACE AS SELECT DISTINCT * FROM abcd WHERE x<5";
-$parser->parse($sql);
+$parser->parse($sql, true);
 $p = $parser->parsed;
 $expected = getExpectedValue(dirname(__FILE__), 'issue33l.serialized');
 eq_array($p, $expected, 'CREATE TABLE statement with select statement, replace duplicates');
-*/
+
 ?>
