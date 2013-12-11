@@ -294,7 +294,7 @@ class TableProcessor extends AbstractProcessor {
                     break;
 
                 case 'LIKE':
-                    $result['like'] = array('table' => $trim, 'base_expr' => $trim,
+                    $result['like'] = array('expr_type' => ExpressionType::TABLE, 'table' => $trim, 'base_expr' => $trim,
                                             'no_quotes' => $this->revokeQuotation($trim));
                     $this->clear($expr, $base_expr, $separator, $currCategory);
                     break;
