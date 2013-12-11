@@ -8,7 +8,6 @@ $parser = new PHPSQLParser($sql);
 $p = $parser->parsed;
 $creator = new PHPSQLCreator();
 $created = $creator->create($p);
-print_r($created);
 $expected = getExpectedValue(dirname(__FILE__), 'issue101.sql', false);
 ok($created === $expected, 'alias with quotes');
 ?>
