@@ -273,7 +273,7 @@ class CreateDefinitionProcessor extends AbstractProcessor {
 
                 case 'LIKE':
                 # this is the tablename after LIKE
-                    $expr[] = array('expr_type' => ExpressionType::TABLE, 'table' => $trim, 'base_expr' => $trim,
+                    $expr[] = array('table' => $trim, 'base_expr' => $trim,
                                     'no_quotes' => $this->revokeQuotation($trim));
                     break;
 
