@@ -12,18 +12,18 @@ $sql = 'SELECT 1';
 echo $sql . "\n";
 $start = microtime(true);
 $parser = new PHPSQLParser($sql, true);
-
+$stop = microtime(true);
 print_r($parser->parsed);
-echo "parse time simplest query:" . (microtime(true) - $start) . "\n";
+echo "parse time simplest query:" . ($stop - $start) . "\n";
 
 /*You can use the constuctor for parsing.  The parsed statement is stored at the ->parsed property.*/
 $sql = 'REPLACE INTO table (a,b,c) VALUES (1,2,3)';
 echo $sql . "\n";
 $start = microtime(true);
 $parser = new PHPSQLParser($sql);
-
+$stop = microtime(true);
 print_r($parser->parsed);
-echo "parse time very somewhat simple statement:" . (microtime(true) - $start) . "\n";
+echo "parse time very somewhat simple statement:" . ($stop - $start) . "\n";
 
 /* You can use the ->parse() method too.  The parsed structure is returned, and 
    also available in the ->parsed property. */
@@ -152,6 +152,7 @@ SELECT NULL,NULL,NULL,NULL,NULL FROM DUAL LIMIT 1';
 
 $start = microtime(true);
 $parser = new PHPSQLParser($sql);
-echo "Parse time highly complex statement: " . (microtime(true) - $start) . "\n";
+$stop = microtime(true);
+echo "Parse time highly complex statement: " . ($stop - $start) . "\n";
 
 ?>
