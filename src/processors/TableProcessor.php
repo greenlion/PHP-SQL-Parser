@@ -66,7 +66,7 @@ class TableProcessor extends AbstractProcessor {
 
         $currCategory = "TABLE_NAME";
         $result = array('base_expr' => false, 'name' => false, 'no_quotes' => false, 'create-def' => false,
-                        'options' => false, 'like' => false, 'select' => false);
+                        'options' => false, 'like' => false, 'select-option' => false);
         $expr = array();
         $base_expr = '';
         $skip = 0;
@@ -229,18 +229,18 @@ class TableProcessor extends AbstractProcessor {
             case 'IGNORE':
             case 'REPLACE':
                 $expr[] = $this->getReservedType($trim);
-                $result['select'] = array('base_expr' => trim($base_expr), 'duplicates' => $trim, 'as' => false,
-                                          'sub_tree' => $expr);
+                $result['select-option'] = array('base_expr' => trim($base_expr), 'duplicates' => $trim, 'as' => false,
+                                                 'sub_tree' => $expr);
                 continue 2;
 
             case 'AS':
                 $expr[] = $this->getReservedType($trim);
-                if (!isset($result['select']['duplicates'])) {
-                    $result['select']['duplicates'] = false;
+                if (!isset($result['select-option']['duplicates'])) {
+                    $result['select-option']['duplicates'] = false;
                 }
-                $result['select']['as'] = true;
-                $result['select']['base_expr'] = trim($base_expr);
-                $result['select']['sub_tree'] = $expr;
+                $result['select-option']['as'] = true;
+                $result['select-option']['base_expr'] = trim($base_expr);
+                $result['select-option']['sub_tree'] = $expr;
                 continue 2;
 
             case 'PARTITION':
@@ -347,8 +347,8 @@ class TableProcessor extends AbstractProcessor {
         if ($result['like'] === false) {
             unset($result['like']);
         }
-        if ($result['select'] === false) {
-            unset($result['select']);
+        if ($result['select-option'] === false) {
+            unset($result['select-option']);
         }
 
         return $result;
