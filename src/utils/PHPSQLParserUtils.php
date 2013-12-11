@@ -1,6 +1,6 @@
 <?php
 /**
- * parser-utils.php
+ * PHPSQLParserUtils.php
  *
  * These are utility functions for the PHPSQLParser.
  *

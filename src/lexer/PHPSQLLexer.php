@@ -30,9 +30,9 @@
  * DAMAGE.
  */
 
-require_once(dirname(__FILE__) . '/../utils/PHPSQLParserUtils.php');
-require_once(dirname(__FILE__) . '/LexerSplitter.php');
-require_once(dirname(__FILE__) . '/../exceptions/InvalidParameterException.php');
+require_once dirname(__FILE__) . '/../utils/PHPSQLParserUtils.php';
+require_once dirname(__FILE__) . '/LexerSplitter.php';
+require_once dirname(__FILE__) . '/../exceptions/InvalidParameterException.php';
 
 /**
  * This class splits the SQL string into little parts, which the parser can
