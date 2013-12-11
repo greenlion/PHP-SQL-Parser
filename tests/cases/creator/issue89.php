@@ -1,7 +1,7 @@
 <?php
-require_once(dirname(__FILE__) . '/../../../src/PHPSQLParser.php');
-require_once(dirname(__FILE__) . '/../../../src/PHPSQLCreator.php');
-require_once(dirname(__FILE__) . '/../../test-more.php');
+require_once dirname(__FILE__) . '/../../../src/PHPSQLParser.php';
+require_once dirname(__FILE__) . '/../../../src/PHPSQLCreator.php';
+require_once dirname(__FILE__) . '/../../test-more.php';
 
 
 $sql = "select ut.id, ut.numero_cartella, ut.nome, ut.cognome, floor(DATEDIFF(de.`data`,ut.data_di_nascita)/365) as eta,
@@ -15,4 +15,5 @@ $creator = new PHPSQLCreator($parser->parsed);
 $created = $creator->created;
 $expected = getExpectedValue(dirname(__FILE__), 'issue89.sql', false);
 ok($created === $expected, 'functions');
+
 ?>

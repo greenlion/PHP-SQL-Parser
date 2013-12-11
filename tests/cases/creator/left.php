@@ -1,9 +1,8 @@
 <?php
 
-require_once(dirname(__FILE__) . '/../../../src/PHPSQLParser.php');
-require_once(dirname(__FILE__) . '/../../../src/PHPSQLCreator.php');
-require_once(dirname(__FILE__) . '/../../test-more.php');
-
+require_once dirname(__FILE__) . '/../../../src/PHPSQLParser.php';
+require_once dirname(__FILE__) . '/../../../src/PHPSQLCreator.php';
+require_once dirname(__FILE__) . '/../../test-more.php';
 
 
 $sql = 'SELECT *
@@ -15,4 +14,5 @@ $creator = new PHPSQLCreator($parser->parsed);
 $created = $creator->created;
 $expected = getExpectedValue(dirname(__FILE__), 'left.sql', false);
 ok($created === $expected, 'left joins and table-expression');
+
 ?>
