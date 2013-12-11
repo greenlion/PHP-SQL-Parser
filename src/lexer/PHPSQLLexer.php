@@ -1,6 +1,6 @@
 <?php
 /**
- * lexer.php
+ * PHPSQLLexer.php
  *
  * This file contains the lexer, which splits the SQL statement just before parsing.
  *
@@ -92,8 +92,7 @@ class PHPSQLLexer extends PHPSQLParserUtils {
         $tokens = $this->balanceBackticks($tokens);
         $tokens = $this->concatColReferences($tokens);
         $tokens = $this->balanceParenthesis($tokens);
-        $tokens = $this->balanceMultilineComments($tokens);
-        $tokens = $this->concatInlineComments($tokens);
+        $tokens = $this->concatComments($tokens);
         $tokens = $this->concatUserDefinedVariables($tokens);
         return $tokens;
     }
@@ -130,7 +129,7 @@ class PHPSQLLexer extends PHPSQLParserUtils {
         return array_values($tokens);
     }
 
-    private function concatInlineComments($tokens) {
+    private function concatComments($tokens) {
 
         $i = 0;
         $cnt = count($tokens);
@@ -146,67 +145,30 @@ class PHPSQLLexer extends PHPSQLParserUtils {
             $token = $tokens[$i];
 
             if ($comment !== false) {
-                if ($token === "\n" || $token === "\r\n") {
+                if ($inline === true && ($token === "\n" || $token === "\r\n")) {
                     $comment = false;
                 } else {
                     unset($tokens[$i]);
                     $tokens[$comment] .= $token;
                 }
-            }
-
-            if (($comment === false) && ($token === "-")) {
-                if (isset($tokens[$i + 1]) && $tokens[$i + 1] === "-") {
-                    $comment = $i;
-                    $tokens[$i] = "--";
-                    $i++;
-                    unset($tokens[$i]);
-                    continue;
-                }
-            }
-
-            $i++;
-        }
-
-        return array_values($tokens);
-    }
-
-    private function balanceMultilineComments($tokens) {
-
-        $i = 0;
-        $cnt = count($tokens);
-        $comment = false;
-
-        while ($i < $cnt) {
-
-            if (!isset($tokens[$i])) {
-                $i++;
-                continue;
-            }
-
-            $token = $tokens[$i];
-
-            if ($comment !== false) {
-                unset($tokens[$i]);
-                $tokens[$comment] .= $token;
-                if ($token === "*" && isset($tokens[$i + 1]) && $tokens[$i + 1] === "/") {
-                    unset($tokens[$i + 1]);
-                    $tokens[$comment] .= "/";
+                if ($inline === false && ($token === "*/")) {
                     $comment = false;
                 }
             }
 
-            if (($comment === false) && ($token === "/")) {
-                if (isset($tokens[$i + 1]) && $tokens[$i + 1] === "*") {
-                    $comment = $i;
-                    $tokens[$i] = "/*";
-                    $i++;
-                    unset($tokens[$i]);
-                    continue;
-                }
+            if (($comment === false) && ($token === "--")) {
+                $comment = $i;
+                $inline = true;
             }
 
+            if (($comment === false) && ($token === "/*")) {
+                $comment = $i;
+                $inline = false;
+            }
+            
             $i++;
         }
+
         return array_values($tokens);
     }
 
