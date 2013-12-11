@@ -31,11 +31,18 @@
  * DAMAGE.
  */
 
+/**
+ * This class holds an sorted array of characters, which are used as stop token.
+ * On every character of the array the given SQL string will be split into single tokens.
+ * The array must be sorted by character size, longest first (3 chars -> 2 chars -> 1 char).
+ *
+ * @author arothe
+ */
 class LexerSplitter {
 
     private static $splitters = array("<=>", "\r\n", "!=", ">=", "<=", "<>", "<<", ">>", ":=", "\\", "&&", "||", ":=",
-                                      ">", "<", "|", "=", "^", "(", ")", "\t", "\n", "'", "\"", "`", ",", "@", " ",
-                                      "+", "-", "*", "/", ";");
+                                      "/*", "*/", "--", ">", "<", "|", "=", "^", "(", ")", "\t", "\n", "'", "\"", "`",
+                                      ",", "@", " ", "+", "-", "*", "/", ";");
     private $tokenSize;
     private $hashSet;
 
