@@ -31,8 +31,8 @@
  * DAMAGE.
  */
 
-require_once(dirname(__FILE__) . '/positions/PositionCalculator.php');
-require_once(dirname(__FILE__) . '/processors/DefaultProcessor.php');
+require_once dirname(__FILE__) . '/positions/PositionCalculator.php';
+require_once dirname(__FILE__) . '/processors/DefaultProcessor.php';
 
 /**
  * This class implements the parser functionality.

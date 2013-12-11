@@ -29,9 +29,9 @@
  * DAMAGE.
  */
 
-require_once(dirname(__FILE__) . '/exceptions/UnsupportedFeatureException.php');
-require_once(dirname(__FILE__) . '/exceptions/UnableToCreateSQLException.php');
-require_once(dirname(__FILE__) . '/utils/ExpressionType.php');
+require_once dirname(__FILE__) . '/exceptions/UnsupportedFeatureException.php';
+require_once dirname(__FILE__) . '/exceptions/UnableToCreateSQLException.php';
+require_once dirname(__FILE__) . '/utils/ExpressionType.php';
 
 class PHPSQLCreator {
 
