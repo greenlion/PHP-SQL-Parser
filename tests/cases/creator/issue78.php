@@ -1,8 +1,8 @@
 <?php
 
-require_once(dirname(__FILE__) . '/../../../src/PHPSQLParser.php');
-require_once(dirname(__FILE__) . '/../../../src/PHPSQLCreator.php');
-require_once(dirname(__FILE__) . '/../../test-more.php');
+require_once dirname(__FILE__) . '/../../../src/PHPSQLParser.php';
+require_once dirname(__FILE__) . '/../../../src/PHPSQLCreator.php';
+require_once dirname(__FILE__) . '/../../test-more.php';
 
 $sql = "show columns from `foo.bar`";
 $parser = new PHPSQLParser($sql);
@@ -38,4 +38,5 @@ $creator = new PHPSQLCreator($parser->parsed);
 $created = $creator->created;
 $expected = getExpectedValue(dirname(__FILE__), 'issue78e.sql', false);
 ok($created === $expected, 'show full columns from like');
+
 ?>

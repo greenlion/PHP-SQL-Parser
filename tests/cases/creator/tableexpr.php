@@ -1,8 +1,8 @@
 <?php
 
-require_once(dirname(__FILE__) . '/../../../src/PHPSQLParser.php');
-require_once(dirname(__FILE__) . '/../../../src/PHPSQLCreator.php');
-require_once(dirname(__FILE__) . '/../../test-more.php');
+require_once dirname(__FILE__) . '/../../../src/PHPSQLParser.php';
+require_once dirname(__FILE__) . '/../../../src/PHPSQLCreator.php';
+require_once dirname(__FILE__) . '/../../test-more.php';
 
 
 $sql = "SELECT * FROM t1 LEFT JOIN (t2, t3, t4)
@@ -12,4 +12,5 @@ $creator = new PHPSQLCreator($parser->parsed);
 $created = $creator->created;
 $expected = getExpectedValue(dirname(__FILE__), 'tableexpr.sql', false);
 ok($created === $expected, 'table-expression on second position');
+
 ?>

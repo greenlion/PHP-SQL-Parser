@@ -1,7 +1,7 @@
 <?php
-require_once(dirname(__FILE__) . '/../../../src/PHPSQLParser.php');
-require_once(dirname(__FILE__) . '/../../../src/PHPSQLCreator.php');
-require_once(dirname(__FILE__) . '/../../test-more.php');
+require_once dirname(__FILE__) . '/../../../src/PHPSQLParser.php';
+require_once dirname(__FILE__) . '/../../../src/PHPSQLCreator.php';
+require_once dirname(__FILE__) . '/../../test-more.php';
 
 $sql = "SELECT
  u.`id` AS userid,
@@ -21,4 +21,5 @@ $creator = new PHPSQLCreator();
 $created = $creator->create($parsed);
 $expected = getExpectedValue(dirname(__FILE__), 'magnus.sql', false);
 ok($created === $expected, 'Aliases for functions.');
+
 ?>
