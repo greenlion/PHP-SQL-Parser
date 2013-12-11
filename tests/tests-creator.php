@@ -9,6 +9,7 @@ require_once dirname(__FILE__) . '/cases/creator/count_distinct.php';
 require_once dirname(__FILE__) . '/cases/creator/function.php';
 require_once dirname(__FILE__) . '/cases/creator/inlist.php';
 require_once dirname(__FILE__) . '/cases/creator/insert.php';
+require_once dirname(__FILE__) . '/cases/creator/issue33.php';
 require_once dirname(__FILE__) . '/cases/creator/issue57.php';
 require_once dirname(__FILE__) . '/cases/creator/issue58.php';
 require_once dirname(__FILE__) . '/cases/creator/issue63.php';
