@@ -67,11 +67,25 @@ class PHPSQLCreator {
         case "SHOW":
             $this->created = $this->processShowStatement($parsed);
             break;
+        case "CREATE":
+            $this->created = $this->processCreateStatement($parsed);
+            break;
         default:
             throw new UnsupportedFeatureException($k);
             break;
         }
         return $this->created;
+    }
+
+    protected function processCreateStatement($parsed) {
+        $sql = $this->processCREATE($parsed);
+        if (isset($parsed['LIKE'])) {
+            $sql .= " " . $this->processLIKE($parsed['LIKE']);
+        }
+        if (isset($parsed['SELECT'])) {
+            $sql .= " " . $this->created = $this->processSelectStatement($parsed);
+        }
+        return $sql;
     }
 
     protected function processShowStatement($parsed) {
@@ -80,6 +94,61 @@ class PHPSQLCreator {
             $sql .= " " . $this->processWHERE($parsed['WHERE']);
         }
         return $sql;
+    }
+
+    protected function processCREATE($parsed) {
+        $create = $parsed['CREATE'];
+        $sql = $this->processSubTree($create);
+
+        if (($create['expr_type'] === ExpressionType::TABLE)
+                || ($create['expr_type'] === ExpressionType::TEMPORARY_TABLE)) {
+            $sql .= " " . $this->processCreateTable($parsed['TABLE']);
+        }
+        // TODO: add more expr_types here (like VIEW), if available
+        return "CREATE " . $sql;
+    }
+
+    protected function processCreateTable($parsed) {
+        $sql = $parsed['name'];
+        $sql .= $this->processCreateTableDefinition($parsed);
+        $sql .= $this->processCreateTableOptions($parsed);
+        $sql .= $this->processCreateTableSelectOption($parsed);
+        if (strlen($sql) === 0) {
+            throw new UnableToCreateSQLException('TABLE', "", $parsed, 'name');
+        }
+        return $sql;
+    }
+
+    protected function processCreateTableDefinition($parsed) {
+        if (!isset($parsed) || $parsed['create-def'] === false) {
+            return "";
+        }
+        $def = $parsed['create-def'];
+        // TODO
+    }
+
+    protected function processCreateTableOptions($parsed) {
+        if (!isset($parsed['options']) || $parsed['options'] === false) {
+            return "";
+        }
+        $option = $parsed['options'];
+        // TODO
+    }
+
+    protected function processCreateTableSelectOption($parsed) {
+        if (!isset($parsed['select-option']) || $parsed['select-option'] === false) {
+            return "";
+        }
+        $option = $parsed['select-option'];
+        // TODO
+    }
+
+    protected function processLIKE($parsed) {
+        $sql = $this->processTable($parsed, 0);
+        if (strlen($sql) === 0) {
+            throw new UnableToCreateSQLException('LIKE', "", $like, 'table');
+        }
+        return "LIKE " . $sql;
     }
 
     protected function processSHOW($parsed) {
@@ -232,10 +301,8 @@ class PHPSQLCreator {
             if ($len == strlen($sql)) {
                 throw new UnableToCreateSQLException('FROM', $k, $v, 'expr_type');
             }
-
-            #$sql .= " ";
         }
-        return "FROM " . $sql; #substr($sql, 0, - 1);
+        return "FROM " . $sql;
     }
 
     protected function processORDER($parsed) {
