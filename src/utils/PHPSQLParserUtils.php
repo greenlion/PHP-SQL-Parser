@@ -33,7 +33,7 @@
 /**
  * This class implements some helper functions.
  * @author arothe
- *
+ * @deprecated
  */
 class PHPSQLParserUtils {
 
@@ -65,9 +65,7 @@ class PHPSQLParserUtils {
         if ($length == 0) {
             return true;
         }
-
-        $start = $length * -1;
-        return (substr($haystack, $start) === $needle);
+        return (substr($haystack, -$length) === $needle);
     }
 
     /**
