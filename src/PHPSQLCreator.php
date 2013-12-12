@@ -1,6 +1,6 @@
 <?php
 /**
- * php-sql-creator.php
+ * PHPSQLCreator.php
  * 
  * A pure PHP SQL creator, which generates SQL from the output of PHPSQLParser.
  * 
@@ -123,8 +123,145 @@ class PHPSQLCreator {
         if (!isset($parsed) || $parsed['create-def'] === false) {
             return "";
         }
-        $def = $parsed['create-def'];
-        // TODO
+        return $this->processTableBracketExpression($parsed['create-def']);
+    }
+
+    protected function processTableBracketExpression($parsed) {
+        if ($parsed['expr_type'] !== ExpressionType::BRACKET_EXPRESSION) {
+            return "";
+        }
+        $sql = "";
+        foreach ($parsed['sub_tree'] as $k => $v) {
+            $len = strlen($sql);
+            $sql .= $this->processColDef($v);
+            $sql .= $this->processPrimaryKey($v);
+            $sql .= $this->processCheck($v);
+
+            if ($len == strlen($sql)) {
+                throw new UnableToCreateSQLException('CREATE TABLE create-def expression subtree', $k, $v, 'expr_type');
+            }
+
+            $sql .= ", ";
+        }
+
+        $sql = "(" . substr($sql, 0, -2) . ")";
+        return $sql;
+    }
+
+    protected function processColDef($parsed) {
+        if ($parsed['expr_type'] !== ExpressionType::COLDEF) {
+            return "";
+        }
+        $sql = "";
+        foreach ($parsed['sub_tree'] as $k => $v) {
+            $len = strlen($sql);
+            $sql .= $this->processColRef($v);
+            $sql .= $this->processColumnType($v);
+
+            if ($len == strlen($sql)) {
+                throw new UnableToCreateSQLException('CREATE TABLE primary key subtree', $k, $v, 'expr_type');
+            }
+
+            $sql .= " ";
+        }
+
+        return substr($sql, 0, -1);
+    }
+
+    protected function processColumnType($parsed) {
+        if ($parsed['expr_type'] !== ExpressionType::COLUMN_TYPE) {
+            return "";
+        }
+        $sql = "";
+        foreach ($parsed['sub_tree'] as $k => $v) {
+            $len = strlen($sql);
+            $sql .= $this->processDataType($v);
+            // FIXME: the SelectBracketExpression needs another array
+            $sql .= $this->processSelectBracketExpression($v);
+            $sql .= $this->processReserved($v);
+    
+            if ($len == strlen($sql)) {
+                throw new UnableToCreateSQLException('CREATE TABLE column-type subtree', $k, $v, 'expr_type');
+            }
+    
+            $sql .= " ";
+        }
+    
+        return substr($sql, 0, -1);
+    }
+    
+    protected function processDataType($parsed) {
+        if ($parsed['expr_type'] !== ExpressionType::DATA_TYPE) {
+            return "";
+        }
+        return $parsed['base_expr'];
+    }
+    
+    protected function processPrimaryKey($parsed) {
+        if ($parsed['expr_type'] !== ExpressionType::PRIMARY_KEY) {
+            return "";
+        }
+        $sql = "";
+        foreach ($parsed['sub_tree'] as $k => $v) {
+            $len = strlen($sql);
+            $sql .= $this->processConstraint($v);
+            $sql .= $this->processReserved($v);
+            $sql .= $this->processColumnList($v);
+
+            if ($len == strlen($sql)) {
+                throw new UnableToCreateSQLException('CREATE TABLE primary key subtree', $k, $v, 'expr_type');
+            }
+
+            $sql .= " ";
+        }
+
+        return substr($sql, 0, -1);
+    }
+
+    protected function processConstraint($parsed) {
+        if ($parsed['expr_type'] !== ExpressionType::CONSTRAINT) {
+            return "";
+        }
+        return "CONSTRAINT " . $this->processConstant($parsed['sub_tree']);
+    }
+
+    protected function processColumnList($parsed) {
+        if ($parsed['expr_type'] !== ExpressionType::COLUMN_LIST) {
+            return "";
+        }
+        $sql = "";
+        foreach ($parsed['sub_tree'] as $k => $v) {
+            $len = strlen($sql);
+            $sql .= $this->processIndexColumn($v);
+
+            if ($len == strlen($sql)) {
+                throw new UnableToCreateSQLException('CREATE TABLE column-list subtree', $k, $v, 'expr_type');
+            }
+
+            $sql .= " ";
+        }
+        // TODO: what about length and direction?    
+        return "(" . substr($sql, 0, -1) . ")";
+    }
+
+    protected function processCheck($parsed) {
+        if ($parsed['expr_type'] !== ExpressionType::CHECK) {
+            return "";
+        }
+        $sql = "";
+        foreach ($parsed['sub_tree'] as $k => $v) {
+            $len = strlen($sql);
+            $sql .= $this->processReserved($v);
+            $sql .= $this->processSelectBracketExpression($v);
+
+            if ($len == strlen($sql)) {
+                throw new UnableToCreateSQLException('CREATE TABLE check subtree', $k, $v, 'expr_type');
+            }
+
+            $sql .= " ";
+        }
+
+        return substr($sql, 0, -1);
     }
 
     protected function processCreateTableOptions($parsed) {
