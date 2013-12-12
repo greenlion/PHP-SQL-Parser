@@ -41,12 +41,25 @@ require_once dirname(__FILE__) . '/../exceptions/InvalidParameterException.php';
  * @author arothe
  *
  */
-class PHPSQLLexer extends PHPSQLParserUtils {
+class PHPSQLLexer {
 
     private $splitters;
 
     public function __construct() {
         $this->splitters = new LexerSplitter();
+    }
+
+    /**
+     * Ends the given string $haystack with the string $needle?
+     * @param string $haystack
+     * @param string $needle
+     */
+    protected function endsWith($haystack, $needle) {
+        $length = strlen($needle);
+        if ($length == 0) {
+            return true;
+        }
+        return (substr($haystack, -$length) === $needle);
     }
 
     public function split($sql) {
@@ -165,7 +178,7 @@ class PHPSQLLexer extends PHPSQLParserUtils {
                 $comment = $i;
                 $inline = false;
             }
-            
+
             $i++;
         }
 
