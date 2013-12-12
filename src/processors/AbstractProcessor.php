@@ -53,7 +53,6 @@ abstract class AbstractProcessor {
 
     /**
      * Revokes the quoting characters from an expression
-     * TODO: this is a copy of ParserUtils::revokeQuotation(), can we delete one version?
      */
     protected function revokeQuotation($sql) {
         $result = trim($sql);
@@ -79,7 +78,6 @@ abstract class AbstractProcessor {
     /**
      * This method removes parenthesis from start of the given string.
      * It removes also the associated closing parenthesis.
-     * TODO: this is a copy of ParserUtils::removeParenthesisFromStart(), can we delete one version?
      */
     protected function removeParenthesisFromStart($token) {
         $parenthesisRemoved = 0;
@@ -191,7 +189,6 @@ abstract class AbstractProcessor {
 
     /**
      * translates an array of objects into an associative array
-     * TODO: this is a copy of the PHPSQLParserUtils::toArray()
      */
     public function toArray($tokenList) {
         $expr = array();
