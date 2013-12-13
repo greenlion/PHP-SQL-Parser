@@ -36,19 +36,19 @@
  * On every character of the array the given SQL string will be split into single tokens.
  * The array must be sorted by character size, longest first (3 chars -> 2 chars -> 1 char).
  *
- * @author arothe
+ * @author arothe <andre.rothe@phosco.info>
  */
 class LexerSplitter {
 
-    private static $splitters = array("<=>", "\r\n", "!=", ">=", "<=", "<>", "<<", ">>", ":=", "\\", "&&", "||", ":=",
-                                      "/*", "*/", "--", ">", "<", "|", "=", "^", "(", ")", "\t", "\n", "'", "\"", "`",
-                                      ",", "@", " ", "+", "-", "*", "/", ";");
+    private static $_splitters = array("<=>", "\r\n", "!=", ">=", "<=", "<>", "<<", ">>", ":=", "\\", "&&", "||", ":=",
+                                       "/*", "*/", "--", ">", "<", "|", "=", "^", "(", ")", "\t", "\n", "'", "\"", "`",
+                                       ",", "@", " ", "+", "-", "*", "/", ";");
     private $tokenSize;
     private $hashSet;
 
     public function __construct() {
-        $this->tokenSize = strlen(self::$splitters[0]); # should be the largest one
-        $this->hashSet = array_flip(self::$splitters);
+        $this->tokenSize = strlen(self::$_splitters[0]); # should be the largest one
+        $this->hashSet = array_flip(self::$_splitters);
     }
 
     public function getMaxLengthOfSplitter() {
