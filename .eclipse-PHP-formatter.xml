@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <profiles version="1">
-<profile kind="PDTToolsCodeFormatterProfile" name="Andre PHP" version="1">
+<profile kind="PDTToolsCodeFormatterProfile" name="PhOSCo PHP" version="1">
 <setting id="jp.sourceforge.pdt_tools.formatter.insert_new_line_in_empty_block" value="insert"/>
 <setting id="jp.sourceforge.pdt_tools.formatter.indent_body_declarations_compare_to_type_header" value="true"/>
 <setting id="jp.sourceforge.pdt_tools.formatter.insert_space_before_comma_in_superinterfaces" value="do not insert"/>
