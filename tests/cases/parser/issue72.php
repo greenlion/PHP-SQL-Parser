@@ -1,8 +1,8 @@
 <?php
-require_once(dirname(__FILE__) . "/../../../src/PHPSQLParser.php");
-require_once(dirname(__FILE__) . "/../../test-more.php");
+require_once dirname(__FILE__) . "/../../../src/PHPSQLParser.php";
+require_once dirname(__FILE__) . "/../../test-more.php";
 
-# user defined variable
+// user defined variable
 $sql = "update table set column=@max";
 $parser = new PHPSQLParser($sql);
 $p = $parser->parsed;
