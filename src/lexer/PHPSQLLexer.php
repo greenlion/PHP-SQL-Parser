@@ -43,10 +43,10 @@ require_once dirname(__FILE__) . '/../exceptions/InvalidParameterException.php';
  */
 class PHPSQLLexer {
 
-    private $splitters;
+    private $_splitters;
 
     public function __construct() {
-        $this->splitters = new LexerSplitter();
+        $this->_splitters = new LexerSplitter();
     }
 
     /**
@@ -70,7 +70,7 @@ class PHPSQLLexer {
         $tokens = array();
         $token = "";
 
-        $splitLen = $this->splitters->getMaxLengthOfSplitter();
+        $splitLen = $this->_splitters->getMaxLengthOfSplitter();
         $found = false;
         $len = strlen($sql);
         $pos = 0;
@@ -79,7 +79,7 @@ class PHPSQLLexer {
 
             for ($i = $splitLen; $i > 0; $i--) {
                 $substr = substr($sql, $pos, $i);
-                if ($this->splitters->isSplitter($substr)) {
+                if ($this->_splitters->isSplitter($substr)) {
 
                     if ($token !== "") {
                         $tokens[] = $token;
