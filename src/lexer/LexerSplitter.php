@@ -47,7 +47,7 @@ class LexerSplitter {
     private $hashSet;
 
     public function __construct() {
-        $this->tokenSize = strlen(self::$_splitters[0]); # should be the largest one
+        $this->tokenSize = strlen(self::$_splitters[0]); // should be the largest one
         $this->hashSet = array_flip(self::$_splitters);
     }
 
