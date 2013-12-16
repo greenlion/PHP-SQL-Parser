@@ -50,7 +50,8 @@ class PHPSQLCreator {
             throw new UnsupportedFeatureException($k);
             break;
         case "SELECT":
-            $this->created = $this->processSelectStatement($parsed);
+            $builder = new SelectStatementBuilder($parsed);
+            $this->created = $builder->build($parsed);
             break;
         case "INSERT":
             $this->created = $this->processInsertStatement($parsed);
@@ -68,7 +69,8 @@ class PHPSQLCreator {
             $this->created = $this->processShowStatement($parsed);
             break;
         case "CREATE":
-            $this->created = $this->processCreateStatement($parsed);
+            $builder = new CreateStatementBuilder($parsed);
+            $this->created = $builder->build($parsed);
             break;
         default:
             throw new UnsupportedFeatureException($k);
@@ -77,215 +79,12 @@ class PHPSQLCreator {
         return $this->created;
     }
 
-    protected function processCreateStatement($parsed) {
-        $sql = $this->processCREATE($parsed);
-        if (isset($parsed['LIKE'])) {
-            $sql .= " " . $this->processLIKE($parsed['LIKE']);
-        }
-        if (isset($parsed['SELECT'])) {
-            $sql .= " " . $this->created = $this->processSelectStatement($parsed);
-        }
-        return $sql;
-    }
-
     protected function processShowStatement($parsed) {
         $sql = $this->processSHOW($parsed);
         if (isset($parsed['WHERE'])) {
             $sql .= " " . $this->processWHERE($parsed['WHERE']);
         }
         return $sql;
-    }
-
-    protected function processCREATE($parsed) {
-        $create = $parsed['CREATE'];
-        $sql = $this->processSubTree($create);
-
-        if (($create['expr_type'] === ExpressionType::TABLE)
-                || ($create['expr_type'] === ExpressionType::TEMPORARY_TABLE)) {
-            $sql .= " " . $this->processCreateTable($parsed['TABLE']);
-        }
-        // TODO: add more expr_types here (like VIEW), if available
-        return "CREATE " . $sql;
-    }
-
-    protected function processCreateTable($parsed) {
-        $sql = $parsed['name'];
-        $sql .= $this->processCreateTableDefinition($parsed);
-        $sql .= $this->processCreateTableOptions($parsed);
-        $sql .= $this->processCreateTableSelectOption($parsed);
-        if (strlen($sql) === 0) {
-            throw new UnableToCreateSQLException('TABLE', "", $parsed, 'name');
-        }
-        return $sql;
-    }
-
-    protected function processCreateTableDefinition($parsed) {
-        if (!isset($parsed) || $parsed['create-def'] === false) {
-            return "";
-        }
-        return $this->processTableBracketExpression($parsed['create-def']);
-    }
-
-    protected function processTableBracketExpression($parsed) {
-        if ($parsed['expr_type'] !== ExpressionType::BRACKET_EXPRESSION) {
-            return "";
-        }
-        $sql = "";
-        foreach ($parsed['sub_tree'] as $k => $v) {
-            $len = strlen($sql);
-            $sql .= $this->processColDef($v);
-            $sql .= $this->processPrimaryKey($v);
-            $sql .= $this->processCheck($v);
-
-            if ($len == strlen($sql)) {
-                throw new UnableToCreateSQLException('CREATE TABLE create-def expression subtree', $k, $v, 'expr_type');
-            }
-
-            $sql .= ", ";
-        }
-
-        $sql = "(" . substr($sql, 0, -2) . ")";
-        return $sql;
-    }
-
-    protected function processColDef($parsed) {
-        if ($parsed['expr_type'] !== ExpressionType::COLDEF) {
-            return "";
-        }
-        $sql = "";
-        foreach ($parsed['sub_tree'] as $k => $v) {
-            $len = strlen($sql);
-            $sql .= $this->processColRef($v);
-            $sql .= $this->processColumnType($v);
-
-            if ($len == strlen($sql)) {
-                throw new UnableToCreateSQLException('CREATE TABLE primary key subtree', $k, $v, 'expr_type');
-            }
-
-            $sql .= " ";
-        }
-
-        return substr($sql, 0, -1);
-    }
-
-    protected function processColumnType($parsed) {
-        if ($parsed['expr_type'] !== ExpressionType::COLUMN_TYPE) {
-            return "";
-        }
-        $sql = "";
-        foreach ($parsed['sub_tree'] as $k => $v) {
-            $len = strlen($sql);
-            $sql .= $this->processDataType($v);
-            // FIXME: the SelectBracketExpression needs another array
-            $sql .= $this->processSelectBracketExpression($v);
-            $sql .= $this->processReserved($v);
-    
-            if ($len == strlen($sql)) {
-                throw new UnableToCreateSQLException('CREATE TABLE column-type subtree', $k, $v, 'expr_type');
-            }
-    
-            $sql .= " ";
-        }
-    
-        return substr($sql, 0, -1);
-    }
-    
-    protected function processDataType($parsed) {
-        if ($parsed['expr_type'] !== ExpressionType::DATA_TYPE) {
-            return "";
-        }
-        return $parsed['base_expr'];
-    }
-    
-    protected function processPrimaryKey($parsed) {
-        if ($parsed['expr_type'] !== ExpressionType::PRIMARY_KEY) {
-            return "";
-        }
-        $sql = "";
-        foreach ($parsed['sub_tree'] as $k => $v) {
-            $len = strlen($sql);
-            $sql .= $this->processConstraint($v);
-            $sql .= $this->processReserved($v);
-            $sql .= $this->processColumnList($v);
-
-            if ($len == strlen($sql)) {
-                throw new UnableToCreateSQLException('CREATE TABLE primary key subtree', $k, $v, 'expr_type');
-            }
-
-            $sql .= " ";
-        }
-
-        return substr($sql, 0, -1);
-    }
-
-    protected function processConstraint($parsed) {
-        if ($parsed['expr_type'] !== ExpressionType::CONSTRAINT) {
-            return "";
-        }
-        return "CONSTRAINT " . $this->processConstant($parsed['sub_tree']);
-    }
-
-    protected function processColumnList($parsed) {
-        if ($parsed['expr_type'] !== ExpressionType::COLUMN_LIST) {
-            return "";
-        }
-        $sql = "";
-        foreach ($parsed['sub_tree'] as $k => $v) {
-            $len = strlen($sql);
-            $sql .= $this->processIndexColumn($v);
-
-            if ($len == strlen($sql)) {
-                throw new UnableToCreateSQLException('CREATE TABLE column-list subtree', $k, $v, 'expr_type');
-            }
-
-            $sql .= " ";
-        }
-        // TODO: what about length and direction?    
-        return "(" . substr($sql, 0, -1) . ")";
-    }
-
-    protected function processCheck($parsed) {
-        if ($parsed['expr_type'] !== ExpressionType::CHECK) {
-            return "";
-        }
-        $sql = "";
-        foreach ($parsed['sub_tree'] as $k => $v) {
-            $len = strlen($sql);
-            $sql .= $this->processReserved($v);
-            $sql .= $this->processSelectBracketExpression($v);
-
-            if ($len == strlen($sql)) {
-                throw new UnableToCreateSQLException('CREATE TABLE check subtree', $k, $v, 'expr_type');
-            }
-
-            $sql .= " ";
-        }
-
-        return substr($sql, 0, -1);
-    }
-
-    protected function processCreateTableOptions($parsed) {
-        if (!isset($parsed['options']) || $parsed['options'] === false) {
-            return "";
-        }
-        $option = $parsed['options'];
-        // TODO
-    }
-
-    protected function processCreateTableSelectOption($parsed) {
-        if (!isset($parsed['select-option']) || $parsed['select-option'] === false) {
-            return "";
-        }
-        $option = $parsed['select-option'];
-        // TODO
-    }
-
-    protected function processLIKE($parsed) {
-        $sql = $this->processTable($parsed, 0);
-        if (strlen($sql) === 0) {
-            throw new UnableToCreateSQLException('LIKE', "", $like, 'table');
-        }
-        return "LIKE " . $sql;
     }
 
     protected function processSHOW($parsed) {
@@ -357,25 +156,6 @@ class PHPSQLCreator {
         return $v['source']['base_expr'] . " TO " . $v['destination']['base_expr'];
     }
 
-    protected function processSelectStatement($parsed) {
-        $sql = $this->processSELECT($parsed['SELECT']);
-        if (isset($parsed['FROM'])) {
-            $sql .= " " . $this->processFROM($parsed['FROM']);
-        }
-        if (isset($parsed['WHERE'])) {
-            $sql .= " " . $this->processWHERE($parsed['WHERE']);
-        }
-        if (isset($parsed['GROUP'])) {
-            $sql .= " " . $this->processGROUP($parsed['GROUP']);
-        }
-        if (isset($parsed['ORDER'])) {
-            $sql .= " " . $this->processORDER($parsed['ORDER']);
-        }
-        if (isset($parsed['LIMIT'])) {
-            $sql .= " " . $this->processLIMIT($parsed['LIMIT']);
-        }
-        return $sql;
-    }
 
     protected function processInsertStatement($parsed) {
         // TODO: are there more than one tables possible (like [INSERT][1])
@@ -725,51 +505,8 @@ class PHPSQLCreator {
         return $parsed['base_expr'] . "(" . substr($sql, 0, -1) . ")" . $this->processAlias($parsed);
     }
 
-    protected function hasAlias($parsed) {
-        return isset($parsed['alias']);
-    }
 
-    protected function processSelectExpression($parsed) {
-        if ($parsed['expr_type'] !== ExpressionType::EXPRESSION) {
-            return "";
-        }
-        $sql = $this->processSubTree($parsed, " ");
-        $sql .= $this->processAlias($parsed);
-        return $sql;
-    }
 
-    protected function processSelectBracketExpression($parsed) {
-        if ($parsed['expr_type'] !== ExpressionType::BRACKET_EXPRESSION) {
-            return "";
-        }
-        $sql = $this->processSubTree($parsed, " ");
-        $sql = "(" . $sql . ")";
-        return $sql;
-    }
-
-    protected function processSubTree($parsed, $delim = " ") {
-        if ($parsed['sub_tree'] === '') {
-            return "";
-        }
-        $sql = "";
-        foreach ($parsed['sub_tree'] as $k => $v) {
-            $len = strlen($sql);
-            $sql .= $this->processColRef($v);
-            $sql .= $this->processFunction($v);
-            $sql .= $this->processOperator($v);
-            $sql .= $this->processConstant($v);
-            $sql .= $this->processSubQuery($v);
-            $sql .= $this->processSelectBracketExpression($v);
-            $sql .= $this->processReserved($v);
-
-            if ($len == strlen($sql)) {
-                throw new UnableToCreateSQLException('expression subtree', $k, $v, 'expr_type');
-            }
-
-            $sql .= $delim;
-        }
-        return substr($sql, 0, -1);
-    }
 
     protected function processRefClause($parsed) {
         if ($parsed === false) {
@@ -792,34 +529,6 @@ class PHPSQLCreator {
         return "(" . substr($sql, 0, -1) . ")";
     }
 
-    protected function processAlias($parsed) {
-        if (!isset($parsed['alias']) || $parsed['alias'] === false) {
-            return "";
-        }
-        $sql = "";
-        if ($parsed['alias']['as']) {
-            $sql .= " as";
-        }
-        $sql .= " " . $parsed['alias']['name'];
-        return $sql;
-    }
-
-    protected function processJoin($parsed) {
-        if ($parsed === 'CROSS') {
-            return ", ";
-        }
-        if ($parsed === 'JOIN') {
-            return " INNER JOIN ";
-        }
-        if ($parsed === 'LEFT') {
-            return " LEFT JOIN ";
-        }
-        if ($parsed === 'RIGHT') {
-            return " RIGHT JOIN ";
-        }
-        // TODO: add more
-        throw new UnsupportedFeatureException($parsed);
-    }
 
     protected function processRefType($parsed) {
         if ($parsed === false) {
@@ -884,56 +593,9 @@ class PHPSQLCreator {
         return $sql;
     }
 
-    protected function processOperator($parsed) {
-        if ($parsed['expr_type'] !== ExpressionType::OPERATOR) {
-            return "";
-        }
-        return $parsed['base_expr'];
-    }
 
-    protected function processColRef($parsed) {
-        if ($parsed['expr_type'] !== ExpressionType::COLREF) {
-            return "";
-        }
-        $sql = $parsed['base_expr'];
-        $sql .= $this->processAlias($parsed);
-        $sql .= $this->processDirection($parsed);
-        return $sql;
-    }
 
-    protected function processPosition($parsed) {
-        if ($parsed['expr_type'] !== ExpressionType::POSITION) {
-            return "";
-        }
-        return $parsed['base_expr'];
-    }
 
-    protected function processDirection($parsed) {
-        if (!isset($parsed['direction']) || $parsed['direction'] === false) {
-            return "";
-        }
-        return (" " . $parsed['direction']);
-    }
-
-    protected function processReserved($parsed) {
-        if (!$this->isReserved($parsed)) {
-            return "";
-        }
-        return $parsed['base_expr'];
-    }
-
-    protected function isReserved($parsed) {
-        return ($parsed['expr_type'] === ExpressionType::RESERVED);
-    }
-
-    protected function processConstant($parsed) {
-        if ($parsed['expr_type'] !== ExpressionType::CONSTANT) {
-            return "";
-        }
-        $sql = $parsed['base_expr'];
-        $sql .= $this->processAlias($parsed);
-        return $sql;
-    }
 
     protected function processInList($parsed) {
         if ($parsed['expr_type'] !== ExpressionType::IN_LIST) {
