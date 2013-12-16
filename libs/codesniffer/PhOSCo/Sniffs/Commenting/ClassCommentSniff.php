@@ -46,24 +46,17 @@ if (class_exists('PhOSCo_Sniffs_Commenting_FileCommentSniff', true) === false) {
  * @version   Release: 1.5.1
  * @link      http://pear.php.net/package/PHP_CodeSniffer
  */
-class PhOSCo_Sniffs_Commenting_ClassCommentSniff extends PhOSCo_Sniffs_Commenting_FileCommentSniff
-{
-
+class PhOSCo_Sniffs_Commenting_ClassCommentSniff extends PhOSCo_Sniffs_Commenting_FileCommentSniff {
 
     /**
      * Returns an array of tokens this test wants to listen for.
      *
      * @return array
      */
-    public function register()
-    {
-        return array(
-                T_CLASS,
-                T_INTERFACE,
-               );
+    public function register() {
+        return array(T_CLASS, T_INTERFACE,);
 
     }//end register()
-
 
     /**
      * Processes this test, when one of its tokens is encountered.
@@ -74,18 +67,14 @@ class PhOSCo_Sniffs_Commenting_ClassCommentSniff extends PhOSCo_Sniffs_Commentin
      *
      * @return void
      */
-    public function process(PHP_CodeSniffer_File $phpcsFile, $stackPtr)
-    {
+    public function process(PHP_CodeSniffer_File $phpcsFile, $stackPtr) {
+
         $this->currentFile = $phpcsFile;
 
-        $tokens    = $phpcsFile->getTokens();
-        $type      = strtolower($tokens[$stackPtr]['content']);
+        $tokens = $phpcsFile->getTokens();
+        $type = strtolower($tokens[$stackPtr]['content']);
         $errorData = array($type);
-        $find      = array(
-                      T_ABSTRACT,
-                      T_WHITESPACE,
-                      T_FINAL,
-                     );
+        $find = array(T_ABSTRACT, T_WHITESPACE, T_FINAL,);
 
         // Extract the class comment docblock.
         $commentEnd = $phpcsFile->findPrevious($find, ($stackPtr - 1), null, true);
@@ -94,15 +83,13 @@ class PhOSCo_Sniffs_Commenting_ClassCommentSniff extends PhOSCo_Sniffs_Commentin
             $error = 'You must use "/**" style comments for a %s comment';
             $phpcsFile->addError($error, $stackPtr, 'WrongStyle', $errorData);
             return;
-        } else if ($commentEnd === false
-            || $tokens[$commentEnd]['code'] !== T_DOC_COMMENT
-        ) {
+        } else if ($commentEnd === false || $tokens[$commentEnd]['code'] !== T_DOC_COMMENT) {
             $phpcsFile->addError('Missing %s doc comment', $stackPtr, 'Missing', $errorData);
             return;
         }
 
         $commentStart = ($phpcsFile->findPrevious(T_DOC_COMMENT, ($commentEnd - 1), null, true) + 1);
-        $commentNext  = $phpcsFile->findPrevious(T_WHITESPACE, ($commentEnd + 1), $stackPtr, false, $phpcsFile->eolChar);
+        $commentNext = $phpcsFile->findPrevious(T_WHITESPACE, ($commentEnd + 1), $stackPtr, false, $phpcsFile->eolChar);
 
         // Distinguish file and class comment.
         $prevClassToken = $phpcsFile->findPrevious(T_CLASS, ($stackPtr - 1));
@@ -113,15 +100,11 @@ class PhOSCo_Sniffs_Commenting_ClassCommentSniff extends PhOSCo_Sniffs_Commentin
                 $prevComment = $phpcsFile->findPrevious(T_DOC_COMMENT, ($prevNonComment - 1));
                 if ($prevComment === false) {
                     // There is only 1 doc comment between open tag and class token.
-                    $newlineToken = $phpcsFile->findNext(T_WHITESPACE, ($commentEnd + 1), $stackPtr, false, $phpcsFile->eolChar);
+                    $newlineToken = $phpcsFile->findNext(T_WHITESPACE, ($commentEnd + 1), $stackPtr, false,
+                        $phpcsFile->eolChar);
                     if ($newlineToken !== false) {
-                        $newlineToken = $phpcsFile->findNext(
-                            T_WHITESPACE,
-                            ($newlineToken + 1),
-                            $stackPtr,
-                            false,
-                            $phpcsFile->eolChar
-                        );
+                        $newlineToken = $phpcsFile->findNext(T_WHITESPACE, ($newlineToken + 1), $stackPtr, false,
+                            $phpcsFile->eolChar);
 
                         if ($newlineToken !== false) {
                             // Blank line between the class and the doc block.
@@ -135,10 +118,7 @@ class PhOSCo_Sniffs_Commenting_ClassCommentSniff extends PhOSCo_Sniffs_Commentin
             }//end if
         }//end if
 
-        $comment = $phpcsFile->getTokensAsString(
-            $commentStart,
-            ($commentEnd - $commentStart + 1)
-        );
+        $comment = $phpcsFile->getTokensAsString($commentStart, ($commentEnd - $commentStart + 1));
 
         // Parse the class comment.docblock.
         try {
@@ -158,9 +138,9 @@ class PhOSCo_Sniffs_Commenting_ClassCommentSniff extends PhOSCo_Sniffs_Commentin
         }
 
         // No extra newline before short description.
-        $short        = $comment->getShortComment();
+        $short = $comment->getShortComment();
         $newlineCount = 0;
-        $newlineSpan  = strspn($short, $phpcsFile->eolChar);
+        $newlineSpan = strspn($short, $phpcsFile->eolChar);
         if ($short !== '' && $newlineSpan > 0) {
             $error = 'Extra newline(s) found before %s comment short description';
             $phpcsFile->addError($error, ($commentStart + 1), 'SpacingBeforeShort', $errorData);
@@ -171,7 +151,7 @@ class PhOSCo_Sniffs_Commenting_ClassCommentSniff extends PhOSCo_Sniffs_Commentin
         // Exactly one blank line between short and long description.
         $long = $comment->getLongComment();
         if (empty($long) === false) {
-            $between        = $comment->getWhiteSpaceBetween();
+            $between = $comment->getWhiteSpaceBetween();
             $newlineBetween = substr_count($between, $phpcsFile->eolChar);
             if ($newlineBetween !== 2) {
                 $error = 'There must be exactly one blank line between descriptions in %s comments';
@@ -192,7 +172,7 @@ class PhOSCo_Sniffs_Commenting_ClassCommentSniff extends PhOSCo_Sniffs_Commentin
                 }
 
                 $phpcsFile->addError($error, ($commentStart + $newlineCount), 'SpacingBeforeTags', $errorData);
-                $short = rtrim($short, $phpcsFile->eolChar.' ');
+                $short = rtrim($short, $phpcsFile->eolChar . ' ');
             }
         }
 
@@ -201,7 +181,6 @@ class PhOSCo_Sniffs_Commenting_ClassCommentSniff extends PhOSCo_Sniffs_Commentin
 
     }//end process()
 
-
     /**
      * Process the version tag.
      *
@@ -209,8 +188,7 @@ class PhOSCo_Sniffs_Commenting_ClassCommentSniff extends PhOSCo_Sniffs_Commentin
      *
      * @return void
      */
-    protected function processVersion($errorPos)
-    {
+    protected function processVersion($errorPos) {
         $version = $this->commentParser->getVersion();
         if ($version !== null) {
             $content = $version->getContent();
@@ -220,13 +198,12 @@ class PhOSCo_Sniffs_Commenting_ClassCommentSniff extends PhOSCo_Sniffs_Commentin
                 $this->currentFile->addError($error, $errorPos, 'EmptyVersion');
             } else if ((strstr($content, 'Release:') === false)) {
                 $error = 'Invalid version "%s" in doc comment; consider "Release: <package_version>" instead';
-                $data  = array($content);
+                $data = array($content);
                 $this->currentFile->addWarning($error, $errorPos, 'InvalidVersion', $data);
             }
         }
 
     }//end processVersion()
-
 
 }//end class
 
