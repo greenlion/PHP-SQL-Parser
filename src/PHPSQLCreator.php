@@ -93,51 +93,6 @@ class PHPSQLCreator {
         return $sql;
     }
 
-    protected function processSHOW($parsed) {
-        $show = $parsed['SHOW'];
-        $sql = "";
-        foreach ($show as $k => $v) {
-            $len = strlen($sql);
-            $sql .= $this->processReserved($v);
-            $sql .= $this->processConstant($v);
-            $sql .= $this->processEngine($v);
-            $sql .= $this->processDatabase($v);
-            $sql .= $this->processProcedure($v);
-            $sql .= $this->processFunction($v);
-            $sql .= $this->processTable($v, 0);
-
-            if ($len == strlen($sql)) {
-                throw new UnableToCreateSQLException('SHOW', $k, $v, 'expr_type');
-            }
-
-            $sql .= " ";
-        }
-
-        $sql = substr($sql, 0, -1);
-        return "SHOW " . $sql;
-    }
-
-    protected function processEngine($parsed) {
-        if ($parsed['expr_type'] !== ExpressionType::ENGINE) {
-            return "";
-        }
-        return $parsed['base_expr'];
-    }
-
-    protected function processProcedure($parsed) {
-        if ($parsed['expr_type'] !== ExpressionType::PROCEDURE) {
-            return "";
-        }
-        return $parsed['base_expr'];
-    }
-
-    protected function processDatabase($parsed) {
-        if ($parsed['expr_type'] !== ExpressionType::DATABASE) {
-            return "";
-        }
-        return $parsed['base_expr'];
-    }
-
     protected function processRenameTableStatement($parsed) {
         $rename = $parsed['RENAME'];
         $sql = "";
@@ -170,26 +125,6 @@ class PHPSQLCreator {
         return "LIMIT " . $sql;
     }
 
-    protected function processRecord($parsed) {
-        if ($parsed['expr_type'] !== ExpressionType::RECORD) {
-            return "";
-        }
-        $sql = "";
-        foreach ($parsed['data'] as $k => $v) {
-            $len = strlen($sql);
-            $sql .= $this->processConstant($v);
-            $sql .= $this->processFunction($v);
-            $sql .= $this->processOperator($v);
-
-            if ($len == strlen($sql)) {
-                throw new UnableToCreateSQLException(ExpressionType::RECORD, $k, $v, 'expr_type');
-            }
-
-            $sql .= ",";
-        }
-        $sql = substr($sql, 0, -1);
-        return "(" . $sql . ")";
-    }
 
 
 
