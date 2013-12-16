@@ -83,11 +83,6 @@ class PhOSCo_Sniffs_Classes_ClassDeclarationSniff implements PHP_CodeSniffer_Sni
             return;
         }
 
-        if ($tokens[($curlyBrace + 1)]['content'] !== $phpcsFile->eolChar) {
-            $error = 'Opening %s brace must be on a line by itself';
-            $phpcsFile->addError($error, $curlyBrace, 'OpenBraceNotAlone', $errorData);
-        }
-
         if ($tokens[($curlyBrace - 1)]['code'] === T_WHITESPACE) {
             $prevContent = $tokens[($curlyBrace - 1)]['content'];
             if ($prevContent === $phpcsFile->eolChar) {
@@ -97,7 +92,7 @@ class PhOSCo_Sniffs_Classes_ClassDeclarationSniff implements PHP_CodeSniffer_Sni
                 $spaces     = strlen($blankSpace);
             }
 
-            $expected = ($tokens[$stackPtr]['level'] * $this->indent);
+            $expected = 1;
             if ($spaces !== $expected) {
                 $error = 'Expected %s spaces before opening brace; %s found';
                 $data  = array(
