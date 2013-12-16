@@ -39,8 +39,6 @@
  * 
  */
 
-require_once dirname(__FILE__) . '/../utils/ExpressionType.php';
-
 /**
  * This class implements the builder for directions (e.g. of the order-by clause). 
  * You can overwrite all functions to achive another handling.
