@@ -1,0 +1,12 @@
+Install PHP_CodeSniffer:
+
+pear install PHP_CodeSniffer
+
+
+Check the code with:
+
+phpcs --standard=/path/to/the/PhOSCo/folder /path/to/the/src/folder >/tmp/code-errors.txt
+vi /tmp/code-errors.txt
+
+
+Correct all listed errors (...I hate it)
