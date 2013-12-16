@@ -85,11 +85,6 @@ class PhOSCo_Sniffs_Commenting_FileCommentSniff implements PHP_CodeSniffer_Sniff
                                         'allow_multiple' => false,
                                         'order_text'     => 'follows @license',
                                        ),
-                       'link'       => array(
-                                        'required'       => true,
-                                        'allow_multiple' => true,
-                                        'order_text'     => 'follows @version',
-                                       ),
                        'see'        => array(
                                         'required'       => false,
                                         'allow_multiple' => true,
