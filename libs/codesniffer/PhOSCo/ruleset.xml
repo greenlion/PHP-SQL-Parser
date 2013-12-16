@@ -8,6 +8,8 @@
 		<exclude name="Generic.Files.LineLength" />
 		<exclude name="PEAR.Classes.ClassDeclaration" />
 		<exclude name="PEAR.Functions.FunctionDeclaration" />
+		<exclude name="PEAR.Commenting.FileComment" />
+		<exclude name="PEAR.Commenting.ClassComment" />
 	</rule>
 
 	<!-- Lines can be 120 chars long, but never show errors -->
