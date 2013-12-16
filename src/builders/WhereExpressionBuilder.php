@@ -100,7 +100,7 @@ class WhereExpressionBuilder {
         return $builder->build($parsed);
     }
     
-    protected function build($parsed) {
+    public function build($parsed) {
         if ($parsed['expr_type'] !== ExpressionType::EXPRESSION) {
             return "";
         }
