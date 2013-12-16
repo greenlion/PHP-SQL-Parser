@@ -1,6 +1,6 @@
 <?php
 /**
- * LIKEBuilder.php
+ * LikeBuilder.php
  *
  * Builds the LIKE statement part of a CREATE TABLE statement.
  *
@@ -50,7 +50,7 @@ require_once dirname(__FILE__) . '/TableBuilder.php';
  * @license http://www.debian.org/misc/bsd.license  BSD License (3 Clause)
  *  
  */
-class CREATEBuilder {
+class LikeBuilder {
 
     protected function buildTable($parsed) {
         $builder = new TableBuilder($parsed);
