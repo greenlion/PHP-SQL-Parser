@@ -1,8 +1,8 @@
 <?php
 /**
- * PositionBuilder.php
+ * UpdateStatement.php
  *
- * Builds positions of the GROUP BY clause.
+ * Builds the UPDATE statement
  *
  * PHP version 5
  *
@@ -39,24 +39,41 @@
  * 
  */
 
-require_once dirname(__FILE__) . '/../utils/ExpressionType.php';
+require_once dirname(__FILE__) . '/WhereBuilder.php';
+require_once dirname(__FILE__) . '/SetBuilder.php';
+require_once dirname(__FILE__) . '/UpdateBuilder.php';
 
 /**
- * This class implements the builder for positions of the GROUP-BY clause. 
- * You can overwrite all functions to achive another handling.
+ * This class implements the builder for the whole Update statement. You can overwrite
+ * all functions to achive another handling.
  *
  * @author  André Rothe <andre.rothe@phosco.info>
  * @license http://www.debian.org/misc/bsd.license  BSD License (3 Clause)
  *  
  */
-class OperatorBuilder {
+class UpdateStatementBuilder {
 
-    public function build($parsed) {
-        if ($parsed['expr_type'] !== ExpressionType::POSITION) {
-            return "";
-        }
-        return $parsed['base_expr'];
+    protected function buildWHERE($parsed) {
+        $builder = new WhereBuilder($parsed);
+        return $builder->build($parsed);
     }
 
+    protected function buildSET($parsed) {
+        $builder = new SetBuilder($parsed);
+        return $builder->build($parsed);
+    }
+
+    protected function buildUPDATE($parsed) {
+        $builder = new UpdateBuilder($parsed);
+        return $builder->build($parsed);
+    }
+
+    public function build($parsed) {
+        $sql = $this->buildUPDATE($parsed['UPDATE']) . " " . $this->buildSET($parsed['SET']);
+        if (isset($parsed['WHERE'])) {
+            $sql .= " " . $this->buildWHERE($parsed['WHERE']);
+        }
+        return $sql;
+    }
 }
 ?>

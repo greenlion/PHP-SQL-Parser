@@ -1,8 +1,8 @@
 <?php
 /**
- * PositionBuilder.php
+ * OrderByBuilder.php
  *
- * Builds positions of the GROUP BY clause.
+ * Builds the ORDERBY clause.
  *
  * PHP version 5
  *
@@ -39,24 +39,45 @@
  * 
  */
 
-require_once dirname(__FILE__) . '/../utils/ExpressionType.php';
+require_once dirname(__FILE__) . '/../exceptions/UnableToCreateSQLException.php';
+require_once dirname(__FILE__) . '/OrderByAliasBuilder.php';
+require_once dirname(__FILE__) . '/ColumnReferenceBuilder.php';
 
 /**
- * This class implements the builder for positions of the GROUP-BY clause. 
+ * This class implements the builder for the ORDER-BY clause. 
  * You can overwrite all functions to achive another handling.
  *
  * @author  André Rothe <andre.rothe@phosco.info>
  * @license http://www.debian.org/misc/bsd.license  BSD License (3 Clause)
  *  
  */
-class OperatorBuilder {
+class OrderByBuilder {
 
-    public function build($parsed) {
-        if ($parsed['expr_type'] !== ExpressionType::POSITION) {
-            return "";
-        }
-        return $parsed['base_expr'];
+    protected function buildColRef($parsed) {
+        $builder = new ColumnReferenceBuilder($parsed);
+        return $builder->build($parsed);
     }
 
+    protected function buildOrderByAlias($parsed) {
+        $builder = new OrderByAliasBuilder($parsed);
+        return $builder->build($parsed);
+    }
+
+    public function build($parsed) {
+        $sql = "";
+        foreach ($parsed as $k => $v) {
+            $len = strlen($sql);
+            $sql .= $this->buildOrderByAlias($v);
+            $sql .= $this->buildColRef($v);
+
+            if ($len == strlen($sql)) {
+                throw new UnableToCreateSQLException('ORDER', $k, $v, 'expr_type');
+            }
+
+            $sql .= ",";
+        }
+        $sql = substr($sql, 0, -1);
+        return "ORDER BY " . $sql;
+    }
 }
 ?>
