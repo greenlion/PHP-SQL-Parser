@@ -1,8 +1,8 @@
 <?php
 /**
- * PositionBuilder.php
+ * DeleteBuilder.php
  *
- * Builds positions of the GROUP BY clause.
+ * Builds the DELETE statement
  *
  * PHP version 5
  *
@@ -39,24 +39,22 @@
  * 
  */
 
-require_once dirname(__FILE__) . '/../utils/ExpressionType.php';
-
 /**
- * This class implements the builder for positions of the GROUP-BY clause. 
- * You can overwrite all functions to achive another handling.
+ * This class implements the builder for the [DELETE] part. You can overwrite
+ * all functions to achive another handling.
  *
  * @author  André Rothe <andre.rothe@phosco.info>
  * @license http://www.debian.org/misc/bsd.license  BSD License (3 Clause)
  *  
  */
-class OperatorBuilder {
+class DeleteBuilder {
 
     public function build($parsed) {
-        if ($parsed['expr_type'] !== ExpressionType::POSITION) {
-            return "";
+        $sql = "DELETE";
+        foreach ($parsed['TABLES'] as $k => $v) {
+            $sql .= $v . ",";
         }
-        return $parsed['base_expr'];
+        return substr($sql, 0, -1);
     }
-
 }
 ?>

@@ -1,8 +1,8 @@
 <?php
 /**
- * PositionBuilder.php
+ * FromBuilder.php
  *
- * Builds positions of the GROUP BY clause.
+ * Builds the FROM statement
  *
  * PHP version 5
  *
@@ -39,24 +39,49 @@
  * 
  */
 
-require_once dirname(__FILE__) . '/../utils/ExpressionType.php';
+require_once dirname(__FILE__) . '/../exceptions/UnableToCreateSQLException';
+require_once dirname(__FILE__) . '/TableBuilder.php';
+require_once dirname(__FILE__) . '/TableExpressionBuilder.php';
+require_once dirname(__FILE__) . '/SubQueryBuilder.php';
 
 /**
- * This class implements the builder for positions of the GROUP-BY clause. 
- * You can overwrite all functions to achive another handling.
+ * This class implements the builder for the [FROM] part. You can overwrite
+ * all functions to achive another handling.
  *
  * @author  André Rothe <andre.rothe@phosco.info>
  * @license http://www.debian.org/misc/bsd.license  BSD License (3 Clause)
  *  
  */
-class OperatorBuilder {
+class FromBuilder {
 
-    public function build($parsed) {
-        if ($parsed['expr_type'] !== ExpressionType::POSITION) {
-            return "";
-        }
-        return $parsed['base_expr'];
+    protected function buildTable($parsed) {
+        $builder = new TableBuilder($parsed);
+        return $builder->build($parsed);
     }
 
+    protected function buildTableExpression($parsed) {
+        $builder = new TableExpressionBuilder($parsed);
+        return $builder->build($parsed);
+    }
+
+    protected function buildSubQuery($parsed) {
+        $builder = new SubQueryBuilder($parsed);
+        return $builder->build($parsed);
+    }
+
+    public function build($parsed) {
+        $sql = "";
+        foreach ($parsed as $k => $v) {
+            $len = strlen($sql);
+            $sql .= $this->processTable($v, $k);
+            $sql .= $this->processTableExpression($v, $k);
+            $sql .= $this->processSubquery($v, $k);
+
+            if ($len == strlen($sql)) {
+                throw new UnableToCreateSQLException('FROM', $k, $v, 'expr_type');
+            }
+        }
+        return "FROM " . $sql;
+    }
 }
 ?>
