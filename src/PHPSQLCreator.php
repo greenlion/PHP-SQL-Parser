@@ -30,8 +30,11 @@
  */
 
 require_once dirname(__FILE__) . '/exceptions/UnsupportedFeatureException.php';
-require_once dirname(__FILE__) . '/exceptions/UnableToCreateSQLException.php';
-require_once dirname(__FILE__) . '/utils/ExpressionType.php';
+require_once dirname(__FILE__) . '/utils/SelectStatementBuilder.php';
+require_once dirname(__FILE__) . '/utils/DeleteStatementBuilder.php';
+require_once dirname(__FILE__) . '/utils/UpdateStatementBuilder.php';
+require_once dirname(__FILE__) . '/utils/InsertStatementBuilder.php';
+require_once dirname(__FILE__) . '/utils/CreateStatementBuilder.php';
 
 class PHPSQLCreator {
 
@@ -54,13 +57,16 @@ class PHPSQLCreator {
             $this->created = $builder->build($parsed);
             break;
         case "INSERT":
-            $this->created = $this->processInsertStatement($parsed);
+            $builder = new InsertStatementBuilder($parsed);
+            $this->created = $builder->build($parsed);
             break;
         case "DELETE":
-            $this->created = $this->processDeleteStatement($parsed);
+            $builder = new DeleteStatementBuilder($parsed);
+            $this->created = $builder->build($parsed);
             break;
         case "UPDATE":
-            $this->created = $this->processUpdateStatement($parsed);
+            $builder = new UpdateStatementBuilder($parsed);
+            $this->created = $builder->build($parsed);
             break;
         case "RENAME":
             $this->created = $this->processRenameTableStatement($parsed);
@@ -156,112 +162,12 @@ class PHPSQLCreator {
         return $v['source']['base_expr'] . " TO " . $v['destination']['base_expr'];
     }
 
-
-    protected function processInsertStatement($parsed) {
-        // TODO: are there more than one tables possible (like [INSERT][1])
-        return $this->processINSERT($parsed['INSERT'][0]) . " " . $this->processVALUES($parsed['VALUES']);
-        // TODO: subquery?
-    }
-
-    protected function processDeleteStatement($parsed) {
-        $sql = $this->processDELETE($parsed['DELETE']) . " " . $this->processFROM($parsed['FROM']);
-        if (isset($parsed['WHERE'])) {
-            $sql .= " " . $this->processWHERE($parsed['WHERE']);
-        }
-        return $sql;
-    }
-
-    protected function processUpdateStatement($parsed) {
-        $sql = $this->processUPDATE($parsed['UPDATE']) . " " . $this->processSET($parsed['SET']);
-        if (isset($parsed['WHERE'])) {
-            $sql .= " " . $this->processWHERE($parsed['WHERE']);
-        }
-        return $sql;
-    }
-
-    protected function processDELETE($parsed) {
-        $sql = "DELETE";
-        foreach ($parsed['TABLES'] as $k => $v) {
-            $sql .= $v . ",";
-        }
-        return substr($sql, 0, -1);
-    }
-
-    protected function processSELECT($parsed) {
-        $sql = "";
-        foreach ($parsed as $k => $v) {
-            $len = strlen($sql);
-            $sql .= $this->processColRef($v);
-            $sql .= $this->processSelectBracketExpression($v);
-            $sql .= $this->processSelectExpression($v);
-            $sql .= $this->processFunction($v);
-            $sql .= $this->processConstant($v);
-
-            if ($len == strlen($sql)) {
-                throw new UnableToCreateSQLException('SELECT', $k, $v, 'expr_type');
-            }
-
-            $sql .= ", ";
-        }
-        $sql = substr($sql, 0, -2);
-        return "SELECT " . $sql;
-    }
-
-    protected function processFROM($parsed) {
-        $sql = "";
-        foreach ($parsed as $k => $v) {
-            $len = strlen($sql);
-            $sql .= $this->processTable($v, $k);
-            $sql .= $this->processTableExpression($v, $k);
-            $sql .= $this->processSubquery($v, $k);
-
-            if ($len == strlen($sql)) {
-                throw new UnableToCreateSQLException('FROM', $k, $v, 'expr_type');
-            }
-        }
-        return "FROM " . $sql;
-    }
-
-    protected function processORDER($parsed) {
-        $sql = "";
-        foreach ($parsed as $k => $v) {
-            $len = strlen($sql);
-            $sql .= $this->processOrderByAlias($v);
-            $sql .= $this->processColRef($v);
-
-            if ($len == strlen($sql)) {
-                throw new UnableToCreateSQLException('ORDER', $k, $v, 'expr_type');
-            }
-
-            $sql .= ",";
-        }
-        $sql = substr($sql, 0, -1);
-        return "ORDER BY " . $sql;
-    }
-
     protected function processLIMIT($parsed) {
         $sql = ($parsed['offset'] ? $parsed['offset'] . ", " : "") . $parsed['rowcount'];
         if ($sql === "") {
             throw new UnableToCreateSQLException('LIMIT', 'rowcount', $parsed, 'rowcount');
         }
         return "LIMIT " . $sql;
-    }
-
-    protected function processGROUP($parsed) {
-        $sql = "";
-        foreach ($parsed as $k => $v) {
-            $len = strlen($sql);
-            $sql .= $this->processColRef($v);
-            $sql .= $this->processPosition($v);
-
-            if ($len == strlen($sql)) {
-                throw new UnableToCreateSQLException('GROUP', $k, $v, 'expr_type');
-            }
-
-            $sql .= ",";
-        }
-        $sql = substr($sql, 0, -1);
-        return "GROUP BY " . $sql;
     }
 
     protected function processRecord($parsed) {
@@ -299,37 +205,6 @@ class PHPSQLCreator {
         }
         $sql = substr($sql, 0, -1);
         return "VALUES " . $sql;
-    }
-
-    protected function processINSERT($parsed) {
-        $sql = "INSERT INTO " . $parsed['table'];
-
-        if ($parsed['columns'] === false) {
-            return $sql;
-        }
-
-        $columns = "";
-        foreach ($parsed['columns'] as $k => $v) {
-            $len = strlen($columns);
-            $columns .= $this->processColRef($v);
-
-            if ($len == strlen($columns)) {
-                throw new UnableToCreateSQLException('INSERT[columns]', $k, $v, 'expr_type');
-            }
-
-            $columns .= ",";
-        }
-
-        if ($columns !== "") {
-            $columns = " (" . substr($columns, 0, -1) . ")";
-        }
-
-        $sql .= $columns;
-        return $sql;
-    }
-
-    protected function processUPDATE($parsed) {
-        return "UPDATE " . $parsed[0]['table'];
     }
 
     protected function processSetExpression($parsed) {
@@ -478,7 +353,7 @@ class PHPSQLCreator {
 
     protected function processFunction($parsed) {
         if (($parsed['expr_type'] !== ExpressionType::AGGREGATE_FUNCTION)
-                && ($parsed['expr_type'] !== ExpressionType::SIMPLE_FUNCTION)) {
+            && ($parsed['expr_type'] !== ExpressionType::SIMPLE_FUNCTION)) {
             return "";
         }
 
@@ -505,9 +380,6 @@ class PHPSQLCreator {
         return $parsed['base_expr'] . "(" . substr($sql, 0, -1) . ")" . $this->processAlias($parsed);
     }
 
-
-
-
     protected function processRefClause($parsed) {
         if ($parsed === false) {
             return "";
@@ -528,7 +400,6 @@ class PHPSQLCreator {
         }
         return "(" . substr($sql, 0, -1) . ")";
     }
-
 
     protected function processRefType($parsed) {
         if ($parsed === false) {
@@ -592,10 +463,6 @@ class PHPSQLCreator {
         }
         return $sql;
     }
-
-
-
-
 
     protected function processInList($parsed) {
         if ($parsed['expr_type'] !== ExpressionType::IN_LIST) {
