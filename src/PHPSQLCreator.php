@@ -191,44 +191,7 @@ class PHPSQLCreator {
         return "(" . $sql . ")";
     }
 
-    protected function processVALUES($parsed) {
-        $sql = "";
-        foreach ($parsed as $k => $v) {
-            $len = strlen($sql);
-            $sql .= $this->processRecord($v);
 
-            if ($len == strlen($sql)) {
-                throw new UnableToCreateSQLException('VALUES', $k, $v, 'expr_type');
-            }
-
-            $sql .= ",";
-        }
-        $sql = substr($sql, 0, -1);
-        return "VALUES " . $sql;
-    }
-
-    protected function processSetExpression($parsed) {
-        if ($parsed['expr_type'] !== ExpressionType::EXPRESSION) {
-            return "";
-        }
-        $sql = "";
-        foreach ($parsed['sub_tree'] as $k => $v) {
-            $len = strlen($sql);
-            $sql .= $this->processColRef($v);
-            $sql .= $this->processConstant($v);
-            $sql .= $this->processOperator($v);
-            $sql .= $this->processFunction($v);
-
-            if ($len == strlen($sql)) {
-                throw new UnableToCreateSQLException('SET expression subtree', $k, $v, 'expr_type');
-            }
-
-            $sql .= " ";
-        }
-
-        $sql = substr($sql, 0, -1);
-        return $sql;
-    }
 
     protected function processSET($parsed) {
         $sql = "";
@@ -245,97 +208,8 @@ class PHPSQLCreator {
         return "SET " . substr($sql, 0, -1);
     }
 
-    protected function processWHERE($parsed) {
-        $sql = "WHERE ";
-        foreach ($parsed as $k => $v) {
-            $len = strlen($sql);
 
-            $sql .= $this->processOperator($v);
-            $sql .= $this->processConstant($v);
-            $sql .= $this->processColRef($v);
-            $sql .= $this->processSubquery($v);
-            $sql .= $this->processInList($v);
-            $sql .= $this->processFunction($v);
-            $sql .= $this->processWhereExpression($v);
-            $sql .= $this->processWhereBracketExpression($v);
-            $sql .= $this->processUserVariable($v);
 
-            if (strlen($sql) == $len) {
-                throw new UnableToCreateSQLException('WHERE', $k, $v, 'expr_type');
-            }
-
-            $sql .= " ";
-        }
-        return substr($sql, 0, -1);
-    }
-
-    protected function processWhereExpression($parsed) {
-        if ($parsed['expr_type'] !== ExpressionType::EXPRESSION) {
-            return "";
-        }
-        $sql = "";
-        foreach ($parsed['sub_tree'] as $k => $v) {
-            $len = strlen($sql);
-            $sql .= $this->processColRef($v);
-            $sql .= $this->processConstant($v);
-            $sql .= $this->processOperator($v);
-            $sql .= $this->processInList($v);
-            $sql .= $this->processFunction($v);
-            $sql .= $this->processWhereExpression($v);
-            $sql .= $this->processWhereBracketExpression($v);
-            $sql .= $this->processUserVariable($v);
-
-            if ($len == strlen($sql)) {
-                throw new UnableToCreateSQLException('WHERE expression subtree', $k, $v, 'expr_type');
-            }
-
-            $sql .= " ";
-        }
-
-        $sql = substr($sql, 0, -1);
-        return $sql;
-    }
-
-    protected function processUserVariable($parsed) {
-        if ($parsed['expr_type'] !== ExpressionType::USER_VARIABLE) {
-            return "";
-        }
-        return $parsed['base_expr'];
-    }
-
-    protected function processWhereBracketExpression($parsed) {
-        if ($parsed['expr_type'] !== ExpressionType::BRACKET_EXPRESSION) {
-            return "";
-        }
-        $sql = "";
-        foreach ($parsed['sub_tree'] as $k => $v) {
-            $len = strlen($sql);
-            $sql .= $this->processColRef($v);
-            $sql .= $this->processConstant($v);
-            $sql .= $this->processOperator($v);
-            $sql .= $this->processInList($v);
-            $sql .= $this->processFunction($v);
-            $sql .= $this->processWhereExpression($v);
-            $sql .= $this->processWhereBracketExpression($v);
-            $sql .= $this->processUserVariable($v);
-
-            if ($len == strlen($sql)) {
-                throw new UnableToCreateSQLException('WHERE expression subtree', $k, $v, 'expr_type');
-            }
-
-            $sql .= " ";
-        }
-
-        $sql = "(" . substr($sql, 0, -1) . ")";
-        return $sql;
-    }
-
-    protected function processOrderByAlias($parsed) {
-        if ($parsed['expr_type'] !== ExpressionType::ALIAS) {
-            return "";
-        }
-        return $parsed['base_expr'] . $this->processDirection($parsed);
-    }
 
     protected function processLimitRowCount($key, $value) {
         if ($key != 'rowcount') {
