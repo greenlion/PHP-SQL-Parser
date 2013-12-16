@@ -51,7 +51,7 @@ require_once dirname(__FILE__) . '/../utils/ExpressionType.php';
  */
 class DataTypeBuilder {
 
-    protected function build($parsed) {
+    public function build($parsed) {
         if ($parsed['expr_type'] !== ExpressionType::DATA_TYPE) {
             return "";
         }
