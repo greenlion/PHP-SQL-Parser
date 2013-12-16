@@ -39,6 +39,10 @@
  * 
  */
 
+require_once dirname(__FILE__) . '/LikeBuilder.php';
+require_once dirname(__FILE__) . '/SelectStatementBuilder.php';
+require_once dirname(__FILE__) . '/CreateBuilder.php';
+
 /**
  * This class implements the builder for the whole Create statement. You can overwrite
  * all functions to achive another handling.
@@ -60,7 +64,7 @@ class CreateStatementBuilder {
     }
 
     protected function buildCREATE($parsed) {
-        $builder = new CREATEBuilder($parsed);
+        $builder = new CreateBuilder($parsed);
         return $builder->build($parsed);
     }
     
