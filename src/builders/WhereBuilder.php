@@ -106,7 +106,7 @@ class WhereBuilder {
         return $builder->build($parsed);
     }
     
-    protected function build($parsed) {
+    public function build($parsed) {
         $sql = "WHERE ";
         foreach ($parsed as $k => $v) {
             $len = strlen($sql);
