@@ -43,20 +43,20 @@ class LexerSplitter {
     private static $_splitters = array("<=>", "\r\n", "!=", ">=", "<=", "<>", "<<", ">>", ":=", "\\", "&&", "||", ":=",
                                        "/*", "*/", "--", ">", "<", "|", "=", "^", "(", ")", "\t", "\n", "'", "\"", "`",
                                        ",", "@", " ", "+", "-", "*", "/", ";");
-    private $tokenSize;
-    private $hashSet;
+    private $_tokenSize;
+    private $_hashSet;
 
     public function __construct() {
-        $this->tokenSize = strlen(self::$_splitters[0]); // should be the largest one
-        $this->hashSet = array_flip(self::$_splitters);
+        $this->_tokenSize = strlen(self::$_splitters[0]); // should be the largest one
+        $this->_hashSet = array_flip(self::$_splitters);
     }
 
     public function getMaxLengthOfSplitter() {
-        return $this->tokenSize;
+        return $this->_tokenSize;
     }
 
     public function isSplitter($token) {
-        return isset($this->hashSet[$token]);
+        return isset($this->_hashSet[$token]);
     }
 }
 
