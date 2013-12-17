@@ -29,8 +29,13 @@ $sql = "CREATE TABLE hohoho (a varchar(1000) NOT NULL, CONSTRAINT hohoho_pk PRIM
 $parser->parse($sql);
 $p = $parser->parsed;
 print_r($p);
-$creator = new PHPSQLCreator($parser->parsed);
-$created = $creator->created;
+try {
+    $creator = new PHPSQLCreator($parser->parsed);
+    $created = $creator->created;
+} catch (Exception $e) {
+    echo $e->getMessage();
+    $created = "";
+}
 $expected = getExpectedValue(dirname(__FILE__), 'issue33c.sql', false);
 ok($created === $expected, 'CREATE TABLE statement with named primary key and check');
 
