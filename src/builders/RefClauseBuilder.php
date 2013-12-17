@@ -60,7 +60,7 @@ class RefClauseBuilder {
     }
 
     protected function buildOperator($parsed) {
-        $builder = new OperatorExpressionBuilder();
+        $builder = new OperatorBuilder();
         return $builder->build($parsed);
     }
 
