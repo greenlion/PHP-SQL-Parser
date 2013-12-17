@@ -118,7 +118,7 @@ class WhereBracketExpressionBuilder {
             $sql .= " ";
         }
 
-        $sql = substr($sql, 0, -1);
+        $sql = "(" . substr($sql, 0, -1) . ")";
         return $sql;
     }
 
