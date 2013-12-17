@@ -39,7 +39,7 @@
  * 
  */
 
-require_once dirname(__FILE__) . '/../exceptions/UnableToCreateSQLException';
+require_once dirname(__FILE__) . '/../exceptions/UnableToCreateSQLException.php';
 require_once dirname(__FILE__) . '/TableBuilder.php';
 require_once dirname(__FILE__) . '/TableExpressionBuilder.php';
 require_once dirname(__FILE__) . '/SubQueryBuilder.php';
