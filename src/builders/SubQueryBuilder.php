@@ -77,7 +77,7 @@ class SubQueryBuilder {
     }
 
     protected function buildSelectStatement($parsed) {
-        $builder = new AliasBuilder();
+        $builder = new SelectStatementBuilder();
         return $builder->build($parsed);
     }
 
