@@ -52,16 +52,16 @@ require_once dirname(__FILE__) . '/SubTreeBuilder.php';
  */
 class InListBuilder {
 
-    protected function buildSubTree($parsed) {
+    protected function buildSubTree($parsed, $delim) {
         $builder = new SubTreeBuilder();
-        return $builder->build($parsed);
+        return $builder->build($parsed, $delim);
     }
 
     public function build($parsed) {
         if ($parsed['expr_type'] !== ExpressionType::IN_LIST) {
             return "";
         }
-        $sql = $this->buildSubTree($parsed, ",");
+        $sql = $this->buildSubTree($parsed, ", ");
         return "(" . $sql . ")";
     }
 }
