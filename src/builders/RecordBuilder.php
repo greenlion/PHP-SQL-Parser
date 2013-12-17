@@ -35,7 +35,7 @@
  * @author    André Rothe <andre.rothe@phosco.info>
  * @copyright 2010-2014 Justin Swanhart and André Rothe
  * @license   http://www.debian.org/misc/bsd.license  BSD License (3 Clause)
- * @version   SVN: $Id: CheckBuilder.php 764 2013-12-16 11:19:30Z phosco@gmx.de $
+ * @version   SVN: $Id$
  * 
  */
 
