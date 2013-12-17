@@ -81,7 +81,7 @@ class SubQueryBuilder {
         return $builder->build($parsed);
     }
 
-    protected function build($parsed, $index = 0) {
+    public function build($parsed, $index = 0) {
         if ($parsed['expr_type'] !== ExpressionType::SUBQUERY) {
             return "";
         }
