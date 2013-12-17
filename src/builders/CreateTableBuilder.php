@@ -71,9 +71,9 @@ class CreateTableBuilder {
     
     public function build($parsed) {
         $sql = $parsed['name'];
-        $sql .= $this->processCreateTableDefinition($parsed);
-        $sql .= $this->processCreateTableOptions($parsed);
-        $sql .= $this->processCreateTableSelectOption($parsed);
+        $sql .= $this->buildCreateTableDefinition($parsed);
+        $sql .= $this->buildCreateTableOptions($parsed);
+        $sql .= $this->buildCreateTableSelectOption($parsed);
         if (strlen($sql) === 0) {
             throw new UnableToCreateSQLException('TABLE', "", $parsed, 'name');
         }
