@@ -63,7 +63,7 @@ class SelectExpressionBuilder {
         return $builder->build($parsed);
     }
 
-    protected function processSelectExpression($parsed) {
+    public function build($parsed) {
         if ($parsed['expr_type'] !== ExpressionType::EXPRESSION) {
             return "";
         }
