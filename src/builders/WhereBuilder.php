@@ -114,7 +114,7 @@ class WhereBuilder {
             $sql .= $this->buildOperator($v);
             $sql .= $this->buildConstant($v);
             $sql .= $this->buildColRef($v);
-            $sql .= $this->buildSubquery($v);
+            $sql .= $this->buildSubQuery($v);
             $sql .= $this->buildInList($v);
             $sql .= $this->buildFunction($v);
             $sql .= $this->buildWhereExpression($v);
