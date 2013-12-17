@@ -7,8 +7,10 @@ require_once dirname(__FILE__) . '/../../test-more.php';
 
 $sql = "SELECT a.* FROM tabla_a a WHERE (a.client_id in (1,2,3))";
 $parser = new PHPSQLParser($sql);
+print_r($parser->parsed);
 $creator = new PHPSQLCreator($parser->parsed);
 $created = $creator->created;
+print_r($created);
 $expected = getExpectedValue(dirname(__FILE__), 'issue58.sql', false);
 ok($created === $expected, 'in-list within WHERE expression');
 
