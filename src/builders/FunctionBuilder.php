@@ -74,16 +74,16 @@ class FunctionBuilder {
         return $builder->build($parsed);
     }
 
-    protected function buildFunction($parsed) {
-        $builder = new FunctionBuilder();
-        return $builder->build($parsed);
-    }
-
     protected function buildReserved($parsed) {
         $builder = new ReservedBuilder();
         return $builder->build($parsed);
     }
 
+    protected function isReserved($parsed) {
+        $builder = new ReservedBuilder();
+        return $builder->isReserved($parsed);
+    }
+    
     protected function buildSelectExpression($parsed) {
         $builder = new SelectExpressionBuilder();
         return $builder->build($parsed);
@@ -107,7 +107,7 @@ class FunctionBuilder {
         $sql = "";
         foreach ($parsed['sub_tree'] as $k => $v) {
             $len = strlen($sql);
-            $sql .= $this->buildFunction($v);
+            $sql .= $this->build($v);
             $sql .= $this->buildConstant($v);
             $sql .= $this->buildColRef($v);
             $sql .= $this->buildReserved($v);

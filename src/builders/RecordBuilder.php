@@ -59,17 +59,17 @@ class RecordBuilder {
         $builder = new OperatorBuilder();
         return $builder->build($parsed);
     }
-    
+
     protected function buildFunction($parsed) {
         $builder = new FunctionBuilder();
         return $builder->build($parsed);
     }
-    
+
     protected function buildConstant($parsed) {
         $builder = new ConstantBuilder();
         return $builder->build($parsed);
     }
-    
+
     public function build($parsed) {
         if ($parsed['expr_type'] !== ExpressionType::RECORD) {
             return "";
@@ -77,9 +77,9 @@ class RecordBuilder {
         $sql = "";
         foreach ($parsed['data'] as $k => $v) {
             $len = strlen($sql);
-            $sql .= $this->processConstant($v);
-            $sql .= $this->processFunction($v);
-            $sql .= $this->processOperator($v);
+            $sql .= $this->buildConstant($v);
+            $sql .= $this->buildFunction($v);
+            $sql .= $this->buildOperator($v);
 
             if ($len == strlen($sql)) {
                 throw new UnableToCreateSQLException(ExpressionType::RECORD, $k, $v, 'expr_type');
@@ -90,6 +90,6 @@ class RecordBuilder {
         $sql = substr($sql, 0, -1);
         return "(" . $sql . ")";
     }
-    
+
 }
 ?>

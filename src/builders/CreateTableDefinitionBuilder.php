@@ -56,7 +56,7 @@ class CreateTableDefinitionBuilder {
         return $builder->build($parsed);
     }
 
-    public function process($parsed) {
+    public function build($parsed) {
         if (!isset($parsed) || $parsed['create-def'] === false) {
             return "";
         }
