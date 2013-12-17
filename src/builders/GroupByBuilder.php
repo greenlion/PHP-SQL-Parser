@@ -74,9 +74,9 @@ class GroupByBuilder {
                 throw new UnableToCreateSQLException('GROUP', $k, $v, 'expr_type');
             }
 
-            $sql .= ",";
+            $sql .= ", ";
         }
-        $sql = substr($sql, 0, -1);
+        $sql = substr($sql, 0, -2);
         return "GROUP BY " . $sql;
     }
     
