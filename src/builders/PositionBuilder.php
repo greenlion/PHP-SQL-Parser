@@ -49,7 +49,7 @@ require_once dirname(__FILE__) . '/../utils/ExpressionType.php';
  * @license http://www.debian.org/misc/bsd.license  BSD License (3 Clause)
  *  
  */
-class OperatorBuilder {
+class PositionBuilder {
 
     public function build($parsed) {
         if ($parsed['expr_type'] !== ExpressionType::POSITION) {
@@ -57,6 +57,5 @@ class OperatorBuilder {
         }
         return $parsed['base_expr'];
     }
-
 }
 ?>
