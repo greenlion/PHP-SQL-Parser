@@ -96,7 +96,7 @@ class WhereBracketExpressionBuilder {
     }
 
     public function build($parsed) {
-        if ($parsed['expr_type'] !== ExpressionType::EXPRESSION) {
+        if ($parsed['expr_type'] !== ExpressionType::BRACKET_EXPRESSION) {
             return "";
         }
         $sql = "";
