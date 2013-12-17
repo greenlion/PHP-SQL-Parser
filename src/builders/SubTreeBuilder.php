@@ -115,7 +115,7 @@ class SubTreeBuilder {
 
             $sql .= $delim;
         }
-        return substr($sql, 0, -1);
+        return substr($sql, 0, -strlen($delim));
     }
 }
 ?>
