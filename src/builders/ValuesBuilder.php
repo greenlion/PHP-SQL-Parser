@@ -53,7 +53,7 @@ require_once dirname(__FILE__) . '/RecordBuilder.php';
 class ValuesBuilder {
 
     protected function buildRecord($parsed) {
-        $builder = new RecordBuilder($parsed);
+        $builder = new RecordBuilder();
         return $builder->build($parsed);
     }
 

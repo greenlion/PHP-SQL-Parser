@@ -54,17 +54,17 @@ require_once dirname(__FILE__) . '/DeleteBuilder.php';
 class DeleteStatementBuilder {
 
     protected function buildWHERE($parsed) {
-        $builder = new WhereBuilder($parsed);
+        $builder = new WhereBuilder();
         return $builder->build($parsed);
     }
 
     protected function buildFROM($parsed) {
-        $builder = new FromBuilder($parsed);
+        $builder = new FromBuilder();
         return $builder->build($parsed);
     }
 
     protected function buildDELETE($parsed) {
-        $builder = new DeleteBuilder($parsed);
+        $builder = new DeleteBuilder();
         return $builder->build($parsed);
     }
     

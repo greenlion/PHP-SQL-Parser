@@ -54,17 +54,17 @@ require_once dirname(__FILE__) . '/CreateBuilder.php';
 class CreateStatementBuilder {
 
     protected function buildLIKE($parsed) {
-        $builder = new LikeBuilder($parsed);
+        $builder = new LikeBuilder();
         return $builder->build($parsed);
     }
 
     protected function buildSelectStatement($parsed) {
-        $builder = new SelectStatementBuilder($parsed);
+        $builder = new SelectStatementBuilder();
         return $builder->build($parsed);
     }
 
     protected function buildCREATE($parsed) {
-        $builder = new CreateBuilder($parsed);
+        $builder = new CreateBuilder();
         return $builder->build($parsed);
     }
     

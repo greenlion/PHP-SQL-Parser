@@ -53,7 +53,7 @@ require_once dirname(__FILE__) . '/DirectionBuilder.php';
 class OrderByAliasBuilder {
 
     protected function buildDirection($parsed) {
-        $builder = new DirectionBuilder($parsed);
+        $builder = new DirectionBuilder();
         return $builder->build($parsed);
     }
 

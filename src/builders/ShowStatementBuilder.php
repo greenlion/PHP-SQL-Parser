@@ -53,12 +53,12 @@ require_once dirname(__FILE__) . '/WhereBuilder.php';
 class ShowStatementBuilder {
 
     protected function buildWHERE($parsed) {
-        $builder = new WhereBuilder($parsed);
+        $builder = new WhereBuilder();
         return $builder->build($parsed);
     }
     
     protected function buildSHOW($parsed) {
-        $builder = new ShowBuilder($parsed);
+        $builder = new ShowBuilder();
         return $builder->build($parsed);
     }
     

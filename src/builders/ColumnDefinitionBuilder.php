@@ -54,12 +54,12 @@ require_once dirname(__FILE__) . '/../utils/ExpressionType.php';
 class ColumnDefinitionBuilder {
 
     protected function buildColRef($parsed) {
-        $builder = new ColumnReferenceBuilder($parsed);
+        $builder = new ColumnReferenceBuilder();
         return $builder->build($parsed);
     }
 
     protected function buildColumnType($parsed) {
-        $builder = new ColumnTypeBuilder($parsed);
+        $builder = new ColumnTypeBuilder();
         return $builder->build($parsed);
     }
 

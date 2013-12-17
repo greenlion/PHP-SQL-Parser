@@ -54,19 +54,19 @@ require_once dirname(__FILE__) . '/SubQueryBuilder.php';
  */
 class FromBuilder {
 
-    protected function buildTable($parsed) {
-        $builder = new TableBuilder($parsed);
-        return $builder->build($parsed);
+    protected function buildTable($parsed, $key) {
+        $builder = new TableBuilder();
+        return $builder->build($parsed, $key);
     }
 
-    protected function buildTableExpression($parsed) {
-        $builder = new TableExpressionBuilder($parsed);
-        return $builder->build($parsed);
+    protected function buildTableExpression($parsed, $key) {
+        $builder = new TableExpressionBuilder();
+        return $builder->build($parsed, $key);
     }
 
-    protected function buildSubQuery($parsed) {
-        $builder = new SubQueryBuilder($parsed);
-        return $builder->build($parsed);
+    protected function buildSubQuery($parsed, $key) {
+        $builder = new SubQueryBuilder();
+        return $builder->build($parsed, $key);
     }
 
     public function build($parsed) {

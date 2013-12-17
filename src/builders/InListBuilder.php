@@ -53,7 +53,7 @@ require_once dirname(__FILE__) . '/SubTreeBuilder.php';
 class InListBuilder {
 
     protected function buildSubTree($parsed) {
-        $builder = new SubTreeBuilder($parsed);
+        $builder = new SubTreeBuilder();
         return $builder->build($parsed);
     }
 

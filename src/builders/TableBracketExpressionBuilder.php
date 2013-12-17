@@ -56,17 +56,17 @@ require_once dirname(__FILE__) . '/../utils/ExpressionType.php';
 class TableBracketExpressionBuilder {
 
     protected function buildColDef($parsed) {
-        $builder = new ColumnDefinitionBuilder($parsed);
+        $builder = new ColumnDefinitionBuilder();
         return $builder->build($parsed);
     }
 
     protected function buildPrimaryKey($parsed) {
-        $builder = new PrimaryKeyBuilder($parsed);
+        $builder = new PrimaryKeyBuilder();
         return $builder->build($parsed);
     }
 
     protected function buildCheck($parsed) {
-        $builder = new CheckBuilder($parsed);
+        $builder = new CheckBuilder();
         return $builder->build($parsed);
     }
     

@@ -53,7 +53,7 @@ require_once dirname(__FILE__) . '/../utils/ExpressionType.php';
 class ConstantBuilder {
 
     protected function buildAlias($parsed) {
-        $builder = new AliasBuilder($parsed);
+        $builder = new AliasBuilder();
         return $builder->build($parsed);
     }
 

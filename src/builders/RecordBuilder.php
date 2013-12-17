@@ -56,17 +56,17 @@ require_once dirname(__FILE__) . '/FunctionBuilder.php';
 class RecordBuilder {
 
     protected function buildOperator($parsed) {
-        $builder = new OperatorBuilder($parsed);
+        $builder = new OperatorBuilder();
         return $builder->build($parsed);
     }
     
     protected function buildFunction($parsed) {
-        $builder = new FunctionBuilder($parsed);
+        $builder = new FunctionBuilder();
         return $builder->build($parsed);
     }
     
     protected function buildConstant($parsed) {
-        $builder = new ConstantBuilder($parsed);
+        $builder = new ConstantBuilder();
         return $builder->build($parsed);
     }
     

@@ -53,7 +53,7 @@ require_once dirname(__FILE__) . '/../utils/ExpressionType.php';
 class IndexColumnBuilder {
 
     protected function buildIndexColumn($parsed) {
-        $builder = new IndexColumnBuilder($parsed);
+        $builder = new IndexColumnBuilder();
         return $builder->build($parsed);
     }
 

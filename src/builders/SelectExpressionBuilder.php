@@ -53,13 +53,13 @@ require_once dirname(__FILE__) . '/../utils/ExpressionType.php';
  */
 class SelectExpressionBuilder {
 
-    protected function buildSubTree($parsed) {
-        $builder = new SubTreeBuilder($parsed);
-        return $builder->build($parsed);
+    protected function buildSubTree($parsed, $delim) {
+        $builder = new SubTreeBuilder();
+        return $builder->build($parsed, $delim);
     }
 
     protected function buildAlias($parsed) {
-        $builder = new AliasBuilder($parsed);
+        $builder = new AliasBuilder();
         return $builder->build($parsed);
     }
 

@@ -57,27 +57,27 @@ require_once dirname(__FILE__) . '/../utils/ExpressionType.php';
 class SubQueryBuilder {
 
     protected function buildRefClause($parsed) {
-        $builder = new RefClauseBuilder($parsed);
+        $builder = new RefClauseBuilder();
         return $builder->build($parsed);
     }
 
     protected function buildRefType($parsed) {
-        $builder = new RefTypeBuilder($parsed);
+        $builder = new RefTypeBuilder();
         return $builder->build($parsed);
     }
 
     protected function buildJoin($parsed) {
-        $builder = new JoinBuilder($parsed);
+        $builder = new JoinBuilder();
         return $builder->build($parsed);
     }
 
     protected function buildAlias($parsed) {
-        $builder = new AliasBuilder($parsed);
+        $builder = new AliasBuilder();
         return $builder->build($parsed);
     }
 
     protected function buildSelectStatement($parsed) {
-        $builder = new AliasBuilder($parsed);
+        $builder = new AliasBuilder();
         return $builder->build($parsed);
     }
 

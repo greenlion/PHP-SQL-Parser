@@ -53,7 +53,7 @@ require_once dirname(__FILE__) . '/ColumnReferenceBuilder.php';
 class InsertBuilder {
 
     protected function buildColRef($parsed) {
-        $builder = new ColumnReferenceBuilder($parsed);
+        $builder = new ColumnReferenceBuilder();
         return $builder->build($parsed);
     }
 

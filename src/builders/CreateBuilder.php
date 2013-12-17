@@ -54,12 +54,12 @@ require_once dirname(__FILE__) . '/SubTreeBuilder.php';
 class CreateBuilder {
 
     protected function buildCreateTable($parsed) {
-        $builder = new CreateTableBuilder($parsed);
+        $builder = new CreateTableBuilder();
         return $builder->build($parsed);
     }
 
     protected function buildSubTree($parsed) {
-        $builder = new SubTreeBuilder($parsed);
+        $builder = new SubTreeBuilder();
         return $builder->build($parsed);
     }
     

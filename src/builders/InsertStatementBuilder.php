@@ -53,7 +53,7 @@ require_once dirname(__FILE__) . '/ValuesBuilder.php';
 class InsertStatementBuilder {
 
     protected function buildVALUES($parsed) {
-        $builder = new ValuesBuilder($parsed);
+        $builder = new ValuesBuilder();
         return $builder->build($parsed);
     }
 

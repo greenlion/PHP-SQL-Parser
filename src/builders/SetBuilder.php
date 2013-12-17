@@ -57,7 +57,7 @@ require_once dirname(__FILE__) . '/FunctionBuilder.php';
 class SetBuilder {
 
     protected function buildSetExpression($parsed) {
-        $builder = new SetExpressionBuilder($parsed);
+        $builder = new SetExpressionBuilder();
         return $builder->build($parsed);
     }
 
