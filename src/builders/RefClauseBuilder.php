@@ -39,7 +39,7 @@
  * 
  */
 
-require_once dirname(__FILE__) . '/../exceptions/UnableToCreateSQLException';
+require_once dirname(__FILE__) . '/../exceptions/UnableToCreateSQLException.php';
 require_once dirname(__FILE__) . '/ColumnReferenceBuilder.php';
 require_once dirname(__FILE__) . '/OperatorBuilder.php';
 require_once dirname(__FILE__) . '/ConstantBuilder.php';
