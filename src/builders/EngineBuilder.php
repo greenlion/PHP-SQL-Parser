@@ -51,7 +51,7 @@ require_once dirname(__FILE__) . '/../utils/ExpressionType.php';
  */
 class EngineBuilder {
 
-    public function processEngine($parsed) {
+    public function build($parsed) {
         if ($parsed['expr_type'] !== ExpressionType::ENGINE) {
             return "";
         }
