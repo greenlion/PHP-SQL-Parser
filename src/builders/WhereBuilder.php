@@ -62,64 +62,64 @@ require_once dirname(__FILE__) . '/SubQueryBuilder.php';
 class WhereBuilder {
 
     protected function buildColRef($parsed) {
-        $builder = new ColumnReferenceBuilder($parsed);
+        $builder = new ColumnReferenceBuilder();
         return $builder->build($parsed);
     }
 
     protected function buildConstant($parsed) {
-        $builder = new ConstantBuilder($parsed);
+        $builder = new ConstantBuilder();
         return $builder->build($parsed);
     }
-    
+
     protected function buildOperator($parsed) {
-        $builder = new OperatorBuilder($parsed);
+        $builder = new OperatorBuilder();
         return $builder->build($parsed);
     }
-    
+
     protected function buildFunction($parsed) {
-        $builder = new FunctionBuilder($parsed);
+        $builder = new FunctionBuilder();
         return $builder->build($parsed);
     }
-    
+
     protected function buildSubQuery($parsed) {
-        $builder = new SubQueryBuilder($parsed);
+        $builder = new SubQueryBuilder();
         return $builder->build($parsed);
     }
-    
+
     protected function buildInList($parsed) {
-        $builder = new InListBuilder($parsed);
+        $builder = new InListBuilder();
         return $builder->build($parsed);
     }
-    
+
     protected function buildWhereExpression($parsed) {
-        $builder = new WhereExpressionBuilder($parsed);
+        $builder = new WhereExpressionBuilder();
         return $builder->build($parsed);
     }
-    
+
     protected function buildWhereBracketExpression($parsed) {
-        $builder = new WhereBracketExpressionBuilder($parsed);
+        $builder = new WhereBracketExpressionBuilder();
         return $builder->build($parsed);
     }
-    
+
     protected function buildUserVariable($parsed) {
-        $builder = new UserVariableBuilder($parsed);
+        $builder = new UserVariableBuilder();
         return $builder->build($parsed);
     }
-    
+
     public function build($parsed) {
         $sql = "WHERE ";
         foreach ($parsed as $k => $v) {
             $len = strlen($sql);
 
-            $sql .= $this->processOperator($v);
-            $sql .= $this->processConstant($v);
-            $sql .= $this->processColRef($v);
-            $sql .= $this->processSubquery($v);
-            $sql .= $this->processInList($v);
-            $sql .= $this->processFunction($v);
-            $sql .= $this->processWhereExpression($v);
-            $sql .= $this->processWhereBracketExpression($v);
-            $sql .= $this->processUserVariable($v);
+            $sql .= $this->buildOperator($v);
+            $sql .= $this->buildConstant($v);
+            $sql .= $this->buildColRef($v);
+            $sql .= $this->buildSubquery($v);
+            $sql .= $this->buildInList($v);
+            $sql .= $this->buildFunction($v);
+            $sql .= $this->buildWhereExpression($v);
+            $sql .= $this->buildWhereBracketExpression($v);
+            $sql .= $this->buildUserVariable($v);
 
             if (strlen($sql) == $len) {
                 throw new UnableToCreateSQLException('WHERE', $k, $v, 'expr_type');
@@ -129,6 +129,6 @@ class WhereBuilder {
         }
         return substr($sql, 0, -1);
     }
-    
+
 }
 ?>

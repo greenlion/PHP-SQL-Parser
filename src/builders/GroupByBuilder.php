@@ -54,12 +54,12 @@ require_once dirname(__FILE__) . '/ColumnReferenceBuilder.php';
 class GroupByBuilder {
 
     protected function buildColRef($parsed) {
-        $builder = new ColumnReferenceBuilder($parsed);
+        $builder = new ColumnReferenceBuilder();
         return $builder->build($parsed);
     }
 
     protected function buildPosition($parsed) {
-        $builder = new PositionBuilder($parsed);
+        $builder = new PositionBuilder();
         return $builder->build($parsed);
     }
 

@@ -52,9 +52,9 @@ require_once dirname(__FILE__) . '/TableBuilder.php';
  */
 class LikeBuilder {
 
-    protected function buildTable($parsed) {
-        $builder = new TableBuilder($parsed);
-        return $builder->build($parsed);
+    protected function buildTable($parsed, $index) {
+        $builder = new TableBuilder();
+        return $builder->build($parsed, $index);
     }
     
     public function build($parsed) {

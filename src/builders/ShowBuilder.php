@@ -58,38 +58,38 @@ require_once dirname(__FILE__) . '/TableBuilder.php';
  */
 class ShowBuilder {
 
-    protected function buildTable($parsed) {
-        $builder = new TableBuilder($parsed);
-        return $builder->build($parsed);
+    protected function buildTable($parsed, $delim) {
+        $builder = new TableBuilder();
+        return $builder->build($parsed, $delim);
     }
     
     protected function buildFunction($parsed) {
-        $builder = new FunctionBuilder($parsed);
+        $builder = new FunctionBuilder();
         return $builder->build($parsed);
     }
     
     protected function buildProcedure($parsed) {
-        $builder = new ProcedureBuilder($parsed);
+        $builder = new ProcedureBuilder();
         return $builder->build($parsed);
     }
     
     protected function buildDatabase($parsed) {
-        $builder = new DatabaseBuilder($parsed);
+        $builder = new DatabaseBuilder();
         return $builder->build($parsed);
     }
     
     protected function buildEngine($parsed) {
-        $builder = new EngineBuilder($parsed);
+        $builder = new EngineBuilder();
         return $builder->build($parsed);
     }
     
     protected function buildConstant($parsed) {
-        $builder = new ConstantBuilder($parsed);
+        $builder = new ConstantBuilder();
         return $builder->build($parsed);
     }
     
     protected function buildReserved($parsed) {
-        $builder = new ReservedBuilder($parsed);
+        $builder = new ReservedBuilder();
         return $builder->build($parsed);
     }
     
@@ -98,13 +98,13 @@ class ShowBuilder {
         $sql = "";
         foreach ($show as $k => $v) {
             $len = strlen($sql);
-            $sql .= $this->processReserved($v);
-            $sql .= $this->processConstant($v);
-            $sql .= $this->processEngine($v);
-            $sql .= $this->processDatabase($v);
-            $sql .= $this->processProcedure($v);
-            $sql .= $this->processFunction($v);
-            $sql .= $this->processTable($v, 0);
+            $sql .= $this->buildReserved($v);
+            $sql .= $this->buildConstant($v);
+            $sql .= $this->buildEngine($v);
+            $sql .= $this->buildDatabase($v);
+            $sql .= $this->buildProcedure($v);
+            $sql .= $this->buildFunction($v);
+            $sql .= $this->buildTable($v, 0);
 
             if ($len == strlen($sql)) {
                 throw new UnableToCreateSQLException('SHOW', $k, $v, 'expr_type');

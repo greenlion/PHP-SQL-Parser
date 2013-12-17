@@ -53,7 +53,7 @@ require_once dirname(__FILE__) . '/ConstantBuilder.php';
 class ConstraintBuilder {
 
     protected function buildConstant($parsed) {
-        $builder = new ConstantBuilder($parsed);
+        $builder = new ConstantBuilder();
         return $builder->build($parsed);
     }
 

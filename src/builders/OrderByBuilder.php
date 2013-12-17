@@ -54,12 +54,12 @@ require_once dirname(__FILE__) . '/ColumnReferenceBuilder.php';
 class OrderByBuilder {
 
     protected function buildColRef($parsed) {
-        $builder = new ColumnReferenceBuilder($parsed);
+        $builder = new ColumnReferenceBuilder();
         return $builder->build($parsed);
     }
 
     protected function buildOrderByAlias($parsed) {
-        $builder = new OrderByAliasBuilder($parsed);
+        $builder = new OrderByAliasBuilder();
         return $builder->build($parsed);
     }
 

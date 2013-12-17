@@ -56,27 +56,27 @@ require_once dirname(__FILE__) . '/ColumnReferenceBuilder.php';
 class SelectBuilder {
 
     protected function buildConstant($parsed) {
-        $builder = new ConstantBuilder($parsed);
+        $builder = new ConstantBuilder();
         return $builder->build($parsed);
     }
 
     protected function buildFunction($parsed) {
-        $builder = new FunctionBuilder($parsed);
+        $builder = new FunctionBuilder();
         return $builder->build($parsed);
     }
 
     protected function buildSelectExpression($parsed) {
-        $builder = new SelectExpressionBuilder($parsed);
+        $builder = new SelectExpressionBuilder();
         return $builder->build($parsed);
     }
 
     protected function buildSelectBracketExpression($parsed) {
-        $builder = new SelectBracketExpressionBuilder($parsed);
+        $builder = new SelectBracketExpressionBuilder();
         return $builder->build($parsed);
     }
 
     protected function buildColRef($parsed) {
-        $builder = new ColumnReferenceBuilder($parsed);
+        $builder = new ColumnReferenceBuilder();
         return $builder->build($parsed);
     }
 

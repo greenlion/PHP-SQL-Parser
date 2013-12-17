@@ -56,17 +56,17 @@ require_once dirname(__FILE__) . '/ReservedBuilder.php';
 class PrimaryKeyBuilder {
 
     protected function buildColumnList($parsed) {
-        $builder = new ColumnListBuilder($parsed);
+        $builder = new ColumnListBuilder();
         return $builder->build($parsed);
     }
 
     protected function buildConstraint($parsed) {
-        $builder = new ConstraintBuilder($parsed);
+        $builder = new ConstraintBuilder();
         return $builder->build($parsed);
     }
 
     protected function buildReserved($parsed) {
-        $builder = new ReservedBuilder($parsed);
+        $builder = new ReservedBuilder();
         return $builder->build($parsed);
     }
 

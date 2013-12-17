@@ -53,12 +53,12 @@ require_once dirname(__FILE__) . '/../utils/ExpressionType.php';
 class ColumnReferenceBuilder {
 
     protected function buildDirection($parsed) {
-        $builder = new DirectionBuilder($parsed);
+        $builder = new DirectionBuilder();
         return $builder->build($parsed);
     }
 
     protected function buildAlias($parsed) {
-        $builder = new AliasBuilder($parsed);
+        $builder = new AliasBuilder();
         return $builder->build($parsed);
     }
 
