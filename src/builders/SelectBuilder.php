@@ -80,15 +80,15 @@ class SelectBuilder {
         return $builder->build($parsed);
     }
 
-    protected function build($parsed) {
+    public function build($parsed) {
         $sql = "";
         foreach ($parsed as $k => $v) {
             $len = strlen($sql);
-            $sql .= $this->processColRef($v);
-            $sql .= $this->processSelectBracketExpression($v);
-            $sql .= $this->processSelectExpression($v);
-            $sql .= $this->processFunction($v);
-            $sql .= $this->processConstant($v);
+            $sql .= $this->buildColRef($v);
+            $sql .= $this->buildSelectBracketExpression($v);
+            $sql .= $this->buildSelectExpression($v);
+            $sql .= $this->buildFunction($v);
+            $sql .= $this->buildConstant($v);
 
             if ($len == strlen($sql)) {
                 throw new UnableToCreateSQLException('SELECT', $k, $v, 'expr_type');
