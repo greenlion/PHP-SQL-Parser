@@ -53,6 +53,11 @@ require_once dirname(__FILE__) . '/ColumnReferenceBuilder.php';
  */
 class OrderByBuilder {
 
+    protected function buildFunction($parsed) {
+        $builder = new FunctionBuilder();
+        return $builder->build($parsed);
+    }
+    
     protected function buildColRef($parsed) {
         $builder = new ColumnReferenceBuilder();
         return $builder->build($parsed);
@@ -69,14 +74,15 @@ class OrderByBuilder {
             $len = strlen($sql);
             $sql .= $this->buildOrderByAlias($v);
             $sql .= $this->buildColRef($v);
+            $sql .= $this->buildFunction($v);
 
             if ($len == strlen($sql)) {
                 throw new UnableToCreateSQLException('ORDER', $k, $v, 'expr_type');
             }
 
-            $sql .= ",";
+            $sql .= ", ";
         }
-        $sql = substr($sql, 0, -1);
+        $sql = substr($sql, 0, -2);
         return "ORDER BY " . $sql;
     }
 }
