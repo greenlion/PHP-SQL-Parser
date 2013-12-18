@@ -25,7 +25,6 @@ ORDER BY dbo.fn_GetAccountName(calls.parent_id) ASC LIMIT 0
 $parser = new PHPSQLParser($sql);
 $creator = new PHPSQLCreator($parser->parsed);
 $created = $creator->created;
-print_r($created);
 $expected = getExpectedValue(dirname(__FILE__), 'issue105.sql', false);
 ok($created === $expected, 'function within order-by');
 
