@@ -62,18 +62,18 @@ class CreateBuilder {
         $builder = new SubTreeBuilder();
         return $builder->build($parsed);
     }
-    
+
     public function build($parsed) {
         $create = $parsed['CREATE'];
         $sql = $this->buildSubTree($create);
 
         if (($create['expr_type'] === ExpressionType::TABLE)
-                || ($create['expr_type'] === ExpressionType::TEMPORARY_TABLE)) {
+            || ($create['expr_type'] === ExpressionType::TEMPORARY_TABLE)) {
             $sql .= " " . $this->buildCreateTable($parsed['TABLE']);
         }
         // TODO: add more expr_types here (like VIEW), if available
         return "CREATE " . $sql;
     }
-    
+
 }
 ?>
