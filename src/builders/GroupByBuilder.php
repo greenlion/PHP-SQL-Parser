@@ -42,6 +42,7 @@
 require_once dirname(__FILE__) . '/../exceptions/UnableToCreateSQLException.php';
 require_once dirname(__FILE__) . '/PositionBuilder.php';
 require_once dirname(__FILE__) . '/ColumnReferenceBuilder.php';
+require_once dirname(__FILE__) . '/FunctionBuilder.php';
 
 /**
  * This class implements the builder for the GROUP-BY clause. 
@@ -63,12 +64,18 @@ class GroupByBuilder {
         return $builder->build($parsed);
     }
 
+    protected function buildFunction($parsed) {
+        $builder = new FunctionBuilder();
+        return $builder->build($parsed);
+    }
+        
     public function build($parsed) {
         $sql = "";
         foreach ($parsed as $k => $v) {
             $len = strlen($sql);
             $sql .= $this->buildColRef($v);
             $sql .= $this->buildPosition($v);
+            $sql .= $this->buildFunction($v);
 
             if ($len == strlen($sql)) {
                 throw new UnableToCreateSQLException('GROUP', $k, $v, 'expr_type');
