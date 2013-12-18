@@ -21,7 +21,7 @@ Or integrate it as external tool into Eclipse:
 * on the Build tab set the parameters as needed
 * click "Apply" and "Close"
 
-* select on of the folders or *.php files
+* select one of the folders or *.php files
 * execute the external tool "CodeSniffer"
 * review the errors within the console output within Eclipse
 
