@@ -43,7 +43,7 @@ require_once dirname(__FILE__) . '/../exceptions/UnsupportedFeatureException.php
 
 /**
  * This class implements the references type within a JOIN. 
- * You can overwrite all functions to achive another handling.
+ * You can overwrite all functions to achieve another handling.
  *
  * @author  André Rothe <andre.rothe@phosco.info>
  * @license http://www.debian.org/misc/bsd.license  BSD License (3 Clause)
