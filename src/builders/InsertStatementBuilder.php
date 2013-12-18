@@ -62,7 +62,7 @@ class InsertStatementBuilder {
         return $builder->build($parsed);
     }
 
-   public function build($parsed) {
+    public function build($parsed) {
         // TODO: are there more than one tables possible (like [INSERT][1])
         return $this->buildINSERT($parsed['INSERT'][0]) . " " . $this->buildVALUES($parsed['VALUES']);
         // TODO: subquery?
