@@ -47,7 +47,7 @@ require_once dirname(__FILE__) . '/ColumnReferenceBuilder.php';
 
 /**
  * This class implements the builder for the [SELECT] field. You can overwrite
- * all functions to achive another handling.
+ * all functions to achieve another handling.
  *
  * @author  André Rothe <andre.rothe@phosco.info>
  * @license http://www.debian.org/misc/bsd.license  BSD License (3 Clause)

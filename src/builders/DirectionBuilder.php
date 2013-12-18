@@ -41,7 +41,7 @@
 
 /**
  * This class implements the builder for directions (e.g. of the order-by clause). 
- * You can overwrite all functions to achive another handling.
+ * You can overwrite all functions to achieve another handling.
  *
  * @author  André Rothe <andre.rothe@phosco.info>
  * @license http://www.debian.org/misc/bsd.license  BSD License (3 Clause)

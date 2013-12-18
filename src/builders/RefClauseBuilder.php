@@ -46,7 +46,7 @@ require_once dirname(__FILE__) . '/ConstantBuilder.php';
 
 /**
  * This class implements the references clause within a JOIN. 
- * You can overwrite all functions to achive another handling.
+ * You can overwrite all functions to achieve another handling.
  *
  * @author  André Rothe <andre.rothe@phosco.info>
  * @license http://www.debian.org/misc/bsd.license  BSD License (3 Clause)
