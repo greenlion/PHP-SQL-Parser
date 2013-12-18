@@ -10,6 +10,7 @@
 		<exclude name="PEAR.Functions.FunctionDeclaration" />
 		<exclude name="PEAR.Commenting.FileComment" />
 		<exclude name="PEAR.Commenting.ClassComment" />
+		<exclude name="PEAR.ControlStructures.MultiLineCondition" />
 	</rule>
 
 	<!-- Lines can be 120 chars long, but never show errors -->
