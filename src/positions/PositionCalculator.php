@@ -149,6 +149,7 @@ class PositionCalculator {
                 || ($key === 'expr_type' && $parsed === ExpressionType::CHECK)
                 || ($key === 'expr_type' && $parsed === ExpressionType::COLLATE)
                 || ($key === 'expr_type' && $parsed === ExpressionType::LIKE)
+                || ($key === 'expr_type' && $parsed === ExpressionType::INDEX)
                 || ($key === 'select-option' && $parsed !== false) || ($key === 'alias' && $parsed !== false)) {
                 // we hold the current position and come back after the next base_expr
                 // we do this, because the next base_expr contains the complete expression/subquery/record
