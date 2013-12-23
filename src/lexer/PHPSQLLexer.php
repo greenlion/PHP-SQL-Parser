@@ -2,34 +2,43 @@
 /**
  * PHPSQLLexer.php
  *
- * This file contains the lexer, which splits the SQL statement just before parsing.
+ * This file contains the lexer, which splits and recombines parts of the 
+ * SQL statement just before parsing.
+ * 
+ * PHP version 5
  *
- * Copyright (c) 2010-2012, Justin Swanhart
- * with contributions by André Rothe <arothe@phosco.info, phosco@gmx.de>
- *
+ * LICENSE:
+ * Copyright (c) 2010-2014 Justin Swanhart and André Rothe
  * All rights reserved.
  *
- * Redistribution and use in source and binary forms, with or without modification,
- * are permitted provided that the following conditions are met:
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ * 1. Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions and the following disclaimer.
+ * 2. Redistributions in binary form must reproduce the above copyright
+ *    notice, this list of conditions and the following disclaimer in the
+ *    documentation and/or other materials provided with the distribution.
+ * 3. The name of the author may not be used to endorse or promote products
+ *    derived from this software without specific prior written permission.
  *
- *   * Redistributions of source code must retain the above copyright notice,
- *     this list of conditions and the following disclaimer.
- *   * Redistributions in binary form must reproduce the above copyright notice,
- *     this list of conditions and the following disclaimer in the documentation
- *     and/or other materials provided with the distribution.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY
- * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
- * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT
- * SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED
- * TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR
- * BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
- * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
- * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
- * DAMAGE.
+ * THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
+ * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+ * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+ * IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
+ * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
+ * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+ * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+ * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+ * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * 
+ * @author    André Rothe <andre.rothe@phosco.info>
+ * @copyright 2010-2014 Justin Swanhart and André Rothe
+ * @license   http://www.debian.org/misc/bsd.license  BSD License (3 Clause)
+ * @version   SVN: $Id$
+ * 
  */
-
 require_once dirname(__FILE__) . '/../utils/PHPSQLParserUtils.php';
 require_once dirname(__FILE__) . '/LexerSplitter.php';
 require_once dirname(__FILE__) . '/../exceptions/InvalidParameterException.php';
@@ -43,7 +52,7 @@ require_once dirname(__FILE__) . '/../exceptions/InvalidParameterException.php';
  */
 class PHPSQLLexer {
 
-    private $_splitters;
+    protected $_splitters;
 
     public function __construct() {
         $this->_splitters = new LexerSplitter();
@@ -110,7 +119,7 @@ class PHPSQLLexer {
         return $tokens;
     }
 
-    private function concatUserDefinedVariables($tokens) {
+    protected function concatUserDefinedVariables($tokens) {
         $i = 0;
         $cnt = count($tokens);
         $userdef = false;
@@ -142,7 +151,7 @@ class PHPSQLLexer {
         return array_values($tokens);
     }
 
-    private function concatComments($tokens) {
+    protected function concatComments($tokens) {
 
         $i = 0;
         $cnt = count($tokens);
@@ -185,11 +194,11 @@ class PHPSQLLexer {
         return array_values($tokens);
     }
 
-    private function isBacktick($token) {
+    protected function isBacktick($token) {
         return ($token === "'" || $token === "\"" || $token === "`");
     }
 
-    private function balanceBackticks($tokens) {
+    protected function balanceBackticks($tokens) {
         $i = 0;
         $cnt = count($tokens);
         while ($i < $cnt) {
@@ -213,7 +222,7 @@ class PHPSQLLexer {
 
     # backticks are not balanced within one token, so we have
     # to re-combine some tokens
-    private function balanceCharacter($tokens, $idx, $char) {
+    protected function balanceCharacter($tokens, $idx, $char) {
 
         $token_count = count($tokens);
         $i = $idx + 1;
@@ -237,14 +246,15 @@ class PHPSQLLexer {
         return array_values($tokens);
     }
 
-    /*
-     * does the token ends with dot?
-     * concat it with the next token
+    /**
+     * This function concats some tokens to a column reference.
+     * There are two different cases:
      * 
-     * does the token starts with a dot?
-     * concat it with the previous token
+     * 1. If the current token ends with a dot, we will add the next token
+     * 2. If the next token starts with a dot, we will add it to the previous token 
+     *
      */
-    private function concatColReferences($tokens) {
+    protected function concatColReferences($tokens) {
 
         $cnt = count($tokens);
         $i = 0;
@@ -293,7 +303,7 @@ class PHPSQLLexer {
         return array_values($tokens);
     }
 
-    private function concatEscapeSequences($tokens) {
+    protected function concatEscapeSequences($tokens) {
         $tokenCount = count($tokens);
         $i = 0;
         while ($i < $tokenCount) {
@@ -310,7 +320,7 @@ class PHPSQLLexer {
         return array_values($tokens);
     }
 
-    private function balanceParenthesis($tokens) {
+    protected function balanceParenthesis($tokens) {
         $token_count = count($tokens);
         $i = 0;
         while ($i < $token_count) {

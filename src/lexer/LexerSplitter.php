@@ -51,11 +51,11 @@
  */
 class LexerSplitter {
 
-    private static $_splitters = array("<=>", "\r\n", "!=", ">=", "<=", "<>", "<<", ">>", ":=", "\\", "&&", "||", ":=",
+    protected static $_splitters = array("<=>", "\r\n", "!=", ">=", "<=", "<>", "<<", ">>", ":=", "\\", "&&", "||", ":=",
                                        "/*", "*/", "--", ">", "<", "|", "=", "^", "(", ")", "\t", "\n", "'", "\"", "`",
                                        ",", "@", " ", "+", "-", "*", "/", ";");
-    private $_tokenSize;
-    private $_hashSet;
+    protected $_tokenSize;
+    protected $_hashSet;
 
     /**
      * Constructor.
