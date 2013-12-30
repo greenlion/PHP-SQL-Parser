@@ -14,14 +14,19 @@ $p = $parser->parse($sql, true);
 $expected = getExpectedValue(dirname(__FILE__), 'issue78b.serialized');
 eq_array($p, $expected, 'explain select');
 
-$sql = "EXPLAIN foo.bar";
+$sql = "EXPLAIN foo bar";
 $p = $parser->parse($sql, true);
 $expected = getExpectedValue(dirname(__FILE__), 'issue78c.serialized');
 eq_array($p, $expected, 'explain table');
 
-$sql = "DESCRIBE foo.bar";
+$sql = "DESCRIBE foo bar%";
 $p = $parser->parse($sql, true);
 $expected = getExpectedValue(dirname(__FILE__), 'issue78d.serialized');
 eq_array($p, $expected, 'describe table');
+
+$sql = "DESC FORMAT = JSON DELETE FROM tableA WHERE x=1";
+$p = $parser->parse($sql, true);
+$expected = getExpectedValue(dirname(__FILE__), 'issue78e.serialized');
+eq_array($p, $expected, 'describe delete');
 
 ?>
