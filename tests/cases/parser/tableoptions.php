@@ -9,11 +9,11 @@ $p = $parser->parsed;
 $expected = getExpectedValue(dirname(__FILE__), 'tableoptions1.serialized');
 eq_array($p, $expected, 'CREATE TABLE statement with table options');
 
+// TODO: the union statement within the CREATE TABLE has not been parsed
 $parser = new PHPSQLParser();
 $sql = "CREATE TABLE hohoho () UNION (tableA, tableB,tableC)";
 $parser->parse($sql);
 $p = $parser->parsed;
-print_r($p);
 $expected = getExpectedValue(dirname(__FILE__), 'tableoptions2.serialized');
 eq_array($p, $expected, 'CREATE TABLE statement with UNION table option');
 
