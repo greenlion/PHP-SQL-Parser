@@ -149,6 +149,14 @@ class SQLProcessor extends SQLChunkProcessor {
             case 'SHOW':
                 $token_category = $upper;
                 break;
+                
+            case 'DESC':
+                if ($token_category === '') {
+                    // short version of DESCRIBE
+                    $token_category = $upper;
+                }
+                // else direction of ORDER-BY
+                break;
 
             case 'RENAME':
             // jump over TABLE keyword

@@ -39,6 +39,7 @@ require_once(dirname(__FILE__) . '/GroupByProcessor.php');
 require_once(dirname(__FILE__) . '/RenameProcessor.php');
 require_once(dirname(__FILE__) . '/UsingProcessor.php');
 require_once(dirname(__FILE__) . '/DescribeProcessor.php');
+require_once(dirname(__FILE__) . '/DescProcessor.php');
 require_once(dirname(__FILE__) . '/HavingProcessor.php');
 require_once(dirname(__FILE__) . '/ReplaceProcessor.php');
 require_once(dirname(__FILE__) . '/ValuesProcessor.php');
@@ -90,11 +91,15 @@ class SQLChunkProcessor extends AbstractProcessor {
         }
         if (!empty($out['EXPLAIN'])) {
             $processor = new ExplainProcessor();
-            $out['EXPLAIN'] = $processor->process($out['EXPLAIN'], isset($out['SELECT']));
+            $out['EXPLAIN'] = $processor->process($out['EXPLAIN'], array_keys($out));
         }
         if (!empty($out['DESCRIBE'])) {
             $processor = new DescribeProcessor();
-            $out['DESCRIBE'] = $processor->process($out['DESCRIBE'], isset($out['SELECT']));
+            $out['DESCRIBE'] = $processor->process($out['DESCRIBE'], array_keys($out));
+        }
+        if (!empty($out['DESC'])) {
+            $processor = new DescProcessor();
+            $out['DESC'] = $processor->process($out['DESC'], array_keys($out));
         }
         if (!empty($out['SELECT'])) {
             $processor = new SelectProcessor();
