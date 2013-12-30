@@ -13,7 +13,6 @@ eq_array($p, $expected, '@ character after operator should not fail.');
 $sql = "SET @a = 1";
 $parser = new PHPSQLParser($sql, true);
 $p = $parser->parsed;
-echo serialize($p);
 $expected = getExpectedValue(dirname(__FILE__), 'issue67b.serialized');
 eq_array($p, $expected, 'user defined variables should not fail');
 
