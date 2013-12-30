@@ -35,7 +35,6 @@ eq_array($p, $expected, 'drop table-list statement');
 // TODO: the type of the object should be part of the DROP field
 $sql = "DROP TEMPORARY TABLE IF EXISTS blah1, blah2 CASCADE";
 $p = $parser->parse($sql, true);
-print_r($p);
 $expected = getExpectedValue(dirname(__FILE__), 'issue74f.serialized');
 eq_array($p, $expected, 'drop temporary table-list if exists statement');
 
