@@ -1,10 +1,10 @@
 <?php
 /**
- * DescribeProcessor.php
+ * DescProcessor.php
  *
- * This file implements the processor for the DESCRIBE statements.
+ * This file implements the processor for the DESC statements, which is a short form of DESCRIBE.
  *
- * Copyright (c) 2010-2012, Justin Swanhart
+ * Copyright (c) 2010-2014, Justin Swanhart
  * with contributions by André Rothe <arothe@phosco.info, phosco@gmx.de>
  *
  * All rights reserved.
@@ -34,14 +34,14 @@ require_once(dirname(__FILE__) . '/ExplainProcessor.php');
 
 /**
  * 
- * This class processes the DESCRIBE statements.
+ * This class processes the DESC statement.
  * 
  * @author arothe
  * 
  */
-class DescribeProcessor extends ExplainProcessor {
+class DescProcessor extends ExplainProcessor {
 
-    protected function isStatement($keys, $needle = "DESCRIBE") {
+    protected function isStatement($keys, $needle = "DESC") {
         return parent::isStatement($keys, $needle);
     }
 }
