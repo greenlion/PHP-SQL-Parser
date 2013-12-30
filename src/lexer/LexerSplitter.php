@@ -41,9 +41,9 @@
  */
 
 /**
- * This class holds an sorted array of characters, which are used as stop token.
- * On every character of the array the given SQL string will be split into single tokens.
- * The array must be sorted by character size, longest first (3 chars -> 2 chars -> 1 char).
+ * This class holds a sorted array of characters, which are used as stop token.
+ * On every part of the array the given SQL string will be split into single tokens.
+ * The array must be sorted by element size, longest first (3 chars -> 2 chars -> 1 char).
  *
  * @author  André Rothe <andre.rothe@phosco.info>
  * @license http://www.debian.org/misc/bsd.license  BSD License (3 Clause)
@@ -51,32 +51,32 @@
  */
 class LexerSplitter {
 
-    protected static $_splitters = array("<=>", "\r\n", "!=", ">=", "<=", "<>", "<<", ">>", ":=", "\\", "&&", "||", ":=",
+    protected static $splitters = array("<=>", "\r\n", "!=", ">=", "<=", "<>", "<<", ">>", ":=", "\\", "&&", "||", ":=",
                                        "/*", "*/", "--", ">", "<", "|", "=", "^", "(", ")", "\t", "\n", "'", "\"", "`",
                                        ",", "@", " ", "+", "-", "*", "/", ";");
-    protected $_tokenSize;
-    protected $_hashSet;
+    protected $tokenSize;
+    protected $hashSet;
 
     /**
      * Constructor.
      * 
-     * It initializes some private fields.
+     * It initializes some fields.
      */
     public function __construct() {
-        $this->_tokenSize = strlen(self::$_splitters[0]); // should be the largest one
-        $this->_hashSet = array_flip(self::$_splitters);
+        $this->tokenSize = strlen(self::$splitters[0]); // should be the largest one
+        $this->hashSet = array_flip(self::$splitters);
     }
 
     /**
      * Get the maximum length of a split token.
      * 
-     * The largest token must be on position 0 of the internal $_splitters array,
+     * The largest element must be on position 0 of the internal $_splitters array,
      * so the function returns the length of that token. It must be > 0.
      * 
      * @return int The number of characters for the largest split token.
      */
     public function getMaxLengthOfSplitter() {
-        return $this->_tokenSize;
+        return $this->tokenSize;
     }
 
     /**
@@ -88,7 +88,7 @@ class LexerSplitter {
      * @return boolean true, if the given string will be a split token, false otherwise
      */
     public function isSplitter($token) {
-        return isset($this->_hashSet[$token]);
+        return isset($this->hashSet[$token]);
     }
 }
 

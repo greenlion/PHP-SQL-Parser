@@ -39,7 +39,7 @@
  * @version   SVN: $Id$
  * 
  */
-require_once dirname(__FILE__) . '/../utils/PHPSQLParserUtils.php';
+
 require_once dirname(__FILE__) . '/LexerSplitter.php';
 require_once dirname(__FILE__) . '/../exceptions/InvalidParameterException.php';
 
@@ -47,21 +47,30 @@ require_once dirname(__FILE__) . '/../exceptions/InvalidParameterException.php';
  * This class splits the SQL string into little parts, which the parser can
  * use to build the result array.
  * 
- * @author arothe
+ * @author  André Rothe <andre.rothe@phosco.info>
+ * @license http://www.debian.org/misc/bsd.license  BSD License (3 Clause)
  *
  */
 class PHPSQLLexer {
 
-    protected $_splitters;
+    protected $splitters;
 
+    /**
+     * Constructor. 
+     * 
+     * It initializes some fields.
+     */
     public function __construct() {
-        $this->_splitters = new LexerSplitter();
+        $this->splitters = new LexerSplitter();
     }
 
     /**
      * Ends the given string $haystack with the string $needle?
+     * 
      * @param string $haystack
      * @param string $needle
+     * 
+     * @return boolean true, if the parameter $haystack ends with the character sequences $needle, false otherwise
      */
     protected function endsWith($haystack, $needle) {
         $length = strlen($needle);
@@ -79,7 +88,7 @@ class PHPSQLLexer {
         $tokens = array();
         $token = "";
 
-        $splitLen = $this->_splitters->getMaxLengthOfSplitter();
+        $splitLen = $this->splitters->getMaxLengthOfSplitter();
         $found = false;
         $len = strlen($sql);
         $pos = 0;
@@ -88,7 +97,7 @@ class PHPSQLLexer {
 
             for ($i = $splitLen; $i > 0; $i--) {
                 $substr = substr($sql, $pos, $i);
-                if ($this->_splitters->isSplitter($substr)) {
+                if ($this->splitters->isSplitter($substr)) {
 
                     if ($token !== "") {
                         $tokens[] = $token;
@@ -220,8 +229,8 @@ class PHPSQLLexer {
         return $tokens;
     }
 
-    # backticks are not balanced within one token, so we have
-    # to re-combine some tokens
+    // backticks are not balanced within one token, so we have
+    // to re-combine some tokens
     protected function balanceCharacter($tokens, $idx, $char) {
 
         $token_count = count($tokens);
@@ -271,7 +280,7 @@ class PHPSQLLexer {
                 $k = $i - 1;
                 $len = strlen($tokens[$i]);
                 while (($k >= 0) && ($len == strlen($tokens[$i]))) {
-                    if (!isset($tokens[$k])) { # FIXME: this can be wrong if we have schema . table . column
+                    if (!isset($tokens[$k])) { // FIXME: this can be wrong if we have schema . table . column
                         $k--;
                         continue;
                     }
