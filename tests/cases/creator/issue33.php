@@ -36,13 +36,12 @@ $p = $parser->parsed;
 try {
     $creator = new PHPSQLCreator($parser->parsed);
     $created = $creator->created;
-    echo $created;
 } catch (Exception $e) {
     echo $e->getMessage();
     echo $e->getTraceAsString();
     $created = "";
 }
-$expected = getExpectedValue(dirname(__FILE__), 'issue33d.sql');
+$expected = getExpectedValue(dirname(__FILE__), 'issue33d.sql', false);
 ok($created === $expected, 'CREATE TABLE statement with not named primary key and check');
 
 /*
