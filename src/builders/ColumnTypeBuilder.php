@@ -77,10 +77,12 @@ class ColumnTypeBuilder {
         foreach ($parsed['sub_tree'] as $k => $v) {
             $len = strlen($sql);
             $sql .= $this->buildDataType($v);
-            // FIXME: the SelectBracketExpression needs another array
+            // FIXME: the SelectBracketExpression concats the elements with " ", but
+            // we need a comma here, maybe we can add a field delim in the parser output
+            // for two/multiple element expressions
             $sql .= $this->buildSelectBracketExpression($v);
             $sql .= $this->buildReserved($v);
-    
+            
             if ($len == strlen($sql)) {
                 throw new UnableToCreateSQLException('CREATE TABLE column-type subtree', $k, $v, 'expr_type');
             }
