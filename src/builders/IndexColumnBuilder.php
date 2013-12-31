@@ -52,18 +52,22 @@ require_once dirname(__FILE__) . '/../utils/ExpressionType.php';
  */
 class IndexColumnBuilder {
 
-    protected function buildIndexColumn($parsed) {
-        $builder = new IndexColumnBuilder();
-        return $builder->build($parsed);
+    protected function buildLength($parsed) {
+        return ($parsed === false ? '' : ('(' . $parsed . ')'));
     }
 
+    protected function buildDirection($parsed) {
+        return ($parsed === false ? '' : (' ' . $parsed));
+    }
+    
     public function build($parsed) {
         if ($parsed['expr_type'] !== ExpressionType::INDEX_COLUMN) {
             return "";
         }
-
-        // TODO: this is a stub method
-        throw new UnsupportedFeatureException(ExpressionType::INDEX_COLUMN);
+        $sql = $parsed['base_expr'];
+        $sql .= $this->buildLength($parsed['length']);
+        $sql .= $this->buildDirection($parsed['dir']);
+        return $sql;
     }
 
 }
