@@ -71,8 +71,7 @@ class ColumnListBuilder {
             }
 
             $sql .= " ";
-        }
-        // TODO: what about length and direction?    
+        } 
         return "(" . substr($sql, 0, -1) . ")";
     }
 
