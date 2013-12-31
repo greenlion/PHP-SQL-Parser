@@ -61,7 +61,8 @@ class ConstraintBuilder {
         if ($parsed['expr_type'] !== ExpressionType::CONSTRAINT) {
             return "";
         }
-        return "CONSTRAINT " . $this->buildConstant($parsed['sub_tree']);
+        $sql = $this->buildConstant($parsed['sub_tree']);
+        return "CONSTRAINT" . (empty($sql) ? '' : (' ' . $sql));
     }
 
 }
