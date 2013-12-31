@@ -88,7 +88,7 @@ class TableBracketExpressionBuilder {
             $sql .= ", ";
         }
 
-        $sql = "(" . substr($sql, 0, -2) . ")";
+        $sql = " (" . substr($sql, 0, -2) . ")";
         return $sql;
     }
     
