@@ -74,9 +74,6 @@ class CreateTableBuilder {
         $sql .= $this->buildCreateTableDefinition($parsed);
         $sql .= $this->buildCreateTableOptions($parsed);
         $sql .= $this->buildCreateTableSelectOption($parsed);
-        if (strlen($sql) === 0) {
-            throw new UnableToCreateSQLException('TABLE', "", $parsed, 'name');
-        }
         return $sql;
     }
     
