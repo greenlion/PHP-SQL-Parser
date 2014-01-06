@@ -41,7 +41,7 @@ require_once(dirname(__FILE__) . '/SelectExpressionProcessor.php');
  */
 class SelectProcessor extends SelectExpressionProcessor {
 
-    public function process(&$tokens) {
+    public function process($tokens) {
         $expression = "";
         $expressionList = array();
         foreach ($tokens as $token) {

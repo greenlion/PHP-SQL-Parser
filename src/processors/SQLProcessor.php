@@ -46,7 +46,7 @@ class SQLProcessor extends SQLChunkProcessor {
      * This function breaks up the SQL statement into logical sections. 
      * Some sections are then further handled by specialized processors.
      */
-    public function process(&$tokens) {
+    public function process($tokens) {
         $prev_category = "";
         $token_category = "";
         $skip_next = 0;

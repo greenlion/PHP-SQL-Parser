@@ -43,6 +43,12 @@ require_once dirname(__FILE__) . '/../lexer/PHPSQLLexer.php';
 abstract class AbstractProcessor {
 
     /**
+     * This function implements the main functionality of a processor class.
+     * Always use default valuses for additional parameters within overridden functions.
+     */
+    public abstract function process($tokens);
+
+    /**
      * this function splits up a SQL statement into easy to "parse"
      * tokens for the SQL processor
      */
@@ -152,7 +158,7 @@ abstract class AbstractProcessor {
 
     protected function isCommentToken($token) {
         return isset($token[0]) && isset($token[1])
-                && (($token[0] === '-' && $token[1] === '-') || ($token[0] === '/' && $token[1] === '*'));
+            && (($token[0] === '-' && $token[1] === '-') || ($token[0] === '/' && $token[1] === '*'));
     }
 
     protected function isColumnReference($out) {
@@ -201,7 +207,7 @@ abstract class AbstractProcessor {
     protected function array_insert_after($array, $key, $entry) {
         $idx = array_search($key, array_keys($array));
         $array = array_slice($array, 0, $idx + 1, true) + $entry
-                + array_slice($array, $idx + 1, count($array) - 1, true);
+            + array_slice($array, $idx + 1, count($array) - 1, true);
         return $array;
     }
 }

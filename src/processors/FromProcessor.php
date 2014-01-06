@@ -105,7 +105,7 @@ class FromProcessor extends AbstractProcessor {
         return $res;
     }
 
-    public function process(&$tokens) {
+    public function process($tokens) {
         $parseInfo = $this->initParseInfo();
         $expr = array();
 

@@ -94,7 +94,7 @@ class OrderByProcessor extends AbstractProcessor {
         return $result;
     }
 
-    public function process($tokens, $select) {
+    public function process($tokens, $select = array()) {
         $out = array();
         $parseInfo = $this->initParseInfo();
 
