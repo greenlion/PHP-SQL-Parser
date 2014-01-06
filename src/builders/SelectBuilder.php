@@ -84,7 +84,17 @@ class SelectBuilder {
         $builder = new ReservedBuilder();
         return $builder->build($parsed);
     }
-    
+    /**
+     * Returns a well-formatted delimiter string. If you don't need nice SQL,
+     * you could simply return $parsed['delim'].
+     * 
+     * @param array $parsed The part of the output array, which contains the current expression.
+     * @return a string, which is added right after the expression
+     */
+    protected function getDelimiter($parsed) {
+        return ($parsed['delim'] === false ? '' : (trim($parsed['delim']) . ' '));
+    }
+
     public function build($parsed) {
         $sql = "";
         foreach ($parsed as $k => $v) {
@@ -100,7 +110,7 @@ class SelectBuilder {
                 throw new UnableToCreateSQLException('SELECT', $k, $v, 'expr_type');
             }
 
-            $sql .= $v['delim'];
+            $sql .= $this->getDelimiter($v);
         }
         return "SELECT " . $sql;
     }
