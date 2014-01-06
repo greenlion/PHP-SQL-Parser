@@ -141,7 +141,7 @@ class ShowProcessor extends AbstractProcessor {
                     } else {
                         $expr_type = ExpressionType::SIMPLE_FUNCTION;
                     }
-                    $resultList[] = array('expr_type' => expr_type, 'name' => $token,
+                    $resultList[] = array('expr_type' => $expr_type, 'name' => $token,
                                           'no_quotes' => $this->revokeQuotation($token), 'base_expr' => $token);
                     break;
                 case 'PROCEDURE':
