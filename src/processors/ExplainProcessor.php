@@ -51,7 +51,7 @@ class ExplainProcessor extends AbstractProcessor {
     }
 
     // TODO: refactor that function
-    public function process($tokens, $keys) {
+    public function process($tokens, $keys = array()) {
 
         $base_expr = "";
         $expr = array();

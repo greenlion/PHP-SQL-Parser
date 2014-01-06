@@ -42,8 +42,8 @@ require_once dirname(__FILE__) . '/../utils/ExpressionType.php';
  */
 class ColumnListProcessor extends AbstractProcessor {
 
-    public function process($token) {
-        $columns = explode(",", $token);
+    public function process($tokens) {
+        $columns = explode(",", $tokens);
         $cols = array();
         foreach ($columns as $k => $v) {
             $cols[] = array('expr_type' => ExpressionType::COLREF, 'base_expr' => trim($v),
