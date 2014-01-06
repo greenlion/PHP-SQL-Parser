@@ -80,6 +80,11 @@ class SelectBuilder {
         return $builder->build($parsed);
     }
 
+    protected function buildReserved($parsed) {
+        $builder = new ReservedBuilder();
+        return $builder->build($parsed);
+    }
+    
     public function build($parsed) {
         $sql = "";
         foreach ($parsed as $k => $v) {
@@ -89,6 +94,7 @@ class SelectBuilder {
             $sql .= $this->buildSelectExpression($v);
             $sql .= $this->buildFunction($v);
             $sql .= $this->buildConstant($v);
+            $sql .= $this->buildReserved($v);
 
             if ($len == strlen($sql)) {
                 throw new UnableToCreateSQLException('SELECT', $k, $v, 'expr_type');
