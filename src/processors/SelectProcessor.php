@@ -46,7 +46,9 @@ class SelectProcessor extends SelectExpressionProcessor {
         $expressionList = array();
         foreach ($tokens as $token) {
             if ($this->isCommaToken($token)) {
-                $expressionList[] = parent::process(trim($expression));
+                $expression = parent::process(trim($expression));
+                $expression['delim'] = ',';
+                $expressionList[] = $expression;
                 $expression = "";
             } else {
                 switch (strtoupper($token)) {
@@ -62,7 +64,9 @@ class SelectProcessor extends SelectExpressionProcessor {
                 case 'SQL_SMALL_RESULT':
                 case 'SQL_BIG_RESULT':
                 case 'SQL_BUFFER_RESULT':
-                    $expressionList[] = parent::process(trim($token));
+                    $expression = parent::process(trim($token));
+                    $expression['delim'] = ' ';
+                    $expressionList[] = $expression;
                     $expression = "";
                     break;
 
@@ -72,7 +76,9 @@ class SelectProcessor extends SelectExpressionProcessor {
             }
         }
         if ($expression) {
-            $expressionList[] = parent::process(trim($expression));
+            $expression = parent::process(trim($expression));
+            $expression['delim'] = false;
+            $expressionList[] = $expression;
         }
         return $expressionList;
     }
