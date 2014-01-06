@@ -100,9 +100,8 @@ class SelectBuilder {
                 throw new UnableToCreateSQLException('SELECT', $k, $v, 'expr_type');
             }
 
-            $sql .= ", ";
+            $sql .= $v['delim'];
         }
-        $sql = substr($sql, 0, -2);
         return "SELECT " . $sql;
     }
 }
