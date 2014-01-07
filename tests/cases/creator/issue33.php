@@ -2,7 +2,7 @@
 require_once dirname(__FILE__) . '/../../../src/PHPSQLParser.php';
 require_once dirname(__FILE__) . '/../../../src/PHPSQLCreator.php';
 require_once dirname(__FILE__) . '/../../test-more.php';
-/*
+
 $parser = new PHPSQLParser();
 $sql = "CREATE TABLE hohoho (LIKE xyz)";
 $parser->parse($sql, true);
@@ -10,7 +10,7 @@ $creator = new PHPSQLCreator($parser->parsed);
 $created = $creator->created;
 $expected = getExpectedValue(dirname(__FILE__), 'issue33a.sql', false);
 ok($created === $expected, 'CREATE TABLE statement with (LIKE)');
-*/
+
 $parser = new PHPSQLParser();
 $sql = "CREATE TABLE hohoho LIKE xyz";
 $parser->parse($sql, true);
