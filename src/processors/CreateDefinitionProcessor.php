@@ -43,6 +43,7 @@ require_once dirname(__FILE__) . '/AbstractProcessor.php';
 require_once dirname(__FILE__) . '/ColumnDefinitionProcessor.php';
 require_once dirname(__FILE__) . '/IndexColumnListProcessor.php';
 require_once dirname(__FILE__) . '/ReferenceDefinitionProcessor.php';
+require_once dirname(__FILE__) . '/ExpressionListProcessor.php';
 require_once dirname(__FILE__) . '/../utils/ExpressionType.php';
 
 /**
@@ -54,7 +55,7 @@ require_once dirname(__FILE__) . '/../utils/ExpressionType.php';
  */
 class CreateDefinitionProcessor extends AbstractProcessor {
 
-    protected function processxx($parsed) {
+    protected function processExpressionList($parsed) {
         $processor = new ExpressionListProcessor();
         return $processor->process($parsed);
     }
