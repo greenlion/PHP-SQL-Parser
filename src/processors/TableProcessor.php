@@ -55,10 +55,9 @@ class TableProcessor extends AbstractProcessor {
         return array('expr_type' => ExpressionType::OPERATOR, 'base_expr' => $token);
     }
 
-    protected function clear(&$expr, &$base_expr, &$separator, &$category) {
+    protected function clear(&$expr, &$base_expr, &$category) {
         $expr = array();
         $base_expr = '';
-        $separator = ' ';
         $category = 'CREATE_DEF';
     }
 
@@ -70,7 +69,6 @@ class TableProcessor extends AbstractProcessor {
         $expr = array();
         $base_expr = '';
         $skip = 0;
-        $separator = false; # first option has no separator
 
         foreach ($tokens as $token) {
             $trim = trim($token);
@@ -95,7 +93,9 @@ class TableProcessor extends AbstractProcessor {
             case ',':
             # it is possible to separate the table options with comma!
                 if ($prevCategory === 'CREATE_DEF') {
-                    $separator = ',';
+                    $last = array_pop($result['options']);
+                    $last['delim'] = ',';
+                    $result['options'][] = $last;
                     $base_expr = "";
                 }
                 continue 2;
@@ -220,9 +220,9 @@ class TableProcessor extends AbstractProcessor {
                     # all assignments with the keywords
                     $expr[] = $this->getReservedType($trim);
                     $result['options'][] = array('expr_type' => ExpressionType::EXPRESSION,
-                                                 'base_expr' => trim($base_expr), 'delim' => $separator,
+                                                 'base_expr' => trim($base_expr), 'delim' => ' ',
                                                  'sub_tree' => $expr);
-                    $this->clear($expr, $base_expr, $separator, $currCategory);
+                    $this->clear($expr, $base_expr, $currCategory);
                 }
                 break;
 
@@ -255,48 +255,48 @@ class TableProcessor extends AbstractProcessor {
                 # the charset name
                     $expr[] = $this->getConstantType($trim);
                     $result['options'][] = array('expr_type' => ExpressionType::CHARSET,
-                                                 'base_expr' => trim($base_expr), 'delim' => $separator,
+                                                 'base_expr' => trim($base_expr), 'delim' => ' ',
                                                  'sub_tree' => $expr);
-                    $this->clear($expr, $base_expr, $separator, $currCategory);
+                    $this->clear($expr, $base_expr, $currCategory);
                     break;
 
                 case 'COLLATE':
                 # the collate name
                     $expr[] = $this->getConstantType($trim);
                     $result['options'][] = array('expr_type' => ExpressionType::COLLATE,
-                                                 'base_expr' => trim($base_expr), 'delim' => $separator,
+                                                 'base_expr' => trim($base_expr), 'delim' => ' ',
                                                  'sub_tree' => $expr);
-                    $this->clear($expr, $base_expr, $separator, $currCategory);
+                    $this->clear($expr, $base_expr, $currCategory);
                     break;
 
                 case 'DATA_DIRECTORY':
                 # we have the directory name
                     $expr[] = $this->getConstantType($trim);
                     $result['options'][] = array('expr_type' => ExpressionType::DIRECTORY, 'kind' => 'DATA',
-                                                 'base_expr' => trim($base_expr), 'delim' => $separator,
+                                                 'base_expr' => trim($base_expr), 'delim' => ' ',
                                                  'sub_tree' => $expr);
-                    $this->clear($expr, $base_expr, $separator, $prevCategory);
+                    $this->clear($expr, $base_expr, $prevCategory);
                     continue 3;
 
                 case 'INDEX_DIRECTORY':
                 # we have the directory name
                     $expr[] = $this->getConstantType($trim);
                     $result['options'][] = array('expr_type' => ExpressionType::DIRECTORY, 'kind' => 'INDEX',
-                                                 'base_expr' => trim($base_expr), 'delim' => $separator,
+                                                 'base_expr' => trim($base_expr), 'delim' => ' ',
                                                  'sub_tree' => $expr);
-                    $this->clear($expr, $base_expr, $separator, $prevCategory);
+                    $this->clear($expr, $base_expr, $prevCategory);
                     continue 3;
 
                 case 'TABLE_NAME':
                     $result['base_expr'] = $result['name'] = $trim;
                     $result['no_quotes'] = $this->revokeQuotation($trim);
-                    $this->clear($expr, $base_expr, $separator, $prevCategory);
+                    $this->clear($expr, $base_expr, $prevCategory);
                     break;
 
                 case 'LIKE':
                     $result['like'] = array('expr_type' => ExpressionType::TABLE, 'table' => $trim, 'base_expr' => $trim,
                                             'no_quotes' => $this->revokeQuotation($trim));
-                    $this->clear($expr, $base_expr, $separator, $currCategory);
+                    $this->clear($expr, $base_expr, $currCategory);
                     break;
 
                 case '':
@@ -308,7 +308,6 @@ class TableProcessor extends AbstractProcessor {
                         $result['create-def'] = array('expr_type' => ExpressionType::BRACKET_EXPRESSION,
                                                       'base_expr' => $base_expr, 'sub_tree' => $coldef['create-def']);
                         $expr = array();
-                        $separator = ' ';
                         $base_expr = '';
                         $currCategory = 'CREATE_DEF';
                     }
@@ -324,17 +323,17 @@ class TableProcessor extends AbstractProcessor {
                     $expr[] = array('expr_type' => ExpressionType::BRACKET_EXPRESSION, 'base_expr' => $trim,
                                     'sub_tree' => '***TODO***');
                     $result['options'][] = array('expr_type' => ExpressionType::UNION, 'base_expr' => trim($base_expr),
-                                                 'delim' => $separator, 'sub_tree' => $expr);
-                    $this->clear($expr, $base_expr, $separator, $currCategory);
+                                                 'delim' => ' ', 'sub_tree' => $expr);
+                    $this->clear($expr, $base_expr, $currCategory);
                     break;
 
                 default:
                 # strings and numeric constants
                     $expr[] = $this->getConstantType($trim);
                     $result['options'][] = array('expr_type' => ExpressionType::EXPRESSION,
-                                                 'base_expr' => trim($base_expr), 'delim' => $separator,
+                                                 'base_expr' => trim($base_expr), 'delim' => ' ',
                                                  'sub_tree' => $expr);
-                    $this->clear($expr, $base_expr, $separator, $currCategory);
+                    $this->clear($expr, $base_expr, $currCategory);
                     break;
                 }
                 break;
