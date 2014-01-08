@@ -128,13 +128,13 @@ $expected = getExpectedValue(dirname(__FILE__), 'issue33k.sql', false);
 ok($created === $expected, 'CREATE TABLE statement with primary key column and multiple index options and check');
 
 
-/*
 $parser = new PHPSQLParser();
 $sql = "CREATE TABLE hohoho (a integer not null) REPLACE AS SELECT DISTINCT * FROM abcd WHERE x<5";
 $parser->parse($sql, true);
 $p = $parser->parsed;
-$expected = getExpectedValue(dirname(__FILE__), 'issue33l.serialized');
-eq_array($p, $expected, 'CREATE TABLE statement with select statement, replace duplicates');
- */
+$creator = new PHPSQLCreator($parser->parsed);
+$created = $creator->created;
+$expected = getExpectedValue(dirname(__FILE__), 'issue33l.sql', false);
+ok($created === $expected, 'CREATE TABLE statement with select statement, replace duplicates');
 
 ?>
