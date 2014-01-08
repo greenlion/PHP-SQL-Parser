@@ -44,6 +44,7 @@ require_once dirname(__FILE__) . '/../exceptions/UnableToCreateSQLException.php'
 require_once dirname(__FILE__) . '/ColumnListBuilder.php';
 require_once dirname(__FILE__) . '/ConstraintBuilder.php';
 require_once dirname(__FILE__) . '/ReservedBuilder.php';
+require_once dirname(__FILE__) . '/IndexTypeBuilder.php';
 
 /**
  * This class implements the builder for the PRIMARY KEY  statement part of CREATE TABLE. 
@@ -70,6 +71,11 @@ class PrimaryKeyBuilder {
         return $builder->build($parsed);
     }
 
+    protected function buildIndexType($parsed) {
+        $builder = new IndexTypeBuilder();
+        return $builder->build($parsed);
+    }
+    
     public function build($parsed) {
         if ($parsed['expr_type'] !== ExpressionType::PRIMARY_KEY) {
             return "";
@@ -80,6 +86,7 @@ class PrimaryKeyBuilder {
             $sql .= $this->buildConstraint($v);
             $sql .= $this->buildReserved($v);
             $sql .= $this->buildColumnList($v);
+            $sql .= $this->buildIndexType($v);
 
             if ($len == strlen($sql)) {
                 throw new UnableToCreateSQLException('CREATE TABLE primary key subtree', $k, $v, 'expr_type');
