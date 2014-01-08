@@ -40,6 +40,8 @@
  */
 
 require_once dirname(__FILE__) . '/../utils/ExpressionType.php';
+require_once dirname(__FILE__) . '/SelectExpressionBuilder.php';
+require_once dirname(__FILE__) . '/CharacterSetBuilder.php';
 
 /**
  * This class implements the builder for the table-options statement part of CREATE TABLE. 
@@ -51,12 +53,45 @@ require_once dirname(__FILE__) . '/../utils/ExpressionType.php';
  */
 class CreateTableOptionsBuilder {
 
+    protected function buildExpression($parsed) {
+        $builder = new SelectExpressionBuilder();
+        return $builder->build($parsed);
+    }
+	
+    protected function buildCharacterSet($parsed) {
+        $builder = new CharacterSetBuilder();
+        return $builder->build($parsed);
+    }
+    
+    /**
+     * Returns a well-formatted delimiter string. If you don't need nice SQL,
+     * you could simply return $parsed['delim'].
+     * 
+     * @param array $parsed The part of the output array, which contains the current expression.
+     * @return a string, which is added right after the expression
+     */
+    protected function getDelimiter($parsed) {
+        return ($parsed['delim'] === false ? '' : (trim($parsed['delim']) . ' '));
+    }
+     
     public function build($parsed) {
         if (!isset($parsed['options']) || $parsed['options'] === false) {
             return "";
         }
-        $option = $parsed['options'];
-        // TODO
+        $options = $parsed['options'];
+        $sql = "";
+        foreach ($options as $k => $v) {
+            $len = strlen($sql);
+            $sql .= $this->buildExpression($v);
+            $sql .= $this->buildCharacterSet($v);
+
+            if ($len == strlen($sql)) {
+                throw new UnableToCreateSQLException('CREATE TABLE options', $k, $v, 'expr_type');
+            }
+
+            $sql .= $this->getDelimiter($v);
+        }
+        return " " . substr($sql, 0, -1);
     }
 }
 ?>
