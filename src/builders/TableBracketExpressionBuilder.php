@@ -42,6 +42,7 @@
 require_once dirname(__FILE__) . '/../exceptions/UnableToCreateSQLException.php';
 require_once dirname(__FILE__) . '/ColumnDefinitionBuilder.php';
 require_once dirname(__FILE__) . '/PrimaryKeyBuilder.php';
+require_once dirname(__FILE__) . '/ForeignKeyBuilder.php';
 require_once dirname(__FILE__) . '/CheckBuilder.php';
 require_once dirname(__FILE__) . '/LikeExpressionBuilder.php';
 require_once dirname(__FILE__) . '/../utils/ExpressionType.php';
@@ -66,6 +67,11 @@ class TableBracketExpressionBuilder {
         return $builder->build($parsed);
     }
 
+    protected function buildForeignKey($parsed) {
+        $builder = new ForeignKeyBuilder();
+        return $builder->build($parsed);
+    }
+    
     protected function buildCheck($parsed) {
         $builder = new CheckBuilder();
         return $builder->build($parsed);
@@ -87,7 +93,8 @@ class TableBracketExpressionBuilder {
             $sql .= $this->buildPrimaryKey($v);
             $sql .= $this->buildCheck($v);
             $sql .= $this->buildLikeExpression($v);
-
+            $sql .= $this->buildForeignKey($v);
+            
             if ($len == strlen($sql)) {
                 throw new UnableToCreateSQLException('CREATE TABLE create-def expression subtree', $k, $v, 'expr_type');
             }
