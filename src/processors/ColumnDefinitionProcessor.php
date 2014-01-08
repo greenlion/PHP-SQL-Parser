@@ -32,6 +32,7 @@
 
 require_once dirname(__FILE__) . '/AbstractProcessor.php';
 require_once dirname(__FILE__) . '/ReferenceDefinitionProcessor.php';
+require_once dirname(__FILE__) . '/ExpressionListProcessor.php';
 require_once dirname(__FILE__) . '/../utils/ExpressionType.php';
 
 /**
@@ -43,6 +44,26 @@ require_once dirname(__FILE__) . '/../utils/ExpressionType.php';
  */
 class ColumnDefinitionProcessor extends AbstractProcessor {
 
+    protected function processExpressionList($parsed) {
+        $processor = new ExpressionListProcessor();
+        return $processor->process($parsed);
+    }
+    
+    protected function processReferenceDefinition($parsed) {
+        $processor = new ReferenceDefinitionProcessor();
+        return $processor->process($parsed);
+    }
+    
+    protected function removeComma($tokens) {
+        $res = array();        
+        foreach ($tokens as $token) {
+            if (trim($token) !== ',') {
+                $res[] = $token;
+            }
+        }
+        return $res;
+    }
+    
     protected function buildColDef($expr, $base_expr, $options, $refs, $key) {
         $expr = array('expr_type' => ExpressionType::COLUMN_TYPE, 'base_expr' => $base_expr, 'sub_tree' => $expr);
 
@@ -148,13 +169,13 @@ class ColumnDefinitionProcessor extends AbstractProcessor {
                 $expr[] = array('expr_type' => ExpressionType::DATA_TYPE, 'base_expr' => $trim, 'length' => false);
                 $currCategory = 'SINGLE_PARAM_PARENTHESIS';
                 $prevCategory = $upper;
-                break;
+                continue 2;
 
             case 'CHAR':
                 $expr[] = array('expr_type' => ExpressionType::DATA_TYPE, 'base_expr' => $trim, 'length' => false);
                 $currCategory = 'SINGLE_PARAM_PARENTHESIS';
                 $prevCategory = 'TEXT';
-                break;
+                continue 2;
 
             case 'REAL':
             case 'DOUBLE':
@@ -163,7 +184,7 @@ class ColumnDefinitionProcessor extends AbstractProcessor {
                                 'zerofill' => false);
                 $currCategory = 'TWO_PARAM_PARENTHESIS';
                 $prevCategory = $upper;
-                break;
+                continue 2;
 
             case 'DECIMAL':
             case 'NUMERIC':
@@ -171,7 +192,7 @@ class ColumnDefinitionProcessor extends AbstractProcessor {
                                 'zerofill' => false);
                 $currCategory = 'TWO_PARAM_PARENTHESIS';
                 $prevCategory = $upper;
-                break;
+                continue 2;
 
             case 'DATE':
             case 'TIME':
@@ -184,7 +205,7 @@ class ColumnDefinitionProcessor extends AbstractProcessor {
             case 'LONGBLOB':
                 $expr[] = array('expr_type' => ExpressionType::DATA_TYPE, 'base_expr' => $trim);
                 $prevCategory = $currCategory = $upper;
-                break;
+                continue 2;
 
             // the next token can be BINARY
             case 'TINYTEXT':
@@ -214,7 +235,7 @@ class ColumnDefinitionProcessor extends AbstractProcessor {
                 $prevCategory = $currCategory = $upper;
                 // TODO: is it right?
                 // spatial types
-                break;
+                continue 2;
 
             case 'CHARACTER':
                 if ($prevCategory === 'TEXT') {
@@ -297,8 +318,7 @@ class ColumnDefinitionProcessor extends AbstractProcessor {
                 continue 2;
 
             case 'REFERENCES':
-                $processor = new ReferenceDefinitionProcessor();
-                $refs = $processor->process(array_splice($tokens, $key - 1, null, true));
+                $refs = $this->processReferenceDefinition(array_splice($tokens, $key - 1, null, true));
                 $skip = $refs['till'] - $key;
                 unset($refs['till']);
                 // TODO: check this, we need the last comma
@@ -366,7 +386,7 @@ class ColumnDefinitionProcessor extends AbstractProcessor {
                     $parsed = array('expr_type' => ExpressionType::CONSTANT, 'base_expr' => trim($parsed));
                     $last = array_pop($expr);
                     $last['length'] = $parsed['base_expr'];
-                    //$last['sub_tree'] = array('expr_type' => ExpressionType::BRACKET_EXPRESSION, 'base_expr' => $trim, 'sub_tree' => $parsed);
+                    
                     $expr[] = $last;
                     $expr[] = array('expr_type' => ExpressionType::BRACKET_EXPRESSION, 'base_expr' => $trim,
                                     'sub_tree' => array($parsed));
@@ -377,15 +397,15 @@ class ColumnDefinitionProcessor extends AbstractProcessor {
                 // maximum of two parameters
                     $parsed = $this->removeParenthesisFromStart($trim);
                     $parsed = $this->splitSQLIntoTokens($parsed);
-                    $processor = new ExpressionListProcessor();
-                    $parsed = $processor->process($parsed);
+                    $parsed = $this->removeComma($parsed);
+                    $parsed = $this->processExpressionList($parsed);
 
                     // TODO: check that
 
                     $last = array_pop($expr);
                     $last['length'] = $parsed[0]['base_expr'];
                     $last['decimals'] = isset($parsed[1]) ? $parsed[1]['base_expr'] : false;
-                    //$last['sub_tree'] = array('expr_type' => ExpressionType::BRACKET_EXPRESSION, 'base_expr' => $trim, 'sub_tree' => $parsed);
+                    
                     $expr[] = $last;
                     $expr[] = array('expr_type' => ExpressionType::BRACKET_EXPRESSION, 'base_expr' => $trim,
                                     'sub_tree' => $parsed);
@@ -396,8 +416,8 @@ class ColumnDefinitionProcessor extends AbstractProcessor {
                 // some parameters
                     $parsed = $this->removeParenthesisFromStart($trim);
                     $parsed = $this->splitSQLIntoTokens($parsed);
-                    $processor = new ExpressionListProcessor();
-                    $parsed = $processor->process($parsed);
+                    $parsed = $this->removeComma($parsed);
+                    $this->processExpressionList($parsed);
 
                     $last = array_pop($expr);
                     $last['sub_tree'] = array('expr_type' => ExpressionType::BRACKET_EXPRESSION, 'base_expr' => $trim,
