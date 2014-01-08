@@ -99,6 +99,7 @@ $parser->parse($sql);
 $p = $parser->parsed;
 $expected = getExpectedValue(dirname(__FILE__), 'issue33i.serialized');
 eq_array($p, $expected, 'CREATE TABLE statement with foreign key references');
+*/
 
 $parser = new PHPSQLParser();
 $sql = "CREATE TEMPORARY TABLE IF   NOT 
@@ -109,9 +110,13 @@ nota2 int NOT NULL
 )";
 $parser->parse($sql, true);
 $p = $parser->parsed;
-$expected = getExpectedValue(dirname(__FILE__), 'issue33j.serialized');
-eq_array($p, $expected, 'simple CREATE TABLE statement with positions');
+$creator = new PHPSQLCreator($parser->parsed);
+$created = $creator->created;
+$expected = getExpectedValue(dirname(__FILE__), 'issue33j.sql', false);
+ok($created === $expected, 'simple CREATE TEMPORARY TABLE statement with positions');
 
+
+/*
 $parser = new PHPSQLParser();
 $sql = "CREATE TABLE hohoho (a varchar(1000), PRIMARY KEY (a(5) ASC) key_block_size 4 using btree with parser haha, CHECK(a > 5))";
 $parser->parse($sql);
