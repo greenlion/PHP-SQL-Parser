@@ -116,14 +116,17 @@ $expected = getExpectedValue(dirname(__FILE__), 'issue33j.sql', false);
 ok($created === $expected, 'simple CREATE TEMPORARY TABLE statement with positions');
 
 
-/*
 $parser = new PHPSQLParser();
 $sql = "CREATE TABLE hohoho (a varchar(1000), PRIMARY KEY (a(5) ASC) key_block_size 4 using btree with parser haha, CHECK(a > 5))";
 $parser->parse($sql);
 $p = $parser->parsed;
-$expected = getExpectedValue(dirname(__FILE__), 'issue33k.serialized');
-eq_array($p, $expected, 'CREATE TABLE statement with primary key and multiple index options and check');
+$creator = new PHPSQLCreator($parser->parsed);
+$created = $creator->created;
+$expected = getExpectedValue(dirname(__FILE__), 'issue33k.sql', false);
+ok($created === $expected, 'CREATE TABLE statement with primary key column and multiple index options and check');
 
+
+/*
 $parser = new PHPSQLParser();
 $sql = "CREATE TABLE hohoho (a integer not null) REPLACE AS SELECT DISTINCT * FROM abcd WHERE x<5";
 $parser->parse($sql, true);
