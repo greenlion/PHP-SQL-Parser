@@ -71,30 +71,30 @@ class PHPSQLCreator {
             throw new UnsupportedFeatureException($k);
             break;
         case "SELECT":
-            $builder = new SelectStatementBuilder($parsed);
+            $builder = new SelectStatementBuilder();
             $this->created = $builder->build($parsed);
             break;
         case "INSERT":
-            $builder = new InsertStatementBuilder($parsed);
+            $builder = new InsertStatementBuilder();
             $this->created = $builder->build($parsed);
             break;
         case "DELETE":
-            $builder = new DeleteStatementBuilder($parsed);
+            $builder = new DeleteStatementBuilder();
             $this->created = $builder->build($parsed);
             break;
         case "UPDATE":
-            $builder = new UpdateStatementBuilder($parsed);
+            $builder = new UpdateStatementBuilder();
             $this->created = $builder->build($parsed);
             break;
         case "RENAME":
             $this->created = $this->processRenameTableStatement($parsed);
             break;
         case "SHOW":
-            $builder = new ShowStatementBuilder($parsed);
+            $builder = new ShowStatementBuilder();
             $this->created = $builder->build($parsed);
             break;
         case "CREATE":
-            $builder = new CreateStatementBuilder($parsed);
+            $builder = new CreateStatementBuilder();
             $this->created = $builder->build($parsed);
             break;
         default:
