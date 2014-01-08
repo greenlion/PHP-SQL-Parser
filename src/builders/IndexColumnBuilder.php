@@ -64,7 +64,7 @@ class IndexColumnBuilder {
         if ($parsed['expr_type'] !== ExpressionType::INDEX_COLUMN) {
             return "";
         }
-        $sql = $parsed['base_expr'];
+        $sql = $parsed['name'];
         $sql .= $this->buildLength($parsed['length']);
         $sql .= $this->buildDirection($parsed['dir']);
         return $sql;
