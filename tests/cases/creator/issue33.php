@@ -11,6 +11,7 @@ $created = $creator->created;
 $expected = getExpectedValue(dirname(__FILE__), 'issue33a.sql', false);
 ok($created === $expected, 'CREATE TABLE statement with (LIKE)');
 
+
 $parser = new PHPSQLParser();
 $sql = "CREATE TABLE hohoho LIKE xyz";
 $parser->parse($sql, true);
@@ -20,6 +21,7 @@ $created = $creator->created;
 $expected = getExpectedValue(dirname(__FILE__), 'issue33b.sql', false);
 ok($created === $expected, 'CREATE TABLE statement with LIKE');
 
+
 $parser = new PHPSQLParser();
 $sql = "CREATE TABLE hohoho (a varchar(1000) NOT NULL, CONSTRAINT hohoho_pk PRIMARY KEY (a), CHECK(a > 5))";
 $parser->parse($sql);
@@ -28,6 +30,7 @@ $creator = new PHPSQLCreator($parser->parsed);
 $created = $creator->created;
 $expected = getExpectedValue(dirname(__FILE__), 'issue33c.sql', false);
 ok($created === $expected, 'CREATE TABLE statement with named primary key and check');
+
 
 $parser = new PHPSQLParser();
 $sql = "CREATE TABLE hohoho (a varchar(1000), CONSTRAINT PRIMARY KEY (a), CHECK(a > 5))";
@@ -70,14 +73,17 @@ $expected = getExpectedValue(dirname(__FILE__), 'issue33f.sql', false);
 ok($created === $expected, 'CREATE TABLE statement columns and options');
 
 
-/*
 $parser = new PHPSQLParser();
 $sql = "CREATE TABLE hohoho (a varchar(1000), PRIMARY KEY USING btree (a(5) ASC) key_block_size 4 with parser haha, CHECK(a > 5))";
 $parser->parse($sql);
 $p = $parser->parsed;
-$expected = getExpectedValue(dirname(__FILE__), 'issue33g.serialized');
-eq_array($p, $expected, 'CREATE TABLE statement with primary key with index options and check');
+$creator = new PHPSQLCreator($parser->parsed);
+$created = $creator->created;
+$expected = getExpectedValue(dirname(__FILE__), 'issue33g.sql', false);
+ok($created === $expected, 'CREATE TABLE statement with primary key with index options and check');
 
+
+/*
 $parser = new PHPSQLParser();
 $sql = "CREATE TABLE hohoho (a varchar(1000)) ENGINE=xyz,COMMENT='haha' DEFAULT COLLATE = latin1_german2_ci";
 $parser->parse($sql, true);
