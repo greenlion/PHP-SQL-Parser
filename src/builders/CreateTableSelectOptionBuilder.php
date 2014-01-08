@@ -54,7 +54,10 @@ class CreateTableSelectOptionBuilder {
             return "";
         }
         $option = $parsed['select-option'];
-        // TODO
+
+        $sql = ($option['duplicates'] === false ? '' : (' ' . $option['duplicates']));
+        $sql .= ($option['as'] === false ? '' : ' AS');
+        return $sql;
     }
 }
 ?>
