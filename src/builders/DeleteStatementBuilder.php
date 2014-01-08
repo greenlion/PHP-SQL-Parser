@@ -69,9 +69,9 @@ class DeleteStatementBuilder {
     }
     
     public function processDeleteStatement($parsed) {
-        $sql = $this->buildDELETE($parsed['DELETE']) . " " . $this->processFROM($parsed['FROM']);
+        $sql = $this->buildDELETE($parsed['DELETE']) . " " . $this->buildFROM($parsed['FROM']);
         if (isset($parsed['WHERE'])) {
-            $sql .= " " . $this->processWHERE($parsed['WHERE']);
+            $sql .= " " . $this->buildWHERE($parsed['WHERE']);
         }
         return $sql;
     }
