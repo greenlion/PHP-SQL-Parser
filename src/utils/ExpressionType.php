@@ -112,5 +112,6 @@ class ExpressionType {
     const DATA_TYPE = "data-type";
     const COLUMN_TYPE = "column-type";
     const DEF_VALUE = "default-value";
+    const COMMENT = "comment";
 }
 ?>
