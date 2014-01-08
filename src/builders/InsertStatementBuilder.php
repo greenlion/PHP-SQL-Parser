@@ -58,7 +58,7 @@ class InsertStatementBuilder {
     }
 
     protected function buildINSERT($parsed) {
-        $builder = new InsertBuilder($parsed);
+        $builder = new InsertBuilder();
         return $builder->build($parsed);
     }
 
