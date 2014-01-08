@@ -42,6 +42,7 @@
 require_once dirname(__FILE__) . '/../utils/ExpressionType.php';
 require_once dirname(__FILE__) . '/SelectExpressionBuilder.php';
 require_once dirname(__FILE__) . '/CharacterSetBuilder.php';
+require_once dirname(__FILE__) . '/CollationBuilder.php';
 
 /**
  * This class implements the builder for the table-options statement part of CREATE TABLE. 
@@ -60,6 +61,11 @@ class CreateTableOptionsBuilder {
 	
     protected function buildCharacterSet($parsed) {
         $builder = new CharacterSetBuilder();
+        return $builder->build($parsed);
+    }
+    
+    protected function buildCollation($parsed) {
+        $builder = new CollationBuilder();
         return $builder->build($parsed);
     }
     
@@ -84,6 +90,7 @@ class CreateTableOptionsBuilder {
             $len = strlen($sql);
             $sql .= $this->buildExpression($v);
             $sql .= $this->buildCharacterSet($v);
+            $sql .= $this->buildCollation($v);
 
             if ($len == strlen($sql)) {
                 throw new UnableToCreateSQLException('CREATE TABLE options', $k, $v, 'expr_type');
