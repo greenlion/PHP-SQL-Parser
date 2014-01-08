@@ -137,4 +137,14 @@ $created = $creator->created;
 $expected = getExpectedValue(dirname(__FILE__), 'issue33l.sql', false);
 ok($created === $expected, 'CREATE TABLE statement with select statement, replace duplicates');
 
+
+$parser = new PHPSQLParser();
+$sql = "CREATE TABLE hohoho (a varchar(1000), b float(5,3)) ";
+$parser->parse($sql);
+$p = $parser->parsed;
+$creator = new PHPSQLCreator($parser->parsed);
+$created = $creator->created;
+$expected = getExpectedValue(dirname(__FILE__), 'issue33m.sql', false);
+ok($created === $expected, 'CREATE TABLE statement multi-param column type');
+
 ?>
