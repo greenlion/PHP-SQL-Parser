@@ -74,7 +74,7 @@ class CreateStatementBuilder {
             $sql .= " " . $this->buildLIKE($parsed['LIKE']);
         }
         if (isset($parsed['SELECT'])) {
-            $sql .= " " . $this->processSelectStatement($parsed);
+            $sql .= " " . $this->buildSelectStatement($parsed);
         }
         return $sql;
     }
