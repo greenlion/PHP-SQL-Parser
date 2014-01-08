@@ -41,7 +41,7 @@
 
 require_once dirname(__FILE__) . '/../exceptions/UnableToCreateSQLException.php';
 require_once dirname(__FILE__) . '/ReservedBuilder.php';
-require_once dirname(__FILE__) . '/SelectBracketExpressionBuilder.php';
+require_once dirname(__FILE__) . '/ColumnTypeBracketExpressionBuilder.php';
 require_once dirname(__FILE__) . '/DataTypeBuilder.php';
 require_once dirname(__FILE__) . '/../utils/ExpressionType.php';
 /**
@@ -54,8 +54,8 @@ require_once dirname(__FILE__) . '/../utils/ExpressionType.php';
  */
 class ColumnTypeBuilder {
 
-    protected function buildSelectBracketExpression($parsed) {
-        $builder = new SelectBracketExpressionBuilder();
+    protected function buildColumnTypeBracketExpression($parsed) {
+        $builder = new ColumnTypeBracketExpressionBuilder();
         return $builder->build($parsed);
     }
 
@@ -77,10 +77,7 @@ class ColumnTypeBuilder {
         foreach ($parsed['sub_tree'] as $k => $v) {
             $len = strlen($sql);
             $sql .= $this->buildDataType($v);
-            // FIXME: the SelectBracketExpression concats the elements with " ", but
-            // we need a comma here, maybe we can add a field delim in the parser output
-            // for two/multiple element expressions
-            $sql .= $this->buildSelectBracketExpression($v);
+            $sql .= $this->buildColumnTypeBracketExpression($v);
             $sql .= $this->buildReserved($v);
             
             if ($len == strlen($sql)) {
