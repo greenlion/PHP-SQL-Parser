@@ -97,10 +97,8 @@ $parser = new PHPSQLParser();
 $sql = "CREATE TABLE hohoho (a varchar(1000), b integer, FOREIGN KEY haha (b) references xyz (id) match full on delete cascade) ";
 $parser->parse($sql);
 $p = $parser->parsed;
-print_r($p);
 $creator = new PHPSQLCreator($parser->parsed);
 $created = $creator->created;
-print_r($created);
 $expected = getExpectedValue(dirname(__FILE__), 'issue33i.sql', false);
 ok($created === $expected, 'CREATE TABLE statement with foreign key references');
 
