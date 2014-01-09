@@ -74,7 +74,7 @@ class TableProcessor extends AbstractProcessor {
         $processor = new CreateDefinitionProcessor();
         return $processor->process($tokens);
     }
-    
+
     protected function clear(&$expr, &$base_expr, &$category) {
         $expr = array();
         $base_expr = '';
@@ -83,7 +83,7 @@ class TableProcessor extends AbstractProcessor {
 
     public function process($tokens) {
 
-        $currCategory = "TABLE_NAME";
+        $currCategory = 'TABLE_NAME';
         $result = array('base_expr' => false, 'name' => false, 'no_quotes' => false, 'create-def' => false,
                         'options' => false, 'like' => false, 'select-option' => false);
         $expr = array();
@@ -103,7 +103,7 @@ class TableProcessor extends AbstractProcessor {
                 break;
             }
 
-            if ($trim === "") {
+            if ($trim === '') {
                 continue;
             }
 
@@ -116,7 +116,7 @@ class TableProcessor extends AbstractProcessor {
                     $last = array_pop($result['options']);
                     $last['delim'] = ',';
                     $result['options'][] = $last;
-                    $base_expr = "";
+                    $base_expr = '';
                 }
                 continue 2;
 
@@ -359,7 +359,7 @@ class TableProcessor extends AbstractProcessor {
             }
 
             $prevCategory = $currCategory;
-            $currCategory = "";
+            $currCategory = '';
         }
 
         if ($result['like'] === false) {
