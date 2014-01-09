@@ -41,6 +41,7 @@
 
 require_once dirname(__FILE__) . '/../exceptions/UnableToCreateSQLException.php';
 require_once dirname(__FILE__) . '/SetExpressionBuilder.php';
+require_once dirname(__FILE__) . '/Builder.php';
 
 /**
  * This class implements the builder for the SET part of INSERT statement. 
@@ -50,7 +51,7 @@ require_once dirname(__FILE__) . '/SetExpressionBuilder.php';
  * @license http://www.debian.org/misc/bsd.license  BSD License (3 Clause)
  *  
  */
-class SetBuilder {
+class SetBuilder implements Builder {
 
     protected function buildSetExpression($parsed) {
         $builder = new SetExpressionBuilder();

@@ -44,6 +44,7 @@ require_once dirname(__FILE__) . '/../exceptions/UnableToCreateSQLException.php'
 require_once dirname(__FILE__) . '/ConstantBuilder.php';
 require_once dirname(__FILE__) . '/OperatorBuilder.php';
 require_once dirname(__FILE__) . '/ReservedBuilder.php';
+require_once dirname(__FILE__) . '/Builder.php';
 
 /**
  * This class implements the builder for the collation statement part of CREATE TABLE. 
@@ -53,7 +54,7 @@ require_once dirname(__FILE__) . '/ReservedBuilder.php';
  * @license http://www.debian.org/misc/bsd.license  BSD License (3 Clause)
  *  
  */
-class CollationBuilder {
+class CollationBuilder implements Builder {
 
     protected function buildOperator($parsed) {
         $builder = new OperatorBuilder();

@@ -40,7 +40,9 @@
  */
 
 require_once dirname(__FILE__) . '/SubTreeBuilder.php';
+require_once dirname(__FILE__) . '/Builder.php';
 require_once dirname(__FILE__) . '/../utils/ExpressionType.php';
+
 /**
  * This class implements the builder for bracket expressions within a SELECT statement. 
  * You can overwrite all functions to achieve another handling.
@@ -49,7 +51,7 @@ require_once dirname(__FILE__) . '/../utils/ExpressionType.php';
  * @license http://www.debian.org/misc/bsd.license  BSD License (3 Clause)
  *  
  */
-class SelectBracketExpressionBuilder {
+class SelectBracketExpressionBuilder implements Builder {
 
     protected function buildSubTree($parsed, $delim) {
         $builder = new SubTreeBuilder();
