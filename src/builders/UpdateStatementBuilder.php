@@ -42,6 +42,7 @@
 require_once dirname(__FILE__) . '/WhereBuilder.php';
 require_once dirname(__FILE__) . '/SetBuilder.php';
 require_once dirname(__FILE__) . '/UpdateBuilder.php';
+require_once dirname(__FILE__) . '/Builder.php';
 
 /**
  * This class implements the builder for the whole Update statement. You can overwrite
@@ -51,7 +52,7 @@ require_once dirname(__FILE__) . '/UpdateBuilder.php';
  * @license http://www.debian.org/misc/bsd.license  BSD License (3 Clause)
  *  
  */
-class UpdateStatementBuilder {
+class UpdateStatementBuilder implements Builder {
 
     protected function buildWHERE($parsed) {
         $builder = new WhereBuilder();

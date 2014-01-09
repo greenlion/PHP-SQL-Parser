@@ -44,6 +44,7 @@ require_once dirname(__FILE__) . '/AliasBuilder.php';
 require_once dirname(__FILE__) . '/JoinBuilder.php';
 require_once dirname(__FILE__) . '/RefTypeBuilder.php';
 require_once dirname(__FILE__) . '/RefClauseBuilder.php';
+require_once dirname(__FILE__) . '/Builder.php';
 
 /**
  * This class implements the builder for the table name and join options. 
@@ -53,7 +54,7 @@ require_once dirname(__FILE__) . '/RefClauseBuilder.php';
  * @license http://www.debian.org/misc/bsd.license  BSD License (3 Clause)
  *  
  */
-class TableBuilder {
+class TableBuilder implements Builder {
 
     protected function buildAlias($parsed) {
         $builder = new AliasBuilder();
@@ -75,7 +76,7 @@ class TableBuilder {
         return $builder->build($parsed);
     }
 
-    public function build($parsed, $index) {
+    public function build($parsed, $index = 0) {
         if ($parsed['expr_type'] !== ExpressionType::TABLE) {
             return "";
         }
