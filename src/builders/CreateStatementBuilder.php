@@ -42,6 +42,7 @@
 require_once dirname(__FILE__) . '/LikeBuilder.php';
 require_once dirname(__FILE__) . '/SelectStatementBuilder.php';
 require_once dirname(__FILE__) . '/CreateBuilder.php';
+require_once dirname(__FILE__) . '/Builder.php';
 
 /**
  * This class implements the builder for the whole Create statement. You can overwrite
@@ -51,7 +52,7 @@ require_once dirname(__FILE__) . '/CreateBuilder.php';
  * @license http://www.debian.org/misc/bsd.license  BSD License (3 Clause)
  *  
  */
-class CreateStatementBuilder {
+class CreateStatementBuilder implements Builder {
 
     protected function buildLIKE($parsed) {
         $builder = new LikeBuilder();

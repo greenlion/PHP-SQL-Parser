@@ -43,6 +43,7 @@ require_once dirname(__FILE__) . '/../exceptions/UnableToCreateSQLException.php'
 require_once dirname(__FILE__) . '/CreateTableDefinitionBuilder.php';
 require_once dirname(__FILE__) . '/CreateTableSelectOptionBuilder.php';
 require_once dirname(__FILE__) . '/CreateTableOptionsBuilder.php';
+require_once dirname(__FILE__) . '/Builder.php';
 
 /**
  * This class implements the builder for the CREATE TABLE statement. You can overwrite
@@ -52,7 +53,7 @@ require_once dirname(__FILE__) . '/CreateTableOptionsBuilder.php';
  * @license http://www.debian.org/misc/bsd.license  BSD License (3 Clause)
  *  
  */
-class CreateTableBuilder {
+class CreateTableBuilder implements Builder {
 
     protected function buildCreateTableDefinition($parsed) {
         $builder = new CreateTableDefinitionBuilder();
