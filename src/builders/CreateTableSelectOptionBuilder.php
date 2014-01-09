@@ -39,6 +39,8 @@
  * 
  */
 
+require_once dirname(__FILE__) . '/Builder.php';
+
 /**
  * This class implements the builder for the select-options statement part of CREATE TABLE. 
  * You can overwrite all functions to achieve another handling.
@@ -47,7 +49,7 @@
  * @license http://www.debian.org/misc/bsd.license  BSD License (3 Clause)
  *  
  */
-class CreateTableSelectOptionBuilder {
+class CreateTableSelectOptionBuilder implements Builder {
 
     public function build($parsed) {
         if (!isset($parsed['select-option']) || $parsed['select-option'] === false) {

@@ -42,6 +42,7 @@
 require_once dirname(__FILE__) . '/WhereBuilder.php';
 require_once dirname(__FILE__) . '/FromBuilder.php';
 require_once dirname(__FILE__) . '/DeleteBuilder.php';
+require_once dirname(__FILE__) . '/Builder.php';
 
 /**
  * This class implements the builder for the whole Delete statement. You can overwrite
@@ -51,7 +52,7 @@ require_once dirname(__FILE__) . '/DeleteBuilder.php';
  * @license http://www.debian.org/misc/bsd.license  BSD License (3 Clause)
  *  
  */
-class DeleteStatementBuilder {
+class DeleteStatementBuilder implements Builder {
 
     protected function buildWHERE($parsed) {
         $builder = new WhereBuilder();

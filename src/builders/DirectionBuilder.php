@@ -39,6 +39,8 @@
  * 
  */
 
+require_once dirname(__FILE__) . '/Builder.php';
+
 /**
  * This class implements the builder for directions (e.g. of the order-by clause). 
  * You can overwrite all functions to achieve another handling.
@@ -47,7 +49,7 @@
  * @license http://www.debian.org/misc/bsd.license  BSD License (3 Clause)
  *  
  */
-class DirectionBuilder {
+class DirectionBuilder implements Builder {
 
     public function build($parsed) {
         if (!isset($parsed['direction']) || $parsed['direction'] === false) {

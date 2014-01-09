@@ -45,6 +45,7 @@ require_once dirname(__FILE__) . '/ConstantBuilder.php';
 require_once dirname(__FILE__) . '/ReservedBuilder.php';
 require_once dirname(__FILE__) . '/ColumnListBuilder.php';
 require_once dirname(__FILE__) . '/ForeignRefBuilder.php';
+require_once dirname(__FILE__) . '/Builder.php';
 
 /**
  * This class implements the builder for the FOREIGN KEY statement part of CREATE TABLE. 
@@ -54,7 +55,7 @@ require_once dirname(__FILE__) . '/ForeignRefBuilder.php';
  * @license http://www.debian.org/misc/bsd.license  BSD License (3 Clause)
  *  
  */
-class ForeignKeyBuilder {
+class ForeignKeyBuilder implements Builder {
 
     protected function buildConstant($parsed) {
         $builder = new ConstantBuilder();

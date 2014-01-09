@@ -39,6 +39,8 @@
  * 
  */
 
+require_once dirname(__FILE__) . '/Builder.php';
+
 /**
  * This class implements the builder for the [DELETE] part. You can overwrite
  * all functions to achieve another handling.
@@ -47,7 +49,7 @@
  * @license http://www.debian.org/misc/bsd.license  BSD License (3 Clause)
  *  
  */
-class DeleteBuilder {
+class DeleteBuilder implements Builder {
 
     public function build($parsed) {
         $sql = "DELETE";
