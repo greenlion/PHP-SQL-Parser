@@ -324,7 +324,7 @@ class TableProcessor extends AbstractProcessor {
                 // after table name
                     if ($prevCategory === 'TABLE_NAME' && $upper[0] === '(' && substr($upper, -1) === ')') {
                         $unparsed = $this->splitSQLIntoTokens($this->removeParenthesisFromStart($trim));
-                        $colref = $this->processCreateDefinition($unparsed);
+                        $coldef = $this->processCreateDefinition($unparsed);
                         $result['create-def'] = array('expr_type' => ExpressionType::BRACKET_EXPRESSION,
                                                       'base_expr' => $base_expr, 'sub_tree' => $coldef['create-def']);
                         $expr = array();
