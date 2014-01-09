@@ -46,7 +46,7 @@ require_once dirname(__FILE__) . '/WhereBuilder.php';
 require_once dirname(__FILE__) . '/GroupByBuilder.php';
 require_once dirname(__FILE__) . '/HavingBuilder.php';
 require_once dirname(__FILE__) . '/OrderByBuilder.php';
-
+require_once dirname(__FILE__) . '/Builder.php';
 /**
  * This class implements the builder for the whole Select statement. You can overwrite
  * all functions to achieve another handling.
@@ -55,7 +55,7 @@ require_once dirname(__FILE__) . '/OrderByBuilder.php';
  * @license http://www.debian.org/misc/bsd.license  BSD License (3 Clause)
  *  
  */
-class SelectStatementBuilder {
+class SelectStatementBuilder implements Builder {
 
     protected function buildSELECT($parsed) {
         $builder = new SelectBuilder();

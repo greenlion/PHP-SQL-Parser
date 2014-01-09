@@ -39,6 +39,8 @@
  * 
  */
 
+require_once dirname(__FILE__) . '/Builder.php';
+
 /**
  * This class implements the builder for aliases. 
  * You can overwrite all functions to achieve another handling.
@@ -47,7 +49,7 @@
  * @license http://www.debian.org/misc/bsd.license  BSD License (3 Clause)
  *  
  */
-class AliasBuilder {
+class AliasBuilder implements Builder {
 
     public function hasAlias($parsed) {
         return isset($parsed['alias']);

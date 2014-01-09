@@ -40,6 +40,7 @@
  */
 
 require_once dirname(__FILE__) . '/../utils/ExpressionType.php';
+require_once dirname(__FILE__) . '/Builder.php';
 
 /**
  * This class implements the builder for reserved keywords.
@@ -49,7 +50,7 @@ require_once dirname(__FILE__) . '/../utils/ExpressionType.php';
  * @license http://www.debian.org/misc/bsd.license  BSD License (3 Clause)
  *  
  */
-class ReservedBuilder {
+class ReservedBuilder implements Builder {
 
     public function isReserved($parsed) {
         return ($parsed['expr_type'] === ExpressionType::RESERVED);

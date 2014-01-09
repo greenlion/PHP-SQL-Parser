@@ -40,6 +40,7 @@
  */
 
 require_once dirname(__FILE__) . '/../utils/ExpressionType.php';
+require_once dirname(__FILE__) . '/Builder.php';
 
 /**
  * This class implements the builder for a procedure within SHOW statement. 
@@ -49,7 +50,7 @@ require_once dirname(__FILE__) . '/../utils/ExpressionType.php';
  * @license http://www.debian.org/misc/bsd.license  BSD License (3 Clause)
  *  
  */
-class ProcedureBuilder {
+class ProcedureBuilder implements Builder {
 
     public function build($parsed) {
         if ($parsed['expr_type'] !== ExpressionType::PROCEDURE) {

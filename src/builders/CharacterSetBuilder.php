@@ -41,10 +41,10 @@
 
 require_once dirname(__FILE__) . '/../utils/ExpressionType.php';
 require_once dirname(__FILE__) . '/../exceptions/UnableToCreateSQLException.php';
-require_once dirname(__FILE__) . '/ColumnListBuilder.php';
-require_once dirname(__FILE__) . '/ConstraintBuilder.php';
+require_once dirname(__FILE__) . '/ConstantBuilder.php';
+require_once dirname(__FILE__) . '/OperatorBuilder.php';
 require_once dirname(__FILE__) . '/ReservedBuilder.php';
-require_once dirname(__FILE__) . '/IndexTypeBuilder.php';
+require_once dirname(__FILE__) . '/Builder.php';
 
 /**
  * This class implements the builder for the CHARACTER SET statement part of CREATE TABLE. 
@@ -54,7 +54,7 @@ require_once dirname(__FILE__) . '/IndexTypeBuilder.php';
  * @license http://www.debian.org/misc/bsd.license  BSD License (3 Clause)
  *  
  */
-class CharacterSetBuilder {
+class CharacterSetBuilder implements Builder {
 
     protected function buildConstant($parsed) {
         $builder = new ConstantBuilder();

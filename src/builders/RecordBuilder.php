@@ -44,6 +44,7 @@ require_once dirname(__FILE__) . '/../utils/ExpressionType.php';
 require_once dirname(__FILE__) . '/OperatorBuilder.php';
 require_once dirname(__FILE__) . '/ConstantBuilder.php';
 require_once dirname(__FILE__) . '/FunctionBuilder.php';
+require_once dirname(__FILE__) . '/Builder.php';
 
 /**
  * This class implements the builder for the records within INSERT statement. 
@@ -53,7 +54,7 @@ require_once dirname(__FILE__) . '/FunctionBuilder.php';
  * @license http://www.debian.org/misc/bsd.license  BSD License (3 Clause)
  *  
  */
-class RecordBuilder {
+class RecordBuilder implements Builder {
 
     protected function buildOperator($parsed) {
         $builder = new OperatorBuilder();
