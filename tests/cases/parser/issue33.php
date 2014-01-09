@@ -108,4 +108,49 @@ $p = $parser->parsed;
 $expected = getExpectedValue(dirname(__FILE__), 'issue33l.serialized');
 eq_array($p, $expected, 'CREATE TABLE statement with select statement, replace duplicates');
 
+
+$parser = new PHPSQLParser();
+$sql = "CREATE TABLE ti (id INT, amount DECIMAL(7,2), tr_date DATE)
+    ENGINE=INNODB
+    PARTITION BY HASH( MONTH(tr_date) )
+    PARTITIONS 6";
+$parser->parse($sql);
+$p = $parser->parsed;
+$expected = getExpectedValue(dirname(__FILE__), 'issue33m.serialized');
+eq_array($p, $expected, 'CREATE TABLE statement with partitions');
+
+
+$parser = new PHPSQLParser();
+$sql = "CREATE TABLE ts (id INT, purchased DATE)
+    PARTITION BY RANGE( YEAR(purchased) )
+    SUBPARTITION BY HASH( TO_DAYS(purchased) ) (
+        PARTITION p0 VALUES LESS THAN (1990) (
+            SUBPARTITION s0
+                DATA DIRECTORY = '/disk0/data'
+                INDEX DIRECTORY = '/disk0/idx',
+            SUBPARTITION s1
+                DATA DIRECTORY = '/disk1/data'
+                INDEX DIRECTORY = '/disk1/idx'
+        ),
+        PARTITION p1 VALUES LESS THAN (2000) (
+            SUBPARTITION s2
+                DATA DIRECTORY = '/disk2/data'
+                INDEX DIRECTORY = '/disk2/idx',
+            SUBPARTITION s3
+                DATA DIRECTORY = '/disk3/data'
+                INDEX DIRECTORY = '/disk3/idx'
+        ),
+        PARTITION p2 VALUES LESS THAN MAXVALUE (
+            SUBPARTITION s4
+                DATA DIRECTORY = '/disk4/data'
+                INDEX DIRECTORY = '/disk4/idx',
+            SUBPARTITION s5
+                DATA DIRECTORY = '/disk5/data'
+                INDEX DIRECTORY = '/disk5/idx'
+        )
+    )";
+$parser->parse($sql);
+$p = $parser->parsed;
+$expected = getExpectedValue(dirname(__FILE__), 'issue33n.serialized');
+eq_array($p, $expected, 'CREATE TABLE statement with subpartitions');
 ?>
