@@ -98,9 +98,9 @@ abstract class AbstractProcessor {
         $parenthesisRemoved = 0;
 
         $trim = trim($token);
-        if ($trim !== "" && $trim[0] === "(") { // remove only one parenthesis pair now!
+        if ($trim !== '' && $trim[0] === '(') { // remove only one parenthesis pair now!
             $parenthesisRemoved++;
-            $trim[0] = " ";
+            $trim[0] = ' ';
             $trim = trim($trim);
         }
 
@@ -118,13 +118,13 @@ abstract class AbstractProcessor {
                 $string++;
             }
 
-            if (($string % 2 === 0) && ($trim[$i] === "(")) {
+            if (($string % 2 === 0) && ($trim[$i] === '(')) {
                 $parenthesis++;
             }
 
-            if (($string % 2 === 0) && ($trim[$i] === ")")) {
+            if (($string % 2 === 0) && ($trim[$i] === ')')) {
                 if ($parenthesis == $parenthesisRemoved) {
-                    $trim[$i] = " ";
+                    $trim[$i] = ' ';
                     $parenthesisRemoved--;
                 }
                 $parenthesis--;
@@ -136,11 +136,11 @@ abstract class AbstractProcessor {
 
     protected function getVariableType($expression) {
         // $expression must contain only upper-case characters
-        if ($expression[1] !== "@") {
+        if ($expression[1] !== '@') {
             return ExpressionType::USER_VARIABLE;
         }
 
-        $type = substr($expression, 2, strpos($expression, ".", 2));
+        $type = substr($expression, 2, strpos($expression, '.', 2));
 
         switch ($type) {
         case 'GLOBAL':
@@ -158,11 +158,11 @@ abstract class AbstractProcessor {
     }
 
     protected function isCommaToken($token) {
-        return (trim($token) === ",");
+        return (trim($token) === ',');
     }
 
     protected function isWhitespaceToken($token) {
-        return (trim($token) === "");
+        return (trim($token) === '');
     }
 
     protected function isCommentToken($token) {
