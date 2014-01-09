@@ -54,7 +54,7 @@ require_once dirname(__FILE__) . '/../utils/ExpressionType.php';
  * @license http://www.debian.org/misc/bsd.license  BSD License (3 Clause)
  *  
  */
-class SubQueryBuilder {
+class SubQueryBuilder implements Builder {
 
     protected function buildRefClause($parsed) {
         $builder = new RefClauseBuilder();
@@ -92,7 +92,7 @@ class SubQueryBuilder {
 
         if ($index !== 0) {
             $sql = $this->buildJoin($parsed['join_type']) . $sql;
-            $sql .= $this - buildRefType($parsed['ref_type']);
+            $sql .= $this->buildRefType($parsed['ref_type']);
             $sql .= $this->buildRefClause($parsed['ref_clause']);
         }
         return $sql;
