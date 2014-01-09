@@ -54,6 +54,8 @@ class PartitionOptionsProcessor extends AbstractProcessor {
 
     public function process($tokens) {
 
+        $prevCategory = '';
+        $currCategory = '';
         $result = array();
         $expr = array();
         $base_expr = '';
@@ -84,9 +86,13 @@ class PartitionOptionsProcessor extends AbstractProcessor {
             }
 
             $prevCategory = $currCategory;
-            $currCategory = "";
+            $currCategory = '';
         }
 
+        if (!isset($result['till'])) {
+            // FIXME: set the real read marker
+            $result['till'] = 0;
+        }
         return $result;
     }
 }
