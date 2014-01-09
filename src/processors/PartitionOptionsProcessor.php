@@ -74,12 +74,34 @@ class PartitionOptionsProcessor extends AbstractProcessor {
                 break;
             }
 
-            if ($trim === "") {
+            if ($trim === '') {
                 continue;
             }
 
             $upper = strtoupper($trim);
             switch ($upper) {
+
+            case 'PARTITION':
+                break;
+
+            case 'SUBPARTITION':
+                break;
+
+            case 'BY':
+                break;
+
+            case 'LINEAR':
+            case 'HASH':
+            case 'RANGE':
+            case 'KEY':
+            case 'ALGORITHM':
+            case 'COLUMNS':
+            case 'LIST':
+                break;
+
+            case 'PARTITIONS':
+            case 'SUBPARTITIONS':
+                break;
 
             default:
                 break;
@@ -90,7 +112,7 @@ class PartitionOptionsProcessor extends AbstractProcessor {
         }
 
         if (!isset($result['till'])) {
-            // FIXME: set the real read marker
+            // FIXME: set the real read marker within the $tokens array
             $result['till'] = 0;
         }
         return $result;
