@@ -45,6 +45,7 @@ require_once dirname(__FILE__) . '/ColumnReferenceBuilder.php';
 require_once dirname(__FILE__) . '/ConstantBuilder.php';
 require_once dirname(__FILE__) . '/OperatorBuilder.php';
 require_once dirname(__FILE__) . '/FunctionBuilder.php';
+require_once dirname(__FILE__) . '/Builder.php';
 
 /**
  * This class implements the builder for the SET part of INSERT statement. 
@@ -54,7 +55,7 @@ require_once dirname(__FILE__) . '/FunctionBuilder.php';
  * @license http://www.debian.org/misc/bsd.license  BSD License (3 Clause)
  *  
  */
-class SetExpressionBuilder {
+class SetExpressionBuilder implements Builder {
 
     protected function buildColRef($parsed) {
         $builder = new ColumnReferenceBuilder();

@@ -41,6 +41,7 @@
 
 require_once dirname(__FILE__) . '/ShowBuilder.php';
 require_once dirname(__FILE__) . '/WhereBuilder.php';
+require_once dirname(__FILE__) . '/Builder.php';
 
 /**
  * This class implements the builder for the SHOW statement. 
@@ -50,7 +51,7 @@ require_once dirname(__FILE__) . '/WhereBuilder.php';
  * @license http://www.debian.org/misc/bsd.license  BSD License (3 Clause)
  *  
  */
-class ShowStatementBuilder {
+class ShowStatementBuilder implements Builder {
 
     protected function buildWHERE($parsed) {
         $builder = new WhereBuilder();
