@@ -40,6 +40,7 @@
  */
 
 require_once dirname(__FILE__) . '/TableBracketExpressionBuilder.php';
+require_once dirname(__FILE__) . '/Builder.php';
 
 /**
  * This class implements the builder for the create definitions of CREATE TABLE. 
@@ -49,7 +50,7 @@ require_once dirname(__FILE__) . '/TableBracketExpressionBuilder.php';
  * @license http://www.debian.org/misc/bsd.license  BSD License (3 Clause)
  *  
  */
-class CreateTableDefinitionBuilder {
+class CreateTableDefinitionBuilder implements Builder {
 
     protected function buildTableBracketExpression($parsed) {
         $builder = new TableBracketExpressionBuilder();
