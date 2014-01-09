@@ -41,10 +41,8 @@
 
 require_once dirname(__FILE__) . '/../utils/ExpressionType.php';
 require_once dirname(__FILE__) . '/../exceptions/UnableToCreateSQLException.php';
-require_once dirname(__FILE__) . '/ColumnListBuilder.php';
-require_once dirname(__FILE__) . '/ConstraintBuilder.php';
 require_once dirname(__FILE__) . '/ReservedBuilder.php';
-require_once dirname(__FILE__) . '/IndexTypeBuilder.php';
+require_once dirname(__FILE__) . '/Builder.php';
 
 /**
  * This class implements the builder for the index type of a PRIMARY KEY
@@ -55,7 +53,7 @@ require_once dirname(__FILE__) . '/IndexTypeBuilder.php';
  * @license http://www.debian.org/misc/bsd.license  BSD License (3 Clause)
  *  
  */
-class IndexTypeBuilder {
+class IndexTypeBuilder implements Builder {
 
     protected function buildReserved($parsed) {
         $builder = new ReservedBuilder();

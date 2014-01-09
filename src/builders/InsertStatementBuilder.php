@@ -41,6 +41,7 @@
 
 require_once dirname(__FILE__) . '/InsertBuilder.php';
 require_once dirname(__FILE__) . '/ValuesBuilder.php';
+require_once dirname(__FILE__) . '/Builder.php';
 
 /**
  * This class implements the builder for the whole Insert statement. You can overwrite
@@ -50,7 +51,7 @@ require_once dirname(__FILE__) . '/ValuesBuilder.php';
  * @license http://www.debian.org/misc/bsd.license  BSD License (3 Clause)
  *  
  */
-class InsertStatementBuilder {
+class InsertStatementBuilder implements Builder {
 
     protected function buildVALUES($parsed) {
         $builder = new ValuesBuilder();

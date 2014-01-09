@@ -44,6 +44,7 @@ require_once dirname(__FILE__) . '/../exceptions/UnableToCreateSQLException.php'
 require_once dirname(__FILE__) . '/HavingExpressionBuilder.php';
 require_once dirname(__FILE__) . '/HavingBracketExpressionBuilder.php';
 require_once dirname(__FILE__) . '/WhereExpressionBuilder.php';
+require_once dirname(__FILE__) . '/Builder.php';
 
 /**
  * This class implements the builder for expressions within the HAVING part. 
@@ -54,7 +55,7 @@ require_once dirname(__FILE__) . '/WhereExpressionBuilder.php';
  * @license http://www.debian.org/misc/bsd.license  BSD License (3 Clause)
  *  
  */
-class HavingExpressionBuilder extends WhereExpressionBuilder {
+class HavingExpressionBuilder extends WhereExpressionBuilder implements Builder {
    
     protected function buildHavingExpression($parsed) {
         $builder = new HavingExpressionBuilder();

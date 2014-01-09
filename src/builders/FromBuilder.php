@@ -43,6 +43,7 @@ require_once dirname(__FILE__) . '/../exceptions/UnableToCreateSQLException.php'
 require_once dirname(__FILE__) . '/TableBuilder.php';
 require_once dirname(__FILE__) . '/TableExpressionBuilder.php';
 require_once dirname(__FILE__) . '/SubQueryBuilder.php';
+require_once dirname(__FILE__) . '/Builder.php';
 
 /**
  * This class implements the builder for the [FROM] part. You can overwrite
@@ -52,7 +53,7 @@ require_once dirname(__FILE__) . '/SubQueryBuilder.php';
  * @license http://www.debian.org/misc/bsd.license  BSD License (3 Clause)
  *  
  */
-class FromBuilder {
+class FromBuilder implements Builder {
 
     protected function buildTable($parsed, $key) {
         $builder = new TableBuilder();

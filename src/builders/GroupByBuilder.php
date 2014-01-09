@@ -43,6 +43,7 @@ require_once dirname(__FILE__) . '/../exceptions/UnableToCreateSQLException.php'
 require_once dirname(__FILE__) . '/PositionBuilder.php';
 require_once dirname(__FILE__) . '/ColumnReferenceBuilder.php';
 require_once dirname(__FILE__) . '/FunctionBuilder.php';
+require_once dirname(__FILE__) . '/Builder.php';
 
 /**
  * This class implements the builder for the GROUP-BY clause. 
@@ -52,7 +53,7 @@ require_once dirname(__FILE__) . '/FunctionBuilder.php';
  * @license http://www.debian.org/misc/bsd.license  BSD License (3 Clause)
  *  
  */
-class GroupByBuilder {
+class GroupByBuilder implements Builder {
 
     protected function buildColRef($parsed) {
         $builder = new ColumnReferenceBuilder();

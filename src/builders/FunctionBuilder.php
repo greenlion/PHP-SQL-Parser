@@ -49,6 +49,7 @@ require_once dirname(__FILE__) . '/ReservedBuilder.php';
 require_once dirname(__FILE__) . '/SelectExpressionBuilder.php';
 require_once dirname(__FILE__) . '/SelectBracketExpressionBuilder.php';
 require_once dirname(__FILE__) . '/DirectionBuilder.php';
+require_once dirname(__FILE__) . '/Builder.php';
 
 /**
  * This class implements the builder for function calls. 
@@ -58,7 +59,7 @@ require_once dirname(__FILE__) . '/DirectionBuilder.php';
  * @license http://www.debian.org/misc/bsd.license  BSD License (3 Clause)
  *  
  */
-class FunctionBuilder {
+class FunctionBuilder implements Builder {
 
     protected function buildDirection($parsed) {
         $builder = new DirectionBuilder();
