@@ -43,7 +43,8 @@ require_once dirname(__FILE__) . '/RefClauseBuilder.php';
 require_once dirname(__FILE__) . '/RefTypeBuilder.php';
 require_once dirname(__FILE__) . '/JoinBuilder.php';
 require_once dirname(__FILE__) . '/AliasBuilder.php';
-require_once dirname(__FILE__) . '/AliasBuilder.php';
+require_once dirname(__FILE__) . '/Builder.php';
+require_once dirname(__FILE__) . '/SelectStatementBuilder.php';
 require_once dirname(__FILE__) . '/../utils/ExpressionType.php';
 
 /**
