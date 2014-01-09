@@ -44,6 +44,7 @@ require_once dirname(__FILE__) . '/SelectBuilder.php';
 require_once dirname(__FILE__) . '/FromBuilder.php';
 require_once dirname(__FILE__) . '/WhereBuilder.php';
 require_once dirname(__FILE__) . '/GroupByBuilder.php';
+require_once dirname(__FILE__) . '/HavingBuilder.php';
 require_once dirname(__FILE__) . '/OrderByBuilder.php';
 
 /**
@@ -76,6 +77,11 @@ class SelectStatementBuilder {
         return $builder->build($parsed);
     }
 
+    protected function buildHAVING($parsed) {
+        $builder = new HavingBuilder();
+        return $builder->build($parsed);
+    }
+    
     protected function buildORDER($parsed) {
         $builder = new OrderByBuilder();
         return $builder->build($parsed);
@@ -96,6 +102,9 @@ class SelectStatementBuilder {
         }
         if (isset($parsed['GROUP'])) {
             $sql .= " " . $this->buildGROUP($parsed['GROUP']);
+        }
+        if (isset($parsed['HAVING'])) {
+            $sql .= " " . $this->buildHAVING($parsed['HAVING']);
         }
         if (isset($parsed['ORDER'])) {
             $sql .= " " . $this->buildORDER($parsed['ORDER']);
