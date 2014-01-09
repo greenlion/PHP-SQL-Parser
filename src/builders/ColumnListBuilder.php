@@ -41,6 +41,7 @@
 
 require_once dirname(__FILE__) . '/../exceptions/UnableToCreateSQLException.php';
 require_once dirname(__FILE__) . '/IndexColumnBuilder.php';
+require_once dirname(__FILE__) . '/Builder.php';
 require_once dirname(__FILE__) . '/../utils/ExpressionType.php';
 /**
  * This class implements the builder for column-list parts of CREATE TABLE. 
@@ -50,7 +51,7 @@ require_once dirname(__FILE__) . '/../utils/ExpressionType.php';
  * @license http://www.debian.org/misc/bsd.license  BSD License (3 Clause)
  *  
  */
-class ColumnListBuilder {
+class ColumnListBuilder implements Builder {
 
     protected function buildIndexColumn($parsed) {
         $builder = new IndexColumnBuilder();

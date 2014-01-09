@@ -40,6 +40,7 @@
  */
 
 require_once dirname(__FILE__) . '/AliasBuilder.php';
+require_once dirname(__FILE__) . '/Builder.php';
 require_once dirname(__FILE__) . '/../utils/ExpressionType.php';
 
 /**
@@ -50,7 +51,7 @@ require_once dirname(__FILE__) . '/../utils/ExpressionType.php';
  * @license http://www.debian.org/misc/bsd.license  BSD License (3 Clause)
  *  
  */
-class ConstantBuilder {
+class ConstantBuilder implements Builder {
 
     protected function buildAlias($parsed) {
         $builder = new AliasBuilder();
