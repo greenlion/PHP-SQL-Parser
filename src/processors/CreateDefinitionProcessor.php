@@ -243,7 +243,7 @@ class CreateDefinitionProcessor extends AbstractProcessor {
 
             case 'REFERENCES':
                 if ($currCategory === 'INDEX_COL_LIST' && $prevCategory === 'FOREIGN') {
-                    $refs = processReferenceDefinition(array_slice($tokens, $k - 1, null, true));
+                    $refs = $this->processReferenceDefinition(array_slice($tokens, $k - 1, null, true));
                     $skip = $refs['till'] - $k;
                     unset($refs['till']);
                     $expr[] = $refs;
