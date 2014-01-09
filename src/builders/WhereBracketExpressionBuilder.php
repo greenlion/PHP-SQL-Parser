@@ -47,8 +47,8 @@ require_once dirname(__FILE__) . '/OperatorBuilder.php';
 require_once dirname(__FILE__) . '/FunctionBuilder.php';
 require_once dirname(__FILE__) . '/InListBuilder.php';
 require_once dirname(__FILE__) . '/WhereExpressionBuilder.php';
-require_once dirname(__FILE__) . '/WhereBracketExpressionBuilder.php';
 require_once dirname(__FILE__) . '/UserVariableBuilder.php';
+require_once dirname(__FILE__) . '/Builder.php';
 
 /**
  * This class implements the builder for bracket expressions within the WHERE part. 
@@ -58,7 +58,7 @@ require_once dirname(__FILE__) . '/UserVariableBuilder.php';
  * @license http://www.debian.org/misc/bsd.license  BSD License (3 Clause)
  *  
  */
-class WhereBracketExpressionBuilder {
+class WhereBracketExpressionBuilder implements Builder {
 
     protected function buildColRef($parsed) {
         $builder = new ColumnReferenceBuilder();

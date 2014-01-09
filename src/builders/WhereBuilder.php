@@ -39,7 +39,6 @@
  * 
  */
 
-require_once dirname(__FILE__) . '/../utils/ExpressionType.php';
 require_once dirname(__FILE__) . '/../exceptions/UnableToCreateSQLException.php';
 require_once dirname(__FILE__) . '/ColumnReferenceBuilder.php';
 require_once dirname(__FILE__) . '/ConstantBuilder.php';
@@ -50,6 +49,7 @@ require_once dirname(__FILE__) . '/WhereExpressionBuilder.php';
 require_once dirname(__FILE__) . '/WhereBracketExpressionBuilder.php';
 require_once dirname(__FILE__) . '/UserVariableBuilder.php';
 require_once dirname(__FILE__) . '/SubQueryBuilder.php';
+require_once dirname(__FILE__) . '/Builder.php';
 
 /**
  * This class implements the builder for the WHERE part. 
@@ -59,7 +59,7 @@ require_once dirname(__FILE__) . '/SubQueryBuilder.php';
  * @license http://www.debian.org/misc/bsd.license  BSD License (3 Clause)
  *  
  */
-class WhereBuilder {
+class WhereBuilder implements Builder {
 
     protected function buildColRef($parsed) {
         $builder = new ColumnReferenceBuilder();

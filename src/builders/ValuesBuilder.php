@@ -41,6 +41,7 @@
 
 require_once dirname(__FILE__) . '/../exceptions/UnableToCreateSQLException.php';
 require_once dirname(__FILE__) . '/RecordBuilder.php';
+require_once dirname(__FILE__) . '/Builder.php';
 
 /**
  * This class implements the builder for the VALUES part of INSERT statement. 
@@ -50,7 +51,7 @@ require_once dirname(__FILE__) . '/RecordBuilder.php';
  * @license http://www.debian.org/misc/bsd.license  BSD License (3 Clause)
  *  
  */
-class ValuesBuilder {
+class ValuesBuilder implements Builder {
 
     protected function buildRecord($parsed) {
         $builder = new RecordBuilder();
