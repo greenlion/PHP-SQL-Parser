@@ -4,47 +4,56 @@
  *
  * This file implements the processor for the base SQL statements.
  *
- * Copyright (c) 2010-2012, Justin Swanhart
- * with contributions by André Rothe <arothe@phosco.info, phosco@gmx.de>
+ * PHP version 5
  *
+ * LICENSE:
+ * Copyright (c) 2010-2014 Justin Swanhart and André Rothe
  * All rights reserved.
  *
- * Redistribution and use in source and binary forms, with or without modification,
- * are permitted provided that the following conditions are met:
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ * 1. Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions and the following disclaimer.
+ * 2. Redistributions in binary form must reproduce the above copyright
+ *    notice, this list of conditions and the following disclaimer in the
+ *    documentation and/or other materials provided with the distribution.
+ * 3. The name of the author may not be used to endorse or promote products
+ *    derived from this software without specific prior written permission.
  *
- *   * Redistributions of source code must retain the above copyright notice,
- *     this list of conditions and the following disclaimer.
- *   * Redistributions in binary form must reproduce the above copyright notice,
- *     this list of conditions and the following disclaimer in the documentation
- *     and/or other materials provided with the distribution.
+ * THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
+ * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+ * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+ * IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
+ * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
+ * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+ * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+ * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+ * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY
- * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
- * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT
- * SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED
- * TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR
- * BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
- * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
- * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
- * DAMAGE.
+ * @author    André Rothe <andre.rothe@phosco.info>
+ * @copyright 2010-2014 Justin Swanhart and André Rothe
+ * @license   http://www.debian.org/misc/bsd.license  BSD License (3 Clause)
+ * @version   SVN: $Id$
+ *
  */
 
-require_once(dirname(__FILE__) . '/AbstractProcessor.php');
-require_once(dirname(__FILE__) . '/SQLChunkProcessor.php');
+require_once dirname(__FILE__) . '/AbstractProcessor.php';
+require_once dirname(__FILE__) . '/SQLChunkProcessor.php';
 
 /**
- * 
  * This class processes the base SQL statements.
- * 
- * @author arothe
- * 
+ *
+ * @author  André Rothe <andre.rothe@phosco.info>
+ * @license http://www.debian.org/misc/bsd.license  BSD License (3 Clause)
+ *
  */
 class SQLProcessor extends SQLChunkProcessor {
 
-    /*
+    /**
      * This function breaks up the SQL statement into logical sections. 
-     * Some sections are then further handled by specialized processors.
+     * Some sections are delegated to specialized processors.
      */
     public function process($tokens) {
         $prev_category = "";
@@ -149,7 +158,7 @@ class SQLProcessor extends SQLChunkProcessor {
             case 'SHOW':
                 $token_category = $upper;
                 break;
-                
+
             case 'DESC':
                 if ($token_category === '') {
                     // short version of DESCRIBE
@@ -260,7 +269,6 @@ class SQLProcessor extends SQLChunkProcessor {
                 }
                 $out['OPTIONS'][] = $upper;
                 continue 2;
-                break;
 
             case 'CHECK':
                 if ($prev_category === 'TABLE') {
@@ -339,7 +347,6 @@ class SQLProcessor extends SQLChunkProcessor {
                     $out['OPTIONS'][] = $trim;
                 }
                 continue 2;
-                break;
 
             case 'USING': /* USING in FROM clause is different from USING w/ prepared statement*/
                 if ($token_category === 'EXECUTE') {
@@ -367,7 +374,6 @@ class SQLProcessor extends SQLChunkProcessor {
                 $skip_next = 1;
                 $out['OPTIONS'][] = 'FOR UPDATE';
                 continue 2;
-                break;
 
             case 'UPDATE':
                 if ($token_category === "") {
@@ -385,18 +391,26 @@ class SQLProcessor extends SQLChunkProcessor {
                 $skip_next = 1;
                 break;
 
-            /* These tokens are ignored. */
+            // This token is ignored, except within RENAME
             case 'TO':
                 if ($token_category === 'RENAME') {
                     break;
                 }
+                continue 2;
+
+            // This token is ignored, except within CREATE TABLE
             case 'BY':
+                if ($prev_category === 'TABLE') {
+                    break;
+                }
+                continue 2;
+
+            // These tokens are ignored.
             case 'ALL':
             case 'SHARE':
             case 'MODE':
             case ';':
                 continue 2;
-                break;
 
             case 'KEY':
                 if ($token_category === 'DUPLICATE') {
@@ -411,7 +425,6 @@ class SQLProcessor extends SQLChunkProcessor {
             case 'QUICK':
                 $out['OPTIONS'][] = $upper;
                 continue 2;
-                break;
 
             case 'WITH':
                 if ($token_category === 'GROUP') {
