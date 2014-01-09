@@ -42,6 +42,7 @@
 require_once dirname(__FILE__) . '/../utils/ExpressionType.php';
 require_once dirname(__FILE__) . '/TableBuilder.php';
 require_once dirname(__FILE__) . '/ReservedBuilder.php';
+require_once dirname(__FILE__) . '/Builder.php';
 
 /**
  * This class implements the builder for the (LIKE) keyword within a 
@@ -53,7 +54,7 @@ require_once dirname(__FILE__) . '/ReservedBuilder.php';
  * @license http://www.debian.org/misc/bsd.license  BSD License (3 Clause)
  *  
  */
-class LikeExpressionBuilder {
+class LikeExpressionBuilder implements Builder {
 
     protected function buildTable($parsed, $index) {
         $builder = new TableBuilder();

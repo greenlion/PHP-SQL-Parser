@@ -40,6 +40,7 @@
  */
 
 require_once dirname(__FILE__) . '/../exceptions/UnableToCreateSQLException.php';
+require_once dirname(__FILE__) . '/Builder.php';
 
 /**
  * This class implements the builder LIMIT statement. 
@@ -49,7 +50,7 @@ require_once dirname(__FILE__) . '/../exceptions/UnableToCreateSQLException.php'
  * @license http://www.debian.org/misc/bsd.license  BSD License (3 Clause)
  *  
  */
-class LimitBuilder {
+class LimitBuilder implements Builder {
 
     public function build($parsed) {
         $sql = ($parsed['offset'] ? $parsed['offset'] . ", " : "") . $parsed['rowcount'];
