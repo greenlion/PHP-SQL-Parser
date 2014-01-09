@@ -47,6 +47,7 @@ require_once dirname(__FILE__) . '/FunctionBuilder.php';
 require_once dirname(__FILE__) . '/ProcedureBuilder.php';
 require_once dirname(__FILE__) . '/DatabaseBuilder.php';
 require_once dirname(__FILE__) . '/TableBuilder.php';
+require_once dirname(__FILE__) . '/Builder.php';
 
 /**
  * This class implements the builder for the SHOW statement. 
@@ -56,7 +57,7 @@ require_once dirname(__FILE__) . '/TableBuilder.php';
  * @license http://www.debian.org/misc/bsd.license  BSD License (3 Clause)
  *  
  */
-class ShowBuilder {
+class ShowBuilder implements Builder {
 
     protected function buildTable($parsed, $delim) {
         $builder = new TableBuilder();
