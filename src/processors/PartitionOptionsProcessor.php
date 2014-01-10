@@ -1,6 +1,6 @@
 <?php
 /**
- * PartitionOptions.php
+ * PartitionOptionsProcessor.php
  *
  * This file implements the processor for the PARTITION BY statements 
  * within CREATE TABLE.
@@ -43,6 +43,7 @@
 require_once dirname(__FILE__) . '/AbstractProcessor.php';
 require_once dirname(__FILE__) . '/ColumnListProcessor.php';
 require_once dirname(__FILE__) . '/ExpressionListProcessor.php';
+require_once dirname(__FILE__) . '/PartitionDefinitionProcessor.php';
 require_once dirname(__FILE__) . '/../utils/ExpressionType.php';
 
 /**
@@ -54,22 +55,23 @@ require_once dirname(__FILE__) . '/../utils/ExpressionType.php';
  */
 class PartitionOptionsProcessor extends AbstractProcessor {
 
-    protected function processExpressionList($parsed) {
+    protected function processExpressionList($unparsed) {
         $processor = new ExpressionListProcessor();
-        $expr = $this->removeParenthesisFromStart($parsed);
+        $expr = $this->removeParenthesisFromStart($unparsed);
         $expr = $this->splitSQLIntoTokens($expr);
         return $processor->process($expr);
     }
 
-    protected function processColumnList($parsed) {
+    protected function processColumnList($unparsed) {
         $processor = new ColumnListProcessor();
-        $expr = $this->removeParenthesisFromStart($parsed);
+        $expr = $this->removeParenthesisFromStart($unparsed);
         return $processor->process($expr);
     }
 
     protected function processPartitionDefinition($unparsed) {
-        // FIXME: dummy method
-        return array('partition-definitions' => array(), 'last-parsed' => 0);
+        $processor = new PartitionDefinitionProcessor();
+        $expr = $this->removeParenthesisFromStart($unparsed);
+        return $processor->process($expr);
     }
 
     protected function getReservedType($token) {
