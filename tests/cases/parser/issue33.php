@@ -119,6 +119,17 @@ $p = $parser->parsed;
 $expected = getExpectedValue(dirname(__FILE__), 'issue33m.serialized');
 eq_array($p, $expected, 'CREATE TABLE statement with partitions');
 
+$parser = new PHPSQLParser();
+$sql = "CREATE TABLE ti (id INT, amount DECIMAL(7,2), tr_date DATE)
+    ENGINE=INNODB
+    PARTITION BY LINEAR KEY ALGORITHM=2 (tr_date)
+    PARTITIONS 6";
+$parser->parse($sql);
+$p = $parser->parsed;
+print_r($p);
+$expected = getExpectedValue(dirname(__FILE__), 'issue33n.serialized');
+eq_array($p, $expected, 'CREATE TABLE statement with partitions');
+
 
 $parser = new PHPSQLParser();
 $sql = "CREATE TABLE ts (id INT, purchased DATE)
@@ -151,6 +162,6 @@ $sql = "CREATE TABLE ts (id INT, purchased DATE)
     )";
 $parser->parse($sql);
 $p = $parser->parsed;
-$expected = getExpectedValue(dirname(__FILE__), 'issue33n.serialized');
+$expected = getExpectedValue(dirname(__FILE__), 'issue33o.serialized');
 eq_array($p, $expected, 'CREATE TABLE statement with subpartitions');
 ?>
