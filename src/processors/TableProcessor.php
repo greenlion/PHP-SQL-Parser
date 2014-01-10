@@ -265,9 +265,8 @@ class TableProcessor extends AbstractProcessor {
             case 'PARTITION':
                 if ($prevCategory === 'CREATE_DEF') {
                     $part = $this->processPartitionOptions(array_slice($tokens, $tokenKey - 1, null, true));
-                    $skip = $part['till'] - $tokenKey;
-                    unset($part['till']);
-                    $result['partition-options'] = $part;
+                    $skip = $part['last-parsed'] - $tokenKey;
+                    $result['partition-options'] = $part['partition-options'];
                     continue 2;
                 }
                 // else
