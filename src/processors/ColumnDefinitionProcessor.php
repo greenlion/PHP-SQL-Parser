@@ -46,7 +46,10 @@ class ColumnDefinitionProcessor extends AbstractProcessor {
 
     protected function processExpressionList($parsed) {
         $processor = new ExpressionListProcessor();
-        return $processor->process($parsed);
+        $expr = $this->removeParenthesisFromStart($parsed);
+        $expr = $this->splitSQLIntoTokens($expr);
+        $expr = $this->removeComma($expr);
+        return $processor->process($expr);
     }
     
     protected function processReferenceDefinition($parsed) {
@@ -395,12 +398,7 @@ class ColumnDefinitionProcessor extends AbstractProcessor {
 
                 case 'TWO_PARAM_PARENTHESIS':
                 // maximum of two parameters
-                    $parsed = $this->removeParenthesisFromStart($trim);
-                    $parsed = $this->splitSQLIntoTokens($parsed);
-                    $parsed = $this->removeComma($parsed);
-                    $parsed = $this->processExpressionList($parsed);
-
-                    // TODO: check that
+                    $parsed = $this->processExpressionList($trim);
 
                     $last = array_pop($expr);
                     $last['length'] = $parsed[0]['base_expr'];
@@ -414,10 +412,7 @@ class ColumnDefinitionProcessor extends AbstractProcessor {
 
                 case 'MULTIPLE_PARAM_PARENTHESIS':
                 // some parameters
-                    $parsed = $this->removeParenthesisFromStart($trim);
-                    $parsed = $this->splitSQLIntoTokens($parsed);
-                    $parsed = $this->removeComma($parsed);
-                    $this->processExpressionList($parsed);
+                    $parsed = $this->processExpressionList($trim);
 
                     $last = array_pop($expr);
                     $last['sub_tree'] = array('expr_type' => ExpressionType::BRACKET_EXPRESSION, 'base_expr' => $trim,
