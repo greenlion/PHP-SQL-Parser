@@ -214,8 +214,19 @@ class PartitionOptionsProcessor extends AbstractProcessor {
 
             case 'COLUMNS':
                 if ($currCategory === 'RANGE_EXPR' || $currCategory === 'LIST_EXPR') {
+                    $expr[] = array('expr_type' => ExpressionType::COLUMN_LIST, 'base_expr' => false,
+                                    'sub_tree' => false, 'storage' => substr($base_expr, 0, -strlen($token)));
+
+                    $last = array_pop($parsed);
+                    $subtree = array_pop($last['sub_tree']);
+                    $subtree['sub_tree'] = $expr;
+                    $last['sub_tree'][] = $subtree;
+                    $parsed[] = $last;
+                    unset($subtree);
+
+                    $base_expr = $token;
+                    $expr = array($this->getReservedType($trim));
                     $currCategory = substr($currCategory, 0, -4) . $upper;
-                    // TODO: store it as reserved
                     continue 2;
                 }
                 break;
@@ -305,6 +316,8 @@ class PartitionOptionsProcessor extends AbstractProcessor {
                     $currCategory = $prevCategory;
                     break;
 
+                case 'LIST_COLUMNS':
+                case 'RANGE_COLUMNS':
                 case 'KEY':
                 // the columnlist 
                     $last = $this->getBracketExpressionType($trim);
@@ -325,13 +338,6 @@ class PartitionOptionsProcessor extends AbstractProcessor {
                     $last = '';
                     unset($subtree);
 
-                    $currCategory = $prevCategory;
-                    break;
-
-                case 'LIST_COLUMNS':
-                case 'RANGE_COLUMNS':
-                // the columnlist 
-                // TODO: store it
                     $currCategory = $prevCategory;
                     break;
 
