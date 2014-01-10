@@ -98,6 +98,7 @@ class PartitionOptionsProcessor extends AbstractProcessor {
         $expr = array();
         $base_expr = '';
         $skip = 0;
+        $firstTokenKey = key($tokens);
 
         foreach ($tokens as $tokenKey => $token) {
             $trim = trim($token);
@@ -120,12 +121,6 @@ class PartitionOptionsProcessor extends AbstractProcessor {
             switch ($upper) {
 
             case 'PARTITION':
-                if ($currCategory === 'PARTITION') {
-                    $part = $this->processPartitionDefinition(array_slice($tokens, $tokenKey - 1, null, true));
-                    $skip = $part['last-parsed'] - $tokenKey;
-                    $parsed['partition-definitions'] = $part['partition-definitions'];
-                    break;
-                }
                 $currCategory = $upper;
                 $expr[] = $this->getReservedType($trim);
                 $parsed[] = array('expr_type' => ExpressionType::PARTITION, 'base_expr' => trim($base_expr),
@@ -339,6 +334,18 @@ class PartitionOptionsProcessor extends AbstractProcessor {
                     unset($subtree);
 
                     $currCategory = $prevCategory;
+                    break;
+
+                case '':
+                    if ($prevCategory === 'PARTITION' || $prevCategory === 'SUBPARTITION') {
+                        if ($upper[0] === '(' && substr($upper, -1) === ')') {
+                            $part = $this->processPartitionDefinition(array_slice($tokens, $tokenKey - $firstTokenKey, null, true));
+                            $skip = $part['last-parsed'] - $tokenKey;
+                            $parsed['partition-definitions'] = $part['partition-definitions'];
+                            break;
+                        }
+                    }
+                    // else ?                    
                     break;
 
                 default:
