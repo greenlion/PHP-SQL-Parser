@@ -115,6 +115,8 @@ class ExpressionType {
     const COMMENT = "comment";
     
     const PARTITION = "partition";
+    const PARTITION_LIST = "partition-list";
+    const PARTITION_RANGE = "partition-range";
     const PARTITION_HASH = "partition-hash";
     const PARTITION_KEY = "partition-key";
     const PARTITION_COUNT = "partition-count";
