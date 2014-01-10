@@ -82,28 +82,111 @@ class PartitionOptionsProcessor extends AbstractProcessor {
             switch ($upper) {
 
             case 'PARTITION':
-                break;
-
+                if ($currCategory === 'PARTITION') {
+                    // TODO: delegate the rest of the $tokens to the PartitionDefinitionProcessor
+                    break;                    
+                }
             case 'SUBPARTITION':
-                break;
-
-            case 'BY':
-                break;
-
-            case 'LINEAR':
-            case 'HASH':
-            case 'RANGE':
-            case 'KEY':
-            case 'ALGORITHM':
-            case 'COLUMNS':
-            case 'LIST':
+                $currCategory = $upper;
+                $skip = 1; // skip BY keyword
+                // TODO: store it
                 break;
 
             case 'PARTITIONS':
             case 'SUBPARTITIONS':
+                $currCategory = 'PARTITION_NUM';
+                // TODO: store it
+                continue 2;
+
+            case 'LINEAR':
+            // followed by HASH or KEY
+            // TODO: store it as reserved
+                continue 2;
+
+            case 'HASH':
+                $currCategory = $upper;
+                // TODO: store it
+                continue 2;
+
+            case 'KEY':
+                $currCategory = $upper;
+                // TODO: store it
+                continue 2;
+
+            case 'ALGORITHM':
+                if ($currCategory === 'KEY') {
+                    $currCategory = $upper;
+                    // TODO: store it
+                    continue 2;
+                }
+                break;
+
+            case 'RANGE':
+            case 'LIST':
+                $currCategory = $upper . '_EXPR';
+                // TODO: store it
+                continue 2;
+
+            case 'COLUMNS':
+                if ($currCategory === 'RANGE_EXPR' || $currCategory === 'LIST_EXPR') {
+                    $currCategory = substr($currCategory, 0, 5) . $upper;
+                    // TODO: store it as reserved
+                    continue 2;
+                }
+                break;
+
+            case '=':
+                if ($currCategory === 'ALGORITHM') {
+                    // between ALGORITHM and a constant
+                    // TODO: store it
+                    continue 2;
+                }
                 break;
 
             default:
+                switch ($currCategory) {
+
+                case 'PARTITION_NUM':
+                // the number behind PARTITIONS or SUBPARTITIONS
+                // TODO: store it
+                    $currCategory = $prevCategory;
+                    break;
+
+                case 'HASH':
+                // parenthesis around an expression
+                // TODO: store it
+                    $currCategory = $prevCategory;
+                    break;
+
+                case 'ALGORITHM':
+                // the number of the algorithm
+                // TODO: store it
+                    $currCategory = 'KEY';
+                    continue 3;
+
+                case 'KEY':
+                // the columnlist 
+                // TODO: store it
+                    $currCategory = $prevCategory;
+                    break;
+
+                case 'LIST_EXPR':
+                case 'RANGE_EXPR':
+                // the expression right after RANGE or LIST
+                // TODO: store it
+                    $currCategory = $prevCategory;
+                    break;
+
+                case 'LIST_COLUMNS':
+                case 'RANGE_COLUMNS':
+                // the columnlist 
+                // TODO: store it
+                    $currCategory = $prevCategory;
+                    break;
+
+                default:
+                    break;
+                }
                 break;
             }
 
