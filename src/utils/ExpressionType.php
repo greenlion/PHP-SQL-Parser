@@ -113,5 +113,15 @@ class ExpressionType {
     const COLUMN_TYPE = "column-type";
     const DEF_VALUE = "default-value";
     const COMMENT = "comment";
+    
+    const PARTITION = "partition";
+    const PARTITION_HASH = "partition-hash";
+    const PARTITION_KEY = "partition-key";
+    const PARTITION_COUNT = "partition-count";
+    const ALGORITHM = "key-algorithm";
+    const SUBPARTITION = "sub-partition";
+    const SUBPARTITION_HASH = "sub-partition-hash";
+    const SUBPARTITION_KEY = "sub-partition-key";
+    const SUBPARTITION_COUNT = "sub-partition-count";
 }
 ?>
