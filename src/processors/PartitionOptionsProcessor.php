@@ -198,13 +198,23 @@ class PartitionOptionsProcessor extends AbstractProcessor {
 
             case 'RANGE':
             case 'LIST':
+                $expr[] = array('expr_type' => constant('ExpressionType::PARTITION_' . $upper), 'base_expr' => false,
+                                'sub_tree' => false, 'storage' => substr($base_expr, 0, -strlen($token)));
+
+                $last = array_pop($parsed);
+                $last['by'] = $upper;
+                $last['sub_tree'] = $expr;
+                $parsed[] = $last;
+
+                $base_expr = $token;
+                $expr = array($this->getReservedType($trim));
+
                 $currCategory = $upper . '_EXPR';
-                // TODO: store it
                 continue 2;
 
             case 'COLUMNS':
                 if ($currCategory === 'RANGE_EXPR' || $currCategory === 'LIST_EXPR') {
-                    $currCategory = substr($currCategory, 0, 5) . $upper;
+                    $currCategory = substr($currCategory, 0, -4) . $upper;
                     // TODO: store it as reserved
                     continue 2;
                 }
@@ -270,6 +280,8 @@ class PartitionOptionsProcessor extends AbstractProcessor {
                     $currCategory = 'KEY';
                     continue 3;
 
+                case 'LIST_EXPR':
+                case 'RANGE_EXPR':
                 case 'HASH':
                 // parenthesis around an expression
                     $last = $this->getBracketExpressionType($trim);
@@ -316,13 +328,6 @@ class PartitionOptionsProcessor extends AbstractProcessor {
                     $currCategory = $prevCategory;
                     break;
 
-                case 'LIST_EXPR':
-                case 'RANGE_EXPR':
-                // the expression right after RANGE or LIST
-                // TODO: store it
-                    $currCategory = $prevCategory;
-                    break;
-
                 case 'LIST_COLUMNS':
                 case 'RANGE_COLUMNS':
                 // the columnlist 
@@ -342,8 +347,7 @@ class PartitionOptionsProcessor extends AbstractProcessor {
 
         $result['partition-options'] = $parsed;
         if ($result['last-parsed'] === false) {
-            // FIXME: set the real read marker within the $tokens array
-            $result['last-parsed'] = 0;
+            $result['last-parsed'] = $tokenKey;
         }
         return $result;
     }
