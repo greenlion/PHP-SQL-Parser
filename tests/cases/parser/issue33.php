@@ -141,6 +141,27 @@ $p = $parser->parsed;
 $expected = getExpectedValue(dirname(__FILE__), 'issue33o.serialized');
 eq_array($p, $expected, 'CREATE TABLE statement with partitions');
 
+
+$parser = new PHPSQLParser();
+$sql = "CREATE TABLE ti (id INT, amount DECIMAL(7,2), purchased DATE)
+    ENGINE=INNODB
+    PARTITION BY RANGE(YEAR(purchased))";
+$parser->parse($sql);
+$p = $parser->parsed;
+$expected = getExpectedValue(dirname(__FILE__), 'issue33p.serialized');
+eq_array($p, $expected, 'CREATE TABLE statement with partitions');
+
+
+$parser = new PHPSQLParser();
+$sql = "CREATE TABLE ti (id INT, amount DECIMAL(7,2), purchased DATE)
+    ENGINE=INNODB
+    PARTITION BY LIST COLUMNS (purchased, amount)";
+$parser->parse($sql);
+$p = $parser->parsed;
+print_r($p);
+$expected = getExpectedValue(dirname(__FILE__), 'issue33p.serialized');
+eq_array($p, $expected, 'CREATE TABLE statement with partitions');
+
 /*
 $parser = new PHPSQLParser();
 $sql = "CREATE TABLE ts (id INT, purchased DATE)
