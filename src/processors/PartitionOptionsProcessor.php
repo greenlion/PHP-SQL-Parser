@@ -343,8 +343,9 @@ class PartitionOptionsProcessor extends AbstractProcessor {
                         if ($upper[0] === '(' && substr($upper, -1) === ')') {
                             $part = $this->processPartitionDefinition($trim);
                             $skip = $part['last-parsed'] - $tokenKey;
-                            $parsed['partition-definitions'] = $this->getBracketExpressionType($trim);
-                            $parsed['partition-definitions']['sub_tree'] = $part['partition-definitions'];
+                            $last = $this->getBracketExpressionType($trim);
+                            $last['sub_tree'] = $part['partition-definitions'];
+                            $parsed[] = $last;
                             break;
                         }
                     }
