@@ -87,8 +87,7 @@ class WhereExpressionBuilder implements Builder {
     }
     
     protected function buildWhereExpression($parsed) {
-        $builder = new WhereExpressionBuilder();
-        return $builder->build($parsed);
+        return $this->build($parsed);
     }
     
     protected function buildWhereBracketExpression($parsed) {
