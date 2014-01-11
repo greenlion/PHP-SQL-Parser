@@ -58,8 +58,7 @@ require_once dirname(__FILE__) . '/Builder.php';
 class HavingExpressionBuilder extends WhereExpressionBuilder implements Builder {
    
     protected function buildHavingExpression($parsed) {
-        $builder = new HavingExpressionBuilder();
-        return $builder->build($parsed);
+        return $this->build($parsed);
     }
     
     protected function buildHavingBracketExpression($parsed) {
