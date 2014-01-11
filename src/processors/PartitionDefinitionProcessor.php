@@ -56,7 +56,7 @@ class PartitionDefinitionProcessor extends AbstractProcessor {
 
     public function process($tokens) {
 
-        $result = array('partition-definition' => array(), 'last-parsed' => false);
+        $result = array('partition-definitions' => array(), 'last-parsed' => false);
 
         $prevCategory = '';
         $currCategory = '';
@@ -93,7 +93,7 @@ class PartitionDefinitionProcessor extends AbstractProcessor {
             $currCategory = '';
         }
 
-        $result['partition-definition'] = $parsed;
+        $result['partition-definitions'] = $parsed;
         if ($result['last-parsed'] === false) {
             $result['last-parsed'] = $tokenKey;
         }
