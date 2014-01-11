@@ -64,7 +64,6 @@ class PartitionDefinitionProcessor extends AbstractProcessor {
         $expr = array();
         $base_expr = '';
         $skip = 0;
-        $firstTokenKey = key($tokens);
 
         foreach ($tokens as $tokenKey => $token) {
             $trim = trim($token);
