@@ -158,11 +158,10 @@ $sql = "CREATE TABLE ti (id INT, amount DECIMAL(7,2), purchased DATE)
     PARTITION BY LIST COLUMNS (purchased, amount)";
 $parser->parse($sql);
 $p = $parser->parsed;
-print_r($p);
-$expected = getExpectedValue(dirname(__FILE__), 'issue33p.serialized');
+$expected = getExpectedValue(dirname(__FILE__), 'issue33q.serialized');
 eq_array($p, $expected, 'CREATE TABLE statement with partitions');
 
-/*
+
 $parser = new PHPSQLParser();
 $sql = "CREATE TABLE ts (id INT, purchased DATE)
     PARTITION BY RANGE( YEAR(purchased) )
@@ -194,7 +193,7 @@ $sql = "CREATE TABLE ts (id INT, purchased DATE)
     )";
 $parser->parse($sql);
 $p = $parser->parsed;
-$expected = getExpectedValue(dirname(__FILE__), 'issue33o.serialized');
-eq_array($p, $expected, 'CREATE TABLE statement with subpartitions');
-*/
+$expected = getExpectedValue(dirname(__FILE__), 'issue33r.serialized');
+eq_array($p, $expected, 'CREATE TABLE statement with subpartitions and partition-definitions');
+
 ?>
