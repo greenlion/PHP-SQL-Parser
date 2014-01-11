@@ -71,6 +71,7 @@ class PartitionOptionsProcessor extends AbstractProcessor {
     protected function processPartitionDefinition($unparsed) {
         $processor = new PartitionDefinitionProcessor();
         $expr = $this->removeParenthesisFromStart($unparsed);
+        $expr = $this->splitSQLIntoTokens($expr);
         return $processor->process($expr);
     }
 
@@ -100,7 +101,6 @@ class PartitionOptionsProcessor extends AbstractProcessor {
         $expr = array();
         $base_expr = '';
         $skip = 0;
-        $firstTokenKey = key($tokens);
 
         foreach ($tokens as $tokenKey => $token) {
             $trim = trim($token);
@@ -341,9 +341,10 @@ class PartitionOptionsProcessor extends AbstractProcessor {
                 case '':
                     if ($prevCategory === 'PARTITION' || $prevCategory === 'SUBPARTITION') {
                         if ($upper[0] === '(' && substr($upper, -1) === ')') {
-                            $part = $this->processPartitionDefinition(array_slice($tokens, $tokenKey - $firstTokenKey, null, true));
+                            $part = $this->processPartitionDefinition($trim);
                             $skip = $part['last-parsed'] - $tokenKey;
-                            $parsed['partition-definitions'] = $part['partition-definitions'];
+                            $parsed['partition-definitions'] = $this->getBracketExpressionType($trim);
+                            $parsed['partition-definitions']['sub_tree'] = $part['partition-definitions'];
                             break;
                         }
                     }
