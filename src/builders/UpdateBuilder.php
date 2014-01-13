@@ -51,7 +51,7 @@ require_once dirname(__FILE__) . '/Builder.php';
  */
 class UpdateBuilder implements Builder  {
 
-    public function build($parsed) {
+    public function build(array $parsed) {
         return "UPDATE " . $parsed[0]['table'];
     }
 }

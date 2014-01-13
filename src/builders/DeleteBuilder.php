@@ -51,7 +51,7 @@ require_once dirname(__FILE__) . '/Builder.php';
  */
 class DeleteBuilder implements Builder {
 
-    public function build($parsed) {
+    public function build(array $parsed) {
         $sql = "DELETE";
         foreach ($parsed['TABLES'] as $k => $v) {
             $sql .= $v . ",";

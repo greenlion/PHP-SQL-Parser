@@ -96,7 +96,7 @@ class SelectBuilder implements Builder {
         return ($parsed['delim'] === false ? '' : (trim($parsed['delim']) . ' '));
     }
 
-    public function build($parsed) {
+    public function build(array $parsed) {
         $sql = "";
         foreach ($parsed as $k => $v) {
             $len = strlen($sql);

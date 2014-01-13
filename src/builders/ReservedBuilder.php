@@ -56,7 +56,7 @@ class ReservedBuilder implements Builder {
         return ($parsed['expr_type'] === ExpressionType::RESERVED);
     }
     
-    public function build($parsed) {
+    public function build(array $parsed) {
         if (!$this->isReserved($parsed)) {
             return "";
         }

@@ -58,7 +58,7 @@ class SetBuilder implements Builder {
         return $builder->build($parsed);
     }
 
-    public function build($parsed) {
+    public function build(array $parsed) {
         $sql = "";
         foreach ($parsed as $k => $v) {
             $len = strlen($sql);

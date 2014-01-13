@@ -70,7 +70,7 @@ class RefClauseBuilder implements Builder {
         return $builder->build($parsed);
     }
 
-    public function build($parsed) {
+    public function build(array $parsed) {
         if ($parsed === false) {
             return "";
         }

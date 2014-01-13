@@ -94,7 +94,7 @@ class ShowBuilder implements Builder {
         return $builder->build($parsed);
     }
     
-    public function build($parsed) {
+    public function build(array $parsed) {
         $show = $parsed['SHOW'];
         $sql = "";
         foreach ($show as $k => $v) {

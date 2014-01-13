@@ -95,7 +95,7 @@ class SubTreeBuilder implements Builder {
         return $builder->build($parsed);
     }
 
-    public function build($parsed, $delim = " ") {
+    public function build(array $parsed, $delim = " ") {
         if ($parsed['sub_tree'] === '') {
             return "";
         }

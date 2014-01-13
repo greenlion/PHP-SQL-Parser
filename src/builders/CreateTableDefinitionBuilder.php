@@ -57,7 +57,7 @@ class CreateTableDefinitionBuilder implements Builder {
         return $builder->build($parsed);
     }
 
-    public function build($parsed) {
+    public function build(array $parsed) {
         if (!isset($parsed) || $parsed['create-def'] === false) {
             return "";
         }

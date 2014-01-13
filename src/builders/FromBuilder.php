@@ -70,7 +70,7 @@ class FromBuilder implements Builder {
         return $builder->build($parsed, $key);
     }
 
-    public function build($parsed) {
+    public function build(array $parsed) {
         $sql = "";
         foreach ($parsed as $k => $v) {
             $len = strlen($sql);

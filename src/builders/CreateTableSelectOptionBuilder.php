@@ -51,7 +51,7 @@ require_once dirname(__FILE__) . '/Builder.php';
  */
 class CreateTableSelectOptionBuilder implements Builder {
 
-    public function build($parsed) {
+    public function build(array $parsed) {
         if (!isset($parsed['select-option']) || $parsed['select-option'] === false) {
             return "";
         }

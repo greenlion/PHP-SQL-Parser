@@ -61,7 +61,7 @@ class IndexColumnBuilder implements Builder {
         return ($parsed === false ? '' : (' ' . $parsed));
     }
     
-    public function build($parsed) {
+    public function build(array $parsed) {
         if ($parsed['expr_type'] !== ExpressionType::INDEX_COLUMN) {
             return "";
         }
