@@ -87,6 +87,7 @@ class SubQueryBuilder implements Builder {
             return "";
         }
 
+        // TODO: should we add a numeric level (0) between sub_tree and SELECT?
         $sql = $this->buildSelectStatement($parsed['sub_tree']);
         $sql = "(" . $sql . ")";
         $sql .= $this->buildAlias($parsed);
