@@ -78,6 +78,7 @@ class InsertStatementBuilder implements Builder {
         if (isset($parsed['SELECT'])) {
             $sql .= ' ' . $this->buildSELECT($parsed);
         }
+        return $sql;
     }
 }
 ?>
