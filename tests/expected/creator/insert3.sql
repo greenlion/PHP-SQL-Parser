@@ -1,1 +1,1 @@
-INSERT INTO test (`name`,`test`) VALUES ('\'Superman\'',''),('\'sdfsd\'','')
+INSERT INTO test (`name`, `test`) VALUES ('\'Superman\'', ''), ('\'sdfsd\'', '')
