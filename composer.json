@@ -19,7 +19,20 @@
             "role": "Committer"
         }
     ],
+    "support": {
+        "issues": "http://code.google.com/p/php-sql-parser/issues/list",
+        "source": "http://php-sql-parser.googlecode.com/svn/trunk/"
+    },
+    "autoload": {
+        "classmap": [
+        	"src/PHPSQLCreator.php", 
+        	"src/PHPSQLParser.php"
+        ]
+    },
     "require": {
-        "php": ">=5.3.0"
+        "php": ">=5.2.13"
+    },
+    "require-dev": {
+    	"squizlabs/php_codesniffer": ">=1.5.1"
     }
 }
