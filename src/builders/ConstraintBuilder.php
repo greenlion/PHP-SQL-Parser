@@ -60,9 +60,9 @@ class ConstraintBuilder implements Builder {
 
     public function build(array $parsed) {
         if ($parsed['expr_type'] !== ExpressionType::CONSTRAINT) {
-            return "";
+            return '';
         }
-        $sql = $this->buildConstant($parsed['sub_tree']);
+        $sql = $parsed['sub_tree'] === false ? '' : $this->buildConstant($parsed['sub_tree']);
         return "CONSTRAINT" . (empty($sql) ? '' : (' ' . $sql));
     }
 
