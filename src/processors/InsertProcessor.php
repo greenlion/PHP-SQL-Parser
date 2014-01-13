@@ -96,7 +96,7 @@ class InsertProcessor extends AbstractProcessor {
             }
         }
 
-        $tokenList[$token_category][] = array('table' => $table, 'base_expr' => $table,
+        $tokenList[$token_category][] = array('expr_type' => ExpressionType::TABLE, 'table' => $table, 'base_expr' => $table,
                                               'no_quotes' => $this->revokeQuotation($table));
         if (!empty($parsed)) {
             $tokenList[$token_category][] = $parsed;
