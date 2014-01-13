@@ -84,16 +84,16 @@ class TableExpressionBuilder implements Builder {
 
     public function build(array $parsed, $index = 0) {
         if ($parsed['expr_type'] !== ExpressionType::TABLE_EXPRESSION) {
-            return "";
+            return '';
         }
         $sql = substr($this->buildFROM($parsed['sub_tree']), 5); // remove FROM keyword
-        $sql = "(" . $sql . ")";
+        $sql = '(' . $sql . ')';
         $sql .= $this->buildAlias($parsed);
 
         if ($index !== 0) {
             $sql = $this->buildJoin($parsed['join_type']) . $sql;
             $sql .= $this->buildRefType($parsed['ref_type']);
-            $sql .= $this->buildRefClause($parsed['ref_clause']);
+            $sql .= $parsed['ref_clause'] === false ? '' : $this->buildRefClause($parsed['ref_clause']);
         }
         return $sql;
     }
