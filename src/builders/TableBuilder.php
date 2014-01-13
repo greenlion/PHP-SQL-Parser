@@ -78,7 +78,7 @@ class TableBuilder implements Builder {
 
     public function build(array $parsed, $index = 0) {
         if ($parsed['expr_type'] !== ExpressionType::TABLE) {
-            return "";
+            return '';
         }
 
         $sql = $parsed['table'];
@@ -87,7 +87,7 @@ class TableBuilder implements Builder {
         if ($index !== 0) {
             $sql = $this->buildJoin($parsed['join_type']) . $sql;
             $sql .= $this->buildRefType($parsed['ref_type']);
-            $sql .= $this->buildRefClause($parsed['ref_clause']);
+            $sql .= $parsed['ref_clause'] === false ? '' : $this->buildRefClause($parsed['ref_clause']);
         }
         return $sql;
     }
