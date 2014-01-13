@@ -41,6 +41,7 @@
 
 require_once dirname(__FILE__) . '/InsertBuilder.php';
 require_once dirname(__FILE__) . '/ValuesBuilder.php';
+require_once dirname(__FILE__) . '/SelectStatementBuilder.php';
 require_once dirname(__FILE__) . '/Builder.php';
 
 /**
@@ -63,10 +64,20 @@ class InsertStatementBuilder implements Builder {
         return $builder->build($parsed);
     }
 
-    public function build($parsed) {
+    protected function buildSELECT($parsed) {
+        $builder = new SelectStatementBuilder();
+        return $builder->build($parsed);
+    }
+
+    public function build(array $parsed) {
         // TODO: are there more than one tables possible (like [INSERT][1])
-        return $this->buildINSERT($parsed['INSERT'][0]) . " " . $this->buildVALUES($parsed['VALUES']);
-        // TODO: subquery?
+        $sql = $this->buildINSERT($parsed['INSERT']);
+        if (isset($parsed['VALUES'])) {
+            $sql .= ' ' . $this->buildVALUES($parsed['VALUES']);
+        }
+        if (isset($parsed['VALUES'])) {
+            $sql .= ' ' . $this->buildSELECT($parsed);
+        }
     }
 }
 ?>
