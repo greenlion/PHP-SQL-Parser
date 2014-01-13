@@ -86,9 +86,9 @@ class RecordBuilder implements Builder {
                 throw new UnableToCreateSQLException(ExpressionType::RECORD, $k, $v, 'expr_type');
             }
 
-            $sql .= ",";
+            $sql .= ", ";
         }
-        $sql = substr($sql, 0, -1);
+        $sql = substr($sql, 0, -2);
         return "(" . $sql . ")";
     }
 
