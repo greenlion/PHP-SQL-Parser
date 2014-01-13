@@ -82,7 +82,7 @@ class TableExpressionBuilder implements Builder {
         return $builder->build($parsed);
     }
 
-    public function build(array $parsed, $index) {
+    public function build(array $parsed, $index = 0) {
         if ($parsed['expr_type'] !== ExpressionType::TABLE_EXPRESSION) {
             return "";
         }
