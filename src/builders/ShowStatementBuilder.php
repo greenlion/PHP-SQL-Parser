@@ -63,7 +63,7 @@ class ShowStatementBuilder implements Builder {
         return $builder->build($parsed);
     }
     
-   public function build($parsed) {
+   public function build(array $parsed) {
         $sql = $this->buildSHOW($parsed);
         if (isset($parsed['WHERE'])) {
             $sql .= " " . $this->buildWHERE($parsed['WHERE']);

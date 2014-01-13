@@ -52,7 +52,7 @@ require_once dirname(__FILE__) . '/Builder.php';
  */
 class LimitBuilder implements Builder {
 
-    public function build($parsed) {
+    public function build(array $parsed) {
         $sql = ($parsed['offset'] ? $parsed['offset'] . ", " : "") . $parsed['rowcount'];
         if ($sql === "") {
             throw new UnableToCreateSQLException('LIMIT', 'rowcount', $parsed, 'rowcount');

@@ -69,7 +69,7 @@ class DeleteStatementBuilder implements Builder {
         return $builder->build($parsed);
     }
     
-    public function processDeleteStatement($parsed) {
+    public function processDeleteStatement(array $parsed) {
         $sql = $this->buildDELETE($parsed['DELETE']) . " " . $this->buildFROM($parsed['FROM']);
         if (isset($parsed['WHERE'])) {
             $sql .= " " . $this->buildWHERE($parsed['WHERE']);

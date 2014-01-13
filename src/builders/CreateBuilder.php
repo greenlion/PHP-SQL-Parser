@@ -64,7 +64,7 @@ class CreateBuilder implements Builder {
         return $builder->build($parsed);
     }
 
-    public function build($parsed) {
+    public function build(array $parsed) {
         $create = $parsed['CREATE'];
         $sql = $this->buildSubTree($create);
 

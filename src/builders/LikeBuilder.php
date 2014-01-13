@@ -58,7 +58,7 @@ class LikeBuilder implements Builder {
         return $builder->build($parsed, $index);
     }
     
-    public function build($parsed) {
+    public function build(array $parsed) {
         $sql = $this->buildTable($parsed, 0);
         if (strlen($sql) === 0) {
             throw new UnableToCreateSQLException('LIKE', "", $parsed, 'table');

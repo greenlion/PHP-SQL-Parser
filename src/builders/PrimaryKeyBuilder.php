@@ -89,7 +89,7 @@ class PrimaryKeyBuilder implements Builder {
         return $builder->build($parsed);
     }
     
-    public function build($parsed) {
+    public function build(array $parsed) {
         if ($parsed['expr_type'] !== ExpressionType::PRIMARY_KEY) {
             return "";
         }

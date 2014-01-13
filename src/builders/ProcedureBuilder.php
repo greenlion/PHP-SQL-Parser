@@ -52,7 +52,7 @@ require_once dirname(__FILE__) . '/Builder.php';
  */
 class ProcedureBuilder implements Builder {
 
-    public function build($parsed) {
+    public function build(array $parsed) {
         if ($parsed['expr_type'] !== ExpressionType::PROCEDURE) {
             return "";
         }

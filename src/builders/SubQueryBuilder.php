@@ -82,7 +82,7 @@ class SubQueryBuilder implements Builder {
         return $builder->build($parsed);
     }
 
-    public function build($parsed, $index = 0) {
+    public function build(array $parsed, $index = 0) {
         if ($parsed['expr_type'] !== ExpressionType::SUBQUERY) {
             return "";
         }

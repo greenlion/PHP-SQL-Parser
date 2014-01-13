@@ -106,7 +106,7 @@ class WhereBuilder implements Builder {
         return $builder->build($parsed);
     }
 
-    public function build($parsed) {
+    public function build(array $parsed) {
         $sql = "WHERE ";
         foreach ($parsed as $k => $v) {
             $len = strlen($sql);

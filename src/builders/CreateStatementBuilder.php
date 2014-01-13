@@ -69,7 +69,7 @@ class CreateStatementBuilder implements Builder {
         return $builder->build($parsed);
     }
     
-    public function build($parsed) {
+    public function build(array $parsed) {
         $sql = $this->buildCREATE($parsed);
         if (isset($parsed['LIKE'])) {
             $sql .= " " . $this->buildLIKE($parsed['LIKE']);

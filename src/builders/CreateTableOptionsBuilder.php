@@ -82,7 +82,7 @@ class CreateTableOptionsBuilder implements Builder {
         return ($parsed['delim'] === false ? '' : (trim($parsed['delim']) . ' '));
     }
      
-    public function build($parsed) {
+    public function build(array $parsed) {
         if (!isset($parsed['options']) || $parsed['options'] === false) {
             return "";
         }

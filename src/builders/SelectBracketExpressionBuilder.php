@@ -58,7 +58,7 @@ class SelectBracketExpressionBuilder implements Builder {
         return $builder->build($parsed, $delim);
     }
 
-    public function build($parsed) {
+    public function build(array $parsed) {
         if ($parsed['expr_type'] !== ExpressionType::BRACKET_EXPRESSION) {
             return "";
         }

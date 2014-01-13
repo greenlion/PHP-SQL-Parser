@@ -55,7 +55,7 @@ class AliasBuilder implements Builder {
         return isset($parsed['alias']);
     }
 
-    public function build($parsed) {
+    public function build(array $parsed) {
         if (!isset($parsed['alias']) || $parsed['alias'] === false) {
             return "";
         }
