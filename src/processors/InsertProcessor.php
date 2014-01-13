@@ -87,7 +87,7 @@ class InsertProcessor extends AbstractProcessor {
             $cols = $this->removeParenthesisFromStart($cols);
             if (stripos($cols, 'SELECT') === 0) {
                 $processor = new DefaultProcessor();
-                $parsed['sub_tree'] = array($processor->process($cols));
+                $parsed['sub_tree'] = $processor->process($cols);
                 $parsed['expr_type'] = ExpressionType::SUBQUERY;
             } else {
                 $processor = new ColumnListProcessor();
