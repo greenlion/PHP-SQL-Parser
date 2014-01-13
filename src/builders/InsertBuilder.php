@@ -41,6 +41,9 @@
 
 require_once dirname(__FILE__) . '/../exceptions/UnableToCreateSQLException.php';
 require_once dirname(__FILE__) . '/ColumnReferenceBuilder.php';
+require_once dirname(__FILE__) . '/InsertColumnListBuilder.php';
+require_once dirname(__FILE__) . '/SubQueryBuilder.php';
+require_once dirname(__FILE__) . '/TableBuilder.php';
 require_once dirname(__FILE__) . '/Builder.php';
 
 /**
@@ -53,36 +56,36 @@ require_once dirname(__FILE__) . '/Builder.php';
  */
 class InsertBuilder implements Builder {
 
-    protected function buildColRef($parsed) {
-        $builder = new ColumnReferenceBuilder();
-        return $builder->build($parsed);
+    protected function buildTable($parsed) {
+        $builder = new TableBuilder();
+        return $builder->build($parsed, 0);
     }
-
-    public function build($parsed) {
-        $sql = "INSERT INTO " . $parsed['table'];
-
-        if ($parsed['columns'] === false) {
-            return $sql;
-        }
-
-        $columns = "";
-        foreach ($parsed['columns'] as $k => $v) {
-            $len = strlen($columns);
-            $columns .= $this->buildColRef($v);
-
-            if ($len == strlen($columns)) {
-                throw new UnableToCreateSQLException('INSERT[columns]', $k, $v, 'expr_type');
+    
+    protected function buildSubQuery($parsed) {
+        $builder = new SubQueryBuilder();
+        return $builder->build($parsed, 0);
+    }
+    
+    protected function buildColumnList($parsed) {
+        $builder = new InsertColumnListBuilder();
+        return $builder->build($parsed, 0);
+    }
+    
+    public function build(array $parsed) {
+        $sql =  '';
+        foreach ($parsed as $k => $v) {
+            $len = strlen($sql);
+            $sql .= $this->buildTable($v);
+            $sql .= $this->buildSubQuery($v);
+            $sql .= $this->buildColumnList($v);
+            
+            if ($len == strlen($sql)) {
+                throw new UnableToCreateSQLException('INSERT', $k, $v, 'expr_type');
             }
 
-            $columns .= ",";
+            $sql .= " ";
         }
-
-        if ($columns !== "") {
-            $columns = " (" . substr($columns, 0, -1) . ")";
-        }
-
-        $sql .= $columns;
-        return $sql;
+        return 'INSERT INTO ' . substr($sql, 0, -1);
     }
     
 }
