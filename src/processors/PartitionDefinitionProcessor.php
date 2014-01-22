@@ -54,10 +54,40 @@ require_once dirname(__FILE__) . '/../utils/ExpressionType.php';
  */
 class PartitionDefinitionProcessor extends AbstractProcessor {
 
+    protected function processExpressionList($unparsed) {
+        $processor = new ExpressionListProcessor();
+        $expr = $this->removeParenthesisFromStart($unparsed);
+        $expr = $this->splitSQLIntoTokens($expr);
+        return $processor->process($expr);
+    }
+
+    protected function processSubpartitionDefinition($unparsed) {
+        /*$processor = new SubpartitionDefinitionProcessor();
+        $expr = $this->removeParenthesisFromStart($unparsed);
+        $expr = $this->splitSQLIntoTokens($expr);
+        return $processor->process($expr);*/
+        return array();
+    }
+
+    protected function getReservedType($token) {
+        return array('expr_type' => ExpressionType::RESERVED, 'base_expr' => $token);
+    }
+
+    protected function getConstantType($token) {
+        return array('expr_type' => ExpressionType::CONSTANT, 'base_expr' => $token);
+    }
+
+    protected function getOperatorType($token) {
+        return array('expr_type' => ExpressionType::OPERATOR, 'base_expr' => $token);
+    }
+
+    protected function getBracketExpressionType($token) {
+        return array('expr_type' => ExpressionType::BRACKET_EXPRESSION, 'base_expr' => $token, 'sub_tree' => false);
+    }
+
     public function process($tokens) {
 
-        $result = array('partition-definitions' => array(), 'last-parsed' => false);
-
+        $result = array();
         $prevCategory = '';
         $currCategory = '';
         $parsed = array();
@@ -85,7 +115,244 @@ class PartitionDefinitionProcessor extends AbstractProcessor {
             $upper = strtoupper($trim);
             switch ($upper) {
 
+            case 'PARTITION':
+                if ($currCategory === '') {
+                    $expr[] = $this->getReservedType($trim);
+                    $parsed = array('expr_type' => ExpressionType::PARTITION_DEF, 'base_expr' => trim($base_expr),
+                                      'sub_tree' => false);
+                    $currCategory = $upper;
+                    continue 2;
+                }
+                // else ?
+                break;
+
+            case 'VALUES':
+                if ($prevCategory === 'PARTITION') {
+                    $expr[] = array('expr_type' => ExpressionType::PARTITION_VALUES, 'base_expr' => false,
+                                    'sub_tree' => false, 'storage' => substr($base_expr, 0, -strlen($token)));
+                    $parsed['sub_tree'] = $expr;
+
+                    $base_expr = $token;
+                    $expr = array($this->getReservedType($trim));
+
+                    $currCategory = $upper;
+                    continue 2;
+                }
+                // else ?
+                break;
+
+            case 'LESS':
+                if ($currCategory === 'VALUES') {
+                    $expr[] = $this->getReservedType($trim);
+                    continue 2;
+                }
+                // else ?
+                break;
+
+            case 'THAN':
+                if ($currCategory === 'VALUES') {
+                    // followed by parenthesis and (value-list or expr)
+                    $expr[] = $this->getReservedType($trim);
+                    continue 2;
+                }
+                // else ?
+                break;
+
+            case 'MAXVALUE':
+                if ($currCategory === 'VALUES') {
+                    $expr[] = $this->getConstantType($trim);
+
+                    // TODO: store the upper level
+
+                    continue 2;
+                }
+                // else ?
+                break;
+
+            case 'IN':
+                if ($currCategory === 'VALUES') {
+                    // followed by parenthesis and value-list
+                    $expr[] = $this->getReservedType($trim);
+                    continue 2;
+                }
+                break;
+
+            case 'COMMENT':
+                if ($prevCategory === 'PARTITION') {
+                    $expr[] = array('expr_type' => ExpressionType::PARTITION_COMMENT, 'base_expr' => false,
+                                    'sub_tree' => false, 'storage' => substr($base_expr, 0, -strlen($token)));
+
+                    $parsed['sub_tree'] = $expr;
+                    $base_expr = $token;
+                    $expr = array($this->getReservedType($trim));
+
+                    $currCategory = $upper;
+                    continue 2;
+                }
+                // else ?
+                break;
+
+            case 'STORAGE':
+                if ($prevCategory === 'PARTITION') {
+                    // followed by ENGINE
+                    $currCategory = $upper;
+                    $expr[] = $this->getReservedType($trim);
+                    continue 2;
+                }
+                // else ?
+                break;
+
+            case 'ENGINE':
+                if ($prevCategory === 'PARTITION' || $currCategory === 'STORAGE') {
+                    $expr[] = array('expr_type' => ExpressionType::ENGINE, 'base_expr' => false, 'sub_tree' => false,
+                                    'storage' => substr($base_expr, 0, -strlen($token)));
+
+                    $parsed['sub_tree'] = $expr;
+                    $base_expr = $token;
+                    $expr = array($this->getReservedType($trim));
+
+                    $currCategory = $upper;
+                    continue 2;
+                }
+                // else ?
+                break;
+
+            case '=':
+                if (in_array($currCategory, array('ENGINE', 'COMMENT', 'DIRECTORY', 'MAX_ROWS', 'MIN_ROWS'))) {
+                    $expr[] = $this->getOperatorType($trim);
+                    continue 2;
+                }
+                // else ?
+                break;
+
+            case ',':
+                if ($prevCategory === '' && $currCategory === '') {
+                    // it separates the partition-definitions
+                    $result[] = $parsed;
+                    $parsed = array();
+                    $base_expr = '';
+                }
+                break;
+
+            case 'DATA':
+            case 'INDEX':
+                if ($prevCategory === 'PARTITION') {
+                    // followed by DIRECTORY
+                    $currCategory = $upper;
+                    $expr[] = $this->getReservedType($trim);
+                    continue 2;
+                }
+                // else ?
+                break;
+
+            case 'DIRECTORY':
+                if ($currCategory === 'DATA' || $currCategory === 'INDEX') {
+                    $expr[] = array('expr_type' => constant('ExpressionType::PARTITION_' . $currCategory . '_DIR'),
+                                    'base_expr' => false, 'sub_tree' => false,
+                                    'storage' => substr($base_expr, 0, -strlen($token)));
+
+                    $parsed['sub_tree'] = $expr;
+                    $base_expr = $token;
+                    $expr = array($this->getReservedType($trim));
+
+                    $currCategory = $upper;
+                    continue 2;
+                }
+                // else ?
+                break;
+
+            case 'MAX_ROWS':
+            case 'MIN_ROWS':
+                if ($currCategory === 'PARTITION') {
+                    $expr[] = array('expr_type' => constant('ExpressionType::PARTITION_' . $currCategory),
+                                    'base_expr' => false, 'sub_tree' => false,
+                                    'storage' => substr($base_expr, 0, -strlen($token)));
+
+                    $parsed['sub_tree'] = $expr;
+                    $base_expr = $token;
+                    $expr = array($this->getReservedType($trim));
+
+                    $currCategory = $upper;
+                    continue 2;
+                }
+                // else ?
+                break;
+
             default:
+                switch ($currCategory) {
+
+                case 'MIN_ROWS':
+                case 'MAX_ROWS':
+                    $expr[] = $this->getConstantType($trim);
+                    $currCategory = $prevCategory;
+                    break;
+
+                case 'COMMENT':
+                    $expr[] = $this->getConstantType($trim);
+                    $currCategory = $prevCategory;
+                    break;
+
+                case 'ENGINE':
+                    $expr[] = $this->getConstantType($trim);
+                    $currCategory = $prevCategory;
+                    break;
+
+                case 'DIRECTORY':
+                    $expr[] = $this->getConstantType($trim);
+                    $currCategory = $prevCategory;
+                    break;
+
+                case 'PARTITION':
+                // that is the partition name
+                    $last = array_pop($expr);
+                    $last['name'] = $trim;
+                    $expr[] = $last;
+                    $expr[] = $this->getConstantType($trim);
+                    break;
+
+                case 'VALUES':
+                // we have parenthesis and have to process an expression/in-list
+                    $last = $this->getBracketExpressionType($trim);
+                    $last['sub_tree'] = $this->processExpressionList($trim);
+                    $expr[] = $last;
+                    
+                    $last = array_pop($parsed['sub_tree']);
+                    $last['base_expr'] = $base_expr;
+                    $last['sub_tree'] = $expr;
+
+                    $base_expr = $last['storage'] . $base_expr;
+                    unset($last['storage']);
+                    $parsed['sub_tree'][] = $last;
+
+                    $expr = $parsed['sub_tree'];
+                    unset($last);
+
+                    $currCategory = $prevCategory;
+                    break;
+
+                case '':
+                    if ($prevCategory === 'PARTITION') {
+                        // last part to process, it is only one token!
+                        if ($upper[0] === '(' && substr($upper, -1) === ')') {
+                            $last = $this->getBracketExpressionType($trim);
+                            $last['sub_tree'] = $this->processSubPartitionDefinition($trim);
+                            $expr[] = $last;
+                            unset($last);
+
+                            $parsed['base_expr'] = trim($base_expr);
+                            $parsed['sub_tree'] = $expr;
+                            
+                            $base_expr = '';
+                            $expr = array();
+                            break;
+                        }
+                    }
+                    // else ?                    
+                    break;
+
+                default:
+                    break;
+                }
                 break;
             }
 
@@ -93,10 +360,9 @@ class PartitionDefinitionProcessor extends AbstractProcessor {
             $currCategory = '';
         }
 
-        $result['partition-definitions'] = $parsed;
-        if ($result['last-parsed'] === false) {
-            $result['last-parsed'] = $tokenKey;
-        }
+        $parsed['base_expr'] = trim($base_expr);
+        $parsed['sub_tree'] = $expr;
+        $result[] = $parsed;
         return $result;
     }
 }
