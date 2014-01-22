@@ -341,8 +341,8 @@ class PartitionOptionsProcessor extends AbstractProcessor {
                 case '':
                     if ($prevCategory === 'PARTITION' || $prevCategory === 'SUBPARTITION') {
                         if ($upper[0] === '(' && substr($upper, -1) === ')') {
+                            // last part to process, it is only one token!
                             $part = $this->processPartitionDefinition($trim);
-                            $skip = $part['last-parsed'] - $tokenKey;
                             $last = $this->getBracketExpressionType($trim);
                             $last['sub_tree'] = $part['partition-definitions'];
                             $parsed[] = $last;
