@@ -127,11 +127,17 @@ class ExpressionType {
     const PARTITION_DATA_DIR = 'partition-data-dir';
     const PARTITION_MAX_ROWS = 'partition-max-rows';
     const PARTITION_MIN_ROWS = 'partition-min-rows';
-    const ALGORITHM = 'key-algorithm';
+    const PARTITION_KEY_ALGORITHM = 'partition-key-algorithm';
     
     const SUBPARTITION = 'sub-partition';
+    const SUBPARTITION_DEF = 'sub-partition-def';
     const SUBPARTITION_HASH = 'sub-partition-hash';
     const SUBPARTITION_KEY = 'sub-partition-key';
     const SUBPARTITION_COUNT = 'sub-partition-count';
+    const SUBPARTITION_COMMENT = 'partition-comment';
+    const SUBPARTITION_INDEX_DIR = 'partition-index-dir';
+    const SUBPARTITION_DATA_DIR = 'partition-data-dir';
+    const SUBPARTITION_MAX_ROWS = 'partition-max-rows';
+    const SUBPARTITION_MIN_ROWS = 'partition-min-rows';
 }
 ?>
