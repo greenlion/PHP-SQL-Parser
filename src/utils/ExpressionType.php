@@ -125,6 +125,8 @@ class ExpressionType {
     const PARTITION_COMMENT = 'partition-comment';
     const PARTITION_INDEX_DIR = 'partition-index-dir';
     const PARTITION_DATA_DIR = 'partition-data-dir';
+    const PARTITION_MAX_ROWS = 'partition-max-rows';
+    const PARTITION_MIN_ROWS = 'partition-min-rows';
     const ALGORITHM = 'key-algorithm';
     
     const SUBPARTITION = 'sub-partition';
