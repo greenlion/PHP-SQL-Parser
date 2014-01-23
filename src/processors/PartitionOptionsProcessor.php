@@ -177,7 +177,7 @@ class PartitionOptionsProcessor extends AbstractProcessor {
 
             case 'ALGORITHM':
                 if ($currCategory === 'KEY') {
-                    $expr[] = array('expr_type' => ExpressionType::ALGORITHM, 'base_expr' => false,
+                    $expr[] = array('expr_type' => ExpressionType::PARTITION_KEY_ALGORITHM, 'base_expr' => false,
                                     'sub_tree' => false, 'storage' => substr($base_expr, 0, -strlen($token)));
 
                     $last = array_pop($parsed);
