@@ -2,7 +2,7 @@
 require_once dirname(__FILE__) . "/../../../src/PHPSQLParser.php";
 require_once dirname(__FILE__) . "/../../test-more.php";
 
-/*
+
 $parser = new PHPSQLParser();
 $sql = "CREATE TABLE hohoho (LIKE xyz)";
 $parser->parse($sql, true);
@@ -119,6 +119,7 @@ $p = $parser->parsed;
 $expected = getExpectedValue(dirname(__FILE__), 'issue33m.serialized');
 eq_array($p, $expected, 'CREATE TABLE statement with partitions');
 
+
 $parser = new PHPSQLParser();
 $sql = "CREATE TABLE ti (id INT, amount DECIMAL(7,2), tr_date DATE)
     ENGINE=INNODB
@@ -128,6 +129,7 @@ $parser->parse($sql);
 $p = $parser->parsed;
 $expected = getExpectedValue(dirname(__FILE__), 'issue33n.serialized');
 eq_array($p, $expected, 'CREATE TABLE statement with partitions');
+
 
 $parser = new PHPSQLParser();
 $sql = "CREATE TABLE ti (id INT, amount DECIMAL(7,2), tr_date DATE)
@@ -193,7 +195,6 @@ $sql = "CREATE TABLE ts (id INT, purchased DATE)
     )";
 $parser->parse($sql);
 $p = $parser->parsed;
-print_r($p);
 $expected = getExpectedValue(dirname(__FILE__), 'issue33r.serialized');
 eq_array($p, $expected, 'CREATE TABLE statement with subpartitions and partition-definitions');
 
@@ -231,10 +232,9 @@ $sql = "CREATE TABLE ts (id INT, purchased DATE)
     )";
 $parser->parse($sql);
 $p = $parser->parsed;
-print_r($p);
 $expected = getExpectedValue(dirname(__FILE__), 'issue33s.serialized');
 eq_array($p, $expected, 'CREATE TABLE statement with subpartitions and partition-definitions');
-*/
+
 
 $parser = new PHPSQLParser();
 $sql = "CREATE TABLE ts (id INT, purchased DATE)
@@ -282,7 +282,6 @@ $sql = "CREATE TABLE ts (id INT, purchased DATE)
     )";
 $parser->parse($sql);
 $p = $parser->parsed;
-print_r($p);
-$expected = getExpectedValue(dirname(__FILE__), 'issue33s.serialized');
+$expected = getExpectedValue(dirname(__FILE__), 'issue33t.serialized');
 eq_array($p, $expected, 'CREATE TABLE statement with subpartitions and partition-definitions');
 ?>
