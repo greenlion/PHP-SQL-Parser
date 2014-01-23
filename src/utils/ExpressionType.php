@@ -122,7 +122,11 @@ class ExpressionType {
     const PARTITION_COUNT = 'partition-count';
     const PARTITION_DEF = 'partition-def';
     const PARTITION_VALUES = 'partition-values';
+    const PARTITION_COMMENT = 'partition-comment';
+    const PARTITION_INDEX_DIR = 'partition-index-dir';
+    const PARTITION_DATA_DIR = 'partition-data-dir';
     const ALGORITHM = 'key-algorithm';
+    
     const SUBPARTITION = 'sub-partition';
     const SUBPARTITION_HASH = 'sub-partition-hash';
     const SUBPARTITION_KEY = 'sub-partition-key';
