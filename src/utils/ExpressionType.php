@@ -139,5 +139,6 @@ class ExpressionType {
     const SUBPARTITION_DATA_DIR = 'sub-partition-data-dir';
     const SUBPARTITION_MAX_ROWS = 'sub-partition-max-rows';
     const SUBPARTITION_MIN_ROWS = 'sub-partition-min-rows';
+    const SUBPARTITION_KEY_ALGORITHM = 'sub-partition-key-algorithm';
 }
 ?>
