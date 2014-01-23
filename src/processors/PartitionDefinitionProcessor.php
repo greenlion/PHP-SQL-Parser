@@ -162,9 +162,17 @@ class PartitionDefinitionProcessor extends AbstractProcessor {
                 if ($currCategory === 'VALUES') {
                     $expr[] = $this->getConstantType($trim);
 
-                    // TODO: store the upper level
+                    $last = array_pop($parsed['sub_tree']);
+                    $last['base_expr'] = $base_expr;
+                    $last['sub_tree'] = $expr;
 
-                    continue 2;
+                    $base_expr = $last['storage'] . $base_expr;
+                    unset($last['storage']);
+                    $parsed['sub_tree'][] = $last;
+
+                    $expr = $parsed['sub_tree'];
+                    unset($last);
+                    $currCategory = $prevCategory;
                 }
                 // else ?
                 break;
@@ -360,8 +368,13 @@ class PartitionDefinitionProcessor extends AbstractProcessor {
             $currCategory = '';
         }
 
-        $parsed['base_expr'] = trim($base_expr);
-        $parsed['sub_tree'] = $expr;
+        if ($base_expr !== '') {
+            $parsed['base_expr'] = trim($base_expr);
+        }
+        if (!empty($expr)) {
+            $parsed['sub_tree'] = $expr;
+        }
+        
         $result[] = $parsed;
         return $result;
     }
