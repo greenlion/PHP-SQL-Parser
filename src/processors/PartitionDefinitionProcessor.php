@@ -168,7 +168,8 @@ class PartitionDefinitionProcessor extends AbstractProcessor {
                     $base_expr = $last['storage'] . $base_expr;
                     unset($last['storage']);
                     $parsed['sub_tree'][] = $last;
-
+                    $parsed['base_expr'] = trim($base_expr);
+                    
                     $expr = $parsed['sub_tree'];
                     unset($last);
                     $currCategory = $prevCategory;
@@ -244,13 +245,11 @@ class PartitionDefinitionProcessor extends AbstractProcessor {
                 break;
 
             case ',':
-                if ($prevCategory === '' && $currCategory === '') {
+                if ($prevCategory === 'PARTITION' && $currCategory === '') {
                     // it separates the partition-definitions
                     $result[] = $parsed;
                     $parsed = array();
                     $base_expr = '';
-                    
-                    // TODO: check that
                     $expr = array();
                 }
                 break;
@@ -316,6 +315,8 @@ class PartitionDefinitionProcessor extends AbstractProcessor {
                     unset($last['storage']);
 
                     $parsed['sub_tree'][] = $last;
+                    $parsed['base_expr'] = trim($base_expr);
+                    
                     $expr = $parsed['sub_tree'];
                     unset($last);
 
@@ -328,6 +329,8 @@ class PartitionDefinitionProcessor extends AbstractProcessor {
                     $last['name'] = $trim;
                     $expr[] = $last;
                     $expr[] = $this->getConstantType($trim);
+                    $parsed['sub_tree'] = $expr;
+                    $parsed['base_expr'] = trim($base_expr);
                     break;
 
                 case 'VALUES':
@@ -343,7 +346,8 @@ class PartitionDefinitionProcessor extends AbstractProcessor {
                     $base_expr = $last['storage'] . $base_expr;
                     unset($last['storage']);
                     $parsed['sub_tree'][] = $last;
-
+                    $parsed['base_expr'] = trim($base_expr);
+                    
                     $expr = $parsed['sub_tree'];
                     unset($last);
 
@@ -362,6 +366,7 @@ class PartitionDefinitionProcessor extends AbstractProcessor {
                             $parsed['base_expr'] = trim($base_expr);
                             $parsed['sub_tree'] = $expr;
 
+                            $currCategory = $prevCategory;
                             break;
                         }
                     }
