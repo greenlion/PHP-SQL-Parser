@@ -41,8 +41,8 @@
  */
 
 require_once dirname(__FILE__) . '/AbstractProcessor.php';
-require_once dirname(__FILE__) . '/ColumnListProcessor.php';
 require_once dirname(__FILE__) . '/ExpressionListProcessor.php';
+require_once dirname(__FILE__) . '/SubpartitionDefinitionProcessor.php';
 require_once dirname(__FILE__) . '/../utils/ExpressionType.php';
 
 /**
@@ -62,11 +62,10 @@ class PartitionDefinitionProcessor extends AbstractProcessor {
     }
 
     protected function processSubpartitionDefinition($unparsed) {
-        /*$processor = new SubpartitionDefinitionProcessor();
+        $processor = new SubpartitionDefinitionProcessor();
         $expr = $this->removeParenthesisFromStart($unparsed);
         $expr = $this->splitSQLIntoTokens($expr);
-        return $processor->process($expr);*/
-        return array();
+        return $processor->process($expr);
     }
 
     protected function getReservedType($token) {
@@ -250,6 +249,9 @@ class PartitionDefinitionProcessor extends AbstractProcessor {
                     $result[] = $parsed;
                     $parsed = array();
                     $base_expr = '';
+                    
+                    // TODO: check that
+                    $expr = array();
                 }
                 break;
 
@@ -353,15 +355,13 @@ class PartitionDefinitionProcessor extends AbstractProcessor {
                         // last part to process, it is only one token!
                         if ($upper[0] === '(' && substr($upper, -1) === ')') {
                             $last = $this->getBracketExpressionType($trim);
-                            $last['sub_tree'] = $this->processSubPartitionDefinition($trim);
+                            $last['sub_tree'] = $this->processSubpartitionDefinition($trim);
                             $expr[] = $last;
                             unset($last);
 
                             $parsed['base_expr'] = trim($base_expr);
                             $parsed['sub_tree'] = $expr;
 
-                            $base_expr = '';
-                            $expr = array();
                             break;
                         }
                     }
@@ -376,13 +376,6 @@ class PartitionDefinitionProcessor extends AbstractProcessor {
 
             $prevCategory = $currCategory;
             $currCategory = '';
-        }
-
-        if ($base_expr !== '') {
-            $parsed['base_expr'] = trim($base_expr);
-        }
-        if (!empty($expr)) {
-            $parsed['sub_tree'] = $expr;
         }
 
         $result[] = $parsed;
