@@ -134,10 +134,10 @@ class ExpressionType {
     const SUBPARTITION_HASH = 'sub-partition-hash';
     const SUBPARTITION_KEY = 'sub-partition-key';
     const SUBPARTITION_COUNT = 'sub-partition-count';
-    const SUBPARTITION_COMMENT = 'partition-comment';
-    const SUBPARTITION_INDEX_DIR = 'partition-index-dir';
-    const SUBPARTITION_DATA_DIR = 'partition-data-dir';
-    const SUBPARTITION_MAX_ROWS = 'partition-max-rows';
-    const SUBPARTITION_MIN_ROWS = 'partition-min-rows';
+    const SUBPARTITION_COMMENT = 'sub-partition-comment';
+    const SUBPARTITION_INDEX_DIR = 'sub-partition-index-dir';
+    const SUBPARTITION_DATA_DIR = 'sub-partition-data-dir';
+    const SUBPARTITION_MAX_ROWS = 'sub-partition-max-rows';
+    const SUBPARTITION_MIN_ROWS = 'sub-partition-min-rows';
 }
 ?>
