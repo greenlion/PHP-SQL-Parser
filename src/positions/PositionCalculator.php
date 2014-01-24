@@ -43,11 +43,50 @@ require_once dirname(__FILE__) . '/../exceptions/UnableToCalculatePositionExcept
  */
 class PositionCalculator {
 
-    private static $_allowedOnOperator = array("\t", "\n", "\r", " ", ",", "(", ")", "_", "'", "\"");
-    private static $_allowedOnOther = array("\t", "\n", "\r", " ", ",", "(", ")", "<", ">", "*", "+", "-", "/", "|",
-                                            "&", "=", "!", ";");
+    protected static $allowedOnOperator = array("\t", "\n", "\r", " ", ",", "(", ")", "_", "'", "\"");
+    protected static $allowedOnOther = array("\t", "\n", "\r", " ", ",", "(", ")", "<", ">", "*", "+", "-", "/", "|",
+                                             "&", "=", "!", ";");
 
-    private function _printPos($text, $sql, $charPos, $key, $parsed, $backtracking) {
+    protected $flippedBacktrackingTypes;
+    protected static $backtrackingTypes = array(ExpressionType::EXPRESSION, ExpressionType::SUBQUERY,
+                                                ExpressionType::BRACKET_EXPRESSION, ExpressionType::TABLE_EXPRESSION,
+                                                ExpressionType::RECORD, ExpressionType::IN_LIST,
+                                                ExpressionType::MATCH_ARGUMENTS, ExpressionType::TABLE,
+                                                ExpressionType::TEMPORARY_TABLE, ExpressionType::COLUMN_TYPE,
+                                                ExpressionType::COLDEF, ExpressionType::PRIMARY_KEY,
+                                                ExpressionType::CONSTRAINT, ExpressionType::COLUMN_LIST,
+                                                ExpressionType::CHECK, ExpressionType::COLLATE, ExpressionType::LIKE,
+                                                ExpressionType::INDEX, ExpressionType::INDEX_TYPE,
+                                                ExpressionType::INDEX_SIZE, ExpressionType::INDEX_PARSER,
+                                                ExpressionType::FOREIGN_KEY, ExpressionType::REFERENCE,
+                                                ExpressionType::PARTITION, ExpressionType::PARTITION_HASH,
+                                                ExpressionType::PARTITION_COUNT, ExpressionType::PARTITION_KEY,
+                                                ExpressionType::PARTITION_KEY_ALGORITHM,
+                                                ExpressionType::PARTITION_RANGE, ExpressionType::PARTITION_LIST,
+                                                ExpressionType::PARTITION_DEF, ExpressionType::PARTITION_VALUES,
+                                                ExpressionType::SUBPARTITION_DEF, ExpressionType::PARTITION_DATA_DIR,
+                                                ExpressionType::PARTITION_INDEX_DIR, ExpressionType::PARTITION_COMMENT,
+                                                ExpressionType::PARTITION_MAX_ROWS, ExpressionType::PARTITION_MIN_ROWS,
+                                                ExpressionType::SUBPARTITION_COMMENT,
+                                                ExpressionType::SUBPARTITION_DATA_DIR,
+                                                ExpressionType::SUBPARTITION_INDEX_DIR,
+                                                ExpressionType::SUBPARTITION_KEY,
+                                                ExpressionType::SUBPARTITION_KEY_ALGORITHM,
+                                                ExpressionType::SUBPARTITION_MAX_ROWS,
+                                                ExpressionType::SUBPARTITION_MIN_ROWS, ExpressionType::SUBPARTITION,
+                                                ExpressionType::SUBPARTITION_HASH, ExpressionType::SUBPARTITION_COUNT,
+                                                ExpressionType::CHARSET, ExpressionType::ENGINE);
+
+    /**
+     * Constructor.
+     * 
+     * It initializes some fields.
+     */
+    public function __construct() {
+        $this->flippedBacktrackingTypes = array_flip(self::$backtrackingTypes);
+    }
+
+    protected function _printPos($text, $sql, $charPos, $key, $parsed, $backtracking) {
         if (!isset($_ENV['DEBUG'])) {
             return;
         }
@@ -71,7 +110,7 @@ class PositionCalculator {
         return $parsed;
     }
 
-    private function findPositionWithinString($sql, $value, $expr_type) {
+    protected function findPositionWithinString($sql, $value, $expr_type) {
 
         $offset = 0;
         $ok = false;
@@ -98,10 +137,10 @@ class PositionCalculator {
 
             if ($expr_type === 'operator') {
 
-                $ok = ($before === "" || in_array($before, self::$_allowedOnOperator, true))
+                $ok = ($before === "" || in_array($before, self::$allowedOnOperator, true))
                     || (strtolower($before) >= 'a' && strtolower($before) <= 'z') || ($before >= '0' && $before <= '9');
                 $ok = $ok
-                    && ($after === "" || in_array($after, self::$_allowedOnOperator, true)
+                    && ($after === "" || in_array($after, self::$allowedOnOperator, true)
                         || (strtolower($after) >= 'a' && strtolower($after) <= 'z') || ($after >= '0' && $after <= '9')
                         || ($after === '?') || ($after === '@'));
 
@@ -116,8 +155,8 @@ class PositionCalculator {
             // in all other cases we accept
             // whitespace, comma, operators, parenthesis and end_of_string
 
-            $ok = ($before === "" || in_array($before, self::$_allowedOnOther, true));
-            $ok = $ok && ($after === "" || in_array($after, self::$_allowedOnOther, true));
+            $ok = ($before === "" || in_array($before, self::$allowedOnOther, true));
+            $ok = $ok && ($after === "" || in_array($after, self::$allowedOnOther, true));
 
             if ($ok) {
                 break;
@@ -129,24 +168,11 @@ class PositionCalculator {
         return $pos;
     }
 
-    private function lookForBaseExpression($sql, &$charPos, &$parsed, $key, &$backtracking) {
+    protected function lookForBaseExpression($sql, &$charPos, &$parsed, $key, &$backtracking) {
         if (!is_numeric($key)) {
             if (($key === 'UNION' || $key === 'UNION ALL')
-                || ($key === 'expr_type'
-                    && ($parsed === ExpressionType::EXPRESSION || $parsed === ExpressionType::SUBQUERY
-                        || $parsed === ExpressionType::BRACKET_EXPRESSION
-                        || $parsed === ExpressionType::TABLE_EXPRESSION || $parsed === ExpressionType::RECORD
-                        || $parsed === ExpressionType::IN_LIST || $parsed === ExpressionType::MATCH_ARGUMENTS
-                        || $parsed === ExpressionType::TABLE || $parsed === ExpressionType::TEMPORARY_TABLE
-                        || $parsed === ExpressionType::COLUMN_TYPE || $parsed === ExpressionType::COLDEF
-                        || $parsed === ExpressionType::PRIMARY_KEY || $parsed === ExpressionType::CONSTRAINT
-                        || $parsed === ExpressionType::COLUMN_LIST || $parsed === ExpressionType::CHECK
-                        || $parsed === ExpressionType::COLLATE || $parsed === ExpressionType::LIKE
-                        || $parsed === ExpressionType::INDEX || $parsed === ExpressionType::INDEX_TYPE
-                        || $parsed === ExpressionType::INDEX_SIZE || $parsed === ExpressionType::INDEX_PARSER
-                        || $parsed === ExpressionType::FOREIGN_KEY || $parsed === ExpressionType::REFERENCE
-                        || $parsed === ExpressionType::CHARSET)) || ($key === 'select-option' && $parsed !== false)
-                || ($key === 'alias' && $parsed !== false)) {
+                || ($key === 'expr_type' && isset($this->flippedBacktrackingTypes[$parsed]))
+                || ($key === 'select-option' && $parsed !== false) || ($key === 'alias' && $parsed !== false)) {
                 // we hold the current position and come back after the next base_expr
                 // we do this, because the next base_expr contains the complete expression/subquery/record
                 // and we have to look into it too
