@@ -132,25 +132,21 @@ class PositionCalculator {
     private function lookForBaseExpression($sql, &$charPos, &$parsed, $key, &$backtracking) {
         if (!is_numeric($key)) {
             if (($key === 'UNION' || $key === 'UNION ALL')
-                || ($key === 'expr_type' && $parsed === ExpressionType::EXPRESSION)
-                || ($key === 'expr_type' && $parsed === ExpressionType::SUBQUERY)
-                || ($key === 'expr_type' && $parsed === ExpressionType::BRACKET_EXPRESSION)
-                || ($key === 'expr_type' && $parsed === ExpressionType::TABLE_EXPRESSION)
-                || ($key === 'expr_type' && $parsed === ExpressionType::RECORD)
-                || ($key === 'expr_type' && $parsed === ExpressionType::IN_LIST)
-                || ($key === 'expr_type' && $parsed === ExpressionType::MATCH_ARGUMENTS)
-                || ($key === 'expr_type' && $parsed === ExpressionType::TABLE)
-                || ($key === 'expr_type' && $parsed === ExpressionType::TEMPORARY_TABLE)
-                || ($key === 'expr_type' && $parsed === ExpressionType::COLUMN_TYPE)
-                || ($key === 'expr_type' && $parsed === ExpressionType::COLDEF)
-                || ($key === 'expr_type' && $parsed === ExpressionType::PRIMARY_KEY)
-                || ($key === 'expr_type' && $parsed === ExpressionType::CONSTRAINT)
-                || ($key === 'expr_type' && $parsed === ExpressionType::COLUMN_LIST)
-                || ($key === 'expr_type' && $parsed === ExpressionType::CHECK)
-                || ($key === 'expr_type' && $parsed === ExpressionType::COLLATE)
-                || ($key === 'expr_type' && $parsed === ExpressionType::LIKE)
-                || ($key === 'expr_type' && $parsed === ExpressionType::INDEX)
-                || ($key === 'select-option' && $parsed !== false) || ($key === 'alias' && $parsed !== false)) {
+                || ($key === 'expr_type'
+                    && ($parsed === ExpressionType::EXPRESSION || $parsed === ExpressionType::SUBQUERY
+                        || $parsed === ExpressionType::BRACKET_EXPRESSION
+                        || $parsed === ExpressionType::TABLE_EXPRESSION || $parsed === ExpressionType::RECORD
+                        || $parsed === ExpressionType::IN_LIST || $parsed === ExpressionType::MATCH_ARGUMENTS
+                        || $parsed === ExpressionType::TABLE || $parsed === ExpressionType::TEMPORARY_TABLE
+                        || $parsed === ExpressionType::COLUMN_TYPE || $parsed === ExpressionType::COLDEF
+                        || $parsed === ExpressionType::PRIMARY_KEY || $parsed === ExpressionType::CONSTRAINT
+                        || $parsed === ExpressionType::COLUMN_LIST || $parsed === ExpressionType::CHECK
+                        || $parsed === ExpressionType::COLLATE || $parsed === ExpressionType::LIKE
+                        || $parsed === ExpressionType::INDEX || $parsed === ExpressionType::INDEX_TYPE
+                        || $parsed === ExpressionType::INDEX_SIZE || $parsed === ExpressionType::INDEX_PARSER
+                        || $parsed === ExpressionType::FOREIGN_KEY || $parsed === ExpressionType::REFERENCE
+                        || $parsed === ExpressionType::CHARSET)) || ($key === 'select-option' && $parsed !== false)
+                || ($key === 'alias' && $parsed !== false)) {
                 // we hold the current position and come back after the next base_expr
                 // we do this, because the next base_expr contains the complete expression/subquery/record
                 // and we have to look into it too
