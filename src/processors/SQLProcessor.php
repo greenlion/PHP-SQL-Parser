@@ -69,7 +69,8 @@ class SQLProcessor extends SQLChunkProcessor {
 
             // if it starts with an "(", it should follow a SELECT
             if ($trim !== "" && $trim[0] === "(" && $token_category === "") {
-                $token_category = 'SELECT';
+                $token_category = 'BRACKET';
+                $prev_category = $token_category;
             }
 
             /*
