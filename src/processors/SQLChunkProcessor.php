@@ -4,67 +4,77 @@
  *
  * This file implements the processor for the SQL chunks.
  *
- * Copyright (c) 2010-2012, Justin Swanhart
- * with contributions by André Rothe <arothe@phosco.info, phosco@gmx.de>
+ * PHP version 5
  *
+ * LICENSE:
+ * Copyright (c) 2010-2014 Justin Swanhart and André Rothe
  * All rights reserved.
  *
- * Redistribution and use in source and binary forms, with or without modification,
- * are permitted provided that the following conditions are met:
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ * 1. Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions and the following disclaimer.
+ * 2. Redistributions in binary form must reproduce the above copyright
+ *    notice, this list of conditions and the following disclaimer in the
+ *    documentation and/or other materials provided with the distribution.
+ * 3. The name of the author may not be used to endorse or promote products
+ *    derived from this software without specific prior written permission.
  *
- *   * Redistributions of source code must retain the above copyright notice,
- *     this list of conditions and the following disclaimer.
- *   * Redistributions in binary form must reproduce the above copyright notice,
- *     this list of conditions and the following disclaimer in the documentation
- *     and/or other materials provided with the distribution.
+ * THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
+ * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+ * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+ * IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
+ * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
+ * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+ * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+ * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+ * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY
- * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
- * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT
- * SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED
- * TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR
- * BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
- * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
- * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
- * DAMAGE.
+ * @author    André Rothe <andre.rothe@phosco.info>
+ * @copyright 2010-2014 Justin Swanhart and André Rothe
+ * @license   http://www.debian.org/misc/bsd.license  BSD License (3 Clause)
+ * @version   SVN: $Id$
+ *
  */
 
-require_once(dirname(__FILE__) . '/AbstractProcessor.php');
-require_once(dirname(__FILE__) . '/FromProcessor.php');
-require_once(dirname(__FILE__) . '/RecordProcessor.php');
-require_once(dirname(__FILE__) . '/UpdateProcessor.php');
-require_once(dirname(__FILE__) . '/DeleteProcessor.php');
-require_once(dirname(__FILE__) . '/GroupByProcessor.php');
-require_once(dirname(__FILE__) . '/RenameProcessor.php');
-require_once(dirname(__FILE__) . '/UsingProcessor.php');
-require_once(dirname(__FILE__) . '/DescribeProcessor.php');
-require_once(dirname(__FILE__) . '/DescProcessor.php');
-require_once(dirname(__FILE__) . '/HavingProcessor.php');
-require_once(dirname(__FILE__) . '/ReplaceProcessor.php');
-require_once(dirname(__FILE__) . '/ValuesProcessor.php');
-require_once(dirname(__FILE__) . '/DropProcessor.php');
-require_once(dirname(__FILE__) . '/InsertProcessor.php');
-require_once(dirname(__FILE__) . '/SelectExpressionProcessor.php');
-require_once(dirname(__FILE__) . '/WhereProcessor.php');
-require_once(dirname(__FILE__) . '/DuplicateProcessor.php');
-require_once(dirname(__FILE__) . '/IntoProcessor.php');
-require_once(dirname(__FILE__) . '/SelectProcessor.php');
-require_once(dirname(__FILE__) . '/ExplainProcessor.php');
-require_once(dirname(__FILE__) . '/LimitProcessor.php');
-require_once(dirname(__FILE__) . '/SetProcessor.php');
-require_once(dirname(__FILE__) . '/ExpressionListProcessor.php');
-require_once(dirname(__FILE__) . '/OrderByProcessor.php');
-require_once(dirname(__FILE__) . '/ShowProcessor.php');
-require_once(dirname(__FILE__) . '/CreateProcessor.php');
-require_once(dirname(__FILE__) . '/TableProcessor.php');
+require_once dirname(__FILE__) . '/AbstractProcessor.php';
+require_once dirname(__FILE__) . '/FromProcessor.php';
+require_once dirname(__FILE__) . '/RecordProcessor.php';
+require_once dirname(__FILE__) . '/UpdateProcessor.php';
+require_once dirname(__FILE__) . '/DeleteProcessor.php';
+require_once dirname(__FILE__) . '/GroupByProcessor.php';
+require_once dirname(__FILE__) . '/RenameProcessor.php';
+require_once dirname(__FILE__) . '/UsingProcessor.php';
+require_once dirname(__FILE__) . '/DescribeProcessor.php';
+require_once dirname(__FILE__) . '/DescProcessor.php';
+require_once dirname(__FILE__) . '/HavingProcessor.php';
+require_once dirname(__FILE__) . '/ReplaceProcessor.php';
+require_once dirname(__FILE__) . '/ValuesProcessor.php';
+require_once dirname(__FILE__) . '/DropProcessor.php';
+require_once dirname(__FILE__) . '/InsertProcessor.php';
+require_once dirname(__FILE__) . '/SelectExpressionProcessor.php';
+require_once dirname(__FILE__) . '/WhereProcessor.php';
+require_once dirname(__FILE__) . '/DuplicateProcessor.php';
+require_once dirname(__FILE__) . '/IntoProcessor.php';
+require_once dirname(__FILE__) . '/SelectProcessor.php';
+require_once dirname(__FILE__) . '/ExplainProcessor.php';
+require_once dirname(__FILE__) . '/LimitProcessor.php';
+require_once dirname(__FILE__) . '/SetProcessor.php';
+require_once dirname(__FILE__) . '/ExpressionListProcessor.php';
+require_once dirname(__FILE__) . '/OrderByProcessor.php';
+require_once dirname(__FILE__) . '/ShowProcessor.php';
+require_once dirname(__FILE__) . '/CreateProcessor.php';
+require_once dirname(__FILE__) . '/TableProcessor.php';
+require_once dirname(__FILE__) . '/BracketProcessor.php';
 
 /**
- * 
  * This class processes the SQL chunks.
- * 
- * @author arothe
- * 
+ *
+ * @author  André Rothe <andre.rothe@phosco.info>
+ * @license http://www.debian.org/misc/bsd.license  BSD License (3 Clause)
+ *
  */
 class SQLChunkProcessor extends AbstractProcessor {
 
@@ -79,6 +89,12 @@ class SQLChunkProcessor extends AbstractProcessor {
     public function process($out) {
         if (!$out) {
             return false;
+        }
+        if (!empty($out['BRACKET'])) {
+            // TODO: this field should be a global STATEMENT field within the output
+            // we could add all other categories as sub_tree, it could also work with multipe UNIONs
+            $processor = new BracketProcessor();
+            $out['BRACKET'] = $processor->process($out['BRACKET']);
         }
         if (!empty($out['CREATE'])) {
             $processor = new CreateProcessor();
@@ -100,18 +116,6 @@ class SQLChunkProcessor extends AbstractProcessor {
         if (!empty($out['DESC'])) {
             $processor = new DescProcessor();
             $out['DESC'] = $processor->process($out['DESC'], array_keys($out));
-        }
-        if (!empty($out['BRACKET'])) {
-            // TODO: this field should be a global STATEMENT field within the output
-            // we could add all other categories as sub_tree, it could also work with multipe UNIONs
-            $processor = new DefaultProcessor();
-            $token = $this->removeParenthesisFromStart($out['BRACKET'][0]);
-            $out['BRACKET'] = array(
-                    array('expr_type' => ExpressionType::BRACKET_EXPRESSION, 'base_expr' => trim($out['BRACKET'][0]),
-                            'sub_tree' => $processor->process($token)));
-            if (isset($out['BRACKET'][0]['sub_tree']['BRACKET'])) {
-                $out['BRACKET'][0]['sub_tree'] = $out['BRACKET'][0]['sub_tree']['BRACKET'];
-            }
         }
         if (!empty($out['SELECT'])) {
             $processor = new SelectProcessor();
