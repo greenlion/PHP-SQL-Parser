@@ -93,7 +93,10 @@ class SelectStatementBuilder implements Builder {
     }
 
     public function build(array $parsed) {
-        $sql = $this->buildSELECT($parsed['SELECT']);
+        $sql = "";
+        if (isset($parsed['SELECT'])) {
+            $sql .= $this->buildSELECT($parsed['SELECT']);
+        }
         if (isset($parsed['FROM'])) {
             $sql .= " " . $this->buildFROM($parsed['FROM']);
         }
