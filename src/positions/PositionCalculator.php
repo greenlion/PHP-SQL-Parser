@@ -85,7 +85,7 @@ class PositionCalculator {
                                                 ExpressionType::SUBPARTITION_MAX_ROWS,
                                                 ExpressionType::SUBPARTITION_MIN_ROWS, ExpressionType::SUBPARTITION,
                                                 ExpressionType::SUBPARTITION_HASH, ExpressionType::SUBPARTITION_COUNT,
-                                                ExpressionType::CHARSET, ExpressionType::ENGINE);
+                                                ExpressionType::CHARSET, ExpressionType::ENGINE, ExpressionType::QUERY);
 
     /**
      * Constructor.
@@ -110,7 +110,7 @@ class PositionCalculator {
         }
         $holdem = substr($sql, 0, $charPos) . "^" . substr($sql, $charPos);
         echo $spaces . $text . " key:" . $key . "  parsed:" . $parsed . " back:" . serialize($backtracking) . " "
-            . $holdem . "\n";
+                . $holdem . "\n";
     }
 
     public function setPositionsWithinSQL($sql, $parsed) {
@@ -148,11 +148,12 @@ class PositionCalculator {
             if ($expr_type === 'operator') {
 
                 $ok = ($before === "" || in_array($before, self::$allowedOnOperator, true))
-                    || (strtolower($before) >= 'a' && strtolower($before) <= 'z') || ($before >= '0' && $before <= '9');
+                        || (strtolower($before) >= 'a' && strtolower($before) <= 'z')
+                        || ($before >= '0' && $before <= '9');
                 $ok = $ok
-                    && ($after === "" || in_array($after, self::$allowedOnOperator, true)
-                        || (strtolower($after) >= 'a' && strtolower($after) <= 'z') || ($after >= '0' && $after <= '9')
-                        || ($after === '?') || ($after === '@'));
+                        && ($after === "" || in_array($after, self::$allowedOnOperator, true)
+                                || (strtolower($after) >= 'a' && strtolower($after) <= 'z')
+                                || ($after >= '0' && $after <= '9') || ($after === '?') || ($after === '@'));
 
                 if (!$ok) {
                     $offset = $pos + 1;
@@ -181,8 +182,8 @@ class PositionCalculator {
     protected function lookForBaseExpression($sql, &$charPos, &$parsed, $key, &$backtracking) {
         if (!is_numeric($key)) {
             if (($key === 'UNION' || $key === 'UNION ALL')
-                || ($key === 'expr_type' && isset($this->flippedBacktrackingTypes[$parsed]))
-                || ($key === 'select-option' && $parsed !== false) || ($key === 'alias' && $parsed !== false)) {
+                    || ($key === 'expr_type' && isset($this->flippedBacktrackingTypes[$parsed]))
+                    || ($key === 'select-option' && $parsed !== false) || ($key === 'alias' && $parsed !== false)) {
                 // we hold the current position and come back after the next base_expr
                 // we do this, because the next base_expr contains the complete expression/subquery/record
                 // and we have to look into it too
@@ -226,7 +227,7 @@ class PositionCalculator {
 
                 $subject = substr($sql, $charPos);
                 $pos = $this->findPositionWithinString($subject, $value,
-                    isset($parsed['expr_type']) ? $parsed['expr_type'] : 'alias');
+                        isset($parsed['expr_type']) ? $parsed['expr_type'] : 'alias');
                 if ($pos === false) {
                     throw new UnableToCalculatePositionException($value, $subject);
                 }
