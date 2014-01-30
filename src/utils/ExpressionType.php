@@ -140,5 +140,7 @@ class ExpressionType {
     const SUBPARTITION_MAX_ROWS = 'sub-partition-max-rows';
     const SUBPARTITION_MIN_ROWS = 'sub-partition-min-rows';
     const SUBPARTITION_KEY_ALGORITHM = 'sub-partition-key-algorithm';
+    
+    const QUERY = 'query';
 }
 ?>
