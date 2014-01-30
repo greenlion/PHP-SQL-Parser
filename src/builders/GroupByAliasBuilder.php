@@ -1,8 +1,8 @@
 <?php
 /**
- * GroupByBuilder.php
+ * GroupByAliasBuilder.php
  *
- * Builds the GROUP-BY clause.
+ * Builds an alias within a GROUP-BY clause.
  *
  * PHP version 5
  *
@@ -35,65 +35,28 @@
  * @author    André Rothe <andre.rothe@phosco.info>
  * @copyright 2010-2014 Justin Swanhart and André Rothe
  * @license   http://www.debian.org/misc/bsd.license  BSD License (3 Clause)
- * @version   SVN: $Id$
+ * @version   SVN: $Id: GroupByAliasBuilder.php 1005 2014-01-13 11:12:29Z phosco@gmx.de $
  * 
  */
 
-require_once dirname(__FILE__) . '/../exceptions/UnableToCreateSQLException.php';
-require_once dirname(__FILE__) . '/PositionBuilder.php';
-require_once dirname(__FILE__) . '/ColumnReferenceBuilder.php';
-require_once dirname(__FILE__) . '/FunctionBuilder.php';
-require_once dirname(__FILE__) . '/GroupByAliasBuilder.php';
+require_once dirname(__FILE__) . '/../utils/ExpressionType.php';
 require_once dirname(__FILE__) . '/Builder.php';
 
 /**
- * This class implements the builder for the GROUP-BY clause. 
+ * This class implements the builder for an alias within the GROUP-BY clause. 
  * You can overwrite all functions to achieve another handling.
  *
  * @author  André Rothe <andre.rothe@phosco.info>
  * @license http://www.debian.org/misc/bsd.license  BSD License (3 Clause)
  *  
  */
-class GroupByBuilder implements Builder {
+class GroupByAliasBuilder implements Builder {
 
-    protected function buildColRef($parsed) {
-        $builder = new ColumnReferenceBuilder();
-        return $builder->build($parsed);
-    }
-
-    protected function buildPosition($parsed) {
-        $builder = new PositionBuilder();
-        return $builder->build($parsed);
-    }
-
-    protected function buildFunction($parsed) {
-        $builder = new FunctionBuilder();
-        return $builder->build($parsed);
-    }
-    
-    protected function buildGroupByAlias($parsed) {
-        $builder = new GroupByAliasBuilder();
-        return $builder->build($parsed);
-    }
-            
     public function build(array $parsed) {
-        $sql = "";
-        foreach ($parsed as $k => $v) {
-            $len = strlen($sql);
-            $sql .= $this->buildColRef($v);
-            $sql .= $this->buildPosition($v);
-            $sql .= $this->buildFunction($v);
-            $sql .= $this->buildGroupByAlias($v);
-            
-            if ($len == strlen($sql)) {
-                throw new UnableToCreateSQLException('GROUP', $k, $v, 'expr_type');
-            }
-
-            $sql .= ", ";
+        if ($parsed['expr_type'] !== ExpressionType::ALIAS) {
+            return "";
         }
-        $sql = substr($sql, 0, -2);
-        return "GROUP BY " . $sql;
+        return $parsed['base_expr'];
     }
-    
 }
 ?>
