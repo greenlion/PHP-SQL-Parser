@@ -46,6 +46,7 @@ require_once dirname(__FILE__) . '/builders/UpdateStatementBuilder.php';
 require_once dirname(__FILE__) . '/builders/InsertStatementBuilder.php';
 require_once dirname(__FILE__) . '/builders/CreateStatementBuilder.php';
 require_once dirname(__FILE__) . '/builders/ShowStatementBuilder.php';
+require_once dirname(__FILE__) . '/builders/BracketStatementBuilder.php';
 
 /**
  * This class generates SQL from the output of the PHPSQLParser. 
@@ -66,35 +67,39 @@ class PHPSQLCreator {
         $k = key($parsed);
         switch ($k) {
 
-        case "UNION":
-        case "UNION ALL":
+        case 'UNION':
+        case 'UNION ALL':
             throw new UnsupportedFeatureException($k);
             break;
-        case "SELECT":
+        case 'SELECT':
             $builder = new SelectStatementBuilder();
             $this->created = $builder->build($parsed);
             break;
-        case "INSERT":
+        case 'INSERT':
             $builder = new InsertStatementBuilder();
             $this->created = $builder->build($parsed);
             break;
-        case "DELETE":
+        case 'DELETE':
             $builder = new DeleteStatementBuilder();
             $this->created = $builder->build($parsed);
             break;
-        case "UPDATE":
+        case 'UPDATE':
             $builder = new UpdateStatementBuilder();
             $this->created = $builder->build($parsed);
             break;
-        case "RENAME":
+        case 'RENAME':
             $this->created = $this->processRenameTableStatement($parsed);
             break;
-        case "SHOW":
+        case 'SHOW':
             $builder = new ShowStatementBuilder();
             $this->created = $builder->build($parsed);
             break;
-        case "CREATE":
+        case 'CREATE':
             $builder = new CreateStatementBuilder();
+            $this->created = $builder->build($parsed);
+            break;
+        case 'BRACKET':
+            $builder = new BracketStatementBuilder();
             $this->created = $builder->build($parsed);
             break;
         default:
