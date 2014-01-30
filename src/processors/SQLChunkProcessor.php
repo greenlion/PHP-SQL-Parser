@@ -101,6 +101,18 @@ class SQLChunkProcessor extends AbstractProcessor {
             $processor = new DescProcessor();
             $out['DESC'] = $processor->process($out['DESC'], array_keys($out));
         }
+        if (!empty($out['BRACKET'])) {
+            // TODO: this field should be a global STATEMENT field within the output
+            // we could add all other categories as sub_tree, it could also work with multipe UNIONs
+            $processor = new DefaultProcessor();
+            $token = $this->removeParenthesisFromStart($out['BRACKET'][0]);
+            $out['BRACKET'] = array(
+                    array('expr_type' => ExpressionType::BRACKET_EXPRESSION, 'base_expr' => trim($out['BRACKET'][0]),
+                            'sub_tree' => $processor->process($token)));
+            if (isset($out['BRACKET'][0]['sub_tree']['BRACKET'])) {
+                $out['BRACKET'][0]['sub_tree'] = $out['BRACKET'][0]['sub_tree']['BRACKET'];
+            }
+        }
         if (!empty($out['SELECT'])) {
             $processor = new SelectProcessor();
             $out['SELECT'] = $processor->process($out['SELECT']);
