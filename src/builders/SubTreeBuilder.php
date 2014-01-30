@@ -48,6 +48,7 @@ require_once dirname(__FILE__) . '/FunctionBuilder.php';
 require_once dirname(__FILE__) . '/OperatorBuilder.php';
 require_once dirname(__FILE__) . '/ConstantBuilder.php';
 require_once dirname(__FILE__) . '/SubQueryBuilder.php';
+require_once dirname(__FILE__) . '/QueryBuilder.php';
 require_once dirname(__FILE__) . '/Builder.php';
 
 /**
@@ -90,6 +91,11 @@ class SubTreeBuilder implements Builder {
         return $builder->build($parsed);
     }
 
+    protected function buildQuery($parsed) {
+        $builder = new QueryBuilder();
+        return $builder->build($parsed);
+    }
+    
     protected function buildSelectBracketExpression($parsed) {
         $builder = new SelectBracketExpressionBuilder();
         return $builder->build($parsed);
@@ -109,6 +115,7 @@ class SubTreeBuilder implements Builder {
             $sql .= $this->buildSubQuery($v);
             $sql .= $this->buildSelectBracketExpression($v);
             $sql .= $this->buildReserved($v);
+            $sql .= $this->buildQuery($v);
 
             if ($len == strlen($sql)) {
                 throw new UnableToCreateSQLException('expression subtree', $k, $v, 'expr_type');
