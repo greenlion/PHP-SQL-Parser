@@ -44,7 +44,7 @@ require_once(dirname(__FILE__) . '/../utils/ExpressionType.php');
  */
 class UnionProcessor extends AbstractProcessor {
 
-    public function isUnion($queries) {
+    public static function isUnion($queries) {
         $unionTypes = array('UNION', 'UNION ALL');
         foreach ($unionTypes as $unionType) {
             if (!empty($queries[$unionType])) {
