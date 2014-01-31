@@ -93,7 +93,7 @@ class SelectBuilder implements Builder {
      * @return a string, which is added right after the expression
      */
     protected function getDelimiter($parsed) {
-        return ($parsed['delim'] === false ? '' : (trim($parsed['delim']) . ' '));
+        return (!isset($parsed['delim']) || $parsed['delim'] === false ? '' : (trim($parsed['delim']) . ' '));
     }
 
     public function build(array $parsed) {
