@@ -34,6 +34,7 @@ require_once dirname(__FILE__) . '/cases/creator/issue110.php';
 require_once dirname(__FILE__) . '/cases/creator/issue112.php';
 require_once dirname(__FILE__) . '/cases/creator/issue117.php';
 require_once dirname(__FILE__) . '/cases/creator/issue118.php';
+require_once dirname(__FILE__) . '/cases/creator/issue121.php';
 require_once dirname(__FILE__) . '/cases/creator/join.php';
 require_once dirname(__FILE__) . '/cases/creator/left.php';
 require_once dirname(__FILE__) . '/cases/creator/magnus.php';
