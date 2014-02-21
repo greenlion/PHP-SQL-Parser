@@ -1,8 +1,8 @@
 <?php
 /**
- * TableBracketExpressionBuilder.php
+ * IndexKeyBuilder.php
  *
- * Builds the table expressions within the create definitions of CREATE TABLE.
+ * Builds index key part of a CREATE TABLE statement.
  *
  * PHP version 5
  *
@@ -39,81 +39,63 @@
  * 
  */
 
-require_once dirname(__FILE__) . '/../exceptions/UnableToCreateSQLException.php';
 require_once dirname(__FILE__) . '/../utils/ExpressionType.php';
-require_once dirname(__FILE__) . '/ColumnDefinitionBuilder.php';
-require_once dirname(__FILE__) . '/PrimaryKeyBuilder.php';
-require_once dirname(__FILE__) . '/ForeignKeyBuilder.php';
-require_once dirname(__FILE__) . '/CheckBuilder.php';
-require_once dirname(__FILE__) . '/LikeExpressionBuilder.php';
-require_once dirname(__FILE__) . '/IndexKeyBuilder.php';
+require_once dirname(__FILE__) . '/../exceptions/UnableToCreateSQLException.php';
+require_once dirname(__FILE__) . '/ConstantBuilder.php';
+require_once dirname(__FILE__) . '/ReservedBuilder.php';
+require_once dirname(__FILE__) . '/ColumnListBuilder.php';
+require_once dirname(__FILE__) . '/IndexTypeBuilder.php';
 require_once dirname(__FILE__) . '/Builder.php';
 
 /**
- * This class implements the builder for the table expressions 
- * within the create definitions of CREATE TABLE. 
+ * This class implements the builder for the index key part of a CREATE TABLE statement. 
  * You can overwrite all functions to achieve another handling.
  *
  * @author  André Rothe <andre.rothe@phosco.info>
  * @license http://www.debian.org/misc/bsd.license  BSD License (3 Clause)
  *  
  */
-class TableBracketExpressionBuilder implements Builder {
+class IndexKeyBuilder implements Builder {
 
-    protected function buildColDef($parsed) {
-        $builder = new ColumnDefinitionBuilder();
-        return $builder->build($parsed);
-    }
-
-    protected function buildPrimaryKey($parsed) {
-        $builder = new PrimaryKeyBuilder();
+    protected function buildReserved($parsed) {
+        $builder = new ReservedBuilder();
         return $builder->build($parsed);
     }
 
-    protected function buildForeignKey($parsed) {
-        $builder = new ForeignKeyBuilder();
+    protected function buildConstant($parsed) {
+        $builder = new ConstantBuilder();
         return $builder->build($parsed);
     }
     
-    protected function buildCheck($parsed) {
-        $builder = new CheckBuilder();
+    protected function buildIndexType($parsed) {
+        $builder = new IndexTypeBuilder();
         return $builder->build($parsed);
     }
     
-    protected function buildLikeExpression($parsed) {
-        $builder = new LikeExpressionBuilder();
-        return $builder->build($parsed);
-    }
-    
-    protected function buildIndexKey($parsed) {
-        $builder = new IndexKeyBuilder();
+    protected function buildColumnList($parsed) {
+        $builder = new ColumnListBuilder();
         return $builder->build($parsed);
     }
     
     public function build(array $parsed) {
-        if ($parsed['expr_type'] !== ExpressionType::BRACKET_EXPRESSION) {
+        if ($parsed['expr_type'] !== ExpressionType::INDEX) {
             return "";
         }
         $sql = "";
         foreach ($parsed['sub_tree'] as $k => $v) {
             $len = strlen($sql);
-            $sql .= $this->buildColDef($v);
-            $sql .= $this->buildPrimaryKey($v);
-            $sql .= $this->buildCheck($v);
-            $sql .= $this->buildLikeExpression($v);
-            $sql .= $this->buildForeignKey($v);
-            $sql .= $this->buildIndexKey($v);
-                        
+            $sql .= $this->buildReserved($v);
+            $sql .= $this->buildColumnList($v);
+            $sql .= $this->buildConstant($v);
+            $sql .= $this->buildIndexType($v);            
+
             if ($len == strlen($sql)) {
-                throw new UnableToCreateSQLException('CREATE TABLE create-def expression subtree', $k, $v, 'expr_type');
+                throw new UnableToCreateSQLException('CREATE TABLE index key subtree', $k, $v, 'expr_type');
             }
 
-            $sql .= ", ";
+            $sql .= " ";
         }
-
-        $sql = " (" . substr($sql, 0, -2) . ")";
-        return $sql;
+        return substr($sql, 0, -1);
     }
-    
 }
 ?>
