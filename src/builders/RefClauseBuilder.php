@@ -43,6 +43,7 @@ require_once dirname(__FILE__) . '/../exceptions/UnableToCreateSQLException.php'
 require_once dirname(__FILE__) . '/ColumnReferenceBuilder.php';
 require_once dirname(__FILE__) . '/OperatorBuilder.php';
 require_once dirname(__FILE__) . '/ConstantBuilder.php';
+require_once dirname(__FILE__) . '/FunctionBuilder.php';
 require_once dirname(__FILE__) . '/Builder.php';
 
 /**
@@ -65,6 +66,11 @@ class RefClauseBuilder implements Builder {
         return $builder->build($parsed);
     }
 
+    protected function buildFunction($parsed) {
+        $builder = new FunctionBuilder();
+        return $builder->build($parsed);
+    }
+    
     protected function buildConstant($parsed) {
         $builder = new ConstantBuilder();
         return $builder->build($parsed);
@@ -80,6 +86,7 @@ class RefClauseBuilder implements Builder {
             $sql .= $this->buildColRef($v);
             $sql .= $this->buildOperator($v);
             $sql .= $this->buildConstant($v);
+            $sql .= $this->buildFunction($v);
 
             if ($len == strlen($sql)) {
                 throw new UnableToCreateSQLException('expression ref_clause', $k, $v, 'expr_type');
