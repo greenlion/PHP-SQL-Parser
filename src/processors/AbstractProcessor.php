@@ -68,26 +68,83 @@ abstract class AbstractProcessor {
 
     /**
      * Revokes the quoting characters from an expression
+     * Possibibilies:
+     *   `a`
+     *   'a'
+     *   "a"
+     *   `a`.`b`
+     *   `a.b`
+     *   a.`b`
+     *   `a`.b
+     * It is also possible to have escaped quoting characters 
+     * within an expression part:
+     *   `a``b` => a`b 
+     * And you can use whitespace between the parts:
+     *   a  .  `b` => [a,b]
      */
     protected function revokeQuotation($sql) {
-        $result = trim($sql);
+        $tmp = trim($sql);
+        $result = array();
 
-        if (($result[0] === '`') && ($result[strlen($result) - 1] === '`')) {
-            $result = substr($result, 1, -1);
-            return trim(str_replace('``', '`', $result));
+        $quote = false;
+        $start = 0;
+        $i = 0;
+        $len = strlen($tmp);
+
+        while ($i < $len) {
+
+            $char = $tmp[$i];
+            switch ($char) {
+            case '`':
+            case '\'':
+            case '"':
+                if ($quote === false) {
+                    // start
+                    $quote = $char;
+                    $start = $i + 1;
+                    break;
+                }
+                if ($quote !== $char) {
+                    break;
+                }
+                if (isset($tmp[$i + 1]) && ($quote === $tmp[$i + 1])) {
+                    // escaped
+                    $i++;
+                    break;
+                }
+                // end
+                $char = substr($tmp, $start, $i - $start);
+                $result[] = str_replace($quote . $quote, $quote, $char);
+                $start = $i + 1;
+                $quote = false;
+                break;
+
+            case '.':
+                if ($quote === false) {
+                    // we have found a separator
+                    $char = trim(substr($tmp, $start, $i - $start));
+                    if ($char !== '') {
+                        $result[] = $char;
+                    }
+                    $start = $i + 1;
+                }
+                break;
+
+            default:
+            // ignore
+                break;
+            }
+            $i++;
         }
 
-        if (($result[0] === "'") && ($result[strlen($result) - 1] === "'")) {
-            $result = substr($result, 1, -1);
-            return trim(str_replace("''", "'", $result));
+        if ($quote === false && ($start < $len)) {
+            $char = trim(substr($tmp, $start, $i - $start));
+            if ($char !== '') {
+                $result[] = $char;
+            }
         }
 
-        if (($result[0] === "\"") && ($result[strlen($result) - 1] === "\"")) {
-            $result = substr($result, 1, -1);
-            return trim(str_replace("\"\"", "\"", $result));
-        }
-
-        return $sql;
+        return array('delim' => (count($result) === 1 ? '' : '.'), 'parts' => $result);
     }
 
     /**
@@ -167,7 +224,7 @@ abstract class AbstractProcessor {
 
     protected function isCommentToken($token) {
         return isset($token[0]) && isset($token[1])
-            && (($token[0] === '-' && $token[1] === '-') || ($token[0] === '/' && $token[1] === '*'));
+                && (($token[0] === '-' && $token[1] === '-') || ($token[0] === '/' && $token[1] === '*'));
     }
 
     protected function isColumnReference($out) {
@@ -216,7 +273,7 @@ abstract class AbstractProcessor {
     protected function array_insert_after($array, $key, $entry) {
         $idx = array_search($key, array_keys($array));
         $array = array_slice($array, 0, $idx + 1, true) + $entry
-            + array_slice($array, $idx + 1, count($array) - 1, true);
+                + array_slice($array, $idx + 1, count($array) - 1, true);
         return $array;
     }
 }
