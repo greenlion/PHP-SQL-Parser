@@ -6,6 +6,7 @@
 $start = microtime(true);
 require_once dirname(__FILE__) . '/cases/creator/asc.php';
 require_once dirname(__FILE__) . '/cases/creator/count_distinct.php';
+require_once dirname(__FILE__) . '/cases/creator/delete.php';
 require_once dirname(__FILE__) . '/cases/creator/function.php';
 require_once dirname(__FILE__) . '/cases/creator/inlist.php';
 require_once dirname(__FILE__) . '/cases/creator/insert.php';
