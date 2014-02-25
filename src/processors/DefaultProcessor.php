@@ -81,6 +81,10 @@ class DefaultProcessor extends AbstractProcessor {
 
         return $queries;
     }
+    
+    public function revokeQuotation($sql) {
+        return parent::revokeQuotation($sql);
+    }
 }
 
 ?>
