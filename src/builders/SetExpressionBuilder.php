@@ -45,6 +45,7 @@ require_once dirname(__FILE__) . '/ColumnReferenceBuilder.php';
 require_once dirname(__FILE__) . '/ConstantBuilder.php';
 require_once dirname(__FILE__) . '/OperatorBuilder.php';
 require_once dirname(__FILE__) . '/FunctionBuilder.php';
+require_once dirname(__FILE__) . '/SignBuilder.php';
 require_once dirname(__FILE__) . '/Builder.php';
 
 /**
@@ -77,23 +78,36 @@ class SetExpressionBuilder implements Builder {
         return $builder->build($parsed);
     }
     
+    protected function buildSign($parsed) {
+        $builder = new SignBuilder();
+        return $builder->build($parsed);
+    }
+    
     public function build(array $parsed) {
         if ($parsed['expr_type'] !== ExpressionType::EXPRESSION) {
-            return "";
+            return '';
         }
-        $sql = "";
+        $sql = '';
         foreach ($parsed['sub_tree'] as $k => $v) {
+            $delim = ' ';
             $len = strlen($sql);
             $sql .= $this->buildColRef($v);
             $sql .= $this->buildConstant($v);
             $sql .= $this->buildOperator($v);
             $sql .= $this->buildFunction($v);
-
+            
+            // we don't need whitespace between the sign and 
+            // the following part
+            if ($this->buildSign($v) !== '') {
+                $delim = '';
+            }
+            $sql .= $this->buildSign($v);
+            
             if ($len == strlen($sql)) {
                 throw new UnableToCreateSQLException('SET expression subtree', $k, $v, 'expr_type');
             }
 
-            $sql .= " ";
+            $sql .= $delim;
         }
         $sql = substr($sql, 0, -1);
         return $sql;
