@@ -144,7 +144,6 @@ class SelectExpressionProcessor extends AbstractProcessor {
         // if there is only one part, we copy the expr_type
         // in all other cases we use "expression" as global type
         $type = ExpressionType::EXPRESSION;
-        $no_quotes = $this->revokeQuotation(trim($base_expr));
 
         if (count($processed) === 1) {
             if (!$this->isSubQuery($processed[0])) {
