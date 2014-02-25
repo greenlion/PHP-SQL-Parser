@@ -1,6 +1,7 @@
 <?php
 
 require_once dirname(__FILE__) . '/ExpressionType.php';
+require_once dirname(__FILE__) . '/../processors/DefaultProcessor.php';
 
 class ExpressionToken {
 
@@ -53,8 +54,8 @@ class ExpressionToken {
         return $idx !== false ? $this->token[$idx] : $this->token;
     }
 
-    public function setNoQuotes($token, $qchars = '`') {
-        $this->noQuotes = ($token === null) ? null : $this->revokeQuotation($token, $qchars);
+    public function setNoQuotes($token, $qchars = null) {
+        $this->noQuotes = ($token === null) ? null : $this->revokeQuotation($token);
     }
     
     public function setTokenType($type) {
@@ -135,16 +136,9 @@ class ExpressionToken {
         return $this->tokenType === ExpressionType::SUBQUERY;
     }
 
-    private function revokeQuotation($token, $qchars = '`') {
-        $result = trim($token);
-        for ($i = 0; $i < strlen($qchars); $i++) {
-            $quote = $qchars[$i];
-            if (($result[0] === $quote) && ($result[strlen($result) - 1] === $quote)) {
-                $result = substr($result, 1, -1);
-                return trim(str_replace($quote.$quote, $quote, $result));
-            }
-        }
-        return $token;
+    private function revokeQuotation($token) {
+        $defProc = new DefaultProcessor();
+        return $defProc->revokeQuotation($token);
     }
     
     public function toArray() {
