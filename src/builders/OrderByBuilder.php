@@ -42,6 +42,7 @@
 require_once dirname(__FILE__) . '/../exceptions/UnableToCreateSQLException.php';
 require_once dirname(__FILE__) . '/OrderByAliasBuilder.php';
 require_once dirname(__FILE__) . '/ColumnReferenceBuilder.php';
+require_once dirname(__FILE__) . '/WhereExpressionBuilder.php';
 require_once dirname(__FILE__) . '/Builder.php';
 require_once dirname(__FILE__) . '/FunctionBuilder.php';
 
@@ -70,6 +71,11 @@ class OrderByBuilder implements Builder {
         return $builder->build($parsed);
     }
 
+    protected function buildExpression($parsed) {
+        $builder = new WhereExpressionBuilder();
+        return $builder->build($parsed);
+    }
+    
     public function build(array $parsed) {
         $sql = "";
         foreach ($parsed as $k => $v) {
@@ -77,6 +83,7 @@ class OrderByBuilder implements Builder {
             $sql .= $this->buildOrderByAlias($v);
             $sql .= $this->buildColRef($v);
             $sql .= $this->buildFunction($v);
+            $sql .= $this->buildExpression($v);
 
             if ($len == strlen($sql)) {
                 throw new UnableToCreateSQLException('ORDER', $k, $v, 'expr_type');
