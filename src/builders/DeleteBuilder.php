@@ -52,9 +52,9 @@ require_once dirname(__FILE__) . '/Builder.php';
 class DeleteBuilder implements Builder {
 
     public function build(array $parsed) {
-        $sql = "DELETE";
-        foreach ($parsed['TABLES'] as $k => $v) {
-            $sql .= $v . ",";
+        $sql = "DELETE ";
+        foreach ($parsed['options'] as $k => $v) {
+            $sql .= $v . " ";
         }
         return substr($sql, 0, -1);
     }
