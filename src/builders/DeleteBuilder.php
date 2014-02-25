@@ -55,8 +55,15 @@ class DeleteBuilder implements Builder {
         $sql = "DELETE ";
         foreach ($parsed['options'] as $k => $v) {
             $sql .= $v . " ";
+            $right = -1;
         }
-        return substr($sql, 0, -1);
+        
+        foreach ($parsed['tables'] as $k => $v) {
+            $sql .= $v . ", ";
+            $right = -2;
+        }
+        
+        return substr($sql, 0, $right);
     }
 }
 ?>
