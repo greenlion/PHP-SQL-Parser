@@ -45,6 +45,7 @@ require_once dirname(__FILE__) . '/builders/DeleteStatementBuilder.php';
 require_once dirname(__FILE__) . '/builders/UpdateStatementBuilder.php';
 require_once dirname(__FILE__) . '/builders/InsertStatementBuilder.php';
 require_once dirname(__FILE__) . '/builders/CreateStatementBuilder.php';
+require_once dirname(__FILE__) . '/builders/DropStatementBuilder.php';
 require_once dirname(__FILE__) . '/builders/ShowStatementBuilder.php';
 require_once dirname(__FILE__) . '/builders/BracketStatementBuilder.php';
 
@@ -100,6 +101,10 @@ class PHPSQLCreator {
             break;
         case 'BRACKET':
             $builder = new BracketStatementBuilder();
+            $this->created = $builder->build($parsed);
+            break;
+        case 'DROP':
+            $builder = new DropStatementBuilder();
             $this->created = $builder->build($parsed);
             break;
         default:
