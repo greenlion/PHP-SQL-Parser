@@ -1,7 +1,7 @@
 <?php
 
-require_once(dirname(__FILE__) . "/../../../src/PHPSQLParser.php");
-require_once(dirname(__FILE__) . "/../../test-more.php");
+require_once dirname(__FILE__) . "/../../../src/PHPSQLParser.php";
+require_once dirname(__FILE__) . "/../../test-more.php";
 
 $parser = new PHPSQLParser();
 
@@ -9,6 +9,5 @@ $sql = "SELECT q.qid, question, gid FROM questions as q WHERE (select count(*) f
 $p = $parser->parse($sql);
 $expected = getExpectedValue(dirname(__FILE__), 'inlist1.serialized');
 eq_array($p, $expected, 'in list within WHERE clause');
-
 
 ?>
