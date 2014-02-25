@@ -43,7 +43,7 @@ require_once dirname(__FILE__) . '/../utils/ExpressionType.php';
 require_once dirname(__FILE__) . '/../lexer/PHPSQLLexer.php';
 
 /**
- * This class processes contains some general functions for a processor.
+ * This class contains some general functions for a processor.
  * 
  * @author  André Rothe <andre.rothe@phosco.info>
  * @license http://www.debian.org/misc/bsd.license  BSD License (3 Clause)
@@ -144,7 +144,7 @@ abstract class AbstractProcessor {
             }
         }
 
-        return array('delim' => (count($result) === 1 ? '' : '.'), 'parts' => $result);
+        return array('delim' => (count($result) === 1 ? false : '.'), 'parts' => $result);
     }
 
     /**
