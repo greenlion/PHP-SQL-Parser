@@ -1,8 +1,10 @@
 <?php
-require_once(dirname(__FILE__) . "/../../../src/PHPSQLParser.php");
-require_once(dirname(__FILE__) . "/../../test-more.php");
+
+require_once dirname(__FILE__) . "/../../../src/PHPSQLParser.php";
+require_once dirname(__FILE__) . "/../../test-more.php";
 
 $parser = new PHPSQLParser();
+
 $sql = 'SELECT c1.`some_column` or `c1`.`another_column` or c1.`some column` as `an alias`
           from some_table an_alias group by `an alias`, `alias2`;';
 $parser->parse($sql);
