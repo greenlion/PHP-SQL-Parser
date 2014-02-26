@@ -63,6 +63,7 @@ class BracketProcessor extends AbstractProcessor {
         $subtree = $this->processTopLevel($token);
 
         if (isset($subtree['BRACKET'])) {
+            // TODO: here we lose some other parts of a statement like ORDER BY
             $subtree = $subtree['BRACKET'];
         }
 
