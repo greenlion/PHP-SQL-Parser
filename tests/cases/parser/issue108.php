@@ -1,6 +1,7 @@
 <?php
-require_once(dirname(__FILE__) . "/../../../src/PHPSQLParser.php");
-require_once(dirname(__FILE__) . "/../../test-more.php");
+
+require_once dirname(__FILE__) . "/../../../src/PHPSQLParser.php";
+require_once dirname(__FILE__) . "/../../test-more.php";
 
 try {
     $sql = "CREATE TABLE IF NOT EXISTS `engine4_urdemo_causebug` (
@@ -14,6 +15,6 @@ try {
 } catch (Exception $e) {
     $p = array();
 }
-ok(count($p) > 0, 'position calculation should handle INDEX');
+ok($p['TABLE']['create-def']['sub_tree'][3]['expr_type'] === ExpressionType::INDEX, 'position calculation should handle INDEX');
 
 ?>
