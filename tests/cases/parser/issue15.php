@@ -1,7 +1,7 @@
 <?php
 
-require_once(dirname(__FILE__) . "/../../../src/PHPSQLParser.php");
-require_once(dirname(__FILE__) . "/../../test-more.php");
+require_once dirname(__FILE__) . "/../../../src/PHPSQLParser.php";
+require_once dirname(__FILE__) . "/../../test-more.php";
 
 $parser = new PHPSQLParser();
 
@@ -9,6 +9,5 @@ $sql = "select usr_id, usr_login, case id_tipousuario when 1 then 'Usuario CVE' 
 $p = $parser->parse($sql);
 $expected = getExpectedValue(dirname(__FILE__), 'issue15.serialized');
 eq_array($p, $expected, 'parenthesis problem on issue 15');
-
 
 ?>
