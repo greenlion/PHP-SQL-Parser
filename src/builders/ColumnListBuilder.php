@@ -58,11 +58,11 @@ class ColumnListBuilder implements Builder {
         return $builder->build($parsed);
     }
 
-    public function build(array $parsed) {
+    public function build(array $parsed, $delim = ' ') {
         if ($parsed['expr_type'] !== ExpressionType::COLUMN_LIST) {
-            return "";
+            return '';
         }
-        $sql = "";
+        $sql = '';
         foreach ($parsed['sub_tree'] as $k => $v) {
             $len = strlen($sql);
             $sql .= $this->buildIndexColumn($v);
@@ -71,9 +71,9 @@ class ColumnListBuilder implements Builder {
                 throw new UnableToCreateSQLException('CREATE TABLE column-list subtree', $k, $v, 'expr_type');
             }
 
-            $sql .= " ";
-        } 
-        return "(" . substr($sql, 0, -1) . ")";
+            $sql .= $delim;
+        }
+        return '(' . substr($sql, 0, -strlen($delim)) . ')';
     }
 
 }
