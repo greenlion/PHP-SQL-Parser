@@ -52,40 +52,62 @@ require_once dirname(__FILE__) . '/../utils/ExpressionType.php';
 class CreateProcessor extends AbstractProcessor {
 
     public function process($tokens) {
-        $result = array();
+        $result = $expr = array();
         $base_expr = "";
 
         foreach ($tokens as $token) {
-            $trim = strtoupper(trim($token));
+            
+            $trim = trim($token);
             $base_expr .= $token;
 
             if ($trim === "") {
                 continue;
             }
 
-            switch ($trim) {
+            $upper = strtoupper($trim);
+            switch ($upper) {
 
             case 'TEMPORARY':
+                // CREATE TEMPORARY TABLE
                 $result['expr_type'] = ExpressionType::TEMPORARY_TABLE;
                 $result['not-exists'] = false;
                 $expr[] = array('expr_type' => ExpressionType::RESERVED, 'base_expr' => $trim);
                 break;
 
             case 'TABLE':
+                // CREATE TABLE
                 $result['expr_type'] = ExpressionType::TABLE;
                 $result['not-exists'] = false;
                 $expr[] = array('expr_type' => ExpressionType::RESERVED, 'base_expr' => $trim);
                 break;
 
+            case 'INDEX':
+                // CREATE INDEX
+                $result['expr_type'] = ExpressionType::INDEX;
+                $expr[] = array('expr_type' => ExpressionType::RESERVED, 'base_expr' => $trim);
+                break;
+
+            case 'UNIQUE':
+            case 'FULLTEXT':
+            case 'SPATIAL':
+                // options of CREATE INDEX
+                $result['base_expr'] = $result['expr_type'] = false;
+                $result['constraint'] = $upper; 
+                $expr[] = array('expr_type' => ExpressionType::RESERVED, 'base_expr' => $trim);
+                break;                
+                                
             case 'IF':
+                // option of CREATE TABLE
                 $expr[] = array('expr_type' => ExpressionType::RESERVED, 'base_expr' => $trim);
                 break;
 
             case 'NOT':
+                // option of CREATE TABLE
                 $expr[] = array('expr_type' => ExpressionType::RESERVED, 'base_expr' => $trim);
                 break;
 
             case 'EXISTS':
+                // option of CREATE TABLE
                 $result['not-exists'] = true;
                 $expr[] = array('expr_type' => ExpressionType::RESERVED, 'base_expr' => $trim);
                 break;
