@@ -1,4 +1,5 @@
 <?php
+
 require_once dirname(__FILE__) . "/../../../src/PHPSQLParser.php";
 require_once dirname(__FILE__) . "/../../test-more.php";
 
@@ -284,4 +285,5 @@ $parser->parse($sql);
 $p = $parser->parsed;
 $expected = getExpectedValue(dirname(__FILE__), 'issue33t.serialized');
 eq_array($p, $expected, 'CREATE TABLE statement with subpartitions and partition-definitions');
+
 ?>
