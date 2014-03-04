@@ -67,6 +67,7 @@ require_once dirname(__FILE__) . '/OrderByProcessor.php';
 require_once dirname(__FILE__) . '/ShowProcessor.php';
 require_once dirname(__FILE__) . '/CreateProcessor.php';
 require_once dirname(__FILE__) . '/TableProcessor.php';
+require_once dirname(__FILE__) . '/IndexProcessor.php';
 require_once dirname(__FILE__) . '/BracketProcessor.php';
 
 /**
@@ -104,6 +105,10 @@ class SQLChunkProcessor extends AbstractProcessor {
             $processor = new TableProcessor();
             $out['TABLE'] = $processor->process($out['TABLE']);
             $this->moveLIKE($out);
+        }
+        if (!empty($out['INDEX'])) {
+            $processor = new IndexProcessor();
+            $out['INDEX'] = $processor->process($out['INDEX']);
         }
         if (!empty($out['EXPLAIN'])) {
             $processor = new ExplainProcessor();
