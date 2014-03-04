@@ -202,7 +202,7 @@ class SQLProcessor extends SQLChunkProcessor {
             case 'INTO':
             // prevent wrong handling of CACHE within LOAD INDEX INTO CACHE...
                 if ($prev_category === 'LOAD') {
-                    $out[$prev_category][] = $upper;
+                    $out[$prev_category][] = $trim;
                     continue 2;
                 }
                 $token_category = $upper;
@@ -248,24 +248,24 @@ class SQLProcessor extends SQLChunkProcessor {
             case 'HELP':
                 $token_category = $upper;
                 // set the category in case these get subclauses in a future version of MySQL
-                $out[$upper][0] = $upper;
+                $out[$upper][0] = $trim;
                 continue 2;
 
             case 'REPLACE':
                 if ($prev_category === 'TABLE') {
                     # part of the CREATE TABLE statement
-                    $out[$prev_category][] = $upper;
+                    $out[$prev_category][] = $trim;
                     continue 2;
                 }
                 // set the category in case these get subclauses in a future version of MySQL
                 $token_category = $upper;
-                $out[$upper][0] = $upper;
+                $out[$upper][0] = $trim;
                 continue 2;
 
             case 'IGNORE':
                 if ($prev_category === 'TABLE') {
                     # part of the CREATE TABLE statement
-                    $out[$prev_category][] = $upper;
+                    $out[$prev_category][] = $trim;
                     continue 2;
                 }
                 $out['OPTIONS'][] = $upper;
@@ -273,11 +273,11 @@ class SQLProcessor extends SQLChunkProcessor {
 
             case 'CHECK':
                 if ($prev_category === 'TABLE') {
-                    $out[$prev_category][] = $upper;
+                    $out[$prev_category][] = $trim;
                     continue 2;
                 }
                 $token_category = $upper;
-                $out[$upper][0] = $upper;
+                $out[$upper][0] = $trim;
                 continue 2;
 
             case 'CREATE':
@@ -287,16 +287,23 @@ class SQLProcessor extends SQLChunkProcessor {
                 $token_category = $upper;
                 break;
 
+            case 'INDEX':
+                if ($prev_category === 'CREATE') {
+                    $out[$prev_category][] = $trim;
+                    $token_category = $upper;
+                }    
+                break;
+                
             case 'TABLE':
                 if ($prev_category === 'CREATE') {
-                    $out[$prev_category][] = $upper;
+                    $out[$prev_category][] = $trim;
                     $token_category = $upper;
                 }
                 break;
 
             case 'TEMPORARY':
                 if ($prev_category === 'CREATE') {
-                    $out[$prev_category][] = $upper;
+                    $out[$prev_category][] = $trim;
                     $token_category = $prev_category;
                     continue 2;
                 }
@@ -307,7 +314,7 @@ class SQLProcessor extends SQLChunkProcessor {
                     $token_category = 'CREATE';
                     $out[$token_category] = array_merge($out[$token_category], $out[$prev_category]);
                     $out[$prev_category] = array();
-                    $out[$token_category][] = $upper;
+                    $out[$token_category][] = $trim;
                     $prev_category = $token_category;
                     continue 2;
                 }
@@ -316,14 +323,14 @@ class SQLProcessor extends SQLChunkProcessor {
             case 'NOT':
                 if ($prev_category === 'CREATE') {
                     $token_category = $prev_category;
-                    $out[$prev_category][] = $upper;
+                    $out[$prev_category][] = $trim;
                     continue 2;
                 }
                 break;
 
             case 'EXISTS':
                 if ($prev_category === 'CREATE') {
-                    $out[$prev_category][] = $upper;
+                    $out[$prev_category][] = $trim;
                     $prev_category = $token_category = 'TABLE';
                     continue 2;
                 }
@@ -341,7 +348,9 @@ class SQLProcessor extends SQLChunkProcessor {
             case 'LOCK':
                 if ($token_category === "") {
                     $token_category = $upper;
-                    $out[$upper][0] = $upper;
+                    $out[$upper][0] = $trim;
+                } elseif ($token_category === 'INDEX') {
+                    break;
                 } else {
                     $trim = 'LOCK IN SHARE MODE';
                     $skip_next = 3;
@@ -373,7 +382,7 @@ class SQLProcessor extends SQLChunkProcessor {
                     continue;
                 }
                 $skip_next = 1;
-                $out['OPTIONS'][] = 'FOR UPDATE';
+                $out['OPTIONS'][] = 'FOR UPDATE'; // TODO: this could be generate problems within the position calculator
                 continue 2;
 
             case 'UPDATE':
@@ -388,7 +397,7 @@ class SQLProcessor extends SQLChunkProcessor {
 
             case 'START':
                 $trim = "BEGIN";
-                $out[$upper][0] = $upper;
+                $out[$upper][0] = $upper;  // TODO: this could be generate problems within the position calculator
                 $skip_next = 1;
                 break;
 
@@ -424,13 +433,13 @@ class SQLProcessor extends SQLChunkProcessor {
             case 'DELAYED':
             case 'FORCE':
             case 'QUICK':
-                $out['OPTIONS'][] = $upper;
+                $out['OPTIONS'][] = $trim;
                 continue 2;
 
             case 'WITH':
                 if ($token_category === 'GROUP') {
                     $skip_next = 1;
-                    $out['OPTIONS'][] = 'WITH ROLLUP';
+                    $out['OPTIONS'][] = 'WITH ROLLUP'; // TODO: this could be generate problems within the position calculator
                     continue 2;
                 }
                 break;
