@@ -41,6 +41,7 @@
 
 require_once dirname(__FILE__) . '/../utils/ExpressionType.php';
 require_once dirname(__FILE__) . '/CreateTableBuilder.php';
+require_once dirname(__FILE__) . '/CreateIndexBuilder.php';
 require_once dirname(__FILE__) . '/SubTreeBuilder.php';
 require_once dirname(__FILE__) . '/Builder.php';
 
@@ -59,6 +60,11 @@ class CreateBuilder implements Builder {
         return $builder->build($parsed);
     }
 
+    protected function buildCreateIndex($parsed) {
+        $builder = new CreateIndexBuilder();
+        return $builder->build($parsed);
+    }
+    
     protected function buildSubTree($parsed) {
         $builder = new SubTreeBuilder();
         return $builder->build($parsed);
@@ -70,9 +76,13 @@ class CreateBuilder implements Builder {
 
         if (($create['expr_type'] === ExpressionType::TABLE)
             || ($create['expr_type'] === ExpressionType::TEMPORARY_TABLE)) {
-            $sql .= " " . $this->buildCreateTable($parsed['TABLE']);
+            $sql .= ' ' . $this->buildCreateTable($parsed['TABLE']);
         }
-        // TODO: add more expr_types here (like VIEW), if available
+        if ($create['expr_type'] === ExpressionType::INDEX) {
+            $sql .= ' ' . $this->buildCreateIndex($parsed['INDEX']);
+        }
+
+        // TODO: add more expr_types here (like VIEW), if available in parser output
         return "CREATE " . $sql;
     }
 
