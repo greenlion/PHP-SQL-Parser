@@ -107,6 +107,8 @@ class ExpressionType {
     const INDEX_COLUMN = 'index-column';
     const INDEX_SIZE = 'index-size';
     const INDEX_PARSER = 'index-parser';
+    const INDEX_ALGORITHM = 'index-algorithm';
+    const INDEX_LOCK = 'index-lock';
     const REFERENCE = 'foreign-ref';
 
     const DATA_TYPE = 'data-type';
