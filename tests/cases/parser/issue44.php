@@ -1,6 +1,7 @@
 <?php
-require_once(dirname(__FILE__) . "/../../../src/PHPSQLParser.php");
-require_once(dirname(__FILE__) . "/../../test-more.php");
+
+require_once dirname(__FILE__) . "/../../../src/PHPSQLParser.php";
+require_once dirname(__FILE__) . "/../../test-more.php";
 
 $parser = new PHPSQLParser();
 
@@ -14,6 +15,5 @@ $parser->parse($sql, true);
 $p = $parser->parsed;
 $expected = getExpectedValue(dirname(__FILE__), 'issue44.serialized');
 eq_array($p, $expected, 'issue 44 position problem');
-
 
 ?>
