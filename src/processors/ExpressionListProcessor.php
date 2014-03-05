@@ -231,14 +231,6 @@ class ExpressionListProcessor extends AbstractProcessor {
                     $tmpExprList = array_values($tmpExprList);
                     $localExprList = $this->process($tmpExprList);
 
-                    if (count($localExprList) > 1) {
-                        $localExpr->setSubTree($localExprList);
-                        $localExpr->setTokenType(ExpressionType::EXPRESSION);
-                        $localExprList = $localExpr->toArray();
-                        $localExprList['alias'] = false;
-                        $localExprList = array($localExprList);
-                    }
-
                     $curr->setTokenType(ExpressionType::BRACKET_EXPRESSION);
                     if (!$curr->getSubTree()) {
                         $curr->setSubTree($localExprList);
