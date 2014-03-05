@@ -58,13 +58,16 @@ class SelectBracketExpressionBuilder implements Builder {
         return $builder->build($parsed, $delim);
     }
 
+    protected function buildAlias($parsed) {
+        $builder = new AliasBuilder();
+        return $builder->build($parsed);
+    }
+
     public function build(array $parsed) {
         if ($parsed['expr_type'] !== ExpressionType::BRACKET_EXPRESSION) {
             return "";
         }
-        $sql = $this->buildSubTree($parsed, " ");
-        $sql = "(" . $sql . ")";
-        return $sql;
+        return "(" . $this->buildSubTree($parsed, " ") . ")" . $this->buildAlias($parsed);
     }
 }
 ?>
