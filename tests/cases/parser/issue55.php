@@ -1,9 +1,8 @@
 <?php
-require_once(dirname(__FILE__) . "/../../../src/PHPSQLParser.php");
-require_once(dirname(__FILE__) . "/../../test-more.php");
 
-# partial SQL statements
-# TODO: table.c should be handled as table and c
+require_once dirname(__FILE__) . "/../../../src/PHPSQLParser.php";
+require_once dirname(__FILE__) . "/../../test-more.php";
+
 $parser = new PHPSQLParser();
 $sql = "GROUP BY a, b, table.c";
 $parser->parse($sql);
