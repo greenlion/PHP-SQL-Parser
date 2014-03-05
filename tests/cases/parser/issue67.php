@@ -1,8 +1,9 @@
 <?php
-require_once(dirname(__FILE__) . "/../../../src/PHPSQLParser.php");
-require_once(dirname(__FILE__) . "/../../test-more.php");
 
-// TODO: the SET statement doesn't work completely, SESSION is not a colref!
+require_once dirname(__FILE__) . "/../../../src/PHPSQLParser.php";
+require_once dirname(__FILE__) . "/../../test-more.php";
+
+// TODO: the SET statement doesn't work completely, SESSION has been lost!
 $sql = "SET SESSION group_concat_max_len = @@max_allowed_packet";
 $parser = new PHPSQLParser($sql, true);
 $p = $parser->parsed;

@@ -1,6 +1,7 @@
 <?php
-require_once(dirname(__FILE__) . "/../../../src/PHPSQLParser.php");
-require_once(dirname(__FILE__) . "/../../test-more.php");
+
+require_once dirname(__FILE__) . "/../../../src/PHPSQLParser.php";
+require_once dirname(__FILE__) . "/../../test-more.php";
 
 $sql = "SELECT lcase(dummy.b) FROM dummy ORDER BY dummy.a, LCASE(dummy.b)";
 $parser = new PHPSQLParser($sql);
