@@ -158,7 +158,7 @@ class SQLChunkProcessor extends AbstractProcessor {
         }
         if (!empty($out['HAVING'])) {
             $processor = new HavingProcessor();
-            $out['HAVING'] = $processor->process($out['HAVING']);
+            $out['HAVING'] = $processor->process($out['HAVING'], isset($out['SELECT']) ? $out['SELECT'] : array());
         }
         if (!empty($out['SET'])) {
             $processor = new SetProcessor();
