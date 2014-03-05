@@ -6,7 +6,7 @@ $testname = "issue 46, throws exception on error";
 try {
 
     $parser = new PHPSQLParser();
-    $sql = "SELECT abc'haha'";  // test code from issue doesn't longer create an exception
+    $sql = "SELECT abc'haha'";
     $parser->parse($sql, true);
     
     $p = $parser->parsed;

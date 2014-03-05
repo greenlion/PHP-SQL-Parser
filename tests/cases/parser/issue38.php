@@ -1,8 +1,8 @@
 <?php
-require_once(dirname(__FILE__) . "/../../../src/PHPSQLParser.php");
-require_once(dirname(__FILE__) . "/../../test-more.php");
 
-# TODO: no_quotes is wrong for `t`.`expires`
+require_once dirname(__FILE__) . "/../../../src/PHPSQLParser.php";
+require_once dirname(__FILE__) . "/../../test-more.php";
+
 $sql = "SELECT * FROM `table` `t` WHERE ( ( UNIX_TIMESTAMP() + 3600 ) > `t`.`expires` ) ";
 $parser = new PHPSQLParser();
 $parser->parse($sql);
