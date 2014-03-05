@@ -1,10 +1,10 @@
 <?php
-require_once(dirname(__FILE__) . "/../../../src/PHPSQLParser.php");
-require_once(dirname(__FILE__) . "/../../test-more.php");
+
+require_once dirname(__FILE__) . "/../../../src/PHPSQLParser.php";
+require_once dirname(__FILE__) . "/../../test-more.php";
 
 $parser = new PHPSQLParser();
 
-// TODO: there is an error in output, the comma is recognized as colref
 $sql = "SELECT CAST( 12 AS decimal( 9, 3 ) )";
 $parser->parse($sql, true);
 $p = $parser->parsed;

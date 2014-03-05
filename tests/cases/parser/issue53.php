@@ -1,6 +1,7 @@
 <?php
-require_once(dirname(__FILE__) . "/../../../src/PHPSQLParser.php");
-require_once(dirname(__FILE__) . "/../../test-more.php");
+
+require_once dirname(__FILE__) . "/../../../src/PHPSQLParser.php";
+require_once dirname(__FILE__) . "/../../test-more.php";
 
 $parser = new PHPSQLParser();
 
@@ -23,6 +24,5 @@ $parser->parse($sql, false);
 $p = $parser->parsed;
 $expected = getExpectedValue(dirname(__FILE__), 'issue53b.serialized');
 eq_array($p, $expected, 'limit without offset');
-
 
 ?>

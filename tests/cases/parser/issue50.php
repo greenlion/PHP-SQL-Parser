@@ -1,9 +1,9 @@
 <?php
-require_once(dirname(__FILE__) . "/../../../src/PHPSQLParser.php");
-require_once(dirname(__FILE__) . "/../../test-more.php");
+
+require_once dirname(__FILE__) . "/../../../src/PHPSQLParser.php";
+require_once dirname(__FILE__) . "/../../test-more.php";
 
 // TODO: not solved, charsets are not possible at the moment
-
 $parser = new PHPSQLParser();
 
 $sql = "SELECT _utf8'hi'";
@@ -27,7 +27,5 @@ $sql = "SELECT _utf8 0xAABBCC";
 $sql = "SELECT _utf8 b'0001'";
 
 $sql = "SELECT _utf8 0b0001";
-
-
 
 ?>
