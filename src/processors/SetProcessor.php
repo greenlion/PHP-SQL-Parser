@@ -30,9 +30,9 @@
  * DAMAGE.
  */
 
-require_once(dirname(__FILE__) . '/AbstractProcessor.php');
-require_once(dirname(__FILE__) . '/ExpressionListProcessor.php');
-require_once(dirname(__FILE__) . '/../utils/ExpressionType.php');
+require_once dirname(__FILE__) . '/AbstractProcessor.php';
+require_once dirname(__FILE__) . '/ExpressionListProcessor.php';
+require_once dirname(__FILE__) . '/../utils/ExpressionType.php';
 
 /**
  * 
@@ -43,18 +43,17 @@ require_once(dirname(__FILE__) . '/../utils/ExpressionType.php');
  */
 class SetProcessor extends AbstractProcessor {
 
-    private $expressionListProcessor;
-
-    public function __construct() {
-        $this->expressionListProcessor = new ExpressionListProcessor();
+    protected function processExpressionList($tokens) {
+        $processor = new ExpressionListProcessor();
+        return $processor->process($tokens);
     }
 
     /**
      * A SET list is simply a list of key = value expressions separated by comma (,).
      * This function produces a list of the key/value expressions.
      */
-    protected function getAssignment($base_expr) {
-        $assignment = $this->expressionListProcessor->process($this->splitSQLIntoTokens($base_expr));
+    protected function processAssignment($base_expr) {
+        $assignment = $this->processExpressionList($this->splitSQLIntoTokens($base_expr));
         return array('expr_type' => ExpressionType::EXPRESSION, 'base_expr' => trim($base_expr),
                      'sub_tree' => $assignment);
     }
@@ -66,13 +65,15 @@ class SetProcessor extends AbstractProcessor {
         $varType = false;
 
         foreach ($tokens as $token) {
-            $upper = strtoupper(trim($token));
+            $trim = trim($token);
+            $upper = strtoupper($trim);
 
             switch ($upper) {
             case 'LOCAL':
             case 'SESSION':
             case 'GLOBAL':
                 if (!$isUpdate) {
+                    $result[] = array('expr_type' => ExpressionType::RESERVED, 'base_expr' => $trim);
                     $varType = $this->getVariableType("@@" . $upper . ".");
                     $baseExpr = "";
                     continue 2;
@@ -80,7 +81,7 @@ class SetProcessor extends AbstractProcessor {
                 break;
 
             case ',':
-                $assignment = $this->getAssignment($baseExpr);
+                $assignment = $this->processAssignment($baseExpr);
                 if (!$isUpdate && $varType !== false) {
                     $assignment['sub_tree'][0]['expr_type'] = $varType;
                 }
@@ -95,7 +96,7 @@ class SetProcessor extends AbstractProcessor {
         }
 
         if (trim($baseExpr) !== "") {
-            $assignment = $this->getAssignment($baseExpr);
+            $assignment = $this->processAssignment($baseExpr);
             if (!$isUpdate && $varType !== false) {
                 $assignment['sub_tree'][0]['expr_type'] = $varType;
             }
