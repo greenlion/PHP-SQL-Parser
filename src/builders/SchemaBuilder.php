@@ -1,8 +1,8 @@
 <?php
 /**
- * DropStatement.php
+ * SchemaBuilder.php
  *
- * Builds the DROP statement
+ * Builds the schema within the DROP statement.
  *
  * PHP version 5
  *
@@ -41,44 +41,22 @@
 
 require_once dirname(__FILE__) . '/../utils/ExpressionType.php';
 require_once dirname(__FILE__) . '/Builder.php';
-require_once dirname(__FILE__) . '/ReservedBuilder.php';
-require_once dirname(__FILE__) . '/DropExpressionBuilder.php';
 
 /**
- * This class implements the builder for the whole DROP TABLE statement. 
+ * This class implements the builder for a schema within DROP statement. 
  * You can overwrite all functions to achieve another handling.
  *
  * @author  André Rothe <andre.rothe@phosco.info>
  * @license http://www.debian.org/misc/bsd.license  BSD License (3 Clause)
  *  
  */
-class DropStatementBuilder implements Builder {
+class SchemaBuilder implements Builder {
 
-    protected function buildReserved($parsed) {
-        $builder = new ReservedBuilder();
-        return $builder->build($parsed);
-    }
-    
-    protected function buildExpression($parsed) {
-        $builder = new DropExpressionBuilder();
-        return $builder->build($parsed);
-    }
-    
     public function build(array $parsed) {
-        $drop = $parsed['DROP'];
-        $sql = '';
-        foreach ($drop['sub_tree'] as $k => $v) {
-            $len = strlen($sql);
-            $sql .= $this->buildReserved($v);
-            $sql .= $this->buildExpression($v);
-
-            if ($len == strlen($sql)) {
-                throw new UnableToCreateSQLException('DROP subtree', $k, $v, 'expr_type');
-            }
-
-            $sql .= ' ';
+        if ($parsed['expr_type'] !== ExpressionType::SCHEMA) {
+            return "";
         }
-        return 'DROP ' . substr($sql, 0, -1);
+        return $parsed['base_expr'];
     }
 }
 ?>

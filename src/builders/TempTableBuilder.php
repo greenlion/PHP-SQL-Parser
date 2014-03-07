@@ -1,8 +1,8 @@
 <?php
 /**
- * DropStatement.php
+ * TempTableBuilder.php
  *
- * Builds the DROP statement
+ * Builds the temporary table name/join options.
  *
  * PHP version 5
  *
@@ -40,45 +40,56 @@
  */
 
 require_once dirname(__FILE__) . '/../utils/ExpressionType.php';
+require_once dirname(__FILE__) . '/AliasBuilder.php';
+require_once dirname(__FILE__) . '/JoinBuilder.php';
+require_once dirname(__FILE__) . '/RefTypeBuilder.php';
+require_once dirname(__FILE__) . '/RefClauseBuilder.php';
 require_once dirname(__FILE__) . '/Builder.php';
-require_once dirname(__FILE__) . '/ReservedBuilder.php';
-require_once dirname(__FILE__) . '/DropExpressionBuilder.php';
 
 /**
- * This class implements the builder for the whole DROP TABLE statement. 
+ * This class implements the builder for the temporary table name and join options. 
  * You can overwrite all functions to achieve another handling.
  *
  * @author  André Rothe <andre.rothe@phosco.info>
  * @license http://www.debian.org/misc/bsd.license  BSD License (3 Clause)
  *  
  */
-class DropStatementBuilder implements Builder {
+class TempTableBuilder implements Builder {
 
-    protected function buildReserved($parsed) {
-        $builder = new ReservedBuilder();
+    protected function buildAlias($parsed) {
+        $builder = new AliasBuilder();
+        return $builder->build($parsed);
+    }
+
+    protected function buildJoin($parsed) {
+        $builder = new JoinBuilder();
         return $builder->build($parsed);
     }
     
-    protected function buildExpression($parsed) {
-        $builder = new DropExpressionBuilder();
+    protected function buildRefType($parsed) {
+        $builder = new RefTypeBuilder();
         return $builder->build($parsed);
     }
     
-    public function build(array $parsed) {
-        $drop = $parsed['DROP'];
-        $sql = '';
-        foreach ($drop['sub_tree'] as $k => $v) {
-            $len = strlen($sql);
-            $sql .= $this->buildReserved($v);
-            $sql .= $this->buildExpression($v);
+    protected function buildRefClause($parsed) {
+        $builder = new RefClauseBuilder();
+        return $builder->build($parsed);
+    }
 
-            if ($len == strlen($sql)) {
-                throw new UnableToCreateSQLException('DROP subtree', $k, $v, 'expr_type');
-            }
-
-            $sql .= ' ';
+    public function build(array $parsed, $index = 0) {
+        if ($parsed['expr_type'] !== ExpressionType::TEMPORARY_TABLE) {
+            return '';
         }
-        return 'DROP ' . substr($sql, 0, -1);
+
+        $sql = $parsed['table'];
+        $sql .= $this->buildAlias($parsed);
+
+        if ($index !== 0) {
+            $sql = $this->buildJoin($parsed['join_type']) . $sql;
+            $sql .= $this->buildRefType($parsed['ref_type']);
+            $sql .= $parsed['ref_clause'] === false ? '' : $this->buildRefClause($parsed['ref_clause']);
+        }
+        return $sql;
     }
 }
 ?>
