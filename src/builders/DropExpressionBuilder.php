@@ -1,8 +1,8 @@
 <?php
 /**
- * DropStatement.php
+ * DropExpressionBuilder.php
  *
- * Builds the DROP statement
+ * Builds the object list of a DROP statement.
  *
  * PHP version 5
  *
@@ -40,45 +40,68 @@
  */
 
 require_once dirname(__FILE__) . '/../utils/ExpressionType.php';
+require_once dirname(__FILE__) . '/TableBuilder.php';
+require_once dirname(__FILE__) . '/TempTableBuilder.php';
+require_once dirname(__FILE__) . '/ViewBuilder.php';
+require_once dirname(__FILE__) . '/SchemaBuilder.php';
+require_once dirname(__FILE__) . '/DatabaseBuilder.php';
 require_once dirname(__FILE__) . '/Builder.php';
-require_once dirname(__FILE__) . '/ReservedBuilder.php';
-require_once dirname(__FILE__) . '/DropExpressionBuilder.php';
 
 /**
- * This class implements the builder for the whole DROP TABLE statement. 
+ * This class implements the builder for the object list of a DROP statement.
  * You can overwrite all functions to achieve another handling.
  *
  * @author  André Rothe <andre.rothe@phosco.info>
  * @license http://www.debian.org/misc/bsd.license  BSD License (3 Clause)
  *  
  */
-class DropStatementBuilder implements Builder {
+class DropExpressionBuilder implements Builder {
 
-    protected function buildReserved($parsed) {
-        $builder = new ReservedBuilder();
+    protected function buildTable($parsed, $index) {
+        $builder = new TableBuilder();
+        return $builder->build($parsed, $index);
+    }
+
+    protected function buildDatabase($parsed) {
+        $builder = new DatabaseBuilder();
+        return $builder->build($parsed);
+    }
+
+    protected function buildSchema($parsed) {
+        $builder = new SchemaBuilder();
         return $builder->build($parsed);
     }
     
-    protected function buildExpression($parsed) {
-        $builder = new DropExpressionBuilder();
+    protected function buildTemporaryTable($parsed) {
+        $builder = new TempTableBuilder();
+        return $builder->build($parsed);
+    }
+    
+    protected function buildView($parsed) {
+        $builder = new ViewBuilder();
         return $builder->build($parsed);
     }
     
     public function build(array $parsed) {
-        $drop = $parsed['DROP'];
+        if ($parsed['expr_type'] !== ExpressionType::EXPRESSION) {
+            return "";
+        }
         $sql = '';
-        foreach ($drop['sub_tree'] as $k => $v) {
+        foreach ($parsed['sub_tree'] as $k => $v) {
             $len = strlen($sql);
-            $sql .= $this->buildReserved($v);
-            $sql .= $this->buildExpression($v);
+            $sql .= $this->buildTable($v, 0);
+            $sql .= $this->buildView($v);
+            $sql .= $this->buildSchema($v);
+            $sql .= $this->buildDatabase($v);
+            $sql .= $this->buildTemporaryTable($v, 0);
 
             if ($len == strlen($sql)) {
-                throw new UnableToCreateSQLException('DROP subtree', $k, $v, 'expr_type');
+                throw new UnableToCreateSQLException('DROP object-list subtree', $k, $v, 'expr_type');
             }
 
-            $sql .= ' ';
+            $sql .= ', ';
         }
-        return 'DROP ' . substr($sql, 0, -1);
+        return substr($sql, 0, -2);
     }
 }
 ?>
