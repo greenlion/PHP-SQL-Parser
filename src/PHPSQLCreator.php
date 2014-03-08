@@ -46,6 +46,7 @@ require_once dirname(__FILE__) . '/builders/UpdateStatementBuilder.php';
 require_once dirname(__FILE__) . '/builders/InsertStatementBuilder.php';
 require_once dirname(__FILE__) . '/builders/CreateStatementBuilder.php';
 require_once dirname(__FILE__) . '/builders/DropStatementBuilder.php';
+require_once dirname(__FILE__) . '/builders/RenameStatementBuilder.php';
 require_once dirname(__FILE__) . '/builders/ShowStatementBuilder.php';
 require_once dirname(__FILE__) . '/builders/BracketStatementBuilder.php';
 
@@ -89,7 +90,8 @@ class PHPSQLCreator {
             $this->created = $builder->build($parsed);
             break;
         case 'RENAME':
-            $this->created = $this->processRenameTableStatement($parsed);
+            $builder = new RenameStatementBuilder();
+            $this->created = $builder->build($parsed);
             break;
         case 'SHOW':
             $builder = new ShowStatementBuilder();
@@ -113,31 +115,6 @@ class PHPSQLCreator {
         }
         return $this->created;
     }
-
-    // TODO: we should change that, there are multiple "rename objects" as
-    // table, user, database
-    protected function processRenameTableStatement($parsed) {
-        $rename = $parsed['RENAME'];
-        $sql = "";
-        foreach ($rename as $k => $v) {
-            $len = strlen($sql);
-            $sql .= $this->processSourceAndDestTable($v);
-
-            if ($len == strlen($sql)) {
-                throw new UnableToCreateSQLException('RENAME', $k, $v, 'expr_type');
-            }
-
-            $sql .= ",";
-        }
-        $sql = substr($sql, 0, -1);
-        return "RENAME TABLE " . $sql;
-    }
-
-    protected function processSourceAndDestTable($v) {
-        if (!isset($v['source']) || !isset($v['destination'])) {
-            return "";
-        }
-        return $v['source']['base_expr'] . " TO " . $v['destination']['base_expr'];
-    }
 }
+
 ?>
