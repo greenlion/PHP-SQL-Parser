@@ -169,10 +169,8 @@ class SQLProcessor extends SQLChunkProcessor {
                 break;
 
             case 'RENAME':
-            // jump over TABLE keyword
                 $token_category = $upper;
-                $skip_next = 1;
-                continue 2;
+                break;
 
             case 'DATABASE':
             case 'SCHEMA':
