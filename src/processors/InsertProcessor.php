@@ -54,9 +54,10 @@ require_once dirname(__FILE__) . '/../utils/ExpressionType.php';
 class InsertProcessor extends AbstractProcessor {
 
     public function process($tokenList, $token_category = 'INSERT') {
-        $table = "";
+        $table = '';
         $cols = false;
         $parsed = array();
+        $tokenList[$token_category] = array();
 
         $into = $tokenList['INTO'];
         foreach ($into as $token) {
@@ -66,7 +67,12 @@ class InsertProcessor extends AbstractProcessor {
                 continue;
             }
 
-            if ($table === "") {
+            if (strtoupper($trim) === 'INTO') {
+                $tokenList[$token_category][] = array('expr_type' => ExpressionType::RESERVED, 'base_expr' => $trim);
+                continue;
+            }
+
+            if ($table === '') {
                 $table = $trim;
                 continue;
             }
@@ -76,19 +82,19 @@ class InsertProcessor extends AbstractProcessor {
             }
         }
 
-        $tokenList[$token_category] = array();
         unset($tokenList['INTO']);
         unset($into);
 
         if ($cols !== false) {
             if ($cols[0] === '(' && substr($cols, -1) === ')') {
-                $parsed = array('expr_type' => false, 'base_expr' => $cols, 'sub_tree' => false);
+                $parsed = array('expr_type' => ExpressionType::BRACKET_EXPRESSION, 'base_expr' => $cols,
+                                'sub_tree' => false);
             }
             $cols = $this->removeParenthesisFromStart($cols);
             if (stripos($cols, 'SELECT') === 0) {
                 $processor = new DefaultProcessor();
-                $parsed['sub_tree'] = $processor->process($cols);
-                $parsed['expr_type'] = ExpressionType::SUBQUERY;
+                $parsed['sub_tree'] = array('expr_type' => ExpressionType::QUERY, 'base_expr' => $cols,
+                                            'sub_tree' => $processor->process($cols));
             } else {
                 $processor = new ColumnListProcessor();
                 $parsed['sub_tree'] = $processor->process($cols);
@@ -96,8 +102,9 @@ class InsertProcessor extends AbstractProcessor {
             }
         }
 
-        $tokenList[$token_category][] = array('expr_type' => ExpressionType::TABLE, 'table' => $table, 'base_expr' => $table,
-                                              'no_quotes' => $this->revokeQuotation($table));
+        $tokenList[$token_category][] = array('expr_type' => ExpressionType::TABLE, 'table' => $table,
+                                              'no_quotes' => $this->revokeQuotation($table), 'alias' => false,
+                                              'base_expr' => $table);
         if (!empty($parsed)) {
             $tokenList[$token_category][] = $parsed;
         }
