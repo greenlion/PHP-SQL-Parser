@@ -84,6 +84,7 @@ class RenameProcessor extends AbstractProcessor {
                 break;
 
             case 'TABLE':
+                $objectType = ExpressionType::TABLE;
                 $resultList[] = array('expr_type'=>ExpressionType::RESERVED, 'base_expr'=>$token->getTrim());   
                 continue 2; 
                 
@@ -100,7 +101,7 @@ class RenameProcessor extends AbstractProcessor {
             $resultList[] = $tablePair;
         }
 
-        return $resultList;
+        return array('expr_type' => $objectType, 'sub_tree'=>$resultList);
     }
 
 }
