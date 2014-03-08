@@ -113,13 +113,13 @@ class DropProcessor extends AbstractProcessor {
                 $object['expr_type'] = $objectType;
                 if ($objectType === ExpressionType::TABLE || $objectType === ExpressionType::TEMPORARY_TABLE) {
                     $object['table'] = $trim;
+                    $object['no_quotes'] = false;
                     $object['alias'] = false;
-                } else {
-                  $object['base_expr'] = $trim;  
                 }
-                $object['no_quote'] = $this->revokeQuotation($trim);
+                $object['base_expr'] = $trim;
+                $object['no_quotes'] = $this->revokeQuotation($trim);
                 $object['delim'] = false;
-                
+
                 $objectList[] = $object;
                 continue 2;
             }
