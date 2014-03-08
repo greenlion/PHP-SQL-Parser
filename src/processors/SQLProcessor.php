@@ -205,7 +205,7 @@ class SQLProcessor extends SQLChunkProcessor {
                     $out[$prev_category][] = $trim;
                     continue 2;
                 }
-                $token_category = $upper;
+                $token_category = $prev_category = $upper;
                 break;
 
             case 'USER':
@@ -291,9 +291,9 @@ class SQLProcessor extends SQLChunkProcessor {
                 if ($prev_category === 'CREATE') {
                     $out[$prev_category][] = $trim;
                     $token_category = $upper;
-                }    
+                }
                 break;
-                
+
             case 'TABLE':
                 if ($prev_category === 'CREATE') {
                     $out[$prev_category][] = $trim;
@@ -397,7 +397,7 @@ class SQLProcessor extends SQLChunkProcessor {
 
             case 'START':
                 $trim = "BEGIN";
-                $out[$upper][0] = $upper;  // TODO: this could be generate problems within the position calculator
+                $out[$upper][0] = $upper; // TODO: this could be generate problems within the position calculator
                 $skip_next = 1;
                 break;
 
