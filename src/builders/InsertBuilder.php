@@ -43,7 +43,9 @@ require_once dirname(__FILE__) . '/../exceptions/UnableToCreateSQLException.php'
 require_once dirname(__FILE__) . '/ColumnReferenceBuilder.php';
 require_once dirname(__FILE__) . '/InsertColumnListBuilder.php';
 require_once dirname(__FILE__) . '/SubQueryBuilder.php';
+require_once dirname(__FILE__) . '/SelectBracketExpressionBuilder.php';
 require_once dirname(__FILE__) . '/TableBuilder.php';
+require_once dirname(__FILE__) . '/ReservedBuilder.php';
 require_once dirname(__FILE__) . '/Builder.php';
 
 /**
@@ -66,6 +68,16 @@ class InsertBuilder implements Builder {
         return $builder->build($parsed, 0);
     }
     
+    protected function buildReserved($parsed) {
+        $builder = new ReservedBuilder();
+        return $builder->build($parsed);
+    }
+    
+    protected function buildBracketExpression($parsed) {
+        $builder = new SelectBracketExpressionBuilder();
+        return $builder->build($parsed);
+    }
+    
     protected function buildColumnList($parsed) {
         $builder = new InsertColumnListBuilder();
         return $builder->build($parsed, 0);
@@ -78,6 +90,8 @@ class InsertBuilder implements Builder {
             $sql .= $this->buildTable($v);
             $sql .= $this->buildSubQuery($v);
             $sql .= $this->buildColumnList($v);
+            $sql .= $this->buildReserved($v);
+            $sql .= $this->buildBracketExpression($v);
             
             if ($len == strlen($sql)) {
                 throw new UnableToCreateSQLException('INSERT', $k, $v, 'expr_type');
@@ -85,7 +99,7 @@ class InsertBuilder implements Builder {
 
             $sql .= " ";
         }
-        return 'INSERT INTO ' . substr($sql, 0, -1);
+        return 'INSERT ' . substr($sql, 0, -1);
     }
     
 }
