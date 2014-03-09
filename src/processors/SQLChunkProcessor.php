@@ -69,6 +69,7 @@ require_once dirname(__FILE__) . '/CreateProcessor.php';
 require_once dirname(__FILE__) . '/TableProcessor.php';
 require_once dirname(__FILE__) . '/IndexProcessor.php';
 require_once dirname(__FILE__) . '/BracketProcessor.php';
+require_once dirname(__FILE__) . '/OptionsProcessor.php';
 
 /**
  * This class processes the SQL chunks.
@@ -200,6 +201,10 @@ class SQLChunkProcessor extends AbstractProcessor {
         if (!empty($out['SHOW'])) {
             $processor = new ShowProcessor();
             $out['SHOW'] = $processor->process($out['SHOW']);
+        }
+        if (!empty($out['OPTIONS'])) {
+            $processor = new OptionsProcessor();
+            $out['OPTIONS'] = $processor->process($out['OPTIONS']);
         }
         return $out;
     }
