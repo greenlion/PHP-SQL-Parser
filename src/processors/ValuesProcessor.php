@@ -30,9 +30,9 @@
  * DAMAGE.
  */
 
-require_once(dirname(__FILE__) . '/../utils/ExpressionType.php');
-require_once(dirname(__FILE__) . '/RecordProcessor.php');
-require_once(dirname(__FILE__) . '/AbstractProcessor.php');
+require_once dirname(__FILE__) . '/../utils/ExpressionType.php';
+require_once dirname(__FILE__) . '/RecordProcessor.php';
+require_once dirname(__FILE__) . '/AbstractProcessor.php';
 
 /**
  * 
@@ -50,28 +50,86 @@ class ValuesProcessor extends AbstractProcessor {
     }
 
     public function process($tokens) {
-        $unparsed = "";
+
+        $currCategory = '';
+        $parsed = array();
+        $base_expr = '';
+
         foreach ($tokens['VALUES'] as $k => $v) {
+            $base_expr .= $v;
+            $trim = trim($v);
+
             if ($this->isWhitespaceToken($v)) {
                 continue;
             }
-            $unparsed .= $v;
+
+            $upper = strtoupper($trim);
+            switch ($upper) {
+
+            case 'ON':
+                if ($currCategory === '') {
+
+                    $processor = new RecordProcessor();
+                    $base_expr = trim(substr($base_expr, 0, -strlen($v)));
+                    $parsed[] = array('expr_type' => ExpressionType::RECORD, 'base_expr' => $base_expr,
+                                      'data' => $this->recordProcessor->process($base_expr), 'delim' => false);
+                    $base_expr = '';
+
+                    $currCategory = 'DUPLICATE';
+                    $parsed[] = array('expr_type' => ExpressionType::RESERVED, 'base_expr' => $trim);
+                }
+                // else ?
+                break;
+
+            case 'DUPLICATE':
+            case 'KEY':
+            case 'UPDATE':
+                if ($currCategory === 'DUPLICATE') {
+                    $parsed[] = array('expr_type' => ExpressionType::RESERVED, 'base_expr' => $trim);
+                    $base_expr = '';
+                }
+                // else ?
+                break;
+
+            case ',':
+                if ($currCategory === 'DUPLICATE') {
+
+                    $processor = new ExpressionListProcessor();
+                    $base_expr = trim(substr($base_expr, 0, -strlen($v)));
+                    $parsed[] = array('expr_type' => ExpressionType::EXPRESSION, 'base_expr' => $base_expr,
+                                      'sub_tree' => $processor->process($this->splitSQLIntoTokens($base_expr)),
+                                      'delim' => $trim);
+                    $base_expr = '';
+                    continue 2;
+                }
+
+                $processor = new RecordProcessor();
+                $parsed[] = array('expr_type' => ExpressionType::RECORD, 'base_expr' => trim($base_expr),
+                                  'data' => $this->recordProcessor->process(trim($base_expr)), 'delim' => $trim);
+                $base_expr = '';
+                break;
+
+            default:
+                break;
+            }
+
         }
 
-        $values = $this->splitSQLIntoTokens($unparsed);
-
-        $parsed = array();
-        foreach ($values as $k => $v) {
-            if ($this->isCommaToken($v)) {
-                unset($values[$k]);
-            } else {
+        if (trim($base_expr) !== '') {
+            if ($currCategory === '') {
                 $processor = new RecordProcessor();
-                $values[$k] = array('expr_type' => ExpressionType::RECORD, 'base_expr' => $v,
-                                    'data' => $this->recordProcessor->process($v));
+                $parsed[] = array('expr_type' => ExpressionType::RECORD, 'base_expr' => trim($base_expr),
+                                  'data' => $this->recordProcessor->process(trim($base_expr)), 'delim' => false);
+            }
+            if ($currCategory === 'DUPLICATE') {
+                $processor = new ExpressionListProcessor();
+                $parsed[] = array('expr_type' => ExpressionType::EXPRESSION, 'base_expr' => trim($base_expr),
+                                  'sub_tree' => $processor->process($this->splitSQLIntoTokens($base_expr)),
+                                  'delim' => false);
             }
         }
 
-        $tokens['VALUES'] = array_values($values);
+        $tokens['VALUES'] = $parsed;
         return $tokens;
     }
 

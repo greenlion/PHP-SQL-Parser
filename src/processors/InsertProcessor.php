@@ -53,65 +53,104 @@ require_once dirname(__FILE__) . '/../utils/ExpressionType.php';
  */
 class InsertProcessor extends AbstractProcessor {
 
-    public function process($tokenList, $token_category = 'INSERT') {
+    protected function processOptions($tokenList) {
+        if (!isset($tokenList['OPTIONS'])) {
+            return array();
+        }
+        $result = array();
+        foreach ($tokenList['OPTIONS'] as $token) {
+            $result[] = array('expr_type' => ExpressionType::RESERVED, 'base_expr' => trim($token));
+        }
+        return $result;
+    }
+
+    protected function processKeyword($keyword, $tokenList) {
+        if (!isset($tokenList[$keyword])) {
+            return array('', false, array());
+        }
+
         $table = '';
         $cols = false;
-        $parsed = array();
-        $tokenList[$token_category] = array();
+        $result = array();
 
-        $into = $tokenList['INTO'];
-        foreach ($into as $token) {
+        foreach ($tokenList[$keyword] as $token) {
             $trim = trim($token);
 
             if ($trim === '') {
                 continue;
             }
 
-            if (strtoupper($trim) === 'INTO') {
-                $tokenList[$token_category][] = array('expr_type' => ExpressionType::RESERVED, 'base_expr' => $trim);
+            $upper = strtoupper($trim);
+            switch ($upper) {
+            case 'INTO':
+                $result[] = array('expr_type' => ExpressionType::RESERVED, 'base_expr' => $trim);
                 continue;
-            }
 
-            if ($table === '') {
-                $table = $trim;
+            case 'INSERT':
                 continue;
-            }
 
-            if ($cols === false) {
-                $cols = $trim;
-            }
-        }
+            default:
+                if ($table === '') {
+                    $table = $trim;
+                    continue;
+                }
 
-        unset($tokenList['INTO']);
-        unset($into);
-
-        if ($cols !== false) {
-            if ($cols[0] === '(' && substr($cols, -1) === ')') {
-                $parsed = array('expr_type' => ExpressionType::BRACKET_EXPRESSION, 'base_expr' => $cols,
-                                'sub_tree' => false);
-            }
-            $cols = $this->removeParenthesisFromStart($cols);
-            if (stripos($cols, 'SELECT') === 0) {
-                $processor = new DefaultProcessor();
-                $parsed['sub_tree'] = array(
-                        array('expr_type' => ExpressionType::QUERY, 'base_expr' => $cols,
-                                'sub_tree' => $processor->process($cols)));
-            } else {
-                $processor = new ColumnListProcessor();
-                $parsed['sub_tree'] = $processor->process($cols);
-                $parsed['expr_type'] = ExpressionType::COLUMN_LIST;
+                if ($cols === false) {
+                    $cols = $trim;
+                }
+                break;
             }
         }
-
-        $tokenList[$token_category][] = array('expr_type' => ExpressionType::TABLE, 'table' => $table,
-                                              'no_quotes' => $this->revokeQuotation($table), 'alias' => false,
-                                              'base_expr' => $table);
-        if (!empty($parsed)) {
-            $tokenList[$token_category][] = $parsed;
-        }
-
-        return $tokenList;
+        return array($table, $cols, $result);
     }
 
+    protected function processColumns($cols) {
+        if ($cols === false) {
+            return $cols;
+        }
+        if ($cols[0] === '(' && substr($cols, -1) === ')') {
+            $parsed = array('expr_type' => ExpressionType::BRACKET_EXPRESSION, 'base_expr' => $cols,
+                            'sub_tree' => false);
+        }
+        $cols = $this->removeParenthesisFromStart($cols);
+        if (stripos($cols, 'SELECT') === 0) {
+            $processor = new DefaultProcessor();
+            $parsed['sub_tree'] = array(
+                    array('expr_type' => ExpressionType::QUERY, 'base_expr' => $cols,
+                            'sub_tree' => $processor->process($cols)));
+        } else {
+            $processor = new ColumnListProcessor();
+            $parsed['sub_tree'] = $processor->process($cols);
+            $parsed['expr_type'] = ExpressionType::COLUMN_LIST;
+        }
+        return $parsed;
+    }
+
+    public function process($tokenList, $token_category = 'INSERT') {
+        $table = '';
+        $cols = false;
+
+        $parsed = $this->processOptions($tokenList);
+        unset($tokenList['OPTIONS']);
+
+        list($table, $cols, $key) = $this->processKeyword('INTO', $tokenList);
+        $parsed = array_merge($parsed, $key);
+        unset($tokenList['INTO']);
+
+        if ($table === '' && $token_category === 'INSERT') {
+            list($table, $cols, $key) = $this->processKeyword('INSERT', $tokenList);
+        }
+
+        $parsed[] = array('expr_type' => ExpressionType::TABLE, 'table' => $table,
+                          'no_quotes' => $this->revokeQuotation($table), 'alias' => false, 'base_expr' => $table);
+
+        $cols = $this->processColumns($cols);
+        if ($cols !== false) {
+            $parsed[] = $cols;
+        }
+
+        $tokenList[$token_category] = $parsed;
+        return $tokenList;
+    }
 }
 ?>
