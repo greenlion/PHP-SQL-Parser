@@ -17,6 +17,7 @@ WHERE calls.deleted = 0
 		)
 GROUP BY dbo.fn_GetDayOfWeekMonIs0(DATEADD(SECOND, -21600, calls_cstm.date_logged_c))
 ORDER BY dbo.fn_GetDayOfWeekMonIs0(DATEADD(SECOND, -21600, calls_cstm.date_logged_c)) ASC";
+
 $parser = new PHPSQLParser($sql);
 $creator = new PHPSQLCreator($parser->parsed);
 $created = $creator->created;
