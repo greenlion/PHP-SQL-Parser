@@ -19,8 +19,6 @@ $sql = '(SELECT colA From test a)
         union all
         (SELECT colB from test b) order by 1';
 $p = $parser->parse($sql, true);
-print_r($p);
-echo serialize($p);
 $expected = getExpectedValue(dirname(__FILE__), 'union2.serialized');
 eq_array($p, $expected, 'mysql union with order-by');
 
