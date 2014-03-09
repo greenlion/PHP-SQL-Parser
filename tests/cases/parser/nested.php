@@ -1,7 +1,7 @@
 <?php
 
-require_once(dirname(__FILE__) . "/../../../src/PHPSQLParser.php");
-require_once(dirname(__FILE__) . "/../../test-more.php");
+require_once dirname(__FILE__) . "/../../../src/PHPSQLParser.php";
+require_once dirname(__FILE__) . "/../../test-more.php";
 
 $parser = new PHPSQLParser();
 
@@ -13,6 +13,7 @@ $parser->parse($sql, true);
 $p = $parser->parsed;
 $expected = getExpectedValue(dirname(__FILE__), 'nested1.serialized');
 eq_array($p, $expected, 'nested left joins');
+
 
 $sql = "SELECT * FROM t1 LEFT JOIN (t2, t3, t4)
                  ON (t2.a=t1.a AND t3.b=t1.b AND t4.c=t1.c)";
