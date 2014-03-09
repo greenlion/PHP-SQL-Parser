@@ -1,6 +1,7 @@
 <?php
-require_once(dirname(__FILE__) . "/../../../src/PHPSQLParser.php");
-require_once(dirname(__FILE__) . "/../../test-more.php");
+
+require_once dirname(__FILE__) . "/../../../src/PHPSQLParser.php";
+require_once dirname(__FILE__) . "/../../test-more.php";
 
 $parser = new PHPSQLParser();
 $sql = 'SELECT c1
@@ -9,6 +10,5 @@ $sql = 'SELECT c1
 $parser->parse($sql);
 $p = $parser->parsed;
 ok($parser->parsed['WHERE'][2]['base_expr'] == '0');
-
 
 ?>
