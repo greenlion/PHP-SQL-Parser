@@ -1,6 +1,7 @@
 <?php
-require_once(dirname(__FILE__) . "/../../../src/PHPSQLParser.php");
-require_once(dirname(__FILE__) . "/../../test-more.php");
+
+require_once dirname(__FILE__) . "/../../../src/PHPSQLParser.php";
+require_once dirname(__FILE__) . "/../../test-more.php";
 
 $sql="select 1 as `a` order by `a`";
 $parser = new PHPSQLParser($sql, true);

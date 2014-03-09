@@ -1,6 +1,7 @@
 <?php
-require_once(dirname(__FILE__) . "/../../../src/PHPSQLParser.php");
-require_once(dirname(__FILE__) . "/../../test-more.php");
+
+require_once dirname(__FILE__) . "/../../../src/PHPSQLParser.php";
+require_once dirname(__FILE__) . "/../../test-more.php";
 
 
 $sql = 'SELECT DATE_ADD(NOW(), INTERVAL 1 MONTH) AS next_month';
