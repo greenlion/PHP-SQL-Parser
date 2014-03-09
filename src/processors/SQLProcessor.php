@@ -98,7 +98,6 @@ class SQLProcessor extends SQLChunkProcessor {
             /* Tokens that get their own sections. These keywords have subclauses. */
             case 'SELECT':
             case 'ORDER':
-            case 'DUPLICATE':
             case 'VALUES':
             case 'GROUP':
             case 'HAVING':
@@ -120,11 +119,20 @@ class SQLProcessor extends SQLChunkProcessor {
             case 'PURGE':
             case 'EXECUTE':
             case 'PREPARE':
+                $token_category = $upper;
+                break;
+
             case 'DEALLOCATE':
                 if ($trim === 'DEALLOCATE') {
                     $skip_next = 1;
                 }
                 $token_category = $upper;
+                break;
+
+            case 'DUPLICATE':
+                if ($token_category !== 'VALUES') {
+                    $token_category = $upper;
+                }
                 break;
 
             case 'SET':
@@ -431,6 +439,7 @@ class SQLProcessor extends SQLChunkProcessor {
             case 'DELAYED':
             case 'FORCE':
             case 'QUICK':
+            case 'HIGH_PRIORITY':
                 $out['OPTIONS'][] = $trim;
                 continue 2;
 
