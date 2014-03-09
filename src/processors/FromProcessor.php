@@ -65,8 +65,8 @@ class FromProcessor extends AbstractProcessor {
 
         // we have a reg_expr, so we have to parse it
         if ($parseInfo['ref_expr'] !== false) {
-            $unparsed = $this->splitSQLIntoTokens($this->removeParenthesisFromStart($parseInfo['ref_expr']));
-
+            $unparsed = $this->splitSQLIntoTokens($parseInfo['ref_expr']);
+            
             // here we can get a comma separated list
             foreach ($unparsed as $k => $v) {
                 if ($this->isCommaToken($v)) {
@@ -181,7 +181,6 @@ class FromProcessor extends AbstractProcessor {
             case 'OUTER':
                 $parseInfo['token_count']++;
                 continue;
-                break;
 
             case 'FOR':
                 $parseInfo['token_count']++;
