@@ -7,7 +7,9 @@ require_once dirname(__FILE__) . "/../../test-more.php";
 $sql = "select t1.* from t1 left outer join t2 on left(t1.c1,6) = t2.c2";
 $parser = new PHPSQLParser($sql);
 $p = $parser->parsed;
+print_r($p);
+echo serialize($p);
 $expected = getExpectedValue(dirname(__FILE__), 'issue125.serialized');
-eq_array($p, $expected, 'no parentheses around ref clause function');
+eq_array($p, $expected, 'LEFT as function within the ref clause');
 
 ?>
