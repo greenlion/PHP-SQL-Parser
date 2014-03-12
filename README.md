@@ -4,12 +4,12 @@ PHP-SQL-Parser
 A pure PHP SQL (non validating) parser w/ focus on MySQL dialect of SQL
 
 
-##Download
+###Download
 
     http://code.google.com/p/php-sql-parser/wiki/Downloads
     http://php-sql-parser.googlecode.com/svn
     
-Full support for the MySQL dialect for the following statement types
+###Full support for the MySQL dialect for the following statement types
 
     SELECT
     INSERT
@@ -43,7 +43,7 @@ ParserManual - Check out the manual here
 
 ###Example Output
 
-*Example Query*
+**Example Query**
 
 ```sql
 SELECT STRAIGHT_JOIN a,b,c 
@@ -51,7 +51,7 @@ SELECT STRAIGHT_JOIN a,b,c
 WHERE d > 5;
 ```
 
-*Example Output (via print_r)*
+**Example Output (via print_r)**
 
 ```php
 Array
