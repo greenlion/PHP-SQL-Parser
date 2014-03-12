@@ -23,23 +23,23 @@ A pure PHP SQL (non validating) parser w/ focus on MySQL dialect of SQL
 
 ###Other SQL statement types
 
-Other statements are returned as an array of tokens. This is not as structured as the information available about the above types. See the ParserManual for more information.
+Other statements are returned as an array of tokens. This is not as structured as the information available about the above types. See the [ParserManual](http://code.google.com/p/php-sql-parser/wiki/ParserManual) for more information.
 
 ###Other SQL dialects
 
-Since the MySQL SQL dialect is very close to SQL-92, this should work for most database applications that need a SQL parser. If using another database dialect, then you may want to change the reserved words - see the ParserManual. It supports UNION, subqueries and compound statements.
+Since the MySQL SQL dialect is very close to SQL-92, this should work for most database applications that need a SQL parser. If using another database dialect, then you may want to change the reserved words - see the [ParserManual](http://code.google.com/p/php-sql-parser/wiki/ParserManual). It supports UNION, subqueries and compound statements.
 
 ###External dependencies
 
-The parser is a self contained class. It has no external dependencies. The parser uses a small amount of regex.
+The parser contains multiple classes. But it has no external dependencies. The parser uses a small amount of regex.
 
 ###Focus
 
-The focus of the parser is complete and accurate support for the MySQL SQL dialect. The focus is not on optimizing for performance. It is expected that you will present syntactically valid queries.
+The focus of the parser is complete and accurate support for the MySQL SQL dialect. The focus is **not** on optimizing for performance. It is expected that you will present syntactically valid queries.
 
 ###Manual
 
-ParserManual - Check out the manual here
+[ParserManual](http://code.google.com/p/php-sql-parser/wiki/ParserManual) - Check out the manual.
 
 ###Example Output
 
