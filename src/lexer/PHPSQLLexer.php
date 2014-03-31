@@ -125,7 +125,48 @@ class PHPSQLLexer {
         $tokens = $this->balanceParenthesis($tokens);
         $tokens = $this->concatComments($tokens);
         $tokens = $this->concatUserDefinedVariables($tokens);
+        $tokens = $this->concatScientificNotations($tokens);
         return $tokens;
+    }
+
+    protected function concatScientificNotations($tokens) {
+
+        $i = 0;
+        $cnt = count($tokens);
+        $scientific = false;
+
+        while ($i < $cnt) {
+
+            if (!isset($tokens[$i])) {
+                $i++;
+                continue;
+            }
+
+            $token = $tokens[$i];
+
+            if ($scientific === true) {
+                if ($token === '-' || $token === '+') {
+                    $tokens[$i - 1] .= $tokens[$i];
+                    $tokens[$i - 1] .= $tokens[$i + 1];
+                    unset($tokens[$i]);
+                    unset($tokens[$i + 1]);
+                
+                } elseif (is_numeric($token)) {
+                    $tokens[$i - 1] .= $tokens[$i];
+                    unset($tokens[$i]);
+                }
+                $scientific = false;
+                continue;
+            }
+
+            if (strtoupper(substr($token, -1, 1)) === 'E') {
+                $scientific = is_numeric(substr($token, 0, -1));
+            }
+
+            $i++;
+        }
+
+        return array_values($tokens);
     }
 
     protected function concatUserDefinedVariables($tokens) {
