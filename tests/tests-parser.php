@@ -73,6 +73,7 @@ require_once dirname(__FILE__) . '/cases/parser/issue120.php';
 require_once dirname(__FILE__) . '/cases/parser/issue122.php';
 require_once dirname(__FILE__) . '/cases/parser/issue125.php';
 require_once dirname(__FILE__) . '/cases/parser/issue131.php';
+require_once dirname(__FILE__) . '/cases/parser/issue133.php';
 require_once dirname(__FILE__) . '/cases/parser/left.php';
 require_once dirname(__FILE__) . '/cases/parser/manual.php';
 require_once dirname(__FILE__) . '/cases/parser/nested.php';
