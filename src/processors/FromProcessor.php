@@ -33,6 +33,7 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  * @author    André Rothe <andre.rothe@phosco.info>
+ * @author    George Schneeloch <noisecapella@gmail.com>
  * @copyright 2010-2014 Justin Swanhart and André Rothe
  * @license   http://www.debian.org/misc/bsd.license  BSD License (3 Clause)
  * @version   SVN: $Id$
@@ -48,6 +49,7 @@ require_once dirname(__FILE__) . '/../utils/ExpressionType.php';
  * This class processes the FROM statement.
  *
  * @author  André Rothe <andre.rothe@phosco.info>
+ * @author  George Schneeloch <noisecapella@gmail.com>
  * @license http://www.debian.org/misc/bsd.license  BSD License (3 Clause)
  *
  */
@@ -143,6 +145,7 @@ class FromProcessor extends AbstractProcessor {
             case ',':
             case 'JOIN':
             case 'INNER':
+			case 'STRAIGHT_JOIN':
                 break;
 
             default:
@@ -199,10 +202,19 @@ class FromProcessor extends AbstractProcessor {
 
             case 'LEFT':
             case 'RIGHT':
-            case 'STRAIGHT_JOIN':
                 $parseInfo['next_join_type'] = $upper;
                 break;
 
+			case 'STRAIGHT_JOIN':
+				$parseInfo['next_join_type'] = "STRAIGHT_JOIN";
+				if ($parseInfo['subquery']) {
+					$parseInfo['sub_tree'] = $this->parse($this->removeParenthesisFromStart($parseInfo['subquery']));
+					$parseInfo['expression'] = $parseInfo['subquery'];
+				}
+
+				$expr[] = $this->processFromExpression($parseInfo);
+				$parseInfo = $this->initParseInfo($parseInfo);
+				break;
             case ',':
                 $parseInfo['next_join_type'] = 'CROSS';
 

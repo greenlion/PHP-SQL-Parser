@@ -33,6 +33,7 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * 
  * @author    André Rothe <andre.rothe@phosco.info>
+ * @author    George Schneeloch <noisecapella@gmail.com>
  * @copyright 2010-2014 Justin Swanhart and André Rothe
  * @license   http://www.debian.org/misc/bsd.license  BSD License (3 Clause)
  * @version   SVN: $Id$
@@ -46,6 +47,7 @@ require_once dirname(__FILE__) . '/../exceptions/UnsupportedFeatureException.php
  * You can overwrite all functions to achieve another handling.
  *
  * @author  André Rothe <andre.rothe@phosco.info>
+ * @author  George Schneeloch <noisecapella@gmail.com>
  * @license http://www.debian.org/misc/bsd.license  BSD License (3 Clause)
  *  
  */
@@ -64,6 +66,9 @@ class JoinBuilder {
         if ($parsed === 'RIGHT') {
             return " RIGHT JOIN ";
         }
+		if ($parsed === 'STRAIGHT_JOIN') {
+			return " STRAIGHT_JOIN ";
+		}
         // TODO: add more
         throw new UnsupportedFeatureException($parsed);
     }
