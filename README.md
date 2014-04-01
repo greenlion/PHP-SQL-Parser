@@ -31,11 +31,11 @@ Since the MySQL SQL dialect is very close to SQL-92, this should work for most d
 
 ###External dependencies
 
-The parser contains multiple classes. But it has no external dependencies. The parser uses a small amount of regex.
+The parser is a self contained class. It has no external dependencies. The parser uses a small amount of regex.
 
 ###Focus
 
-The focus of the parser is complete and accurate support for the MySQL SQL dialect. The focus is **not** on optimizing for performance. It is expected that you will present syntactically valid queries.
+The focus of the parser is complete and accurate support for the MySQL SQL dialect. The focus is not on optimizing for performance. It is expected that you will present syntactically valid queries.
 
 ###Manual
 
