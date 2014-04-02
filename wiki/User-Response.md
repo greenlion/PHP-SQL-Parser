@@ -1,4 +1,4 @@
-Marco64Th (30-Aug-2012)
+#### Marco64Th (30-Aug-2012)
 
 It is very useful in the project i was working on.
 
@@ -11,3 +11,16 @@ Doing this the old fashioned way by going over all sources and editing all queri
 The PHP-SQL parser & Creator gave me a good starting point for that.
 
 ***
+
+#### vincent.vatelot (10-Sep-2012)
+
+Works fine with /tags/2012-07-03 version. I use it in CodeIgniter very easily. Good work! :)
+
+***
+
+#### nababx (3-Feb-2013)
+
+Great job! It would be even better if you had it on packagist... :) 
+
+***
+
