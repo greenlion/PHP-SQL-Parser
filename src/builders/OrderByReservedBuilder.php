@@ -1,8 +1,8 @@
 <?php
 /**
- * ReservedBuilder.php
+ * OrderByReservedBuilder.php
  *
- * Builds reserved keywords.
+ * Builds reserved keywords within the ORDER-BY part.
  *
  * PHP version 5
  *
@@ -39,28 +39,32 @@
  * 
  */
 
-require_once dirname(__FILE__) . '/../utils/ExpressionType.php';
-require_once dirname(__FILE__) . '/Builder.php';
+require_once dirname(__FILE__) . '/ReservedBuilder.php';
+require_once dirname(__FILE__) . '/DirectionBuilder.php';
 
 /**
- * This class implements the builder for reserved keywords.
+ * This class implements the builder for reserved keywords within the ORDER-BY part. 
+ * It must contain the direction. 
  * You can overwrite all functions to achieve another handling.
  *
  * @author  André Rothe <andre.rothe@phosco.info>
  * @license http://www.debian.org/misc/bsd.license  BSD License (3 Clause)
  *  
  */
-class ReservedBuilder implements Builder {
+class OrderByReservedBuilder extends ReservedBuilder {
 
-    public function isReserved($parsed) {
-        return (isset($parsed['expr_type']) && $parsed['expr_type'] === ExpressionType::RESERVED);
+    protected function buildDirection($parsed) {
+        $builder = new DirectionBuilder();
+        return $builder->build($parsed);
     }
-    
+
     public function build(array $parsed) {
-        if (!$this->isReserved($parsed)) {
-            return "";
+        $sql = parent::build($parsed);
+        if ($sql !== '') {
+            $sql .= $this->buildDirection($parsed);
         }
-        return $parsed['base_expr'];
+        return $sql;
     }
+
 }
 ?>

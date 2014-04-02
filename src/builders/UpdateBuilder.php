@@ -39,7 +39,9 @@
  * 
  */
 
+require_once dirname(__FILE__) . '/../exceptions/UnableToCreateSQLException.php';
 require_once dirname(__FILE__) . '/Builder.php';
+require_once dirname(__FILE__) . '/TableBuilder.php';
 
 /**
  * This class implements the builder for the UPDATE statement parts. 
@@ -49,10 +51,25 @@ require_once dirname(__FILE__) . '/Builder.php';
  * @license http://www.debian.org/misc/bsd.license  BSD License (3 Clause)
  *  
  */
-class UpdateBuilder implements Builder  {
+class UpdateBuilder implements Builder {
+
+    protected function buildTable($parsed, $idx) {
+        $builder = new TableBuilder();
+        return $builder->build($parsed, $idx);
+    }
 
     public function build(array $parsed) {
-        return "UPDATE " . $parsed[0]['table'];
+        $sql = '';
+
+        foreach ($parsed as $k => $v) {
+            $len = strlen($sql);
+            $sql .= $this->buildTable($v, $k);
+
+            if ($len == strlen($sql)) {
+                throw new UnableToCreateSQLException('UPDATE table list', $k, $v, 'expr_type');
+            }
+        }
+        return 'UPDATE ' . $sql;
     }
 }
 ?>

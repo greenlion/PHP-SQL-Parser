@@ -42,6 +42,7 @@
 require_once dirname(__FILE__) . '/../utils/ExpressionType.php';
 require_once dirname(__FILE__) . '/../exceptions/UnableToCreateSQLException.php';
 require_once dirname(__FILE__) . '/ColumnReferenceBuilder.php';
+require_once dirname(__FILE__) . '/SelectBracketExpressionBuilder.php';
 require_once dirname(__FILE__) . '/ConstantBuilder.php';
 require_once dirname(__FILE__) . '/OperatorBuilder.php';
 require_once dirname(__FILE__) . '/FunctionBuilder.php';
@@ -78,6 +79,11 @@ class SetExpressionBuilder implements Builder {
         return $builder->build($parsed);
     }
     
+    protected function buildBracketExpression($parsed) {
+        $builder = new SelectBracketExpressionBuilder();
+        return $builder->build($parsed);
+    }
+    
     protected function buildSign($parsed) {
         $builder = new SignBuilder();
         return $builder->build($parsed);
@@ -95,7 +101,8 @@ class SetExpressionBuilder implements Builder {
             $sql .= $this->buildConstant($v);
             $sql .= $this->buildOperator($v);
             $sql .= $this->buildFunction($v);
-            
+            $sql .= $this->buildBracketExpression($v);
+                        
             // we don't need whitespace between the sign and 
             // the following part
             if ($this->buildSign($v) !== '') {

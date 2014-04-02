@@ -41,10 +41,11 @@
 
 require_once dirname(__FILE__) . '/../exceptions/UnableToCreateSQLException.php';
 require_once dirname(__FILE__) . '/OrderByAliasBuilder.php';
-require_once dirname(__FILE__) . '/ColumnReferenceBuilder.php';
-require_once dirname(__FILE__) . '/WhereExpressionBuilder.php';
+require_once dirname(__FILE__) . '/OrderByColumnReferenceBuilder.php';
+require_once dirname(__FILE__) . '/OrderByExpressionBuilder.php';
 require_once dirname(__FILE__) . '/Builder.php';
-require_once dirname(__FILE__) . '/FunctionBuilder.php';
+require_once dirname(__FILE__) . '/OrderByFunctionBuilder.php';
+require_once dirname(__FILE__) . '/OrderByReservedBuilder.php';
 
 /**
  * This class implements the builder for the ORDER-BY clause. 
@@ -57,22 +58,27 @@ require_once dirname(__FILE__) . '/FunctionBuilder.php';
 class OrderByBuilder implements Builder {
 
     protected function buildFunction($parsed) {
-        $builder = new FunctionBuilder();
+        $builder = new OrderByFunctionBuilder();
+        return $builder->build($parsed);
+    }
+    
+    protected function buildReserved($parsed) {
+        $builder = new OrderByReservedBuilder();
         return $builder->build($parsed);
     }
     
     protected function buildColRef($parsed) {
-        $builder = new ColumnReferenceBuilder();
+        $builder = new OrderByColumnReferenceBuilder();
         return $builder->build($parsed);
     }
 
-    protected function buildOrderByAlias($parsed) {
+    protected function buildAlias($parsed) {
         $builder = new OrderByAliasBuilder();
         return $builder->build($parsed);
     }
 
     protected function buildExpression($parsed) {
-        $builder = new WhereExpressionBuilder();
+        $builder = new OrderByExpressionBuilder();
         return $builder->build($parsed);
     }
     
@@ -80,11 +86,12 @@ class OrderByBuilder implements Builder {
         $sql = "";
         foreach ($parsed as $k => $v) {
             $len = strlen($sql);
-            $sql .= $this->buildOrderByAlias($v);
+            $sql .= $this->buildAlias($v);
             $sql .= $this->buildColRef($v);
             $sql .= $this->buildFunction($v);
             $sql .= $this->buildExpression($v);
-
+            $sql .= $this->buildReserved($v);
+            
             if ($len == strlen($sql)) {
                 throw new UnableToCreateSQLException('ORDER', $k, $v, 'expr_type');
             }

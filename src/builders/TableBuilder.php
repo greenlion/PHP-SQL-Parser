@@ -41,6 +41,7 @@
 
 require_once dirname(__FILE__) . '/../utils/ExpressionType.php';
 require_once dirname(__FILE__) . '/AliasBuilder.php';
+require_once dirname(__FILE__) . '/IndexHintListBuilder.php';
 require_once dirname(__FILE__) . '/JoinBuilder.php';
 require_once dirname(__FILE__) . '/RefTypeBuilder.php';
 require_once dirname(__FILE__) . '/RefClauseBuilder.php';
@@ -61,6 +62,11 @@ class TableBuilder implements Builder {
         return $builder->build($parsed);
     }
 
+    protected function buildIndexHintList($parsed) {
+        $builder = new IndexHintListBuilder();
+        return $builder->build($parsed);
+    }
+    
     protected function buildJoin($parsed) {
         $builder = new JoinBuilder();
         return $builder->build($parsed);
@@ -83,6 +89,7 @@ class TableBuilder implements Builder {
 
         $sql = $parsed['table'];
         $sql .= $this->buildAlias($parsed);
+        $sql .= $this->buildIndexHintList($parsed);
 
         if ($index !== 0) {
             $sql = $this->buildJoin($parsed['join_type']) . $sql;

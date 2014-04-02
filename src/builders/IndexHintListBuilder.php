@@ -1,8 +1,8 @@
 <?php
 /**
- * ReservedBuilder.php
+ * IndexHintListBuilder.php
  *
- * Builds reserved keywords.
+ * Builds the index hint list of a table.
  *
  * PHP version 5
  *
@@ -39,28 +39,32 @@
  * 
  */
 
-require_once dirname(__FILE__) . '/../utils/ExpressionType.php';
 require_once dirname(__FILE__) . '/Builder.php';
 
 /**
- * This class implements the builder for reserved keywords.
+ * This class implements the builder for index hint lists. 
  * You can overwrite all functions to achieve another handling.
  *
  * @author  André Rothe <andre.rothe@phosco.info>
  * @license http://www.debian.org/misc/bsd.license  BSD License (3 Clause)
  *  
  */
-class ReservedBuilder implements Builder {
+class IndexHintListBuilder implements Builder {
 
-    public function isReserved($parsed) {
-        return (isset($parsed['expr_type']) && $parsed['expr_type'] === ExpressionType::RESERVED);
+    public function hasHint($parsed) {
+        return isset($parsed['hints']);
     }
-    
+
+    // TODO: the hint list should be enhanced to get base_expr fro position calculation
     public function build(array $parsed) {
-        if (!$this->isReserved($parsed)) {
+        if (!isset($parsed['hints']) || $parsed['hints'] === false) {
             return "";
         }
-        return $parsed['base_expr'];
+        $sql = "";
+        foreach($parsed['hints'] as $k => $v) {
+            $sql .= $v['hint_type'] . " " . $v['hint_list'] . " ";
+        }
+        return " " . substr($sql, 0, -1);
     }
 }
 ?>

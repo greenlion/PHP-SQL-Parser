@@ -6,8 +6,7 @@ A pure PHP SQL (non validating) parser w/ focus on MySQL dialect of SQL
 
 ###Download
 
- [http://code.google.com/p/php-sql-parser/wiki/Downloads](http://code.google.com/p/php-sql-parser/wiki/Downloads)<br>
- [http://php-sql-parser.googlecode.com/svn](http://php-sql-parser.googlecode.com/svn)
+ [GitHub Wiki](https://github.com/witchi/PHP-SQL-Parser/wiki/Downloads)<br>
     
 ###Full support for the MySQL dialect for the following statement types
 
