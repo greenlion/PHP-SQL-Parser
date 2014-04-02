@@ -97,8 +97,57 @@ $parser = new PHPSQLParser();
 $p = $parser->parse($query);
 $creator = new PHPSQLCreator();
 $created = $creator->create($p);
-print_r($created);
 $expected = getExpectedValue(dirname(__FILE__), 'issue62l.sql', false);
 ok($created === $expected, 'complex select clause should not fail');
+
+/*
+$query  = "SELECT * FROM table1 IGNORE INDEX(PRIMARY)";
+$parser = new PHPSQLParser();
+$p = $parser->parse($query);
+$creator = new PHPSQLCreator();
+$created = $creator->create($p);
+$expected = getExpectedValue(dirname(__FILE__), 'issue62m.sql', false);
+ok($created === $expected, 'INDEX HINT should not fail');
+*/
+
+$query  = "INSERT IGNORE INTO table1 VALUES('1')";
+$parser = new PHPSQLParser();
+$p = $parser->parse($query);
+$creator = new PHPSQLCreator();
+$created = $creator->create($p);
+$expected = getExpectedValue(dirname(__FILE__), 'issue62n.sql', false);
+ok($created === $expected, 'INSERT IGNORE should not fail');
+
+$query  = "SELECT *, case when (col1 not like '') then col1 else col2 end as alias1 FROM table1";
+$parser = new PHPSQLParser();
+$p = $parser->parse($query);
+$creator = new PHPSQLCreator();
+$created = $creator->create($p);
+$expected = getExpectedValue(dirname(__FILE__), 'issue62o.sql', false);
+ok($created === $expected, 'CASE WHEN should not fail');
+
+$query  = "SELECT IF(1>2,2,3)";
+$parser = new PHPSQLParser();
+$p = $parser->parse($query);
+$creator = new PHPSQLCreator();
+$created = $creator->create($p);
+$expected = getExpectedValue(dirname(__FILE__), 'issue62p.sql', false);
+ok($created === $expected, 'IF should not fail');
+
+$query  = "SELECT DISTINCT col1 from table1";
+$parser = new PHPSQLParser();
+$p = $parser->parse($query);
+$creator = new PHPSQLCreator();
+$created = $creator->create($p);
+$expected = getExpectedValue(dirname(__FILE__), 'issue62q.sql', false);
+ok($created === $expected, 'DISTINCT should not be lost');
+
+$query  = "UPDATE table1 SET col1 = (1 + 3)";
+$parser = new PHPSQLParser();
+$p = $parser->parse($query);
+$creator = new PHPSQLCreator();
+$created = $creator->create($p);
+$expected = getExpectedValue(dirname(__FILE__), 'issue62r.sql', false);
+ok($created === $expected, 'Bracket expression within SET clause of an UPDATE statement should not fail');
 
 ?>
