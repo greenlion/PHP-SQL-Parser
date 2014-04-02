@@ -53,7 +53,7 @@ require_once dirname(__FILE__) . '/Builder.php';
 class ReservedBuilder implements Builder {
 
     public function isReserved($parsed) {
-        return ($parsed['expr_type'] === ExpressionType::RESERVED);
+        return (isset($parsed['expr_type']) && $parsed['expr_type'] === ExpressionType::RESERVED);
     }
     
     public function build(array $parsed) {
