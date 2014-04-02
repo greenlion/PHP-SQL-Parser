@@ -46,9 +46,9 @@ The focus of the parser is complete and accurate support for the MySQL SQL diale
 **Example Query**
 
 ```sql
-SELECT STRAIGHT_JOIN a,b,c 
-  from some_table an_alias
-WHERE d > 5;
+SELECT STRAIGHT_JOIN a, b, c 
+  FROM some_table an_alias
+ WHERE d > 5;
 ```
 
 **Example Output (via print_r)**
