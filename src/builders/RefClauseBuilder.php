@@ -44,6 +44,7 @@ require_once dirname(__FILE__) . '/ColumnReferenceBuilder.php';
 require_once dirname(__FILE__) . '/OperatorBuilder.php';
 require_once dirname(__FILE__) . '/ConstantBuilder.php';
 require_once dirname(__FILE__) . '/FunctionBuilder.php';
+require_once dirname(__FILE__) . '/InListBuilder.php';
 require_once dirname(__FILE__) . '/SelectBracketExpressionBuilder.php';
 require_once dirname(__FILE__) . '/Builder.php';
 
@@ -57,6 +58,11 @@ require_once dirname(__FILE__) . '/Builder.php';
  */
 class RefClauseBuilder implements Builder {
 
+    protected function buildInList($parsed) {
+        $builder = new InListBuilder();
+        return $builder->build($parsed);
+    }
+    
     protected function buildColRef($parsed) {
         $builder = new ColumnReferenceBuilder();
         return $builder->build($parsed);
@@ -94,6 +100,7 @@ class RefClauseBuilder implements Builder {
             $sql .= $this->buildConstant($v);
             $sql .= $this->buildFunction($v);
             $sql .= $this->buildBracketExpression($v);
+            $sql .= $this->buildInList($v);
 
             if ($len == strlen($sql)) {
                 throw new UnableToCreateSQLException('expression ref_clause', $k, $v, 'expr_type');
