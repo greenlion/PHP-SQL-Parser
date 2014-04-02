@@ -109,12 +109,12 @@ class FromProcessor extends AbstractProcessor {
         }
 
         $res['alias'] = $parseInfo['alias'];
+        $res['hints'] = $parseInfo['hints'];
         $res['join_type'] = $parseInfo['join_type'];
         $res['ref_type'] = $parseInfo['ref_type'];
         $res['ref_clause'] = $parseInfo['ref_expr'];
         $res['base_expr'] = trim($parseInfo['expression']);
         $res['sub_tree'] = $parseInfo['sub_tree'];
-        $res['hints'] = $parseInfo['hints'];
         return $res;
     }
 
