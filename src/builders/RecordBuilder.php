@@ -71,6 +71,11 @@ class RecordBuilder implements Builder {
         return $builder->build($parsed);
     }
 
+    protected function buildColRef($parsed) {
+        $builder = new ColumnReferenceBuilder();
+        return $builder->build($parsed);
+    }
+    
     public function build(array $parsed) {
         if ($parsed['expr_type'] !== ExpressionType::RECORD) {
             return "";
@@ -81,6 +86,7 @@ class RecordBuilder implements Builder {
             $sql .= $this->buildConstant($v);
             $sql .= $this->buildFunction($v);
             $sql .= $this->buildOperator($v);
+            $sql .= $this->buildColRef($v);
 
             if ($len == strlen($sql)) {
                 throw new UnableToCreateSQLException(ExpressionType::RECORD, $k, $v, 'expr_type');
