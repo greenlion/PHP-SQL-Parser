@@ -1,8 +1,8 @@
 <?php
 /**
- * OrderByBuilder.php
+ * OrderByExpressionBuilder.php
  *
- * Builds the ORDERBY clause.
+ * Builds expressions within the ORDER-BY part.
  *
  * PHP version 5
  *
@@ -39,67 +39,32 @@
  * 
  */
 
-require_once dirname(__FILE__) . '/../exceptions/UnableToCreateSQLException.php';
-require_once dirname(__FILE__) . '/OrderByAliasBuilder.php';
-require_once dirname(__FILE__) . '/OrderByColumnReferenceBuilder.php';
-require_once dirname(__FILE__) . '/OrderByExpressionBuilder.php';
-require_once dirname(__FILE__) . '/Builder.php';
-require_once dirname(__FILE__) . '/OrderByFunctionBuilder.php';
-require_once dirname(__FILE__) . '/OrderByReservedBuilder.php';
+require_once dirname(__FILE__) . '/WhereExpressionBuilder.php';
+require_once dirname(__FILE__) . '/DirectionBuilder.php';
 
 /**
- * This class implements the builder for the ORDER-BY clause. 
+ * This class implements the builder for expressions within the ORDER-BY part. 
+ * It must contain the direction. 
  * You can overwrite all functions to achieve another handling.
  *
  * @author  André Rothe <andre.rothe@phosco.info>
  * @license http://www.debian.org/misc/bsd.license  BSD License (3 Clause)
  *  
  */
-class OrderByBuilder implements Builder {
+class OrderByExpressionBuilder extends WhereExpressionBuilder {
 
-    protected function buildFunction($parsed) {
-        $builder = new OrderByFunctionBuilder();
-        return $builder->build($parsed);
-    }
-    
-    protected function buildReserved($parsed) {
-        $builder = new OrderByReservedBuilder();
-        return $builder->build($parsed);
-    }
-    
-    protected function buildColRef($parsed) {
-        $builder = new OrderByColumnReferenceBuilder();
+    protected function buildDirection($parsed) {
+        $builder = new DirectionBuilder();
         return $builder->build($parsed);
     }
 
-    protected function buildAlias($parsed) {
-        $builder = new OrderByAliasBuilder();
-        return $builder->build($parsed);
-    }
-
-    protected function buildExpression($parsed) {
-        $builder = new OrderByExpressionBuilder();
-        return $builder->build($parsed);
-    }
-    
     public function build(array $parsed) {
-        $sql = "";
-        foreach ($parsed as $k => $v) {
-            $len = strlen($sql);
-            $sql .= $this->buildAlias($v);
-            $sql .= $this->buildColRef($v);
-            $sql .= $this->buildFunction($v);
-            $sql .= $this->buildExpression($v);
-            $sql .= $this->buildReserved($v);
-            
-            if ($len == strlen($sql)) {
-                throw new UnableToCreateSQLException('ORDER', $k, $v, 'expr_type');
-            }
-
-            $sql .= ", ";
+        $sql = parent::build($parsed);
+        if ($sql !== '') {
+            $sql .= $this->buildDirection($parsed);
         }
-        $sql = substr($sql, 0, -2);
-        return "ORDER BY " . $sql;
+        return $sql;
     }
+
 }
 ?>
