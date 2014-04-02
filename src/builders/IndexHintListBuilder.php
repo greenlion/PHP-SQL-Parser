@@ -1,8 +1,8 @@
 <?php
 /**
- * TableBuilder.php
+ * IndexHintListBuilder.php
  *
- * Builds the table name/join options.
+ * Builds the index hint list of a table.
  *
  * PHP version 5
  *
@@ -39,64 +39,32 @@
  * 
  */
 
-require_once dirname(__FILE__) . '/../utils/ExpressionType.php';
-require_once dirname(__FILE__) . '/AliasBuilder.php';
-require_once dirname(__FILE__) . '/IndexHintListBuilder.php';
-require_once dirname(__FILE__) . '/JoinBuilder.php';
-require_once dirname(__FILE__) . '/RefTypeBuilder.php';
-require_once dirname(__FILE__) . '/RefClauseBuilder.php';
 require_once dirname(__FILE__) . '/Builder.php';
 
 /**
- * This class implements the builder for the table name and join options. 
+ * This class implements the builder for index hint lists. 
  * You can overwrite all functions to achieve another handling.
  *
  * @author  André Rothe <andre.rothe@phosco.info>
  * @license http://www.debian.org/misc/bsd.license  BSD License (3 Clause)
  *  
  */
-class TableBuilder implements Builder {
+class IndexHintListBuilder implements Builder {
 
-    protected function buildAlias($parsed) {
-        $builder = new AliasBuilder();
-        return $builder->build($parsed);
-    }
-
-    protected function buildIndexHintList($parsed) {
-        $builder = new IndexHintListBuilder();
-        return $builder->build($parsed);
-    }
-    
-    protected function buildJoin($parsed) {
-        $builder = new JoinBuilder();
-        return $builder->build($parsed);
-    }
-    
-    protected function buildRefType($parsed) {
-        $builder = new RefTypeBuilder();
-        return $builder->build($parsed);
-    }
-    
-    protected function buildRefClause($parsed) {
-        $builder = new RefClauseBuilder();
-        return $builder->build($parsed);
+    public function hasHint($parsed) {
+        return isset($parsed['hints']);
     }
 
-    public function build(array $parsed, $index = 0) {
-        if ($parsed['expr_type'] !== ExpressionType::TABLE) {
-            return '';
+    // TODO: the hint list should be enhanced to get base_expr fro position calculation
+    public function build(array $parsed) {
+        if (!isset($parsed['hints']) || $parsed['hints'] === false) {
+            return "";
         }
-
-        $sql = $parsed['table'];
-        $sql .= $this->buildAlias($parsed);
-        $sql .= $this->buildIndexHintList($parsed);
-
-        if ($index !== 0) {
-            $sql = $this->buildJoin($parsed['join_type']) . $sql;
-            $sql .= $this->buildRefType($parsed['ref_type']);
-            $sql .= $parsed['ref_clause'] === false ? '' : $this->buildRefClause($parsed['ref_clause']);
+        $sql = "";
+        foreach($parsed['hints'] as $k => $v) {
+            $sql .= $v['hint_type'] . " " . $v['hint_list'] . " ";
         }
-        return $sql;
+        return " " . substr($sql, 0, -1);
     }
 }
 ?>
