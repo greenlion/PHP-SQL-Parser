@@ -40,7 +40,6 @@
  */
 
 require_once dirname(__FILE__) . '/AliasBuilder.php';
-require_once dirname(__FILE__) . '/DirectionBuilder.php';
 require_once dirname(__FILE__) . '/Builder.php';
 require_once dirname(__FILE__) . '/../utils/ExpressionType.php';
 /**
