@@ -1,3 +1,51 @@
+####  frank@frankmayer.net (7-Feb-2012)
+
+:) Great !! Thanks for your work in this. Much appreciated!!
+
+***
+
+#### ben.swinburne (12-Mar-2012)
+
+Thanks for your quick feedback and continued efforts with this project.
+
+***
+
+#### lucian.toza (2-Apr-2012)
+
+Thanks for the quick reply and the quick fix also :) it works now
+
+***
+
+####  h.leithner (3-May-2012)
+
+Works fine now thx
+
+***
+
+#### akayami (7-May-2012)
+
+Thank you for this tool, it's really great piece of software that opens many possibilities for me. PHP was i need of a good SQL parser for a long time.
+ 
+***
+
+#### roborg (9-May-2012)
+
+I've attached some pretty minor changes that (on my machine at least) make it over 10x faster... hope you find it useful - thanks for a great project!
+
+***
+
+#### korso3 (9-May-2012)
+
+Many thanks on all your effort and fantastic answer.
+
+***
+
+#### adrian.partl (28-Aug-2012)
+
+cool, seems to work. thx!
+
+***
+
 #### Marco64Th (30-Aug-2012)
 
 It is very useful in the project i was working on.
@@ -21,6 +69,24 @@ Works fine with /tags/2012-07-03 version. I use it in CodeIgniter very easily. G
 #### nababx (3-Feb-2013)
 
 Great job! It would be even better if you had it on packagist... :) 
+
+***
+
+#### noisecapella (21-Nov-2013)
+
+Thanks! I wanted to say that this has been very useful for my work and I appreciate the effort put into this. I use it to automatically filter, sort and paginate our SQL queries, and so far it works great!
+
+***
+
+#### phoffmann.plus (13-Jan-2014)
+
+Wow, probably the fastest fix I've ever seen, thank you!
+
+***
+
+### Henk.Blokpoel.Sr (22-Feb-2014)
+
+Hi, thanks a lot! You guys are good & fast. Regards, Henk
 
 ***
 
