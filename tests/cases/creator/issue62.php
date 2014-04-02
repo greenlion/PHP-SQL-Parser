@@ -100,7 +100,6 @@ $created = $creator->create($p);
 $expected = getExpectedValue(dirname(__FILE__), 'issue62l.sql', false);
 ok($created === $expected, 'complex select clause should not fail');
 
-/*
 $query  = "SELECT * FROM table1 IGNORE INDEX(PRIMARY)";
 $parser = new PHPSQLParser();
 $p = $parser->parse($query);
@@ -108,7 +107,6 @@ $creator = new PHPSQLCreator();
 $created = $creator->create($p);
 $expected = getExpectedValue(dirname(__FILE__), 'issue62m.sql', false);
 ok($created === $expected, 'INDEX HINT should not fail');
-*/
 
 $query  = "INSERT IGNORE INTO table1 VALUES('1')";
 $parser = new PHPSQLParser();

@@ -13,6 +13,7 @@ require_once dirname(__FILE__) . '/cases/creator/insert.php';
 require_once dirname(__FILE__) . '/cases/creator/issue33.php';
 require_once dirname(__FILE__) . '/cases/creator/issue57.php';
 require_once dirname(__FILE__) . '/cases/creator/issue58.php';
+require_once dirname(__FILE__) . '/cases/creator/issue62.php';
 require_once dirname(__FILE__) . '/cases/creator/issue63.php';
 require_once dirname(__FILE__) . '/cases/creator/issue66.php';
 require_once dirname(__FILE__) . '/cases/creator/issue76.php';
