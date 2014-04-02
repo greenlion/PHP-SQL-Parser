@@ -46,6 +46,7 @@ require_once dirname(__FILE__) . '/SQLChunkProcessor.php';
  * This class processes the base SQL statements.
  *
  * @author  André Rothe <andre.rothe@phosco.info>
+ * @author  Marco Th. <marco64th@gmail.com>
  * @license http://www.debian.org/misc/bsd.license  BSD License (3 Clause)
  *
  */
@@ -78,12 +79,12 @@ class SQLProcessor extends SQLChunkProcessor {
              */
             if ($skip_next > 0) {
                 if ($trim === "") {
-                    if ($token_category !== "") { # is this correct??
+                    if ($token_category !== "") { // is this correct??
                         $out[$token_category][] = $token;
                     }
                     continue;
                 }
-                #to skip the token we replace it with whitespace
+                // to skip the token we replace it with whitespace
                 $trim = "";
                 $token = "";
                 $skip_next--;
@@ -143,7 +144,7 @@ class SQLProcessor extends SQLChunkProcessor {
 
             case 'LIMIT':
             case 'PLUGIN':
-            # no separate section
+            // no separate section
                 if ($token_category === 'SHOW') {
                     continue;
                 }
@@ -151,11 +152,11 @@ class SQLProcessor extends SQLChunkProcessor {
                 break;
 
             case 'FROM':
-            # this FROM is different from FROM in other DML (not join related)
+            // this FROM is different from FROM in other DML (not join related)
                 if ($token_category === 'PREPARE') {
                     continue 2;
                 }
-                # no separate section
+                // no separate section
                 if ($token_category === 'SHOW') {
                     continue;
                 }
@@ -250,7 +251,6 @@ class SQLProcessor extends SQLChunkProcessor {
             case 'CHECKSUM':
             case 'REPAIR':
             case 'RESTORE':
-            case 'USE':
             case 'HELP':
                 $token_category = $upper;
                 // set the category in case these get subclauses in a future version of MySQL
@@ -259,7 +259,7 @@ class SQLProcessor extends SQLChunkProcessor {
 
             case 'REPLACE':
                 if ($prev_category === 'TABLE') {
-                    # part of the CREATE TABLE statement
+                    // part of the CREATE TABLE statement
                     $out[$prev_category][] = $trim;
                     continue 2;
                 }
@@ -270,8 +270,13 @@ class SQLProcessor extends SQLChunkProcessor {
 
             case 'IGNORE':
                 if ($prev_category === 'TABLE') {
-                    # part of the CREATE TABLE statement
+                    // part of the CREATE TABLE statement
                     $out[$prev_category][] = $trim;
+                    continue 2;
+                }
+                if ($token_category === 'FROM') {
+                    // part of the FROM statement (index hint)
+                    $out[$token_category][] = $trim;
                     continue 2;
                 }
                 $out['OPTIONS'][] = $upper;
@@ -344,7 +349,7 @@ class SQLProcessor extends SQLChunkProcessor {
 
             case 'CACHE':
                 if ($prev_category === "" || $prev_category === 'RESET' || $prev_category === 'FLUSH'
-                        || $prev_category === 'LOAD') {
+                    || $prev_category === 'LOAD') {
                     $token_category = $upper;
                     continue 2;
                 }
@@ -434,12 +439,31 @@ class SQLProcessor extends SQLChunkProcessor {
                 }
                 break;
 
-            /* These tokens set particular options for the statement. They never stand alone. */
+            /* These tokens set particular options for the statement. */
             case 'LOW_PRIORITY':
             case 'DELAYED':
-            case 'FORCE':
             case 'QUICK':
             case 'HIGH_PRIORITY':
+                $out['OPTIONS'][] = $trim;
+                continue 2;
+
+            case 'USE':
+                if ($token_category === 'FROM') {
+                    // index hint within FROM clause
+                    $out[$token_category][] = $trim;
+                    continue 2;
+                }
+                // set the category in case these get subclauses in a future version of MySQL
+                $token_category = $upper;
+                $out[$upper][0] = $trim;
+                continue 2;
+
+            case 'FORCE':
+                if ($token_category === 'FROM') {
+                    // index hint within FROM clause
+                    $out[$token_category][] = $trim;
+                    continue 2;
+                }
                 $out['OPTIONS'][] = $trim;
                 continue 2;
 
