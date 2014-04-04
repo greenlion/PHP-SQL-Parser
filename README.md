@@ -6,7 +6,7 @@ A pure PHP SQL (non validating) parser w/ focus on MySQL dialect of SQL
 
 ###Download
 
- [GitHub Wiki](https://github.com/witchi/PHP-SQL-Parser/wiki/Downloads)<br>
+ [GitHub Wiki](https://github.com/greenlion/PHP-SQL-Parser/wiki/Downloads)<br>
     
 ###Full support for the MySQL dialect for the following statement types
 
@@ -15,6 +15,8 @@ A pure PHP SQL (non validating) parser w/ focus on MySQL dialect of SQL
     UPDATE
     DELETE
     REPLACE
+    RENAME
+    SHOW
     SET
     DROP
     CREATE INDEX
@@ -22,11 +24,11 @@ A pure PHP SQL (non validating) parser w/ focus on MySQL dialect of SQL
 
 ###Other SQL statement types
 
-Other statements are returned as an array of tokens. This is not as structured as the information available about the above types. See the [ParserManual](http://code.google.com/p/php-sql-parser/wiki/ParserManual) for more information.
+Other statements are returned as an array of tokens. This is not as structured as the information available about the above types. See the [ParserManual](https://github.com/greenlion/PHP-SQL-Parser/wiki/Parser-Manual) for more information.
 
 ###Other SQL dialects
 
-Since the MySQL SQL dialect is very close to SQL-92, this should work for most database applications that need a SQL parser. If using another database dialect, then you may want to change the reserved words - see the [ParserManual](http://code.google.com/p/php-sql-parser/wiki/ParserManual). It supports UNION, subqueries and compound statements.
+Since the MySQL SQL dialect is very close to SQL-92, this should work for most database applications that need a SQL parser. If using another database dialect, then you may want to change the reserved words - see the [ParserManual](https://github.com/greenlion/PHP-SQL-Parser/wiki/Parser-Manual). It supports UNION, subqueries and compound statements.
 
 ###External dependencies
 
@@ -38,7 +40,7 @@ The focus of the parser is complete and accurate support for the MySQL SQL diale
 
 ###Manual
 
-[ParserManual](http://code.google.com/p/php-sql-parser/wiki/ParserManual) - Check out the manual.
+[ParserManual](https://github.com/greenlion/PHP-SQL-Parser/wiki/Parser-Manual) - Check out the manual.
 
 ###Example Output
 
