@@ -1,5 +1,5 @@
 ### Git
-https://github.com/witchi/PHP-SQL-Parser
+https://github.com/greenlion/PHP-SQL-Parser
 
 ### Subversion
 https://code.google.com/p/php-sql-parser/source/checkout
