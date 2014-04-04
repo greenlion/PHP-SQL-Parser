@@ -122,10 +122,11 @@ class FromProcessor extends AbstractProcessor {
         $parseInfo = $this->initParseInfo();
         $expr = array();
         $token_category = '';
-        
+        $prevToken = '';
+
         $skip_next = false;
         $i = 0;
-        
+
         foreach ($tokens as $token) {
             $upper = strtoupper(trim($token));
 
@@ -140,18 +141,42 @@ class FromProcessor extends AbstractProcessor {
             }
 
             switch ($upper) {
-            case 'OUTER':
-            case 'LEFT':
-            case 'RIGHT':
             case 'NATURAL':
             case 'CROSS':
             case ',':
-            case 'JOIN':
             case 'INNER':
             case 'STRAIGHT_JOIN':
                 break;
 
+            case 'OUTER':
+            case 'JOIN':
+                if ($token_category === 'LEFT' || $token_category === 'RIGHT') {
+                    $token_category = '';
+                    $parseInfo['next_join_type'] = strtoupper(trim($prevToken)); // it seems to be a join
+                }
+                break;
+
+            case 'LEFT':
+            case 'RIGHT':
+                $token_category = $upper;
+                $prevToken = $token;
+                $i++;
+                continue 2;
+                
             default:
+                if ($token_category === 'LEFT' || $token_category === 'RIGHT') {
+                    if ($upper === '') {
+                        $prevToken .= $token;
+                        break;
+                    } else {
+                        $token_category = '';     // it seems to be a function
+                        $parseInfo['expression'] .= $prevToken;
+                        if ($parseInfo['ref_type'] !== false) { // all after ON / USING
+                            $parseInfo['ref_expr'] .= $prevToken;
+                        }
+                        $prevToken = '';
+                    }
+                }
                 $parseInfo['expression'] .= $token;
                 if ($parseInfo['ref_type'] !== false) { // all after ON / USING
                     $parseInfo['ref_expr'] .= $token;
@@ -163,7 +188,7 @@ class FromProcessor extends AbstractProcessor {
                 $i++;
                 continue;
             }
-            
+
             switch ($upper) {
             case 'AS':
                 $parseInfo['alias'] = array('as' => true, 'name' => "", 'base_expr' => $token);
@@ -190,7 +215,7 @@ class FromProcessor extends AbstractProcessor {
             case 'KEY':
             case 'INDEX':
                 if ($token_category === 'CREATE') {
-                    $token_category = $upper;    // TODO: what is it for a statement?
+                    $token_category = $upper; // TODO: what is it for a statement?
                     continue 2;
                 }
                 if ($token_category === 'IDX_HINT') {
@@ -215,11 +240,6 @@ class FromProcessor extends AbstractProcessor {
                 $parseInfo['token_count']++;
                 $skip_next = true;
                 continue;
-
-            case 'LEFT':
-            case 'RIGHT':
-                $parseInfo['next_join_type'] = $upper;
-                break;
 
             case 'STRAIGHT_JOIN':
                 $parseInfo['next_join_type'] = "STRAIGHT_JOIN";
@@ -246,8 +266,8 @@ class FromProcessor extends AbstractProcessor {
                 break;
 
             default:
-                // TODO: enhance it, so we can have base_expr to calculate the position of the keywords
-                // build a subtree under "hints"
+            // TODO: enhance it, so we can have base_expr to calculate the position of the keywords
+            // build a subtree under "hints"
                 if ($token_category === 'IDX_HINT') {
                     $token_category = '';
                     $cur_hint = (count($parseInfo['hints']) - 1);
