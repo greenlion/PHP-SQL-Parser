@@ -90,3 +90,9 @@ Hi, thanks a lot! You guys are good & fast. Regards, Henk
 
 ***
 
+#### Denis Morozov (05-Apr-2014)
+
+Parser works like a charm! :)
+Thank you!
+
+***
