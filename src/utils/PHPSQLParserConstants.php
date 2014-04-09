@@ -161,7 +161,7 @@ class PHPSQLParserConstants {
                                         'UTC_TIME', 'UTC_TIMESTAMP', 'UUID', 'VAR_POP', 'VAR_SAMP', 'VARIANCE',
                                         'VERSION', 'WEEK', 'WEEKDAY', 'WEEKOFYEAR', 'YEAR', 'YEARWEEK');
 
-    protected static $aggregateFunctions = array('AVG', 'SUM', 'COUNT', 'MIN', 'MAX', 'STDDEV', 'STDDEV_SAMP',
+    protected static $aggregateFunctions = array('AVG', 'SUM', 'COUNT', 'MIN', 'MAX', 'STD', 'STDDEV', 'STDDEV_SAMP',
                                                  'STDDEV_POP', 'VARIANCE', 'VAR_SAMP', 'VAR_POP', 'GROUP_CONCAT',
                                                  'BIT_AND', 'BIT_OR', 'BIT_XOR');
 
