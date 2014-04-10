@@ -56,6 +56,16 @@ require_once dirname(__FILE__) . '/../utils/ExpressionType.php';
  */
 class FromProcessor extends AbstractProcessor {
 
+    protected function processExpressionList($unparsed) {
+        $processor = new ExpressionListProcessor();
+        return $processor->process($unparsed);
+    }
+    
+    protected function processSQLDefault($unparsed) {
+        $processor = new DefaultProcessor();
+        return $processor->process($unparsed);
+    }
+    
     protected function initParseInfo($parseInfo = false) {
         // first init
         if ($parseInfo === false) {
@@ -85,8 +95,7 @@ class FromProcessor extends AbstractProcessor {
                     $unparsed[$k] = "";
                 }
             }
-            $processor = new ExpressionListProcessor();
-            $ref = $processor->process($unparsed);
+            $ref = $this->processExpressionList($unparsed);
             $parseInfo['ref_expr'] = (empty($ref) ? false : $ref);
         }
 
@@ -95,8 +104,7 @@ class FromProcessor extends AbstractProcessor {
             $parseInfo['expression'] = $this->removeParenthesisFromStart($parseInfo['table']);
 
             if (preg_match("/^\\s*select/i", $parseInfo['expression'])) {
-                $processor = new DefaultProcessor();
-                $parseInfo['sub_tree'] = $processor->process($parseInfo['expression']);
+                $parseInfo['sub_tree'] = $this->processSQLDefault($parseInfo['expression']);
                 $res['expr_type'] = ExpressionType::SUBQUERY;
             } else {
                 $tmp = $this->splitSQLIntoTokens($parseInfo['expression']);
