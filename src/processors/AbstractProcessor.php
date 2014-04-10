@@ -267,7 +267,7 @@ abstract class AbstractProcessor {
         foreach ($tokenList as $token) {
             $expr[] = $token->toArray();
         }
-        return (empty($expr) ? false : $expr);
+        return $expr;
     }
 
     protected function array_insert_after($array, $key, $entry) {

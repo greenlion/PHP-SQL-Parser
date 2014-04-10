@@ -66,7 +66,7 @@ class OrderByProcessor extends AbstractProcessor {
             $parseInfo['no_quotes'] = $this->revokeQuotation($parseInfo['base_expr']);
             // search to see if the expression matches an alias
             foreach ($select as $clause) {
-                if (!$clause['alias']) {
+                if (empty($clause['alias'])) {
                     continue;
                 }
 
