@@ -45,7 +45,7 @@ class SelectExpressionProcessor extends AbstractProcessor {
 
     protected function processExpressionList($unparsed) {
         $processor = new ExpressionListProcessor();
-        return $processor->process($expr);
+        return $processor->process($unparsed);
     }
         
     /**
