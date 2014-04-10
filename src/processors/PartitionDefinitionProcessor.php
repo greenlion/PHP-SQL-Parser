@@ -336,7 +336,9 @@ class PartitionDefinitionProcessor extends AbstractProcessor {
                 case 'VALUES':
                 // we have parenthesis and have to process an expression/in-list
                     $last = $this->getBracketExpressionType($trim);
-                    $last['sub_tree'] = $this->processExpressionList($trim);
+                    
+                    $res = $this->processExpressionList($trim);
+                    $last['sub_tree'] = (empty($res) ? false : $res); 
                     $expr[] = $last;
 
                     $last = array_pop($parsed['sub_tree']);

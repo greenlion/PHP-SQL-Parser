@@ -55,7 +55,7 @@ class SetProcessor extends AbstractProcessor {
     protected function processAssignment($base_expr) {
         $assignment = $this->processExpressionList($this->splitSQLIntoTokens($base_expr));
         return array('expr_type' => ExpressionType::EXPRESSION, 'base_expr' => trim($base_expr),
-                     'sub_tree' => $assignment);
+                     'sub_tree' => (empty($assignment) ? false : $assignment));
     }
 
     public function process($tokens, $isUpdate = false) {

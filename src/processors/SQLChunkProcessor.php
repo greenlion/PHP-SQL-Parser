@@ -62,7 +62,6 @@ require_once dirname(__FILE__) . '/SelectProcessor.php';
 require_once dirname(__FILE__) . '/ExplainProcessor.php';
 require_once dirname(__FILE__) . '/LimitProcessor.php';
 require_once dirname(__FILE__) . '/SetProcessor.php';
-require_once dirname(__FILE__) . '/ExpressionListProcessor.php';
 require_once dirname(__FILE__) . '/OrderByProcessor.php';
 require_once dirname(__FILE__) . '/ShowProcessor.php';
 require_once dirname(__FILE__) . '/CreateProcessor.php';

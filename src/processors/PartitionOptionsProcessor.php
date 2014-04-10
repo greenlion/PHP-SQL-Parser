@@ -284,7 +284,8 @@ class PartitionOptionsProcessor extends AbstractProcessor {
                 case 'HASH':
                 // parenthesis around an expression
                     $last = $this->getBracketExpressionType($trim);
-                    $last['sub_tree'] = $this->processExpressionList($trim);
+                    $res = $this->processExpressionList($trim);
+                    $last['sub_tree'] = (empty($res) ? false : $res);
                     $expr[] = $last;
 
                     $last = array_pop($parsed);

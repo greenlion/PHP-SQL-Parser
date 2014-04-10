@@ -86,7 +86,8 @@ class FromProcessor extends AbstractProcessor {
                 }
             }
             $processor = new ExpressionListProcessor();
-            $parseInfo['ref_expr'] = $processor->process($unparsed);
+            $ref = $processor->process($unparsed);
+            $parseInfo['ref_expr'] = (empty($ref) ? false : $ref);
         }
 
         // there is an expression, we have to parse it
