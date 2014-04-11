@@ -184,5 +184,10 @@ class PHPSQLParserConstants {
     public static function isParameterizedFunction($token) {
         return in_array($token, PHPSQLParserConstants::$parameterizedFunctions);
     }
+
+    public static function add_custom_function($token) {
+        $token = strtoupper(trim($token));
+        PHPSQLParserConstants::$customFunctions[$token]=$token;
+    }
 }
 ?>

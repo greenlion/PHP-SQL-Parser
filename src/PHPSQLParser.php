@@ -100,9 +100,7 @@ class PHPSQLParser {
     * @param String $token The name of the function to add
    */
     public function add_custom_function($token) {
-        $token = trim(strtoupper($token));
-        PHPSQLParserConstants::$customFunctions[$token]=$token;
-        PHPSQLParserConstants::$reserved[$token]=$token;
+        PHPSQLParserConstants::add_custom_function($token);
     }
 
    /**
