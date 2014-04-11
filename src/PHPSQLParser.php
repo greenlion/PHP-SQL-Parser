@@ -94,5 +94,22 @@ class PHPSQLParser {
         $this->parsed = $queries;
         return $this->parsed;
     }
+
+   /**
+    * Add a custom function to the parser.  no return value
+    * @param String $token The name of the function to add
+   */
+    public function add_custom_function($token) {
+        $token = trim(strtoupper($token));
+        PHPSQLParserConstants::$customFunctions[$token]=$token;
+        PHPSQLParserConstants::$reserved[$token]=$token;
+    }
+
+   /**
+    * Returns the list of custom functions
+   */
+    public function get_custom_functions() {
+        return PHPSQLParserConstants::$customFunctions;
+    }
 }
 ?>

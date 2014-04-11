@@ -384,6 +384,11 @@ class ExpressionListProcessor extends AbstractProcessor {
             if (!$curr->isOperator() && !$curr->isInList() && !$curr->isFunction() && !$curr->isAggregateFunction()
                     && PHPSQLParserConstants::isReserved($curr->getUpper())) {
 
+                if (PHPSQLParserConstants::isCustomFunction($curr->getUpper())) {
+                    $curr->setTokenType(ExpressionType::CUSTOM_AGGREGATE_FUNCTION);
+                    $curr->setNoQuotes(null);
+                }
+
                 if (PHPSQLParserConstants::isAggregateFunction($curr->getUpper())) {
                     $curr->setTokenType(ExpressionType::AGGREGATE_FUNCTION);
                     $curr->setNoQuotes(null);
