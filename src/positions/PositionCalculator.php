@@ -210,7 +210,7 @@ class PositionCalculator {
             } else {
                 // move the current pos after the keyword
                 // SELECT, WHERE, INSERT etc.
-                if (PHPSQLParserConstants::isReserved($key)) {
+                if (PHPSQLParserConstants::getInstance()->isReserved($key)) {
                     $charPos = stripos($sql, $key, $charPos);
                     $charPos += strlen($key);
                 }

@@ -136,7 +136,7 @@ class ShowProcessor extends AbstractProcessor {
                     $category = "TABLENAME";
                     break;
                 case 'FUNCTION':
-                    if (PHPSQLParserConstants::isAggregateFunction($upper)) {
+                    if (PHPSQLParserConstants::getInstance()->isAggregateFunction($upper)) {
                         $expr_type = ExpressionType::AGGREGATE_FUNCTION;
                     } else {
                         $expr_type = ExpressionType::SIMPLE_FUNCTION;

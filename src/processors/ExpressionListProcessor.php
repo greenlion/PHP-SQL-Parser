@@ -41,6 +41,7 @@
 
 require_once dirname(__FILE__) . '/AbstractProcessor.php';
 require_once dirname(__FILE__) . '/DefaultProcessor.php';
+require_once dirname(__FILE__) . '/../utils/PHPSQLParserConstants.php';
 require_once dirname(__FILE__) . '/../utils/ExpressionToken.php';
 require_once dirname(__FILE__) . '/../utils/ExpressionType.php';
 
@@ -382,9 +383,9 @@ class ExpressionListProcessor extends AbstractProcessor {
 
             /* is a reserved word? */
             if (!$curr->isOperator() && !$curr->isInList() && !$curr->isFunction() && !$curr->isAggregateFunction()
-                    && PHPSQLParserConstants::isReserved($curr->getUpper())) {
+                    && PHPSQLParserConstants::getInstance()->isReserved($curr->getUpper())) {
 
-                if (PHPSQLParserConstants::isAggregateFunction($curr->getUpper())) {
+                if (PHPSQLParserConstants::getInstance()->isAggregateFunction($curr->getUpper())) {
                     $curr->setTokenType(ExpressionType::AGGREGATE_FUNCTION);
                     $curr->setNoQuotes(null);
 
@@ -393,13 +394,13 @@ class ExpressionListProcessor extends AbstractProcessor {
                     $curr->setTokenType(ExpressionType::CONSTANT);
 
                 } else {
-                    if (PHPSQLParserConstants::isParameterizedFunction($curr->getUpper())) {
+                    if (PHPSQLParserConstants::getInstance()->isParameterizedFunction($curr->getUpper())) {
                         // issue 60: check functions with parameters
                         // -> colref (we check parameters later)
                         // -> if there is no parameter, we leave the colref
                         $curr->setTokenType(ExpressionType::COLREF);
 
-                    } elseif (PHPSQLParserConstants::isFunction($curr->getUpper())) {
+                    } elseif (PHPSQLParserConstants::getInstance()->isFunction($curr->getUpper())) {
                         $curr->setTokenType(ExpressionType::SIMPLE_FUNCTION);
                         $curr->setNoQuotes(null);
 
@@ -411,12 +412,12 @@ class ExpressionListProcessor extends AbstractProcessor {
             }
 
             // issue 94, INTERVAL 1 MONTH
-            if ($curr->isConstant() && PHPSQLParserConstants::isParameterizedFunction($prev->getUpper())) {
+            if ($curr->isConstant() && PHPSQLParserConstants::getInstance()->isParameterizedFunction($prev->getUpper())) {
                 $prev->setTokenType(ExpressionType::RESERVED);
                 $prev->setNoQuotes(null);
             }
 
-            if ($prev->isConstant() && PHPSQLParserConstants::isParameterizedFunction($curr->getUpper())) {
+            if ($prev->isConstant() && PHPSQLParserConstants::getInstance()->isParameterizedFunction($curr->getUpper())) {
                 $curr->setTokenType(ExpressionType::RESERVED);
                 $curr->setNoQuotes(null);
             }
