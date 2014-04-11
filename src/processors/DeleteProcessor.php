@@ -41,7 +41,6 @@
 
 require_once dirname(__FILE__) . '/AbstractProcessor.php';
 
-
 /**
  * This class processes the DELETE statements.
  * You can overwrite all functions to achieve another handling.
@@ -57,7 +56,8 @@ class DeleteProcessor extends AbstractProcessor {
         $del = $tokens['DELETE'];
 
         foreach ($tokens['DELETE'] as $expression) {
-            if (strtoupper($expression) !== 'DELETE' && trim($expression, ' .*') !== "" && !$this->isCommaToken($expression)) {
+            if (strtoupper($expression) !== 'DELETE' && trim($expression, ' .*') !== ""
+                && !$this->isCommaToken($expression)) {
                 $tables[] = trim($expression, '.* ');
             }
         }
@@ -67,16 +67,17 @@ class DeleteProcessor extends AbstractProcessor {
                 $tables[] = trim($table['table'], '.* ');
             }
             $tokens['FROM'] = $tokens['USING'];
-            unset($tokens['USING']);              
+            unset($tokens['USING']);
         }
-        
+
         $options = array();
         if (isset($tokens['OPTIONS'])) {
             $options = $tokens['OPTIONS'];
             unset($tokens['OPTIONS']);
         }
 
-        $tokens['DELETE'] = array('options' => $options, 'tables' => $tables);
+        $tokens['DELETE'] = array('options' => (empty($options) ? false : $options),
+                                  'tables' => (empty($tables) ? false : $tables));
         return $tokens;
     }
 }
