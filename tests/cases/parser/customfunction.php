@@ -6,7 +6,7 @@ require_once dirname(__FILE__) . "/../../test-more.php";
 try {
     $sql = "SELECT PERCENTILE(xyz, 90) as percentile from some_table";
     $parser = new PHPSQLParser();
-    $parser->add_custom_function("percentile");
+    $parser->addCustomFunction("percentile");
     $p = $parser->parse($sql, true);
 } catch (Exception $e) {
     $p = array();
