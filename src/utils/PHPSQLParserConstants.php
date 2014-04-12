@@ -31,8 +31,8 @@
  */
 
 class PHPSQLParserConstants {
-    protected static $customFunctions = array();	
-    protected static $reserved        = array('ABS', 'ACOS', 'ADDDATE', 'ADDTIME', 'AES_ENCRYPT', 'AES_DECRYPT', 'AGAINST',
+    protected static $customFunctions = array();
+    protected static $reserved = array('ABS', 'ACOS', 'ADDDATE', 'ADDTIME', 'AES_ENCRYPT', 'AES_DECRYPT', 'AGAINST',
                                        'ASCII', 'ASIN', 'ATAN', 'AVG', 'BENCHMARK', 'BIN', 'BIT_AND', 'BIT_OR',
                                        'BITCOUNT', 'BITLENGTH', 'CAST', 'CEILING', 'CHAR', 'CHAR_LENGTH',
                                        'CHARACTER_LENGTH', 'CHARSET', 'COALESCE', 'COERCIBILITY', 'COLLATION',
@@ -90,10 +90,10 @@ class PHPSQLParserConstants {
                                        'SQL_CALC_FOUND_ROWS', 'SQL_SMALL_RESULT', 'SQL_TSI_DAY', 'SQL_TSI_FRAC_SECOND',
                                        'SQL_TSI_HOUR', 'SQL_TSI_MINUTE', 'SQL_TSI_MONTH', 'SQL_TSI_QUARTER',
                                        'SQL_TSI_SECOND', 'SQL_TSI_WEEK', 'SQL_TSI_YEAR', 'SSL', 'STARTING',
-                                       'STRAIGHT_JOIN', 'STRIPED', 'TABLE', 'TABLES', 'TEMPORARY', 'TERMINATED', 'THEN',
-                                       'TIMESTAMPADD', 'TIMESTAMPDIFF', 'TINYBLOB', 'TINYINT', 'TINYTEXT', 'TO',
-                                       'TRAILING', 'TRUE', 'UNDO', 'UNION', 'UNIQUE', 'UNLOCK', 'UNSIGNED', 'UPDATE',
-                                       'USAGE', 'USE', 'USER_RESOURCES', 'USING', 'UTC_DATE', 'UTC_TIME',
+                                       'STRAIGHT_JOIN', 'STRIPED', 'TABLE', 'TABLES', 'TEMPORARY', 'TERMINATED',
+                                       'THEN', 'TIMESTAMPADD', 'TIMESTAMPDIFF', 'TINYBLOB', 'TINYINT', 'TINYTEXT',
+                                       'TO', 'TRAILING', 'TRUE', 'UNDO', 'UNION', 'UNIQUE', 'UNLOCK', 'UNSIGNED',
+                                       'UPDATE', 'USAGE', 'USE', 'USER_RESOURCES', 'USING', 'UTC_DATE', 'UTC_TIME',
                                        'UTC_TIMESTAMP', 'VALUES', 'VARBINARY', 'VARCHAR', 'VARCHARACTER', 'VARYING',
                                        'WHEN', 'WHERE', 'WHILE', 'WITH', 'WRITE', 'XOR', 'YEAR_MONTH', 'ZEROFILL');
 
@@ -170,24 +170,29 @@ class PHPSQLParserConstants {
     }
 
     public static function isCustomFunction($token) {
-        return in_array($token, PHPSQLParserConstants::$customFunctions); 
+        return isset(PHPSQLParserConstants::$customFunctions[$token]);
     }
 
     public static function isReserved($token) {
-        return in_array($token, SELF::$reserved);
+        return in_array($token, PHPSQLParserConstants::$reserved);
     }
-    
+
     public static function isFunction($token) {
         return in_array($token, PHPSQLParserConstants::$functions);
     }
-    
+
     public static function isParameterizedFunction($token) {
         return in_array($token, PHPSQLParserConstants::$parameterizedFunctions);
     }
 
     public static function add_custom_function($token) {
         $token = strtoupper(trim($token));
-        PHPSQLParserConstants::$customFunctions[$token]=$token;
+        PHPSQLParserConstants::$customFunctions[$token] = $token;
+    }
+
+    public static function remove_custom_function($token) {
+        $token = strtoupper(trim($token));
+        unset(PHPSQLParserConstants::$customFunctions[$token]);
     }
 }
 ?>
