@@ -120,6 +120,10 @@ class ExpressionToken {
         return $this->tokenType === ExpressionType::AGGREGATE_FUNCTION;
     }
 
+    public function isCustomFunction() {
+        return $this->tokenType === ExpressionType::CUSTOM_FUNCTION;
+    }
+
     public function isColumnReference() {
         return $this->tokenType === ExpressionType::COLREF;
     }

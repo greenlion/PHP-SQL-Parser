@@ -97,7 +97,8 @@ class FunctionBuilder implements Builder {
 
     public function build(array $parsed) {
         if (($parsed['expr_type'] !== ExpressionType::AGGREGATE_FUNCTION)
-            && ($parsed['expr_type'] !== ExpressionType::SIMPLE_FUNCTION)) {
+            && ($parsed['expr_type'] !== ExpressionType::SIMPLE_FUNCTION
+            /*&& ($parsed['expr_type'] !== ExpressionType::CUSTOM_FUNCTION*/)) {
             return "";
         }
 
