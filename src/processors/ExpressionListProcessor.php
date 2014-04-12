@@ -130,7 +130,8 @@ class ExpressionListProcessor extends AbstractProcessor {
                     $curr->setTokenType(ExpressionType::MATCH_ARGUMENTS);
                     $prev->setTokenType(ExpressionType::SIMPLE_FUNCTION);
 
-                } elseif ($prev->isColumnReference() || $prev->isFunction() || $prev->isAggregateFunction() || $prev->isCustomFunction()) {
+                } elseif ($prev->isColumnReference() || $prev->isFunction() || $prev->isAggregateFunction()
+                        || $prev->isCustomFunction()) {
 
                     // if we have a colref followed by a parenthesis pair,
                     // it isn't a colref, it is a user-function
@@ -192,7 +193,11 @@ class ExpressionListProcessor extends AbstractProcessor {
 
                     $prev->setSubTree($curr->getSubTree());
                     if ($prev->isColumnReference()) {
-                        $prev->setTokenType(ExpressionType::SIMPLE_FUNCTION);
+                        if (PHPSQLParserConstants::isCustomFunction($prev->getUpper())) {
+                            $prev->setTokenType(ExpressionType::CUSTOM_FUNCTION);
+                        } else {
+                            $prev->setTokenType(ExpressionType::SIMPLE_FUNCTION);
+                        }
                         $prev->setNoQuotes(null);
                     }
 
@@ -275,7 +280,7 @@ class ExpressionListProcessor extends AbstractProcessor {
                     // then * is an operator
                     // but if the previous colref ends with a dot, the * is the all-columns-alias
                     if (!$prev->isColumnReference() && !$prev->isConstant() && !$prev->isExpression()
-                            && !$prev->isBracketExpression() && !$prev->isAggregateFunction() && !$prev->isVariable() &&!$prev->isCustomFunction()) {
+                            && !$prev->isBracketExpression() && !$prev->isAggregateFunction() && !$prev->isVariable()) {
                         $curr->setTokenType(ExpressionType::COLREF);
                         break;
                     }
@@ -381,8 +386,8 @@ class ExpressionListProcessor extends AbstractProcessor {
             }
 
             /* is a reserved word? */
-            if (!$curr->isOperator() && !$curr->isInList() && !$curr->isFunction() && !$curr->isAggregateFunction() && !$curr->isCustomFunction()
-                    && PHPSQLParserConstants::isReserved($curr->getUpper())) {
+            if (!$curr->isOperator() && !$curr->isInList() && !$curr->isFunction() && !$curr->isAggregateFunction()
+                    && !$curr->isCustomFunction() && PHPSQLParserConstants::isReserved($curr->getUpper())) {
 
                 if (PHPSQLParserConstants::isCustomFunction($curr->getUpper())) {
                     $curr->setTokenType(ExpressionType::CUSTOM_FUNCTION);
