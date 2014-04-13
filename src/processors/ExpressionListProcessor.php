@@ -194,7 +194,7 @@ class ExpressionListProcessor extends AbstractProcessor {
 
                     $prev->setSubTree($curr->getSubTree());
                     if ($prev->isColumnReference()) {
-                        if (PHPSQLParserConstants::isCustomFunction($prev->getUpper())) {
+                        if (PHPSQLParserConstants::getInstance()->isCustomFunction($prev->getUpper())) {
                             $prev->setTokenType(ExpressionType::CUSTOM_FUNCTION);
                         } else {
                             $prev->setTokenType(ExpressionType::SIMPLE_FUNCTION);

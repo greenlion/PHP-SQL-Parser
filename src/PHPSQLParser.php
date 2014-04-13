@@ -100,7 +100,7 @@ class PHPSQLParser {
      * @param String $token The name of the function to add
      */
     public function addCustomFunction($token) {
-        PHPSQLParserConstants::addCustomFunction($token);
+        PHPSQLParserConstants::getInstance()->addCustomFunction($token);
     }
 
     /**
@@ -108,14 +108,14 @@ class PHPSQLParser {
      * @param String $token The name of the function to remove
      */
     public function removeCustomFunction($token) {
-        PHPSQLParserConstants::remove_custom_function($token);
+        PHPSQLParserConstants::getInstance()->removeCustomFunction($token);
     }
 
     /**
      * Returns the list of custom functions
      */
     public function getCustomFunctions() {
-        return PHPSQLParserConstants::$customFunctions;
+        return PHPSQLParserConstants::getInstance()->getCustomFunctions();
     }
 }
 ?>
