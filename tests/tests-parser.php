@@ -7,6 +7,7 @@ $start = microtime(true);
 require_once dirname(__FILE__) . '/cases/parser/aliases.php';
 require_once dirname(__FILE__) . '/cases/parser/allcolumns.php';
 require_once dirname(__FILE__) . '/cases/parser/backtick.php';
+require_once dirname(__FILE__) . '/cases/parser/customfunction.php';
 require_once dirname(__FILE__) . '/cases/parser/delete.php';
 require_once dirname(__FILE__) . '/cases/parser/drop.php';
 require_once dirname(__FILE__) . '/cases/parser/from.php';
