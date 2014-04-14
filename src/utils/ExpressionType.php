@@ -61,6 +61,8 @@ class ExpressionType {
     const CONSTANT = 'const';
 
     const AGGREGATE_FUNCTION = 'aggregate_function';
+    const CUSTOM_FUNCTION = 'custom_function';
+
     const SIMPLE_FUNCTION = 'function';
 
     const EXPRESSION = 'expression';

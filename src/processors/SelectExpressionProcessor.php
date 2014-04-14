@@ -117,7 +117,7 @@ class SelectExpressionProcessor extends AbstractProcessor {
 
             if ($this->isReserved($prev) || $this->isConstant($prev) || $this->isAggregateFunction($prev)
                     || $this->isFunction($prev) || $this->isExpression($prev) || $this->isSubQuery($prev)
-                    || $this->isColumnReference($prev) || $this->isBracketExpression($prev)) {
+                    || $this->isColumnReference($prev) || $this->isBracketExpression($prev)|| $this->isCustomFunction($prev)) {
 
                 $alias = array('as' => false, 'name' => trim($last['base_expr']),
                                'no_quotes' => $this->revokeQuotation($last['base_expr']),
