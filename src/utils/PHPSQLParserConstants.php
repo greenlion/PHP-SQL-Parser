@@ -34,6 +34,7 @@ class PHPSQLParserConstants {
 
     private static $inst = null;
 
+    protected $customFunctions = array();
     protected $reserved = array('ABS', 'ACOS', 'ADDDATE', 'ADDTIME', 'AES_ENCRYPT', 'AES_DECRYPT', 'AGAINST', 'ASCII',
                                 'ASIN', 'ATAN', 'AVG', 'BENCHMARK', 'BIN', 'BIT_AND', 'BIT_OR', 'BITCOUNT',
                                 'BITLENGTH', 'CAST', 'CEILING', 'CHAR', 'CHAR_LENGTH', 'CHARACTER_LENGTH', 'CHARSET',
@@ -194,6 +195,20 @@ class PHPSQLParserConstants {
 
     public function isParameterizedFunction($token) {
         return isset($this->parameterizedFunctions[$token]);
+    }
+
+    public function isCustomFunction($token) {
+        return isset($this->customFunctions[$token]);
+    }
+
+    public function addCustomFunction($token) {
+        $token = strtoupper(trim($token));
+        $this->customFunctions[$token] = true;
+    }
+
+    public function removeCustomFunction($token) {
+        $token = strtoupper(trim($token));
+        unset($this->$customFunctions[$token]);
     }
 }
 ?>

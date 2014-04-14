@@ -94,5 +94,28 @@ class PHPSQLParser {
         $this->parsed = $queries;
         return $this->parsed;
     }
+
+    /**
+     * Add a custom function to the parser.  no return value
+     * @param String $token The name of the function to add
+     */
+    public function addCustomFunction($token) {
+        PHPSQLParserConstants::getInstance()->addCustomFunction($token);
+    }
+
+    /**
+     * Remove a custom function from the parser.  no return value
+     * @param String $token The name of the function to remove
+     */
+    public function removeCustomFunction($token) {
+        PHPSQLParserConstants::getInstance()->removeCustomFunction($token);
+    }
+
+    /**
+     * Returns the list of custom functions
+     */
+    public function getCustomFunctions() {
+        return PHPSQLParserConstants::getInstance()->getCustomFunctions();
+    }
 }
 ?>
