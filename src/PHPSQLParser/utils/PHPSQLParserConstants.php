@@ -31,7 +31,6 @@
  */
 
 namespace PHPSQLParser\utils;
-
 class PHPSQLParserConstants {
 
     private static $inst = null;
@@ -211,6 +210,10 @@ class PHPSQLParserConstants {
     public function removeCustomFunction($token) {
         $token = strtoupper(trim($token));
         unset($this->$customFunctions[$token]);
+    }
+
+    public function getCustomFunctions() {
+        return array_keys($this->customFunctions);
     }
 }
 ?>

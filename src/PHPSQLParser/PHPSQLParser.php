@@ -1,7 +1,7 @@
 <?php
 
 /**
- * php-sql-parser.php
+ * PHPSQLParser.php
  *
  * A pure PHP SQL (non validating) parser w/ focus on MySQL dialect of SQL
  *
@@ -103,7 +103,10 @@ class PHPSQLParser {
 
     /**
      * Add a custom function to the parser.  no return value
+     * 
      * @param String $token The name of the function to add
+     * 
+     * @return null
      */
     public function addCustomFunction($token) {
         PHPSQLParserConstants::getInstance()->addCustomFunction($token);
@@ -111,7 +114,10 @@ class PHPSQLParser {
 
     /**
      * Remove a custom function from the parser.  no return value
+     * 
      * @param String $token The name of the function to remove
+     * 
+     * @return null
      */
     public function removeCustomFunction($token) {
         PHPSQLParserConstants::getInstance()->removeCustomFunction($token);
@@ -119,6 +125,8 @@ class PHPSQLParser {
 
     /**
      * Returns the list of custom functions
+     * 
+     * @return array Returns an array of all custom functions 
      */
     public function getCustomFunctions() {
         return PHPSQLParserConstants::getInstance()->getCustomFunctions();
