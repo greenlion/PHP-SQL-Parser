@@ -39,6 +39,10 @@
  *
  */
 
+namespace PHPSQLParser\processors;
+use PHPSQLParser\utils\ExpressionType;
+use PHPSQLParser\utils\ExpressionToken;
+
 require_once dirname(__FILE__) . '/AbstractProcessor.php';
 require_once dirname(__FILE__) . '/../utils/ExpressionToken.php';
 require_once dirname(__FILE__) . '/../utils/ExpressionType.php';

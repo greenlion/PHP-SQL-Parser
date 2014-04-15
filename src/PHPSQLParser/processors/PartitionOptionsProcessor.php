@@ -40,6 +40,9 @@
  *
  */
 
+namespace PHPSQLParser\processors;
+use PHPSQLParser\utils\ExpressionType;
+
 require_once dirname(__FILE__) . '/AbstractProcessor.php';
 require_once dirname(__FILE__) . '/ColumnListProcessor.php';
 require_once dirname(__FILE__) . '/ExpressionListProcessor.php';

@@ -39,6 +39,9 @@
  *
  */
 
+namespace PHPSQLParser\processors;
+use PHPSQLParser\utils\ExpressionType;
+
 require_once dirname(__FILE__) . '/AbstractProcessor.php';
 require_once dirname(__FILE__) . '/CreateDefinitionProcessor.php';
 require_once dirname(__FILE__) . '/PartitionOptionsProcessor.php';

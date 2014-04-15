@@ -39,6 +39,7 @@
  *
  */
 
+namespace PHPSQLParser\processors;
 require_once dirname(__FILE__) . '/AbstractProcessor.php';
 require_once dirname(__FILE__) . '/FromProcessor.php';
 require_once dirname(__FILE__) . '/RecordProcessor.php';

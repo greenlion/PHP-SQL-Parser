@@ -40,6 +40,7 @@
  *
  */
 
+namespace PHPSQLParser\processors;
 require_once(dirname(__FILE__) . '/AbstractProcessor.php');
 require_once(dirname(__FILE__) . '/ExpressionListProcessor.php');
 
@@ -56,7 +57,7 @@ class RecordProcessor extends AbstractProcessor {
         $processor = new ExpressionListProcessor();
         return $processor->process($unparsed);
     }
-    
+
     public function process($unparsed) {
         $unparsed = $this->removeParenthesisFromStart($unparsed);
         $values = $this->splitSQLIntoTokens($unparsed);

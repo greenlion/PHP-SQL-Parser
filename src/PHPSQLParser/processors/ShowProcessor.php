@@ -30,6 +30,10 @@
  * DAMAGE.
  */
 
+namespace PHPSQLParser\processors;
+use PHPSQLParser\utils\ExpressionType;
+use PHPSQLParser\utils\PHPSQLParserConstants;
+
 require_once(dirname(__FILE__) . '/../utils/PHPSQLParserConstants.php');
 require_once(dirname(__FILE__) . '/../utils/ExpressionType.php');
 require_once(dirname(__FILE__) . '/LimitProcessor.php');

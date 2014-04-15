@@ -39,7 +39,7 @@
  *
  */
 
-require_once dirname(__FILE__) . '/AbstractProcessor.php';
+namespace PHPSQLParser\processors;
 require_once dirname(__FILE__) . '/SQLChunkProcessor.php';
 
 /**

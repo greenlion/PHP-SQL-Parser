@@ -39,7 +39,11 @@
  *
  */
 
+namespace PHPSQLParser\processors;
+use PHPSQLParser\utils\ExpressionType;
+
 require_once dirname(__FILE__) . '/AbstractProcessor.php';
+require_once dirname(__FILE__) . '/../utils/ExpressionType.php';
 
 /**
  * This class processes the statement options.
@@ -52,22 +56,23 @@ class OptionsProcessor extends AbstractProcessor {
 
     public function process($tokens) {
         $resultList = array();
-        
+
         foreach ($tokens as $token) {
-        
+
             $tokenList = $this->splitSQLIntoTokens($token);
             $result = array();
-            
+
             foreach ($tokenList as $reserved) {
                 $trim = trim($reserved);
                 if ($trim === '') {
                     continue;
                 }
-                $result[] = array('expr_type'=>ExpressionType::RESERVED,'base_expr'=>$trim);
+                $result[] = array('expr_type' => ExpressionType::RESERVED, 'base_expr' => $trim);
             }
-            $resultList[] = array('expr_type'=>ExpressionType::EXPRESSION, 'base_expr'=>trim($token), 'sub_tree'=>$result);            
+            $resultList[] = array('expr_type' => ExpressionType::EXPRESSION, 'base_expr' => trim($token),
+                                  'sub_tree' => $result);
         }
-        
+
         return $resultList;
     }
 }
