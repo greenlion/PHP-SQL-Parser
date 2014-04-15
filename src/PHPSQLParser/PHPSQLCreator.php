@@ -40,6 +40,16 @@
  */
 
 namespace PHPSQLParser;
+use PHPSQLParser\exceptions\UnsupportedFeatureException;
+use PHPSQLParser\builders\SelectStatementBuilder;
+use PHPSQLParser\builders\DeleteStatementBuilder;
+use PHPSQLParser\builders\UpdateStatementBuilder;
+use PHPSQLParser\builders\InsertStatementBuilder;
+use PHPSQLParser\builders\CreateStatementBuilder;
+use PHPSQLParser\builders\DropStatementBuilder;
+use PHPSQLParser\builders\RenameStatementBuilder;
+use PHPSQLParser\builders\ShowStatementBuilder;
+use PHPSQLParser\builders\BracketStatementBuilder;
 
 require_once dirname(__FILE__) . '/exceptions/UnsupportedFeatureException.php';
 require_once dirname(__FILE__) . '/builders/SelectStatementBuilder.php';
