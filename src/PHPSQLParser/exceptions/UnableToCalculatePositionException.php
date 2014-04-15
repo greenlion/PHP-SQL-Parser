@@ -40,7 +40,7 @@
  * 
  */
 
-namespace PHSQLParser\exceptions;
+namespace PHPSQLParser\exceptions;
 use Exception;
 
 /**

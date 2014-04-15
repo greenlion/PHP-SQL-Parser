@@ -6,7 +6,8 @@
  * directly within a shell.
  */
 
-require_once dirname(__FILE__) . '/../src/PHPSQLParser.php';
+namespace PHPSQLParser;
+require_once dirname(__FILE__) . '/../src/PHPSQLParser/PHPSQLParser.php';
 
 $sql = 'SELECT 1';
 echo $sql . "\n";
