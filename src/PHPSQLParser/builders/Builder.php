@@ -39,6 +39,8 @@
  * 
  */
 
+namespace PHPSQLParser\builders;
+
 /**
  * A builder can create a part of an SQL statement. The necessary information
  * are provided by the function parameter as array. This array is a subtree
