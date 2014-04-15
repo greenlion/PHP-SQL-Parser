@@ -30,6 +30,8 @@
  * DAMAGE.
  */
 
+namespace PHPSQLParser\utils;
+
 class PHPSQLParserConstants {
 
     private static $inst = null;
