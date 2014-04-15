@@ -39,6 +39,9 @@
  * 
  */
 
+namespace PHPSQLParser\builders;
+use PHPSQLParser\exceptions\UnableToCreateSQLException;
+
 require_once dirname(__FILE__) . '/../exceptions/UnableToCreateSQLException.php';
 require_once dirname(__FILE__) . '/ColumnReferenceBuilder.php';
 require_once dirname(__FILE__) . '/ConstantBuilder.php';

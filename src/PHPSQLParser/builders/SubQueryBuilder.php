@@ -39,6 +39,9 @@
  * 
  */
 
+namespace PHPSQLParser\builders;
+use PHPSQLParser\utils\ExpressionType;
+
 require_once dirname(__FILE__) . '/RefClauseBuilder.php';
 require_once dirname(__FILE__) . '/RefTypeBuilder.php';
 require_once dirname(__FILE__) . '/JoinBuilder.php';

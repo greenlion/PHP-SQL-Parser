@@ -39,8 +39,10 @@
  * 
  */
 
+namespace PHPSQLParser\builders;
+use PHPSQLParser\exceptions\UnableToCreateSQLException;
+
 require_once dirname(__FILE__) . '/../exceptions/UnableToCreateSQLException.php';
-require_once dirname(__FILE__) . '/../utils/ExpressionType.php';
 require_once dirname(__FILE__) . '/ReservedBuilder.php';
 require_once dirname(__FILE__) . '/SelectBracketExpressionBuilder.php';
 require_once dirname(__FILE__) . '/ColumnReferenceBuilder.php';
@@ -95,7 +97,7 @@ class SubTreeBuilder implements Builder {
         $builder = new QueryBuilder();
         return $builder->build($parsed);
     }
-    
+
     protected function buildSelectBracketExpression($parsed) {
         $builder = new SelectBracketExpressionBuilder();
         return $builder->build($parsed);

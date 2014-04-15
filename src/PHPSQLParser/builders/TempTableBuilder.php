@@ -39,6 +39,9 @@
  * 
  */
 
+namespace PHPSQLParser\builders;
+use PHPSQLParser\utils\ExpressionType;
+
 require_once dirname(__FILE__) . '/../utils/ExpressionType.php';
 require_once dirname(__FILE__) . '/AliasBuilder.php';
 require_once dirname(__FILE__) . '/JoinBuilder.php';
@@ -65,12 +68,12 @@ class TempTableBuilder implements Builder {
         $builder = new JoinBuilder();
         return $builder->build($parsed);
     }
-    
+
     protected function buildRefType($parsed) {
         $builder = new RefTypeBuilder();
         return $builder->build($parsed);
     }
-    
+
     protected function buildRefClause($parsed) {
         $builder = new RefClauseBuilder();
         return $builder->build($parsed);

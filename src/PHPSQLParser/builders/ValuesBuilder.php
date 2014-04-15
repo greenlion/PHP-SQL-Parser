@@ -39,6 +39,9 @@
  * 
  */
 
+namespace PHPSQLParser\builders;
+use PHPSQLParser\exceptions\UnableToCreateSQLException;
+
 require_once dirname(__FILE__) . '/../exceptions/UnableToCreateSQLException.php';
 require_once dirname(__FILE__) . '/RecordBuilder.php';
 require_once dirname(__FILE__) . '/Builder.php';
@@ -72,6 +75,6 @@ class ValuesBuilder implements Builder {
         }
         $sql = substr($sql, 0, -2);
         return "VALUES " . $sql;
-    }    
+    }
 }
 ?>

@@ -39,6 +39,9 @@
  * 
  */
 
+namespace PHPSQLParser\builders;
+use PHPSQLParser\utils\ExpressionType;
+
 require_once dirname(__FILE__) . '/../utils/ExpressionType.php';
 require_once dirname(__FILE__) . '/AliasBuilder.php';
 require_once dirname(__FILE__) . '/JoinBuilder.php';
@@ -61,7 +64,7 @@ class TableExpressionBuilder implements Builder {
         $builder = new FromBuilder();
         return $builder->build($parsed);
     }
-    
+
     protected function buildAlias($parsed) {
         $builder = new AliasBuilder();
         return $builder->build($parsed);
@@ -71,12 +74,12 @@ class TableExpressionBuilder implements Builder {
         $builder = new JoinBuilder();
         return $builder->build($parsed);
     }
-    
+
     protected function buildRefType($parsed) {
         $builder = new RefTypeBuilder();
         return $builder->build($parsed);
     }
-    
+
     protected function buildRefClause($parsed) {
         $builder = new RefClauseBuilder();
         return $builder->build($parsed);

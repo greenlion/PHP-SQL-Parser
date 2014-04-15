@@ -39,6 +39,7 @@
  * 
  */
 
+namespace PHPSQLParser\builders;
 require_once dirname(__FILE__) . '/ShowBuilder.php';
 require_once dirname(__FILE__) . '/WhereBuilder.php';
 require_once dirname(__FILE__) . '/Builder.php';
@@ -57,13 +58,13 @@ class ShowStatementBuilder implements Builder {
         $builder = new WhereBuilder();
         return $builder->build($parsed);
     }
-    
+
     protected function buildSHOW($parsed) {
         $builder = new ShowBuilder();
         return $builder->build($parsed);
     }
-    
-   public function build(array $parsed) {
+
+    public function build(array $parsed) {
         $sql = $this->buildSHOW($parsed);
         if (isset($parsed['WHERE'])) {
             $sql .= " " . $this->buildWHERE($parsed['WHERE']);
