@@ -4,7 +4,7 @@
     "description": "A pure PHP SQL (non validating) parser w/ focus on MySQL dialect of SQL",
     "keywords": ["sql","parser","creator","MySQL"],
     "homepage": "http://code.google.com/p/php-sql-parser/",
-    "license": "BSD New",
+    "license": "BSD-3-Clause",
     "authors": [
         {
             "name": "Justin Swanhart",
@@ -24,10 +24,7 @@
         "source": "http://php-sql-parser.googlecode.com/svn/trunk/"
     },
     "autoload": {
-        "classmap": [
-        	"src/PHPSQLCreator.php", 
-        	"src/PHPSQLParser.php"
-        ]
+        "files": [ "src/PHPSQLParser/PHPSQLCreator.php", "src/PHPSQLParser/PHPSQLParser.php" ]
     },
     "require": {
         "php": ">=5.3.2"
