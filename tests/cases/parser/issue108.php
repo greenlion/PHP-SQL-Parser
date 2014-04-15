@@ -1,6 +1,6 @@
 <?php
 /**
- * issu107.php
+ * issue108.php
  *
  * Test case for PHPSQLParser.
  *
