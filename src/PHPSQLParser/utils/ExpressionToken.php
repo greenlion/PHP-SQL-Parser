@@ -2,6 +2,8 @@
 
 namespace PHPSQLParser\utils;
 
+use PHPSQLParser\processors\DefaultProcessor;
+
 require_once dirname(__FILE__) . '/ExpressionType.php';
 require_once dirname(__FILE__) . '/../processors/DefaultProcessor.php';
 
