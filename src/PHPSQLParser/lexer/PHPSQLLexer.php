@@ -41,6 +41,7 @@
  */
 
 namespace PHPSQLParser\lexer;
+use PHPSQLParser\exceptions\InvalidParameterException;
 
 require_once dirname(__FILE__) . '/LexerSplitter.php';
 require_once dirname(__FILE__) . '/../exceptions/InvalidParameterException.php';
@@ -84,7 +85,7 @@ class PHPSQLLexer {
 
     public function split($sql) {
         if (!is_string($sql)) {
-            throw new PHPSQLParser\exceptions\InvalidParameterException($sql);
+            throw new InvalidParameterException($sql);
         }
 
         $tokens = array();
@@ -152,7 +153,7 @@ class PHPSQLLexer {
                     $tokens[$i - 1] .= $tokens[$i + 1];
                     unset($tokens[$i]);
                     unset($tokens[$i + 1]);
-                
+
                 } elseif (is_numeric($token)) {
                     $tokens[$i - 1] .= $tokens[$i];
                     unset($tokens[$i]);

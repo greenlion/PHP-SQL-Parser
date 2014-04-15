@@ -41,6 +41,9 @@
  */
 
 namespace PHPSQLParser\positions;
+use PHPSQLParser\utils\PHPSQLParserConstants;
+use PHPSQLParser\exceptions\UnableToCalculatePositionException;
+use PHPSQLParser\utils\ExpressionType;
 
 require_once dirname(__FILE__) . '/../utils/PHPSQLParserConstants.php';
 require_once dirname(__FILE__) . '/../exceptions/UnableToCalculatePositionException.php';
