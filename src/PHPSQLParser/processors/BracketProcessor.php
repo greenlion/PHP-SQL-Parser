@@ -40,6 +40,8 @@
  */
 
 namespace PHPSQLParser\processors;
+use PHPSQLParser\utils\ExpressionType;
+
 require_once dirname(__FILE__) . '/../utils/ExpressionType.php';
 require_once dirname(__FILE__) . '/DefaultProcessor.php';
 require_once dirname(__FILE__) . '/AbstractProcessor.php';
@@ -70,13 +72,12 @@ class BracketProcessor extends AbstractProcessor {
 
         if (isset($subtree['SELECT'])) {
             $subtree = array(
-                    array('expr_type' => PHPSQLParser\utils\ExpressionType::QUERY, 'base_expr' => $token,
-                            'sub_tree' => $subtree));
+                    array('expr_type' => ExpressionType::QUERY, 'base_expr' => $token, 'sub_tree' => $subtree));
         }
 
         return array(
-                array('expr_type' => PHPSQLParser\utils\ExpressionType::BRACKET_EXPRESSION,
-                        'base_expr' => trim($tokens[0]), 'sub_tree' => $subtree));
+                array('expr_type' => ExpressionType::BRACKET_EXPRESSION, 'base_expr' => trim($tokens[0]),
+                        'sub_tree' => $subtree));
     }
 
 }
