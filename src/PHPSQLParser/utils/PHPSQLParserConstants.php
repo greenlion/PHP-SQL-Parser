@@ -209,7 +209,7 @@ class PHPSQLParserConstants {
 
     public function removeCustomFunction($token) {
         $token = strtoupper(trim($token));
-        unset($this->$customFunctions[$token]);
+        unset($this->customFunctions[$token]);
     }
 
     public function getCustomFunctions() {
