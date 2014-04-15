@@ -39,6 +39,7 @@
  * 
  */
 
+namespace PHPSQLParser\builders;
 require_once dirname(__FILE__) . '/IndexTypeBuilder.php';
 
 /**

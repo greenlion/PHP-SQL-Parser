@@ -39,6 +39,7 @@
  * 
  */
 
+namespace PHPSQLParser\builders;
 require_once dirname(__FILE__) . '/LikeBuilder.php';
 require_once dirname(__FILE__) . '/SelectStatementBuilder.php';
 require_once dirname(__FILE__) . '/CreateBuilder.php';
@@ -68,7 +69,7 @@ class CreateStatementBuilder implements Builder {
         $builder = new CreateBuilder();
         return $builder->build($parsed);
     }
-    
+
     public function build(array $parsed) {
         $sql = $this->buildCREATE($parsed);
         if (isset($parsed['LIKE'])) {

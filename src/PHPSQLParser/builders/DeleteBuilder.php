@@ -39,6 +39,7 @@
  * 
  */
 
+namespace PHPSQLParser\builders;
 require_once dirname(__FILE__) . '/Builder.php';
 
 /**
@@ -54,16 +55,16 @@ class DeleteBuilder implements Builder {
     public function build(array $parsed) {
         $sql = "DELETE ";
         $right = -1;
-        
+
         foreach ($parsed['options'] as $k => $v) {
             $sql .= $v . " ";
         }
-        
+
         foreach ($parsed['tables'] as $k => $v) {
             $sql .= $v . ", ";
             $right = -2;
         }
-        
+
         return substr($sql, 0, $right);
     }
 }

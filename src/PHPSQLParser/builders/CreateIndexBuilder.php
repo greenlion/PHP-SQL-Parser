@@ -39,6 +39,7 @@
  * 
  */
 
+namespace PHPSQLParser\builders;
 require_once dirname(__FILE__) . '/CreateIndexTypeBuilder.php';
 require_once dirname(__FILE__) . '/CreateIndexTableBuilder.php';
 require_once dirname(__FILE__) . '/CreateIndexOptionsBuilder.php';
@@ -63,12 +64,12 @@ class CreateIndexBuilder implements Builder {
         $builder = new CreateIndexTableBuilder();
         return $builder->build($parsed);
     }
-    
+
     protected function buildIndexOptions($parsed) {
         $builder = new CreateIndexOptionsBuilder();
         return $builder->build($parsed);
     }
-    
+
     public function build(array $parsed) {
         $sql = $parsed['name'];
         $sql .= ' ' . $this->buildIndexType($parsed);
@@ -78,6 +79,6 @@ class CreateIndexBuilder implements Builder {
         $sql .= $this->buildIndexOptions($parsed);
         return trim($sql);
     }
-    
+
 }
 ?>

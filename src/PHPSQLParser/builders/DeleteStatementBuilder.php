@@ -39,6 +39,7 @@
  * 
  */
 
+namespace PHPSQLParser\builders;
 require_once dirname(__FILE__) . '/WhereBuilder.php';
 require_once dirname(__FILE__) . '/FromBuilder.php';
 require_once dirname(__FILE__) . '/DeleteBuilder.php';
@@ -68,7 +69,7 @@ class DeleteStatementBuilder implements Builder {
         $builder = new DeleteBuilder();
         return $builder->build($parsed);
     }
-    
+
     public function build(array $parsed) {
         $sql = $this->buildDELETE($parsed['DELETE']) . " " . $this->buildFROM($parsed['FROM']);
         if (isset($parsed['WHERE'])) {
@@ -76,6 +77,6 @@ class DeleteStatementBuilder implements Builder {
         }
         return $sql;
     }
-    
+
 }
 ?>
