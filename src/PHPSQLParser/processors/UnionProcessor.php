@@ -107,7 +107,7 @@ class UnionProcessor extends AbstractProcessor {
                         break;
                     }
 
-                    $queries[$unionType][$key] = $this->$processSQL($queries[$unionType][$key]);
+                    $queries[$unionType][$key] = $this->processSQL($queries[$unionType][$key]);
                     break;
                 }
             }
