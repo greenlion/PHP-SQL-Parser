@@ -149,7 +149,7 @@ class PartitionOptionsProcessor extends AbstractProcessor {
             case 'PARTITIONS':
             case 'SUBPARTITIONS':
                 $currCategory = 'PARTITION_NUM';
-                $expr = array('expr_type' => constant('PHPSQParser\utils\ExpressionType::' . substr($upper, 0, -1) . '_COUNT'),
+                $expr = array('expr_type' => constant('PHPSQLParser\utils\ExpressionType::' . substr($upper, 0, -1) . '_COUNT'),
                               'base_expr' => false, 'sub_tree' => array($this->getReservedType($trim)),
                               'storage' => substr($base_expr, 0, -strlen($token)));
                 $base_expr = $token;
@@ -163,7 +163,7 @@ class PartitionOptionsProcessor extends AbstractProcessor {
 
             case 'HASH':
             case 'KEY':
-                $expr[] = array('expr_type' => constant('PHPSQParser\utils\ExpressionType::' . $prevCategory . '_' . $upper),
+                $expr[] = array('expr_type' => constant('PHPSQLParser\utils\ExpressionType::' . $prevCategory . '_' . $upper),
                                 'base_expr' => false, 'linear' => ($currCategory === 'LINEAR'), 'sub_tree' => false,
                                 'storage' => substr($base_expr, 0, -strlen($token)));
 
@@ -180,7 +180,7 @@ class PartitionOptionsProcessor extends AbstractProcessor {
 
             case 'ALGORITHM':
                 if ($currCategory === 'KEY') {
-                    $expr[] = array('expr_type' => constant('PHPSQParser\utils\ExpressionType::' . $prevCategory . '_KEY_ALGORITHM'),
+                    $expr[] = array('expr_type' => constant('PHPSQLParser\utils\ExpressionType::' . $prevCategory . '_KEY_ALGORITHM'),
                                     'base_expr' => false, 'sub_tree' => false,
                                     'storage' => substr($base_expr, 0, -strlen($token)));
 
@@ -201,7 +201,7 @@ class PartitionOptionsProcessor extends AbstractProcessor {
 
             case 'RANGE':
             case 'LIST':
-                $expr[] = array('expr_type' => constant('PHPSQParser\utils\ExpressionType::PARTITION_' . $upper), 'base_expr' => false,
+                $expr[] = array('expr_type' => constant('PHPSQLParser\utils\ExpressionType::PARTITION_' . $upper), 'base_expr' => false,
                                 'sub_tree' => false, 'storage' => substr($base_expr, 0, -strlen($token)));
 
                 $last = array_pop($parsed);
