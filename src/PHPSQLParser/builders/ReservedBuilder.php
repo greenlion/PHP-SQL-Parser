@@ -39,6 +39,9 @@
  * 
  */
 
+namespace PHPSQLParser\builders;
+use PHPSQLParser\utils\ExpressionType;
+
 require_once dirname(__FILE__) . '/../utils/ExpressionType.php';
 require_once dirname(__FILE__) . '/Builder.php';
 
@@ -55,7 +58,7 @@ class ReservedBuilder implements Builder {
     public function isReserved($parsed) {
         return (isset($parsed['expr_type']) && $parsed['expr_type'] === ExpressionType::RESERVED);
     }
-    
+
     public function build(array $parsed) {
         if (!$this->isReserved($parsed)) {
             return "";

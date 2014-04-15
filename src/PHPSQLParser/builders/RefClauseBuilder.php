@@ -39,6 +39,9 @@
  * 
  */
 
+namespace PHPSQLParser\builders;
+use PHPSQLParser\exceptions\UnableToCreateSQLException;
+
 require_once dirname(__FILE__) . '/../exceptions/UnableToCreateSQLException.php';
 require_once dirname(__FILE__) . '/ColumnReferenceBuilder.php';
 require_once dirname(__FILE__) . '/OperatorBuilder.php';
@@ -62,7 +65,7 @@ class RefClauseBuilder implements Builder {
         $builder = new InListBuilder();
         return $builder->build($parsed);
     }
-    
+
     protected function buildColRef($parsed) {
         $builder = new ColumnReferenceBuilder();
         return $builder->build($parsed);

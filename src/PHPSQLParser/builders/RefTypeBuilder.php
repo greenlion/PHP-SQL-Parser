@@ -39,6 +39,9 @@
  * 
  */
 
+namespace PHPSQLParser\builders;
+use PHPSQLParser\exceptions\UnsupportedFeatureException;
+
 require_once dirname(__FILE__) . '/../exceptions/UnsupportedFeatureException.php';
 
 /**

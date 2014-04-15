@@ -39,6 +39,7 @@
  * 
  */
 
+namespace PHPSQLParser\builders;
 require_once dirname(__FILE__) . '/ReservedBuilder.php';
 require_once dirname(__FILE__) . '/DirectionBuilder.php';
 
