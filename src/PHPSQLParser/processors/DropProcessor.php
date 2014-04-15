@@ -39,7 +39,9 @@
  *
  */
 
-require_once dirname(__FILE__) . '/../utils/ExpressionToken.php';
+namespace PHPSQLParser\processors;
+use PHPSQLParser\utils\ExpressionType;
+
 require_once dirname(__FILE__) . '/../utils/ExpressionType.php';
 require_once dirname(__FILE__) . '/AbstractProcessor.php';
 

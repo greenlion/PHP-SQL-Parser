@@ -39,6 +39,7 @@
  *
  */
 
+namespace PHPSQLParser\processors;
 require_once dirname(__FILE__) . '/AbstractProcessor.php';
 require_once dirname(__FILE__) . '/UnionProcessor.php';
 require_once dirname(__FILE__) . '/SQLProcessor.php';
@@ -81,7 +82,7 @@ class DefaultProcessor extends AbstractProcessor {
 
         return $queries;
     }
-    
+
     public function revokeQuotation($sql) {
         return parent::revokeQuotation($sql);
     }
