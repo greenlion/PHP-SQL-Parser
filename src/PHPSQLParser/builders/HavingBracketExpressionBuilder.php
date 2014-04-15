@@ -39,11 +39,14 @@
  * 
  */
 
+namespace PHPSQLParser\builders;
+use PHPSQLParser\exceptions\UnableToCreateSQLException;
+use PHPSQLParser\utils\ExpressionType;
+
 require_once dirname(__FILE__) . '/../utils/ExpressionType.php';
 require_once dirname(__FILE__) . '/../exceptions/UnableToCreateSQLException.php';
 require_once dirname(__FILE__) . '/HavingExpressionBuilder.php';
 require_once dirname(__FILE__) . '/WhereBracketExpressionBuilder.php';
-require_once dirname(__FILE__) . '/Builder.php';
 
 /**
  * This class implements the builder for bracket expressions within the HAVING part. 
@@ -54,7 +57,7 @@ require_once dirname(__FILE__) . '/Builder.php';
  * @license http://www.debian.org/misc/bsd.license  BSD License (3 Clause)
  *  
  */
-class HavingBracketExpressionBuilder extends WhereBracketExpressionBuilder implements Builder {
+class HavingBracketExpressionBuilder extends WhereBracketExpressionBuilder {
     
     protected function buildHavingExpression($parsed) {
         $builder = new HavingExpressionBuilder();

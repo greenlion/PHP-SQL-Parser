@@ -39,6 +39,9 @@
  * 
  */
 
+namespace PHPSQLParser\builders;
+use PHPSQLParser\exceptions\UnableToCreateSQLException;
+
 require_once dirname(__FILE__) . '/../utils/ExpressionType.php';
 require_once dirname(__FILE__) . '/Builder.php';
 require_once dirname(__FILE__) . '/ReservedBuilder.php';
@@ -58,12 +61,12 @@ class DropStatementBuilder implements Builder {
         $builder = new ReservedBuilder();
         return $builder->build($parsed);
     }
-    
+
     protected function buildExpression($parsed) {
         $builder = new DropExpressionBuilder();
         return $builder->build($parsed);
     }
-    
+
     public function build(array $parsed) {
         $drop = $parsed['DROP'];
         $sql = '';

@@ -39,6 +39,9 @@
  * 
  */
 
+namespace PHPSQLParser\builders;
+use PHPSQLParser\utils\ExpressionType;
+
 require_once dirname(__FILE__) . '/../utils/ExpressionType.php';
 require_once dirname(__FILE__) . '/Builder.php';
 
@@ -60,7 +63,7 @@ class IndexColumnBuilder implements Builder {
     protected function buildDirection($parsed) {
         return ($parsed === false ? '' : (' ' . $parsed));
     }
-    
+
     public function build(array $parsed) {
         if ($parsed['expr_type'] !== ExpressionType::INDEX_COLUMN) {
             return "";

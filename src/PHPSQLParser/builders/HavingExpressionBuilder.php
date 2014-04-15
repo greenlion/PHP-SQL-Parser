@@ -39,6 +39,10 @@
  * 
  */
 
+namespace PHPSQLParser\builders;
+use PHPSQLParser\exceptions\UnableToCreateSQLException;
+use PHPSQLParser\utils\ExpressionType;
+
 require_once dirname(__FILE__) . '/../utils/ExpressionType.php';
 require_once dirname(__FILE__) . '/../exceptions/UnableToCreateSQLException.php';
 require_once dirname(__FILE__) . '/HavingExpressionBuilder.php';
@@ -55,17 +59,17 @@ require_once dirname(__FILE__) . '/Builder.php';
  * @license http://www.debian.org/misc/bsd.license  BSD License (3 Clause)
  *  
  */
-class HavingExpressionBuilder extends WhereExpressionBuilder implements Builder {
-   
+class HavingExpressionBuilder extends WhereExpressionBuilder {
+
     protected function buildHavingExpression($parsed) {
         return $this->build($parsed);
     }
-    
+
     protected function buildHavingBracketExpression($parsed) {
         $builder = new HavingBracketExpressionBuilder();
         return $builder->build($parsed);
     }
-    
+
     public function build(array $parsed) {
         if ($parsed['expr_type'] !== ExpressionType::EXPRESSION) {
             return "";
@@ -92,6 +96,6 @@ class HavingExpressionBuilder extends WhereExpressionBuilder implements Builder 
         $sql = substr($sql, 0, -1);
         return $sql;
     }
-    
+
 }
 ?>

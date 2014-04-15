@@ -39,6 +39,7 @@
  * 
  */
 
+namespace PHPSQLParser\builders;
 require_once dirname(__FILE__) . '/InsertBuilder.php';
 require_once dirname(__FILE__) . '/ValuesBuilder.php';
 require_once dirname(__FILE__) . '/SelectStatementBuilder.php';

@@ -40,6 +40,7 @@
  * 
  */
 
+namespace PHPSQLParser\builders;
 require_once dirname(__FILE__) . '/../exceptions/UnsupportedFeatureException.php';
 
 /**
@@ -66,9 +67,9 @@ class JoinBuilder {
         if ($parsed === 'RIGHT') {
             return " RIGHT JOIN ";
         }
-		if ($parsed === 'STRAIGHT_JOIN') {
-			return " STRAIGHT_JOIN ";
-		}
+        if ($parsed === 'STRAIGHT_JOIN') {
+            return " STRAIGHT_JOIN ";
+        }
         // TODO: add more
         throw new UnsupportedFeatureException($parsed);
     }
