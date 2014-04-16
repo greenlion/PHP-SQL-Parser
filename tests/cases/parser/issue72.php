@@ -42,7 +42,7 @@ namespace PHPSQLParser;
 require_once dirname(__FILE__) . '/../../../src/PHPSQLParser/PHPSQLParser.php';
 require_once dirname(__FILE__) . '/../../test-more.php';
 
-$sql = "update table set column=@max";
+$sql = "update table set col=@max";
 $parser = new PHPSQLParser($sql);
 $p = $parser->parsed;
 $expected = getExpectedValue(dirname(__FILE__), 'issue72.serialized');
