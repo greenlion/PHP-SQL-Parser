@@ -168,7 +168,9 @@ class ExpressionListProcessor extends AbstractProcessor {
                             }
 
                             if (!$curr->getSubTree()) {
-                                $curr->setSubTree($localExprList);
+                                if (!empty($localExprList)) {
+                                    $curr->setSubTree($localExprList);
+                                }
                             } else {
                                 $tmpExprList = $curr->getSubTree();
                                 $curr->setSubTree(array_merge($tmpExprList, $localExprList));
@@ -191,7 +193,9 @@ class ExpressionListProcessor extends AbstractProcessor {
                     }
 
                     if (!$curr->getSubTree()) {
-                        $curr->setSubTree($localExprList);
+                        if (!empty($localExprList)) {
+                            $curr->setSubTree($localExprList);
+                        }
                     } else {
                         $tmpExprList = $curr->getSubTree();
                         $curr->setSubTree(array_merge($tmpExprList, $localExprList));
@@ -237,7 +241,9 @@ class ExpressionListProcessor extends AbstractProcessor {
                             }
 
                             if (!$curr->getSubTree()) {
-                                $curr->setSubTree($localExprList);
+                                if (!empty($localExprList)) {
+                                    $curr->setSubTree($localExprList);
+                                }
                             } else {
                                 $tmpExprList = $curr->getSubTree();
                                 $curr->setSubTree(array_merge($tmpExprList, $localExprList));
@@ -253,7 +259,9 @@ class ExpressionListProcessor extends AbstractProcessor {
 
                     $curr->setTokenType(ExpressionType::BRACKET_EXPRESSION);
                     if (!$curr->getSubTree()) {
-                        $curr->setSubTree($localExprList);
+                        if (!empty($localExprList)) {
+                            $curr->setSubTree($localExprList);
+                        }
                     } else {
                         $tmpExprList = $curr->getSubTree();
                         $curr->setSubTree(array_merge($tmpExprList, $localExprList));
