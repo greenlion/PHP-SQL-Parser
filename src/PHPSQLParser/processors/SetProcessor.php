@@ -57,6 +57,9 @@ class SetProcessor extends AbstractProcessor {
      */
     protected function processAssignment($base_expr) {
         $assignment = $this->processExpressionList($this->splitSQLIntoTokens($base_expr));
+        
+        // TODO: if the left side of the assignment is a reserved keyword, it should be changed to colref
+        
         return array('expr_type' => ExpressionType::EXPRESSION, 'base_expr' => trim($base_expr),
                      'sub_tree' => (empty($assignment) ? false : $assignment));
     }
