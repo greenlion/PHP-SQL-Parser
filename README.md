@@ -20,7 +20,9 @@ A pure PHP SQL (non validating) parser w/ focus on MySQL dialect of SQL
     SET
     DROP
     CREATE INDEX
-    CREATE TABLE 
+    CREATE TABLE
+    EXPLAIN
+    DESCRIBE
 
 ###Other SQL statement types
 
