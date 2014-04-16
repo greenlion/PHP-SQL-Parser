@@ -104,6 +104,13 @@ class SelectExpressionProcessor extends AbstractProcessor {
             $base_expr .= $token;
         }
 
+        if ($alias) {
+            // remove quotation from the alias
+            $alias['no_quotes'] = $this->revokeQuotation($alias['name']);
+            $alias['name'] = trim($alias['name']);
+            $alias['base_expr'] = trim($alias['base_expr']);
+        }    
+        
         $stripped = $this->processExpressionList($stripped);
 
         // TODO: the last part can also be a comment, don't use array_pop
@@ -127,26 +134,17 @@ class SelectExpressionProcessor extends AbstractProcessor {
                                'base_expr' => trim($last['base_expr']));
                 // remove the last token
                 array_pop($tokens);
-                $base_expr = join("", $tokens);
             }
         }
 
-        if (!$alias) {
-            $base_expr = join("", $tokens);
-        } else {
-            /* remove escape from the alias */
-            $alias['no_quotes'] = $this->revokeQuotation($alias['name']);
-            $alias['name'] = trim($alias['name']);
-            $alias['base_expr'] = trim($alias['base_expr']);
-        }
-
+        $base_expr = $expression;
+        
         // TODO: this is always done with $stripped, how we do it twice?
         $processed = $this->processExpressionList($tokens);
 
         // if there is only one part, we copy the expr_type
-        // in all other cases we use "expression" as global type
+        // in all other cases we use "EXPRESSION" as global type
         $type = ExpressionType::EXPRESSION;
-
         if (count($processed) === 1) {
             if (!$this->isSubQuery($processed[0])) {
                 $type = $processed[0]['expr_type'];
