@@ -41,7 +41,7 @@
 
 namespace PHPSQLParser\processors;
 
-require_once(dirname(__FILE__) . '/AbstractProcessor.php');
+require_once dirname(__FILE__) . '/AbstractProcessor.php';
 
 /**
  * This class processes the LIMIT statements.
