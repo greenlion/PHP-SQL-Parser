@@ -1,8 +1,8 @@
 <?php
 /**
- * LimitProcessor.php
+ * issue141.php
  *
- * This file implements the processor for the LIMIT statements.
+ * Test case for PHPSQLCreator.
  *
  * PHP version 5
  *
@@ -31,64 +31,24 @@
  * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
+ * 
  * @author    André Rothe <andre.rothe@phosco.info>
  * @copyright 2010-2014 Justin Swanhart and André Rothe
  * @license   http://www.debian.org/misc/bsd.license  BSD License (3 Clause)
  * @version   SVN: $Id$
- *
- */
-
-namespace PHPSQLParser\processors;
-
-require_once dirname(__FILE__) . '/AbstractProcessor.php';
-
-/**
- * This class processes the LIMIT statements.
- * 
- * @author  André Rothe <andre.rothe@phosco.info>
- * @license http://www.debian.org/misc/bsd.license  BSD License (3 Clause)
  * 
  */
-class LimitProcessor extends AbstractProcessor {
+namespace PHPSQLParser;
+require_once dirname(__FILE__) . '/../../../src/PHPSQLParser/PHPSQLParser.php';
+require_once dirname(__FILE__) . '/../../../src/PHPSQLParser/PHPSQLCreator.php';
+require_once dirname(__FILE__) . '/../../test-more.php';
 
-    public function process($tokens) {
-        $rowcount = "";
-        $offset = "";
+$query = "SELECT f FROM t ORDER BY (f-0.0)";
+$parser = new PHPSQLParser();
+$p = $parser->parse($query);
+$creator = new PHPSQLCreator();
+$created = $creator->create($p);
+$expected = getExpectedValue(dirname(__FILE__), 'issue141.sql', false);
+ok($created === $expected, 'bracket expressions within order-by');
 
-        $comma = -1;
-        $exchange = false;
-
-        for ($i = 0; $i < count($tokens); ++$i) {
-            $trim = strtoupper(trim($tokens[$i]));
-            if ($trim === ",") {
-                $comma = $i;
-                break;
-            }
-            if ($trim === "OFFSET") {
-                $comma = $i;
-                $exchange = true;
-                break;
-            }
-        }
-
-        for ($i = 0; $i < $comma; ++$i) {
-            if ($exchange) {
-                $rowcount .= $tokens[$i];
-            } else {
-                $offset .= $tokens[$i];
-            }
-        }
-
-        for ($i = $comma + 1; $i < count($tokens); ++$i) {
-            if ($exchange) {
-                $offset .= $tokens[$i];
-            } else {
-                $rowcount .= $tokens[$i];
-            }
-        }
-
-        return array('offset' => trim($offset), 'rowcount' => trim($rowcount));
-    }
-}
 ?>

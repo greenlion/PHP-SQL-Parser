@@ -1,8 +1,8 @@
 <?php
 /**
- * LimitProcessor.php
+ * OrderByBracketExpressionBuilder.php
  *
- * This file implements the processor for the LIMIT statements.
+ * Builds bracket-expressions within the ORDER-BY part.
  *
  * PHP version 5
  *
@@ -31,64 +31,41 @@
  * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
+ * 
  * @author    André Rothe <andre.rothe@phosco.info>
  * @copyright 2010-2014 Justin Swanhart and André Rothe
  * @license   http://www.debian.org/misc/bsd.license  BSD License (3 Clause)
  * @version   SVN: $Id$
- *
+ * 
  */
 
-namespace PHPSQLParser\processors;
-
-require_once dirname(__FILE__) . '/AbstractProcessor.php';
+namespace PHPSQLParser\builders;
+require_once dirname(__FILE__) . '/WhereBracketExpressionBuilder.php';
+require_once dirname(__FILE__) . '/DirectionBuilder.php';
 
 /**
- * This class processes the LIMIT statements.
- * 
+ * This class implements the builder for bracket-expressions within the ORDER-BY part. 
+ * It must contain the direction. 
+ * You can overwrite all functions to achieve another handling.
+ *
  * @author  André Rothe <andre.rothe@phosco.info>
  * @license http://www.debian.org/misc/bsd.license  BSD License (3 Clause)
- * 
+ *  
  */
-class LimitProcessor extends AbstractProcessor {
+class OrderByBracketExpressionBuilder extends WhereBracketExpressionBuilder {
 
-    public function process($tokens) {
-        $rowcount = "";
-        $offset = "";
-
-        $comma = -1;
-        $exchange = false;
-
-        for ($i = 0; $i < count($tokens); ++$i) {
-            $trim = strtoupper(trim($tokens[$i]));
-            if ($trim === ",") {
-                $comma = $i;
-                break;
-            }
-            if ($trim === "OFFSET") {
-                $comma = $i;
-                $exchange = true;
-                break;
-            }
-        }
-
-        for ($i = 0; $i < $comma; ++$i) {
-            if ($exchange) {
-                $rowcount .= $tokens[$i];
-            } else {
-                $offset .= $tokens[$i];
-            }
-        }
-
-        for ($i = $comma + 1; $i < count($tokens); ++$i) {
-            if ($exchange) {
-                $offset .= $tokens[$i];
-            } else {
-                $rowcount .= $tokens[$i];
-            }
-        }
-
-        return array('offset' => trim($offset), 'rowcount' => trim($rowcount));
+    protected function buildDirection($parsed) {
+        $builder = new DirectionBuilder();
+        return $builder->build($parsed);
     }
+
+    public function build(array $parsed) {
+        $sql = parent::build($parsed);
+        if ($sql !== '') {
+            $sql .= $this->buildDirection($parsed);
+        }
+        return $sql;
+    }
+
 }
 ?>
