@@ -144,6 +144,9 @@ class PositionCalculator {
                 $before = $sql[$pos - 1];
             }
 
+            // if we have a quoted string, we every character is allowed after it
+            // see issue 137
+            $quoted = ($sql[$pos + strlen($value) - 1] === '`');
             $after = "";
             if (isset($sql[$pos + strlen($value)])) {
                 $after = $sql[$pos + strlen($value)];
@@ -173,7 +176,9 @@ class PositionCalculator {
             // whitespace, comma, operators, parenthesis and end_of_string
 
             $ok = ($before === "" || in_array($before, self::$allowedOnOther, true));
-            $ok = $ok && ($after === "" || in_array($after, self::$allowedOnOther, true));
+            $ok = $ok
+                && ($after === "" || in_array($after, self::$allowedOnOther, true)
+                    || ($quoted && (strtolower($after) >= 'a' && strtolower($after) <= 'z')));
 
             if ($ok) {
                 break;
