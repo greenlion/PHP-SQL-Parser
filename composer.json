@@ -2,10 +2,17 @@
     "name": "greenlion/php-sql-parser",
     "type": "library",
     "description": "A pure PHP SQL (non validating) parser w/ focus on MySQL dialect of SQL",
-    "keywords": ["sql","parser","creator","MySQL"],
+    "keywords": 
+    [
+    	"sql",
+    	"parser",
+    	"creator",
+    	"MySQL"
+    ],
     "homepage": "http://code.google.com/p/php-sql-parser/",
     "license": "BSD-3-Clause",
-    "authors": [
+    "authors": 
+    [
         {
             "name": "Justin Swanhart",
             "email": "greenlion@gmail.com",
@@ -19,18 +26,51 @@
             "role": "Committer"
         }
     ],
-    "support": {
+    "support": 
+    {
         "issues": "http://code.google.com/p/php-sql-parser/issues/list",
         "source": "http://php-sql-parser.googlecode.com/svn/trunk/"
     },
-    "autoload": {
+    "autoload": 
+    {
         "files": [ "src/PHPSQLParser/PHPSQLCreator.php", "src/PHPSQLParser/PHPSQLParser.php" ]
     },
-    "require": {
+    "require": 
+    {
         "php": ">=5.3.2"
     },
-    "require-dev": {
+    "require-dev": 
+    {
     	"squizlabs/php_codesniffer": ">=1.5.1",
         "phpunit/phpunit": ">=4.0.14"
-    }
+    },
+    "repositories": [
+        {
+            "type": "package",
+            "package": 
+            {
+                "name": "greenlion/php-sql-parser",
+                "version": "4.0.0",
+                "dist": 
+                {
+                    "type": "zip"
+                    "url": "https://github.com/greenlion/PHP-SQL-Parser/releases/download/v4.0.0/php-sql-parser-4.0.0.zip",
+                },
+                "source": 
+                {
+                    "type": "svn",
+                    "url": "http://php-sql-parser.googlecode.com/svn/"
+                    "reference": "tags/4.0.0/"
+                }
+            }
+        },
+        {
+            "type": "git",
+            "url": "https://github.com/greenlion/PHP-SQL-Parser.git"
+        },
+        {
+            "type": "svn",
+            "url": "http://php-sql-parser.googlecode.com/svn/"
+        }
+    ]
 }
