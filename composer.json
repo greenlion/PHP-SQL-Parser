@@ -55,12 +55,6 @@
                 {
                     "type": "zip"
                     "url": "https://github.com/greenlion/PHP-SQL-Parser/releases/download/v4.0.0/php-sql-parser-4.0.0.zip",
-                },
-                "source": 
-                {
-                    "type": "svn",
-                    "url": "http://php-sql-parser.googlecode.com/svn/"
-                    "reference": "tags/4.0.0/"
                 }
             }
         },
