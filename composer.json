@@ -53,8 +53,8 @@
                 "version": "4.0.0",
                 "dist": 
                 {
-                    "type": "zip"
-                    "url": "https://github.com/greenlion/PHP-SQL-Parser/releases/download/v4.0.0/php-sql-parser-4.0.0.zip",
+                    "type": "zip",
+                    "url": "https://github.com/greenlion/PHP-SQL-Parser/releases/download/v4.0.0/php-sql-parser-4.0.0.zip"
                 }
             }
         },
