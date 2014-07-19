@@ -207,7 +207,7 @@ class FromProcessor extends AbstractProcessor {
                 $parseInfo['token_count']++;
                 $n = 1;
                 $str = "";
-                while ($str === "") {
+                while ($str === "" && isset($tokens[$i + $n])) {
                     $parseInfo['alias']['base_expr'] .= ($tokens[$i + $n] === "" ? " " : $tokens[$i + $n]);
                     $str = trim($tokens[$i + $n]);
                     ++$n;
