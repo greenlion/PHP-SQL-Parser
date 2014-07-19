@@ -14,6 +14,7 @@ require_once dirname(__FILE__) . '/cases/parser/from.php';
 require_once dirname(__FILE__) . '/cases/parser/gtltop.php';
 require_once dirname(__FILE__) . '/cases/parser/inlist.php';
 require_once dirname(__FILE__) . '/cases/parser/insert.php';
+require_once dirname(__FILE__) . '/cases/parser/issue_git11.php';
 require_once dirname(__FILE__) . '/cases/parser/issue11.php';
 require_once dirname(__FILE__) . '/cases/parser/issue12.php';
 require_once dirname(__FILE__) . '/cases/parser/issue15.php';
