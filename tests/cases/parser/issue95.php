@@ -39,7 +39,6 @@
  * 
  */
 namespace PHPSQLParser;
-require_once dirname(__FILE__) . '/../../../src/PHPSQLParser/PHPSQLParser.php';
 require_once dirname(__FILE__) . '/../../test-more.php';
 
 // TODO: not solved, the parser doesn't recognize the UNION

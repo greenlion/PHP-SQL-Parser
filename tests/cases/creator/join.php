@@ -39,8 +39,6 @@
  * 
  */
 namespace PHPSQLParser;
-require_once dirname(__FILE__) . '/../../../src/PHPSQLParser/PHPSQLParser.php';
-require_once dirname(__FILE__) . '/../../../src/PHPSQLParser/PHPSQLCreator.php';
 require_once dirname(__FILE__) . '/../../test-more.php';
 
 $sql = " SELECT a.*, surveyls_title, surveyls_description, surveyls_welcometext, surveyls_url  FROM SURVEYS AS a INNER JOIN SURVEYS_LANGUAGESETTINGS on (surveyls_survey_id=a.sid and surveyls_language=a.language)  order by active DESC, surveyls_title";

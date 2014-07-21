@@ -41,8 +41,6 @@
 namespace PHPSQLParser;
 use PHPSQLParser\exceptions\UnableToCalculatePositionException;
 
-require_once dirname(__FILE__) . '/../../../src/PHPSQLParser/PHPSQLParser.php';
-require_once dirname(__FILE__) . '/../../../src/PHPSQLParser/exceptions/UnableToCalculatePositionException.php';
 require_once dirname(__FILE__) . '/../../test-more.php';
 
 // that is an issue written as comment into the ParserManual...
