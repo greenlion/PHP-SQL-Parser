@@ -44,10 +44,6 @@ use PHPSQLParser\positions\PositionCalculator;
 use PHPSQLParser\processors\DefaultProcessor;
 use PHPSQLParser\utils\PHPSQLParserConstants;
 
-require_once dirname(__FILE__) . '/positions/PositionCalculator.php';
-require_once dirname(__FILE__) . '/processors/DefaultProcessor.php';
-require_once dirname(__FILE__) . '/utils/PHPSQLParserConstants.php';
-
 /**
  * This class implements the parser functionality.
  *

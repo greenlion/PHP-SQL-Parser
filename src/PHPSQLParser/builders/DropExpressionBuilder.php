@@ -43,15 +43,6 @@ namespace PHPSQLParser\builders;
 use PHPSQLParser\exceptions\UnableToCreateSQLException;
 use PHPSQLParser\utils\ExpressionType;
 
-require_once dirname(__FILE__) . '/../exceptions/UnableToCreateSQLException.php';
-require_once dirname(__FILE__) . '/../utils/ExpressionType.php';
-require_once dirname(__FILE__) . '/TableBuilder.php';
-require_once dirname(__FILE__) . '/TempTableBuilder.php';
-require_once dirname(__FILE__) . '/ViewBuilder.php';
-require_once dirname(__FILE__) . '/SchemaBuilder.php';
-require_once dirname(__FILE__) . '/DatabaseBuilder.php';
-require_once dirname(__FILE__) . '/Builder.php';
-
 /**
  * This class implements the builder for the object list of a DROP statement.
  * You can overwrite all functions to achieve another handling.

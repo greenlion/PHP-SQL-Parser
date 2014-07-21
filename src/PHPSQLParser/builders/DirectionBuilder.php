@@ -40,7 +40,6 @@
  */
 
 namespace PHPSQLParser\builders;
-require_once dirname(__FILE__) . '/Builder.php';
 
 /**
  * This class implements the builder for directions (e.g. of the order-by clause). 

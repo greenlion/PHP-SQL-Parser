@@ -39,7 +39,6 @@
  * 
  */
 namespace PHPSQLParser;
-require_once dirname(__FILE__) . '/../../../src/PHPSQLParser/PHPSQLParser.php';
 require_once dirname(__FILE__) . '/../../test-more.php';
 
 $sql = "select * from table1 where col1<>col2 or col3 is null";

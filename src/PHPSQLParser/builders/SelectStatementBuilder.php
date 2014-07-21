@@ -40,14 +40,6 @@
  */
 
 namespace PHPSQLParser\builders;
-require_once dirname(__FILE__) . '/LimitBuilder.php';
-require_once dirname(__FILE__) . '/SelectBuilder.php';
-require_once dirname(__FILE__) . '/FromBuilder.php';
-require_once dirname(__FILE__) . '/WhereBuilder.php';
-require_once dirname(__FILE__) . '/GroupByBuilder.php';
-require_once dirname(__FILE__) . '/HavingBuilder.php';
-require_once dirname(__FILE__) . '/OrderByBuilder.php';
-require_once dirname(__FILE__) . '/Builder.php';
 
 /**
  * This class implements the builder for the whole Select statement. You can overwrite

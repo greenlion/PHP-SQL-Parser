@@ -1,5 +1,7 @@
 <?php
 
+require(__DIR__ . '/../vendor/autoload.php');
+
 /**
  * execute all tests
  */

@@ -39,8 +39,6 @@
  * 
  */
 namespace PHPSQLParser;
-require_once dirname(__FILE__) . '/../../../src/PHPSQLParser/PHPSQLParser.php';
-require_once dirname(__FILE__) . '/../../../src/PHPSQLParser/PHPSQLCreator.php';
 require_once dirname(__FILE__) . '/../../test-more.php';
 
 $query = "SELECT t1.c1, t2.c2 FROM t1 LEFT JOIN t2 ON (LEFT(t1.c2,6) = t2.c1)";

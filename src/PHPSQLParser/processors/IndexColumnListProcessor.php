@@ -33,9 +33,6 @@
 namespace PHPSQLParser\processors;
 use PHPSQLParser\utils\ExpressionType;
 
-require_once(dirname(__FILE__) . '/AbstractProcessor.php');
-require_once(dirname(__FILE__) . '/../utils/ExpressionType.php');
-
 /**
  * 
  * This class processes the index column lists.

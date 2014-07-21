@@ -40,7 +40,6 @@
  */
 
 namespace PHPSQLParser\processors;
-require_once dirname(__FILE__) . '/FromProcessor.php';
 
 /**
  * This class processes the UPDATE statements.

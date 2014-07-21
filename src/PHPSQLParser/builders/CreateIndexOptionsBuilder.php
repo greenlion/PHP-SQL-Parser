@@ -42,15 +42,6 @@
 namespace PHPSQLParser\builders;
 use PHPSQLParser\exceptions\UnableToCreateSQLException;
 
-require_once dirname(__FILE__) . '/../exceptions/UnableToCreateSQLException.php';
-require_once dirname(__FILE__) . '/IndexParserBuilder.php';
-require_once dirname(__FILE__) . '/IndexSizeBuilder.php';
-require_once dirname(__FILE__) . '/IndexTypeBuilder.php';
-require_once dirname(__FILE__) . '/IndexCommentBuilder.php';
-require_once dirname(__FILE__) . '/IndexAlgorithmBuilder.php';
-require_once dirname(__FILE__) . '/IndexLockBuilder.php';
-require_once dirname(__FILE__) . '/Builder.php';
-
 /**
  * This class implements the builder for the index options of a CREATE INDEX
  * statement. 

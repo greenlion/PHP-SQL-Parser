@@ -40,7 +40,6 @@
  */
 
 namespace PHPSQLParser\builders;
-require_once dirname(__FILE__) . '/IndexTypeBuilder.php';
 
 /**
  * This class implements the builder for the index type of a CREATE INDEX

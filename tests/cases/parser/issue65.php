@@ -39,7 +39,6 @@
  * 
  */
 namespace PHPSQLParser;
-require_once dirname(__FILE__) . '/../../../src/PHPSQLParser/PHPSQLParser.php';
 require_once dirname(__FILE__) . '/../../test-more.php';
 
 $sql = "select i1, count(*) cnt from test.s1 group by i1";

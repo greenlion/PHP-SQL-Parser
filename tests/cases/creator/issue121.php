@@ -39,8 +39,6 @@
  * 
  */
 namespace PHPSQLParser;
-require_once dirname(__FILE__) . '/../../../src/PHPSQLParser/PHPSQLParser.php';
-require_once dirname(__FILE__) . '/../../../src/PHPSQLParser/PHPSQLCreator.php';
 require_once dirname(__FILE__) . '/../../test-more.php';
 
 $query = "CREATE TABLE t (mv DECIMAL(3) DEFAULT 10)";
