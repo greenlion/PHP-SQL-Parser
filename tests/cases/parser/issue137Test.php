@@ -51,7 +51,7 @@ class issue137Test extends \PHPUnit_Framework_TestCase {
         $parser = new PHPSQLParser($sql, true);
         $p = $parser->parsed;
         $expected = getExpectedValue(dirname(__FILE__), 'issue137.serialized');
-        eq_array($p, $expected, 'SQL statements without whitespace');
+        $this->assertEquals($expected, $p, 'SQL statements without whitespace');
 
     }
 }

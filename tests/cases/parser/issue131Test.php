@@ -51,7 +51,7 @@ class issue131Test extends \PHPUnit_Framework_TestCase {
         $parser = new PHPSQLParser($sql, true);
         $p = $parser->parsed;
         $expected = getExpectedValue(dirname(__FILE__), 'issue131.serialized');
-        eq_array($p, $expected, 'create index statement');
+        $this->assertEquals($expected, $p, 'create index statement');
 
     }
 }

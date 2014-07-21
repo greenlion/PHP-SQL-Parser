@@ -51,7 +51,7 @@ class issue65Test extends \PHPUnit_Framework_TestCase {
         $parser = new PHPSQLParser($sql);
         $p = $parser->parsed;
         $expected = getExpectedValue(dirname(__FILE__), 'issue65.serialized');
-        eq_array($p, $expected, 'It treats the alias as a colref.');
+        $this->assertEquals($expected, $p, 'It treats the alias as a colref.');
 
     }
 }

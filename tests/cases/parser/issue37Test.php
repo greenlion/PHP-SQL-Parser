@@ -53,7 +53,7 @@ class issue37Test extends \PHPUnit_Framework_TestCase {
         $parser->parse($sql);
         $p = $parser->parsed;
         $expected = getExpectedValue(dirname(__FILE__), 'issue37.serialized');
-        eq_array($p, $expected, 'INSERT statement with newline character');
+        $this->assertEquals($expected, $p, 'INSERT statement with newline character');
 
     }
 }

@@ -53,14 +53,14 @@ class issue40Test extends \PHPUnit_Framework_TestCase {
         $parser->parse($sql);
         $p = $parser->parsed;
         $expected = getExpectedValue(dirname(__FILE__), 'issue40a.serialized');
-        eq_array($p, $expected, 'escaped characters 1');
+        $this->assertEquals($expected, $p, 'escaped characters 1');
 
 
         $sql = "select a from t where x = \"abcd\" and y = 'efgh'";
         $parser->parse($sql);
         $p = $parser->parsed;
         $expected = getExpectedValue(dirname(__FILE__), 'issue40b.serialized');
-        eq_array($p, $expected, 'escaped characters 2');
+        $this->assertEquals($expected, $p, 'escaped characters 2');
 
     }
 }

@@ -51,13 +51,13 @@ class issue80Test extends \PHPUnit_Framework_TestCase {
         $parser = new PHPSQLParser($sql, true);
         $p = $parser->parsed;
         $expected = getExpectedValue(dirname(__FILE__), 'issue80a.serialized');
-        eq_array($p, $expected, 'quoted column names');
+        $this->assertEquals($expected, $p, 'quoted column names');
 
         $sql = "SELECT x+3 `test` FROM `model` WHERE `marker`='this_model' ORDER BY `test`";
         $parser->parse($sql, true);
         $p = $parser->parsed;
         $expected = getExpectedValue(dirname(__FILE__), 'issue80b.serialized');
-        eq_array($p, $expected, 'quoted names and aliases');
+        $this->assertEquals($expected, $p, 'quoted names and aliases');
 
     }
 }

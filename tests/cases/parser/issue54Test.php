@@ -65,7 +65,7 @@ class issue54Test extends \PHPUnit_Framework_TestCase {
         $old_error_handler = set_error_handler($old_error_handler);
 
         $expected = getExpectedValue(dirname(__FILE__), 'issue54.serialized');
-        eq_array($p, $expected, 'having clause and column references with schema/table/col parts.');
+        $this->assertEquals($expected, $p, 'having clause and column references with schema/table/col parts.');
 
     }
 }

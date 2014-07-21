@@ -51,7 +51,7 @@ class issue139Test extends \PHPUnit_Framework_TestCase {
         $parser = new PHPSQLParser($sql, true);
         $p = $parser->parsed;
         $expected = getExpectedValue(dirname(__FILE__), 'issue139.serialized');
-        eq_array($p, $expected, 'lowercase OFFSET should not fail');
+        $this->assertEquals($expected, $p, 'lowercase OFFSET should not fail');
 
     }
 }

@@ -51,21 +51,21 @@ class issue62Test extends \PHPUnit_Framework_TestCase {
         $parser = new PHPSQLParser($sql,true);
         $p = $parser->parsed;
         $expected = getExpectedValue(dirname(__FILE__), 'issue62a.serialized');
-        eq_array($p, $expected, 'CAST expression');
+        $this->assertEquals($expected, $p, 'CAST expression');
 
 
         $sql = "UPDATE vtiger_tab set isentitytype=? WHERE tabid=?";
         $parser = new PHPSQLParser($sql,true);
         $p = $parser->parsed;
         $expected = getExpectedValue(dirname(__FILE__), 'issue62b.serialized');
-        eq_array($p, $expected, '? after operand');
+        $this->assertEquals($expected, $p, '? after operand');
 
 
         $sql = "SELECT * FROM table1 IGNORE INDEX(PRIMARY)";
         $parser = new PHPSQLParser($sql,false);
         $p = $parser->parsed;
         $expected = getExpectedValue(dirname(__FILE__), 'issue62c.serialized');
-        eq_array($p, $expected, 'IGNORE INDEX within FROM clause');
+        $this->assertEquals($expected, $p, 'IGNORE INDEX within FROM clause');
 
     }
 }

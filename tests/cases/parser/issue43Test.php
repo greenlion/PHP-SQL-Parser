@@ -55,7 +55,7 @@ class issue43Test extends \PHPUnit_Framework_TestCase {
         $parser->parse($sql);
         $p = $parser->parsed;
         $expected = getExpectedValue(dirname(__FILE__), 'issue43.serialized');
-        eq_array($p, $expected, 'problem with linefeed after tablename');
+        $this->assertEquals($expected, $p, 'problem with linefeed after tablename');
 
     }
 }

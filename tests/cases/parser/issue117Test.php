@@ -52,7 +52,7 @@ class issue117Test extends \PHPUnit_Framework_TestCase {
         $parser = new PHPSQLParser($sql, true);
         $p = $parser->parsed;
         $expected = getExpectedValue(dirname(__FILE__), 'issue117.serialized');
-        eq_array($p, $expected, 'parentheses on the first position of statement');
+        $this->assertEquals($expected, $p, 'parentheses on the first position of statement');
 
     }
 }

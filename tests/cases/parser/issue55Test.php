@@ -52,14 +52,14 @@ class issue55Test extends \PHPUnit_Framework_TestCase {
         $parser->parse($sql);
         $p = $parser->parsed;
         $expected = getExpectedValue(dirname(__FILE__), 'issue55a.serialized');
-        eq_array($p, $expected, 'partial SQL statement - group by clause');
+        $this->assertEquals($expected, $p, 'partial SQL statement - group by clause');
 
 
         $sql = "ORDER BY a ASC, b DESC, table.c ASC";
         $parser->parse($sql);
         $p = $parser->parsed;
         $expected = getExpectedValue(dirname(__FILE__), 'issue55b.serialized');
-        eq_array($p, $expected, 'partial SQL statement - order by clause');
+        $this->assertEquals($expected, $p, 'partial SQL statement - order by clause');
 
     }
 }

@@ -77,14 +77,14 @@ class selectTest extends \PHPUnit_Framework_TestCase {
         $parser->parse($sql);
         $p = $parser->parsed;
         $expected = getExpectedValue(dirname(__FILE__), 'select1.serialized');
-        eq_array($p, $expected, 'a test for ref_clauses');
+        $this->assertEquals($expected, $p, 'a test for ref_clauses');
 
 
         $sql = "SELECT pl_namespace,pl_title FROM `pagelinks` WHERE pl_from = '1' FOR UPDATE";
         $parser->parse($sql);
         $p = $parser->parsed;
         $expected = getExpectedValue(dirname(__FILE__), 'select2.serialized');
-        eq_array($p, $expected, 'select for update');
+        $this->assertEquals($expected, $p, 'select for update');
 
     }
 }

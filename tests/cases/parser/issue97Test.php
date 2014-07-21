@@ -51,7 +51,7 @@ class issue97Test extends \PHPUnit_Framework_TestCase {
         $parser = new PHPSQLParser($sql);
         $p = $parser->parsed;
         $expected = getExpectedValue(dirname(__FILE__), 'issue97.serialized');
-        eq_array($p, $expected, 'incomplete floating point numbers');
+        $this->assertEquals($expected, $p, 'incomplete floating point numbers');
 
     }
 }

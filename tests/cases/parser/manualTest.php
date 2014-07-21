@@ -58,7 +58,7 @@ class manualTest extends \PHPUnit_Framework_TestCase {
 
         $p = $parser->parsed;
         $expected = getExpectedValue(dirname(__FILE__), 'manual.serialized');
-        eq_array($p, $expected, 'no select expression');
+        $this->assertEquals($expected, $p, 'no select expression');
 
     }
 }

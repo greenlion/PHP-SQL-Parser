@@ -49,35 +49,35 @@ class showTest extends \PHPUnit_Framework_TestCase {
         $parser = new PHPSQLParser($sql);
         $p = $parser->parsed;
         $expected = getExpectedValue(dirname(__FILE__), 'show1.serialized');
-        eq_array($p, $expected, 'show columns from');
+        $this->assertEquals($expected, $p, 'show columns from');
 
 
         $sql = "show CREATE DATABASE `foo`";
         $parser = new PHPSQLParser($sql);
         $p = $parser->parsed;
         $expected = getExpectedValue(dirname(__FILE__), 'show2.serialized');
-        eq_array($p, $expected, 'show create database');
+        $this->assertEquals($expected, $p, 'show create database');
 
 
         $sql = "show DATABASES LIKE '%bar%'";
         $parser = new PHPSQLParser($sql, true);
         $p = $parser->parsed;
         $expected = getExpectedValue(dirname(__FILE__), 'show3.serialized');
-        eq_array($p, $expected, 'show databases like');
+        $this->assertEquals($expected, $p, 'show databases like');
 
 
         $sql = "SHOW ENGINE foo STATUS";
         $parser = new PHPSQLParser($sql, true);
         $p = $parser->parsed;
         $expected = getExpectedValue(dirname(__FILE__), 'show4.serialized');
-        eq_array($p, $expected, 'show engine status');
+        $this->assertEquals($expected, $p, 'show engine status');
 
 
         $sql = "SHOW FULL COLUMNS FROM `foo.bar` FROM hohoho LIKE '%xmas%'";
         $parser = new PHPSQLParser($sql, true);
         $p = $parser->parsed;
         $expected = getExpectedValue(dirname(__FILE__), 'show5.serialized');
-        eq_array($p, $expected, 'show full columns from like');
+        $this->assertEquals($expected, $p, 'show full columns from like');
 
     }
 }

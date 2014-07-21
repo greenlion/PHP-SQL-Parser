@@ -53,21 +53,21 @@ class issue53Test extends \PHPUnit_Framework_TestCase {
         $parser->parse($sql, false);
         $p = $parser->parsed;
         $expected = getExpectedValue(dirname(__FILE__), 'issue53a.serialized');
-        eq_array($p, $expected, 'limit with offset');
+        $this->assertEquals($expected, $p, 'limit with offset');
 
 
         $sql = "SELECT * FROM table WHERE a=1 ORDER BY c DESC LIMIT 20, 10";
         $parser->parse($sql, false);
         $p = $parser->parsed;
         $expected = getExpectedValue(dirname(__FILE__), 'issue53a.serialized');
-        eq_array($p, $expected, 'limit with comma-separated offset');
+        $this->assertEquals($expected, $p, 'limit with comma-separated offset');
 
 
         $sql = "SELECT * FROM table WHERE a=1 ORDER BY c DESC LIMIT 10";
         $parser->parse($sql, false);
         $p = $parser->parsed;
         $expected = getExpectedValue(dirname(__FILE__), 'issue53b.serialized');
-        eq_array($p, $expected, 'limit without offset');
+        $this->assertEquals($expected, $p, 'limit without offset');
 
     }
 }

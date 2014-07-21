@@ -51,7 +51,7 @@ class issue61Test extends \PHPUnit_Framework_TestCase {
         $parser = new PHPSQLParser($sql);
         $p = $parser->parsed;
         $expected = getExpectedValue(dirname(__FILE__), 'issue61.serialized');
-        eq_array($p, $expected, 'functions/expressions within ORDER-BY');
+        $this->assertEquals($expected, $p, 'functions/expressions within ORDER-BY');
 
     }
 }

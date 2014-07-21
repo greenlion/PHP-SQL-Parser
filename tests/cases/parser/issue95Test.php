@@ -56,7 +56,7 @@ class issue95Test extends \PHPUnit_Framework_TestCase {
 
         $p = $parser->parsed;
         $expected = getExpectedValue(dirname(__FILE__), 'issue95.serialized');
-        eq_array($p, $expected, 'union within the from clause');
+        $this->assertEquals($expected, $p, 'union within the from clause');
 
     }
 }

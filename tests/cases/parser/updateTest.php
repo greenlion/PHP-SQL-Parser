@@ -51,14 +51,14 @@ class updateTest extends \PHPUnit_Framework_TestCase {
         $parser->parse($sql);
         $p = $parser->parsed;
         $expected = getExpectedValue(dirname(__FILE__), 'update1.serialized');
-        eq_array($p, $expected, 'update with a sub-select');
+        $this->assertEquals($expected, $p, 'update with a sub-select');
 
 
         $sql = "update SETTINGS_GLOBAL set stg_value='' where stg_name='force_ssl'";
         $parser->parse($sql);
         $p = $parser->parsed;
         $expected = getExpectedValue(dirname(__FILE__), 'update2.serialized');
-        eq_array($p, $expected, 'simple update with strings');
+        $this->assertEquals($expected, $p, 'simple update with strings');
 
     }
 }

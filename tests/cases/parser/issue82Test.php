@@ -52,7 +52,7 @@ class issue82Test extends \PHPUnit_Framework_TestCase {
         $parser->parse($sql);
         $p = $parser->parsed;
         $expected = getExpectedValue(dirname(__FILE__), 'issue82.serialized');
-        eq_array($p, $expected, 'operator * problem');
+        $this->assertEquals($expected, $p, 'operator * problem');
 
     }
 }

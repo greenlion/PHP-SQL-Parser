@@ -51,7 +51,7 @@ class issue68Test extends \PHPUnit_Framework_TestCase {
         $parser = new PHPSQLParser($sql, true);
         $p = $parser->parsed;
         $expected = getExpectedValue(dirname(__FILE__), 'issue68.serialized');
-        eq_array($p, $expected, 'Parameter alias ? should not fail.');
+        $this->assertEquals($expected, $p, 'Parameter alias ? should not fail.');
 
     }
 }

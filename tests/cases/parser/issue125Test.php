@@ -51,7 +51,7 @@ class issue125Test extends \PHPUnit_Framework_TestCase {
         $parser = new PHPSQLParser($sql);
         $p = $parser->parsed;
         $expected = getExpectedValue(dirname(__FILE__), 'issue125.serialized');
-        eq_array($p, $expected, 'LEFT as function within the ref clause');
+        $this->assertEquals($expected, $p, 'LEFT as function within the ref clause');
 
     }
 }

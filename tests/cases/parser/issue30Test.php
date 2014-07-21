@@ -52,7 +52,7 @@ class issue30Test extends \PHPUnit_Framework_TestCase {
         $parser->parse($sql);
         $p = $parser->parsed;
         $expected = getExpectedValue(dirname(__FILE__), 'issue30.serialized');
-        eq_array($p, $expected, 'parenthesis within string literals within function parameter list');
+        $this->assertEquals($expected, $p, 'parenthesis within string literals within function parameter list');
 
     }
 }

@@ -50,7 +50,7 @@ class tableoptionsTest extends \PHPUnit_Framework_TestCase {
         $parser->parse($sql);
         $p = $parser->parsed;
         $expected = getExpectedValue(dirname(__FILE__), 'tableoptions1.serialized');
-        eq_array($p, $expected, 'CREATE TABLE statement with table options');
+        $this->assertEquals($expected, $p, 'CREATE TABLE statement with table options');
 
 
         // TODO: the union statement within the CREATE TABLE has not been parsed
@@ -59,7 +59,7 @@ class tableoptionsTest extends \PHPUnit_Framework_TestCase {
         $parser->parse($sql);
         $p = $parser->parsed;
         $expected = getExpectedValue(dirname(__FILE__), 'tableoptions2.serialized');
-        eq_array($p, $expected, 'CREATE TABLE statement with UNION table option');
+        $this->assertEquals($expected, $p, 'CREATE TABLE statement with UNION table option');
 
     }
 }

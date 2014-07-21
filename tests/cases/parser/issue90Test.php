@@ -51,7 +51,7 @@ class issue90Test extends \PHPUnit_Framework_TestCase {
         $parser = new PHPSQLParser();
         $p = $parser->parse($sql);
         $expected = getExpectedValue(dirname(__FILE__), 'issue90.serialized');
-        eq_array($p, $expected, 'on duplicate key problem');
+        $this->assertEquals($expected, $p, 'on duplicate key problem');
 
     }
 }

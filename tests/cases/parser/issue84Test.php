@@ -52,7 +52,7 @@ class issue84Test extends \PHPUnit_Framework_TestCase {
         $parser->parse($sql, true);
         $p = $parser->parsed;
         $expected = getExpectedValue(dirname(__FILE__), 'issue84a.serialized');
-        eq_array($p, $expected, 'INSERT ... SELECT .. FROM ... WHERE');
+        $this->assertEquals($expected, $p, 'INSERT ... SELECT .. FROM ... WHERE');
 
 
         $parser = new PHPSQLParser();
@@ -60,7 +60,7 @@ class issue84Test extends \PHPUnit_Framework_TestCase {
         $parser->parse($sql, true);
         $p = $parser->parsed;
         $expected = getExpectedValue(dirname(__FILE__), 'issue84b.serialized');
-        eq_array($p, $expected, 'INSERT ... (SELECT .. FROM ... WHERE)');
+        $this->assertEquals($expected, $p, 'INSERT ... (SELECT .. FROM ... WHERE)');
 
 
         $parser = new PHPSQLParser();
@@ -68,7 +68,7 @@ class issue84Test extends \PHPUnit_Framework_TestCase {
         $parser->parse($sql, true);
         $p = $parser->parsed;
         $expected = getExpectedValue(dirname(__FILE__), 'issue84c.serialized');
-        eq_array($p, $expected, 'INSERT ... (cols) VALUES (values)');
+        $this->assertEquals($expected, $p, 'INSERT ... (cols) VALUES (values)');
 
     }
 }

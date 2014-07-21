@@ -53,7 +53,7 @@ class gtltopTest extends \PHPUnit_Framework_TestCase {
         $parser->parse($sql);
         $p = $parser->parsed;
         $expected = getExpectedValue(dirname(__FILE__), 'gtltop.serialized');
-        eq_array($p, $expected, 'a lot of where clauses');
+        $this->assertEquals($expected, $p, 'a lot of where clauses');
 
     }
 }

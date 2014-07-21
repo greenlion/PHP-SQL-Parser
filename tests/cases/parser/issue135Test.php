@@ -51,7 +51,7 @@ class issue135Test extends \PHPUnit_Framework_TestCase {
         $parser = new PHPSQLParser($sql, true);
         $p = $parser->parsed;
         $expected = getExpectedValue(dirname(__FILE__), 'issue135.serialized');
-        eq_array($p, $expected, 'STD must be an aggregate function');
+        $this->assertEquals($expected, $p, 'STD must be an aggregate function');
 
     }
 }

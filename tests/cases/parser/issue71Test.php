@@ -51,13 +51,13 @@ class issue71Test extends \PHPUnit_Framework_TestCase {
         $parser = new PHPSQLParser($sql);
         $p = $parser->parsed;
         $expected = getExpectedValue(dirname(__FILE__), 'issue71a.serialized');
-        eq_array($p, $expected, 'infinite loop on table alias "event"');
+        $this->assertEquals($expected, $p, 'infinite loop on table alias "event"');
 
         $sql = "select acol from table as data";
         $parser = new PHPSQLParser($sql);
         $p = $parser->parsed;
         $expected = getExpectedValue(dirname(__FILE__), 'issue71b.serialized');
-        eq_array($p, $expected, 'infinite loop on table alias "data"');
+        $this->assertEquals($expected, $p, 'infinite loop on table alias "data"');
 
     }
 }

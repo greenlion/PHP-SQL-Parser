@@ -53,7 +53,7 @@ class issue42Test extends \PHPUnit_Framework_TestCase {
         $parser->parse($sql, true);
         $p = $parser->parsed;
         $expected = getExpectedValue(dirname(__FILE__), 'issue42.serialized');
-        eq_array($p, $expected, 'escaped quote in string constant');
+        $this->assertEquals($expected, $p, 'escaped quote in string constant');
 
     }
 }

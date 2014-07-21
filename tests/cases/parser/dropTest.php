@@ -50,7 +50,7 @@ class dropTest extends \PHPUnit_Framework_TestCase {
         $sql = "drop table if exists xyz cascade";
         $p = $parser->parse($sql, true);
         $expected = getExpectedValue(dirname(__FILE__), 'drop.serialized');
-        eq_array($p, $expected, 'drop table statement');
+        $this->assertEquals($expected, $p, 'drop table statement');
 
     }
 }

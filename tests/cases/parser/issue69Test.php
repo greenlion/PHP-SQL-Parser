@@ -51,7 +51,7 @@ class issue69Test extends \PHPUnit_Framework_TestCase {
         $parser = new PHPSQLParser($sql, true);
         $p = $parser->parsed;
         $expected = getExpectedValue(dirname(__FILE__), 'issue69.serialized');
-        eq_array($p, $expected, 'col is null should not fail.');
+        $this->assertEquals($expected, $p, 'col is null should not fail.');
 
     }
 }

@@ -52,7 +52,7 @@ class issue32Test extends \PHPUnit_Framework_TestCase {
         $parser->parse($sql);
         $p = $parser->parsed;
         $expected = getExpectedValue(dirname(__FILE__), 'issue32.serialized');
-        eq_array($p, $expected, 'update with keyword user as table');
+        $this->assertEquals($expected, $p, 'update with keyword user as table');
 
     }
 }

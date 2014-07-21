@@ -54,7 +54,7 @@ class issue56Test extends \PHPUnit_Framework_TestCase {
         $parser->parse($sql, true);
         $p = $parser->parsed;
         $expected = getExpectedValue(dirname(__FILE__), 'issue56a.serialized');
-        eq_array($p, $expected, 'optimizer hint within INSERT');
+        $this->assertEquals($expected, $p, 'optimizer hint within INSERT');
 
         // optimizer/index hints
         // TODO: not solved
@@ -63,7 +63,7 @@ class issue56Test extends \PHPUnit_Framework_TestCase {
         $parser->parse($sql, true);
         $p = $parser->parsed;
         $expected = getExpectedValue(dirname(__FILE__), 'issue56a.serialized');
-        eq_array($p, $expected, 'multiline comment with inline comment inside');
+        $this->assertEquals($expected, $p, 'multiline comment with inline comment inside');
 
         // inline comment
         // TODO: not solved
@@ -74,7 +74,7 @@ class issue56Test extends \PHPUnit_Framework_TestCase {
         $parser->parse($sql, true);
         $p = $parser->parsed;
         $expected = getExpectedValue(dirname(__FILE__), 'issue56b.serialized');
-        eq_array($p, $expected, 'inline comment should not fail, issue 56');
+        $this->assertEquals($expected, $p, 'inline comment should not fail, issue 56');
 
         // inline comment
         // TODO: not solved
@@ -85,7 +85,7 @@ class issue56Test extends \PHPUnit_Framework_TestCase {
         $parser->parse($sql, true);
         $p = $parser->parsed;
         $expected = getExpectedValue(dirname(__FILE__), 'issue56b.serialized');
-        eq_array($p, $expected, 'inline comment with multiline comment inside');
+        $this->assertEquals($expected, $p, 'inline comment with multiline comment inside');
 
     }
 }

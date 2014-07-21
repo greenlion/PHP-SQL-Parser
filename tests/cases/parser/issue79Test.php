@@ -51,13 +51,13 @@ class issue79Test extends \PHPUnit_Framework_TestCase {
         $parser = new PHPSQLParser($sql);
         $p = $parser->parsed;
         $expected = getExpectedValue(dirname(__FILE__), 'issue79a.serialized');
-        eq_array($p, $expected, 'user variables');
+        $this->assertEquals($expected, $p, 'user variables');
 
         $sql = "SELECT (@aa:=id) AS a, (@aa+3) AS b FROM tbl_name HAVING b=5";
         $parser = new PHPSQLParser($sql);
         $p = $parser->parsed;
         $expected = getExpectedValue(dirname(__FILE__), 'issue79b.serialized');
-        eq_array($p, $expected, 'user variables with alias and assignment');
+        $this->assertEquals($expected, $p, 'user variables with alias and assignment');
 
     }
 }

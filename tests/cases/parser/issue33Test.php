@@ -53,7 +53,7 @@ class issue33Test extends \PHPUnit_Framework_TestCase {
         $parser->parse($sql, true);
         $p = $parser->parsed;
         $expected = getExpectedValue(dirname(__FILE__), 'issue33a.serialized');
-        eq_array($p, $expected, 'CREATE TABLE statement with (LIKE)');
+        $this->assertEquals($expected, $p, 'CREATE TABLE statement with (LIKE)');
 
 
         $parser = new PHPSQLParser();
@@ -61,7 +61,7 @@ class issue33Test extends \PHPUnit_Framework_TestCase {
         $parser->parse($sql, true);
         $p = $parser->parsed;
         $expected = getExpectedValue(dirname(__FILE__), 'issue33b.serialized');
-        eq_array($p, $expected, 'CREATE TABLE statement with LIKE');
+        $this->assertEquals($expected, $p, 'CREATE TABLE statement with LIKE');
 
 
         $parser = new PHPSQLParser();
@@ -69,7 +69,7 @@ class issue33Test extends \PHPUnit_Framework_TestCase {
         $parser->parse($sql);
         $p = $parser->parsed;
         $expected = getExpectedValue(dirname(__FILE__), 'issue33c.serialized');
-        eq_array($p, $expected, 'CREATE TABLE statement with named primary key and check');
+        $this->assertEquals($expected, $p, 'CREATE TABLE statement with named primary key and check');
 
 
         $parser = new PHPSQLParser();
@@ -77,7 +77,7 @@ class issue33Test extends \PHPUnit_Framework_TestCase {
         $parser->parse($sql);
         $p = $parser->parsed;
         $expected = getExpectedValue(dirname(__FILE__), 'issue33d.serialized');
-        eq_array($p, $expected, 'CREATE TABLE statement with primary key and check');
+        $this->assertEquals($expected, $p, 'CREATE TABLE statement with primary key and check');
 
 
         $parser = new PHPSQLParser();
@@ -85,7 +85,7 @@ class issue33Test extends \PHPUnit_Framework_TestCase {
         $parser->parse($sql);
         $p = $parser->parsed;
         $expected = getExpectedValue(dirname(__FILE__), 'issue33e.serialized');
-        eq_array($p, $expected, 'CREATE TABLE statement with primary key and check');
+        $this->assertEquals($expected, $p, 'CREATE TABLE statement with primary key and check');
 
 
         $parser = new PHPSQLParser();
@@ -98,7 +98,7 @@ class issue33Test extends \PHPUnit_Framework_TestCase {
         $parser->parse($sql);
         $p = $parser->parsed;
         $expected = getExpectedValue(dirname(__FILE__), 'issue33f.serialized');
-        eq_array($p, $expected, 'CREATE TABLE statement');
+        $this->assertEquals($expected, $p, 'CREATE TABLE statement');
 
 
         $parser = new PHPSQLParser();
@@ -106,7 +106,7 @@ class issue33Test extends \PHPUnit_Framework_TestCase {
         $parser->parse($sql);
         $p = $parser->parsed;
         $expected = getExpectedValue(dirname(__FILE__), 'issue33g.serialized');
-        eq_array($p, $expected, 'CREATE TABLE statement with primary key with index options and check');
+        $this->assertEquals($expected, $p, 'CREATE TABLE statement with primary key with index options and check');
 
 
         $parser = new PHPSQLParser();
@@ -114,7 +114,7 @@ class issue33Test extends \PHPUnit_Framework_TestCase {
         $parser->parse($sql, true);
         $p = $parser->parsed;
         $expected = getExpectedValue(dirname(__FILE__), 'issue33h.serialized');
-        eq_array($p, $expected, 'CREATE TABLE statement with table options separated by different characters');
+        $this->assertEquals($expected, $p, 'CREATE TABLE statement with table options separated by different characters');
 
 
         $parser = new PHPSQLParser();
@@ -122,7 +122,7 @@ class issue33Test extends \PHPUnit_Framework_TestCase {
         $parser->parse($sql);
         $p = $parser->parsed;
         $expected = getExpectedValue(dirname(__FILE__), 'issue33i.serialized');
-        eq_array($p, $expected, 'CREATE TABLE statement with foreign key references');
+        $this->assertEquals($expected, $p, 'CREATE TABLE statement with foreign key references');
 
 
         $parser = new PHPSQLParser();
@@ -135,7 +135,7 @@ class issue33Test extends \PHPUnit_Framework_TestCase {
         $parser->parse($sql, true);
         $p = $parser->parsed;
         $expected = getExpectedValue(dirname(__FILE__), 'issue33j.serialized');
-        eq_array($p, $expected, 'simple CREATE TABLE statement with positions');
+        $this->assertEquals($expected, $p, 'simple CREATE TABLE statement with positions');
 
 
         $parser = new PHPSQLParser();
@@ -143,7 +143,7 @@ class issue33Test extends \PHPUnit_Framework_TestCase {
         $parser->parse($sql);
         $p = $parser->parsed;
         $expected = getExpectedValue(dirname(__FILE__), 'issue33k.serialized');
-        eq_array($p, $expected, 'CREATE TABLE statement with primary key and multiple index options and check');
+        $this->assertEquals($expected, $p, 'CREATE TABLE statement with primary key and multiple index options and check');
 
 
         $parser = new PHPSQLParser();
@@ -151,7 +151,7 @@ class issue33Test extends \PHPUnit_Framework_TestCase {
         $parser->parse($sql, true);
         $p = $parser->parsed;
         $expected = getExpectedValue(dirname(__FILE__), 'issue33l.serialized');
-        eq_array($p, $expected, 'CREATE TABLE statement with select statement, replace duplicates');
+        $this->assertEquals($expected, $p, 'CREATE TABLE statement with select statement, replace duplicates');
 
 
         $parser = new PHPSQLParser();
@@ -162,7 +162,7 @@ class issue33Test extends \PHPUnit_Framework_TestCase {
         $parser->parse($sql);
         $p = $parser->parsed;
         $expected = getExpectedValue(dirname(__FILE__), 'issue33m.serialized');
-        eq_array($p, $expected, 'CREATE TABLE statement with partitions');
+        $this->assertEquals($expected, $p, 'CREATE TABLE statement with partitions');
 
 
         $parser = new PHPSQLParser();
@@ -173,7 +173,7 @@ class issue33Test extends \PHPUnit_Framework_TestCase {
         $parser->parse($sql);
         $p = $parser->parsed;
         $expected = getExpectedValue(dirname(__FILE__), 'issue33n.serialized');
-        eq_array($p, $expected, 'CREATE TABLE statement with partitions');
+        $this->assertEquals($expected, $p, 'CREATE TABLE statement with partitions');
 
 
         $parser = new PHPSQLParser();
@@ -186,7 +186,7 @@ class issue33Test extends \PHPUnit_Framework_TestCase {
         $parser->parse($sql);
         $p = $parser->parsed;
         $expected = getExpectedValue(dirname(__FILE__), 'issue33o.serialized');
-        eq_array($p, $expected, 'CREATE TABLE statement with partitions');
+        $this->assertEquals($expected, $p, 'CREATE TABLE statement with partitions');
 
 
         $parser = new PHPSQLParser();
@@ -196,7 +196,7 @@ class issue33Test extends \PHPUnit_Framework_TestCase {
         $parser->parse($sql);
         $p = $parser->parsed;
         $expected = getExpectedValue(dirname(__FILE__), 'issue33p.serialized');
-        eq_array($p, $expected, 'CREATE TABLE statement with partitions');
+        $this->assertEquals($expected, $p, 'CREATE TABLE statement with partitions');
 
 
         $parser = new PHPSQLParser();
@@ -206,7 +206,7 @@ class issue33Test extends \PHPUnit_Framework_TestCase {
         $parser->parse($sql);
         $p = $parser->parsed;
         $expected = getExpectedValue(dirname(__FILE__), 'issue33q.serialized');
-        eq_array($p, $expected, 'CREATE TABLE statement with partitions');
+        $this->assertEquals($expected, $p, 'CREATE TABLE statement with partitions');
 
 
         $parser = new PHPSQLParser();
@@ -241,7 +241,7 @@ class issue33Test extends \PHPUnit_Framework_TestCase {
         $parser->parse($sql);
         $p = $parser->parsed;
         $expected = getExpectedValue(dirname(__FILE__), 'issue33r.serialized');
-        eq_array($p, $expected, 'CREATE TABLE statement with subpartitions and partition-definitions');
+        $this->assertEquals($expected, $p, 'CREATE TABLE statement with subpartitions and partition-definitions');
 
 
         $parser = new PHPSQLParser();
@@ -278,7 +278,7 @@ class issue33Test extends \PHPUnit_Framework_TestCase {
         $parser->parse($sql);
         $p = $parser->parsed;
         $expected = getExpectedValue(dirname(__FILE__), 'issue33s.serialized');
-        eq_array($p, $expected, 'CREATE TABLE statement with subpartitions and partition-definitions');
+        $this->assertEquals($expected, $p, 'CREATE TABLE statement with subpartitions and partition-definitions');
 
 
         $parser = new PHPSQLParser();
@@ -328,7 +328,7 @@ class issue33Test extends \PHPUnit_Framework_TestCase {
         $parser->parse($sql);
         $p = $parser->parsed;
         $expected = getExpectedValue(dirname(__FILE__), 'issue33t.serialized');
-        eq_array($p, $expected, 'CREATE TABLE statement with subpartitions and partition-definitions');
+        $this->assertEquals($expected, $p, 'CREATE TABLE statement with subpartitions and partition-definitions');
 
     }
 }

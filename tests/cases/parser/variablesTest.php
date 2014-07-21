@@ -49,14 +49,14 @@ class variablesTest extends \PHPUnit_Framework_TestCase {
         $parser = new PHPSQLParser($sql);
         $p = $parser->parsed;
         $expected = getExpectedValue(dirname(__FILE__), 'variables1.serialized');
-        eq_array($p, $expected, 'user variables');
+        $this->assertEquals($expected, $p, 'user variables');
 
 
         $sql = "SELECT (@aa:=id) AS a, (@aa+3) AS b FROM tbl_name HAVING b=5;";
         $parser = new PHPSQLParser($sql);
         $p = $parser->parsed;
         $expected = getExpectedValue(dirname(__FILE__), 'variables2.serialized');
-        eq_array($p, $expected, 'user variables');
+        $this->assertEquals($expected, $p, 'user variables');
 
     }
 }

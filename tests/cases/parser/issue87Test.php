@@ -52,14 +52,14 @@ class issue87Test extends \PHPUnit_Framework_TestCase {
         $parser->parse($sql, true);
         $p = $parser->parsed;
         $expected = getExpectedValue(dirname(__FILE__), 'issue87a.serialized');
-        eq_array($p, $expected, 'rename table');
+        $this->assertEquals($expected, $p, 'rename table');
 
         $parser = new PHPSQLParser();
         $sql = "RENAME TABLE a TO b, `c` to `a`, foo.bar to hello.world";
         $parser->parse($sql, true);
         $p = $parser->parsed;
         $expected = getExpectedValue(dirname(__FILE__), 'issue87b.serialized');
-        eq_array($p, $expected, 'rename multiple tables');
+        $this->assertEquals($expected, $p, 'rename multiple tables');
 
     }
 }

@@ -49,19 +49,19 @@ class deleteTest extends \PHPUnit_Framework_TestCase {
         $parser = new PHPSQLParser();
         $p = $parser->parse($sql);
         $expected = getExpectedValue(dirname(__FILE__), 'delete1.serialized');
-        eq_array($p, $expected, 'simple delete statement');
+        $this->assertEquals($expected, $p, 'simple delete statement');
 
         $sql = "DELETE t1, t2 FROM t1 INNER JOIN t2 INNER JOIN t3 WHERE t1.id=t2.id AND t2.id=t3.id";
         $parser = new PHPSQLParser();
         $p = $parser->parse($sql);
         $expected = getExpectedValue(dirname(__FILE__), 'delete2.serialized');
-        eq_array($p, $expected, 'multi-table delete statement');
+        $this->assertEquals($expected, $p, 'multi-table delete statement');
 
         $sql = "DELETE FROM t1.*, t2.* USING t1 INNER JOIN t2 INNER JOIN t3 WHERE t1.id=t2.id AND t2.id=t3.id;";
         $parser = new PHPSQLParser();
         $p = $parser->parse($sql);
         $expected = getExpectedValue(dirname(__FILE__), 'delete3.serialized');
-        eq_array($p, $expected, 'multi-table delete statement with using');
+        $this->assertEquals($expected, $p, 'multi-table delete statement with using');
 
     }
 }

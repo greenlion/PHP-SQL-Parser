@@ -54,7 +54,7 @@ class nestedTest extends \PHPUnit_Framework_TestCase {
         $parser->parse($sql, true);
         $p = $parser->parsed;
         $expected = getExpectedValue(dirname(__FILE__), 'nested1.serialized');
-        eq_array($p, $expected, 'nested left joins');
+        $this->assertEquals($expected, $p, 'nested left joins');
 
 
         $sql = "SELECT * FROM t1 LEFT JOIN (t2, t3, t4)
@@ -62,7 +62,7 @@ class nestedTest extends \PHPUnit_Framework_TestCase {
         $parser->parse($sql);
         $p = $parser->parsed;
         $expected = getExpectedValue(dirname(__FILE__), 'nested2.serialized');
-        eq_array($p, $expected, 'left joins with multiple tables');
+        $this->assertEquals($expected, $p, 'left joins with multiple tables');
 
     }
 }

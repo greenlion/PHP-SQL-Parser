@@ -54,7 +54,7 @@ class issue50Test extends \PHPUnit_Framework_TestCase {
         $parser->parse($sql, false);
         $p = $parser->parsed;
         $expected = getExpectedValue(dirname(__FILE__), 'issue50.serialized');
-        eq_array($p, $expected, 'does not die if query contains _utf8');
+        $this->assertEquals($expected, $p, 'does not die if query contains _utf8');
 
 
         $sql = "SELECT _utf8'hi' COLLATE latin1_german1_ci";

@@ -53,7 +53,7 @@ class unionTest extends \PHPUnit_Framework_TestCase {
         as b';
         $p = $parser->parse($sql, true);
         $expected = getExpectedValue(dirname(__FILE__), 'union1.serialized');
-        eq_array($p, $expected, 'simple union');
+        $this->assertEquals($expected, $p, 'simple union');
 
 
         // TODO: the order-by clause has not been parsed
@@ -62,7 +62,7 @@ class unionTest extends \PHPUnit_Framework_TestCase {
                 (SELECT colB from test b) order by 1';
         $p = $parser->parse($sql, true);
         $expected = getExpectedValue(dirname(__FILE__), 'union2.serialized');
-        eq_array($p, $expected, 'mysql union with order-by');
+        $this->assertEquals($expected, $p, 'mysql union with order-by');
 
     }
 }

@@ -54,7 +54,7 @@ class issue120Test extends \PHPUnit_Framework_TestCase {
         $parser = new PHPSQLParser($sql, true);
         $p = $parser->parsed;
         $expected = getExpectedValue(dirname(__FILE__), 'issue120.serialized');
-        eq_array($p, $expected, 'parentheses around select');
+        $this->assertEquals($expected, $p, 'parentheses around select');
 
     }
 }

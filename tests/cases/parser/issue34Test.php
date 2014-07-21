@@ -52,13 +52,13 @@ class issue34Test extends \PHPUnit_Framework_TestCase {
         $parser->parse($sql);
         $p = $parser->parsed;
         $expected = getExpectedValue(dirname(__FILE__), 'issue34a.serialized');
-        eq_array($p, $expected, 'SELECT statement with keyword CACHE as tablename');
+        $this->assertEquals($expected, $p, 'SELECT statement with keyword CACHE as tablename');
 
         $sql = "INSERT INTO CACHE VALUES (1);";
         $parser->parse($sql);
         $p = $parser->parsed;
         $expected = getExpectedValue(dirname(__FILE__), 'issue34b.serialized');
-        eq_array($p, $expected, 'INSERT statement with keyword CACHE as tablename');
+        $this->assertEquals($expected, $p, 'INSERT statement with keyword CACHE as tablename');
 
     }
 }
