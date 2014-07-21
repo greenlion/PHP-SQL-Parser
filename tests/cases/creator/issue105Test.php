@@ -69,7 +69,7 @@ class issue105Test extends \PHPUnit_Framework_TestCase {
         $creator = new PHPSQLCreator($parser->parsed);
         $created = $creator->created;
         $expected = getExpectedValue(dirname(__FILE__), 'issue105.sql', false);
-        ok($created === $expected, 'function within order-by');
+        $this->assertSame($expected, $created, 'function within order-by');
 
     }
 }

@@ -53,7 +53,7 @@ class leftTest extends \PHPUnit_Framework_TestCase {
         $creator = new PHPSQLCreator($parser->parsed);
         $created = $creator->created;
         $expected = getExpectedValue(dirname(__FILE__), 'left.sql', false);
-        ok($created === $expected, 'left joins and table-expression');
+        $this->assertSame($expected, $created, 'left joins and table-expression');
 
     }
 }

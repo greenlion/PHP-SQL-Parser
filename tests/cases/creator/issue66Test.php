@@ -53,7 +53,7 @@ class issue66Test extends \PHPUnit_Framework_TestCase {
         $creator = new PHPSQLCreator($parser->parsed);
         $created = $creator->created;
         $expected = getExpectedValue(dirname(__FILE__), 'issue66.sql', false);
-        ok($created === $expected, 'Expression subtree should not fail.');
+        $this->assertSame($expected, $created, 'Expression subtree should not fail.');
 
     }
 }

@@ -53,7 +53,7 @@ class issue131Test extends \PHPUnit_Framework_TestCase {
         $creator = new PHPSQLCreator();
         $created = $creator->create($p);
         $expected = getExpectedValue(dirname(__FILE__), 'issue131.sql', false);
-        ok($created === $expected, 'CREATE INDEX statement');
+        $this->assertSame($expected, $created, 'CREATE INDEX statement');
 
     }
 }

@@ -50,7 +50,7 @@ class ascTest extends \PHPUnit_Framework_TestCase {
         $creator = new PHPSQLCreator($parser->parsed);
         $created = $creator->created;
         $expected = getExpectedValue(dirname(__FILE__), 'asc.sql', false);
-        ok($created === $expected, 'explicit ASC statement');
+        $this->assertSame($expected, $created, 'explicit ASC statement');
 
     }
 }

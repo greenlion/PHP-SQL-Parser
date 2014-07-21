@@ -53,7 +53,7 @@ class issue129Test extends \PHPUnit_Framework_TestCase {
         $creator = new PHPSQLCreator();
         $created = $creator->create($p);
         $expected = getExpectedValue(dirname(__FILE__), 'issue129.sql', false);
-        ok($created === $expected, 'drop table should not fail');
+        $this->assertSame($expected, $created, 'drop table should not fail');
 
     }
 }

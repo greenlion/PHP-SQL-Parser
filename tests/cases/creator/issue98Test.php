@@ -52,7 +52,7 @@ class issue98Test extends \PHPUnit_Framework_TestCase {
         $creator = new PHPSQLCreator($parser->parsed);
         $created = $creator->created;
         $expected = getExpectedValue(dirname(__FILE__), 'issue98.sql', false);
-        ok($created === $expected, 'alias with quotes');
+        $this->assertSame($expected, $created, 'alias with quotes');
 
     }
 }

@@ -53,7 +53,7 @@ class issue88Test extends \PHPUnit_Framework_TestCase {
         $creator = new PHPSQLCreator($parser->parsed);
         $created = $creator->created;
         $expected = getExpectedValue(dirname(__FILE__), 'issue88.sql', false);
-        ok($created === $expected, 'Expression subtree should handle bracket_expressions.');
+        $this->assertSame($expected, $created, 'Expression subtree should handle bracket_expressions.');
 
     }
 }

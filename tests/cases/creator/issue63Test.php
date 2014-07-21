@@ -53,7 +53,7 @@ class issue63Test extends \PHPUnit_Framework_TestCase {
         $creator = new PHPSQLCreator($parser->parsed);
         $created = $creator->created;
         $expected = getExpectedValue(dirname(__FILE__), 'issue63a.sql', false);
-        ok($created === $expected, 'group by with colref fails.');
+        $this->assertSame($expected, $created, 'group by with colref fails.');
 
 
         $sql = "SELECT col AS somealias FROM table ORDER BY somealias LIMIT 1";
@@ -61,7 +61,7 @@ class issue63Test extends \PHPUnit_Framework_TestCase {
         $creator = new PHPSQLCreator($parser->parsed);
         $created = $creator->created;
         $expected = getExpectedValue(dirname(__FILE__), 'issue63b.sql', false);
-        ok($created === $expected, 'ORDER BY alias fails.');
+        $this->assertSame($expected, $created, 'ORDER BY alias fails.');
 
 
         $sql = "SELECT * FROM table LIMIT 1";
@@ -69,7 +69,7 @@ class issue63Test extends \PHPUnit_Framework_TestCase {
         $creator = new PHPSQLCreator($parser->parsed);
         $created = $creator->created;
         $expected = getExpectedValue(dirname(__FILE__), 'issue63c.sql', false);
-        ok($created === $expected, 'LIMIT is ignored in output.');
+        $this->assertSame($expected, $created, 'LIMIT is ignored in output.');
 
     }
 }

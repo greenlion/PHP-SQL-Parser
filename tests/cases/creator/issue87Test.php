@@ -53,7 +53,7 @@ class issue87Test extends \PHPUnit_Framework_TestCase {
         $creator = new PHPSQLCreator($parser->parsed);
         $created = $creator->created;
         $expected = getExpectedValue(dirname(__FILE__), 'issue87.sql', false);
-        ok($created === $expected, 'RENAME multiple tables');
+        $this->assertSame($expected, $created, 'RENAME multiple tables');
 
     }
 }

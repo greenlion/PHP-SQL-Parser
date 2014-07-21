@@ -65,7 +65,7 @@ class issue106Test extends \PHPUnit_Framework_TestCase {
         $creator = new PHPSQLCreator($parser->parsed);
         $created = $creator->created;
         $expected = getExpectedValue(dirname(__FILE__), 'issue106.sql', false);
-        ok($created === $expected, 'function within group-by');
+        $this->assertSame($expected, $created, 'function within group-by');
 
     }
 }

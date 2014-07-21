@@ -53,7 +53,7 @@ class issue117Test extends \PHPUnit_Framework_TestCase {
         $creator = new PHPSQLCreator();
         $created = $creator->create($p);
         $expected = getExpectedValue(dirname(__FILE__), 'issue117.sql', false);
-        ok($created === $expected, 'parentheses on the first position of statement');
+        $this->assertSame($expected, $created, 'parentheses on the first position of statement');
 
     }
 }

@@ -50,7 +50,7 @@ class functionTest extends \PHPUnit_Framework_TestCase {
         $creator = new PHPSQLCreator($parser->parsed);
         $created = $creator->created;
         $expected = getExpectedValue(dirname(__FILE__), 'function.sql', false);
-        ok($created === $expected, 'a function');
+        $this->assertSame($expected, $created, 'a function');
 
     }
 }

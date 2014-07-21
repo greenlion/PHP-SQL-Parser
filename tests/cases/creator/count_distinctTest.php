@@ -54,7 +54,7 @@ class count_distinctTest extends \PHPUnit_Framework_TestCase {
         $creator = new PHPSQLCreator($parser->parsed);
         $created = $creator->created;
         $expected = getExpectedValue(dirname(__FILE__), 'distinct.sql', false);
-        ok($created === $expected, 'count(distinct x)');
+        $this->assertSame($expected, $created, 'count(distinct x)');
 
     }
 }

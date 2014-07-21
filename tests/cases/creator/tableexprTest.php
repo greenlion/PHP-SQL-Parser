@@ -51,7 +51,7 @@ class tableexprTest extends \PHPUnit_Framework_TestCase {
         $creator = new PHPSQLCreator($parser->parsed);
         $created = $creator->created;
         $expected = getExpectedValue(dirname(__FILE__), 'tableexpr.sql', false);
-        ok($created === $expected, 'table-expression on second position');
+        $this->assertSame($expected, $created, 'table-expression on second position');
 
     }
 }

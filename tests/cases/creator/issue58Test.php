@@ -53,7 +53,7 @@ class issue58Test extends \PHPUnit_Framework_TestCase {
         $creator = new PHPSQLCreator($parser->parsed);
         $created = $creator->created;
         $expected = getExpectedValue(dirname(__FILE__), 'issue58.sql', false);
-        ok($created === $expected, 'in-list within WHERE expression');
+        $this->assertSame($expected, $created, 'in-list within WHERE expression');
 
     }
 }

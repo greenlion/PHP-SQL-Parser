@@ -53,7 +53,7 @@ class issue124Test extends \PHPUnit_Framework_TestCase {
         $creator = new PHPSQLCreator();
         $created = $creator->create($p);
         $expected = getExpectedValue(dirname(__FILE__), 'issue124.sql', false);
-        ok($created === $expected, 'ref clause with function');
+        $this->assertSame($expected, $created, 'ref clause with function');
 
     }
 }

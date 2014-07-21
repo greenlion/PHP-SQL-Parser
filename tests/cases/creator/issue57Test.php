@@ -58,7 +58,7 @@ class issue57Test extends \PHPUnit_Framework_TestCase {
         $creator = new PHPSQLCreator($parser->parsed);
         $created = $creator->created;
         $expected = getExpectedValue(dirname(__FILE__), 'issue57.sql', false);
-        ok($created === $expected, 'constants in ref-clause');
+        $this->assertSame($expected, $created, 'constants in ref-clause');
 
     }
 }

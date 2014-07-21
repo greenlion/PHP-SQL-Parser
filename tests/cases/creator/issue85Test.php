@@ -52,7 +52,7 @@ class issue85Test extends \PHPUnit_Framework_TestCase {
         $creator = new PHPSQLCreator($parser->parsed);
         $created = $creator->created;
         $expected = getExpectedValue(dirname(__FILE__), 'issue85.sql', false);
-        ok($created === $expected, 'SELECT statements without FROM (wtf?)');
+        $this->assertSame($expected, $created, 'SELECT statements without FROM (wtf?)');
 
     }
 }

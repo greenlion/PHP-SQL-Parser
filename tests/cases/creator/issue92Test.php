@@ -53,7 +53,7 @@ class issue92Test extends \PHPUnit_Framework_TestCase {
         $creator = new PHPSQLCreator($parser->parsed);
         $created = $creator->created;
         $expected = getExpectedValue(dirname(__FILE__), 'issue92.sql', false);
-        ok($created === $expected, 'Expression subtree should handle colrefs.');
+        $this->assertSame($expected, $created, 'Expression subtree should handle colrefs.');
 
     }
 }

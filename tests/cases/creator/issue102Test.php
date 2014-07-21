@@ -52,7 +52,7 @@ class issue102Test extends \PHPUnit_Framework_TestCase {
         $creator = new PHPSQLCreator($parser->parsed);
         $created = $creator->created;
         $expected = getExpectedValue(dirname(__FILE__), 'issue102.sql', false);
-        ok($created === $expected, 'pipes as OR');
+        $this->assertSame($expected, $created, 'pipes as OR');
 
     }
 }

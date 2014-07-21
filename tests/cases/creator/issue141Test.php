@@ -53,7 +53,7 @@ class issue141Test extends \PHPUnit_Framework_TestCase {
         $creator = new PHPSQLCreator();
         $created = $creator->create($p);
         $expected = getExpectedValue(dirname(__FILE__), 'issue141.sql', false);
-        ok($created === $expected, 'bracket expressions within order-by');
+        $this->assertSame($expected, $created, 'bracket expressions within order-by');
 
     }
 }

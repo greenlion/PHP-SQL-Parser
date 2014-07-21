@@ -52,7 +52,7 @@ class issue110Test extends \PHPUnit_Framework_TestCase {
         $creator = new PHPSQLCreator($parser->parsed);
         $created = $creator->created;
         $expected = getExpectedValue(dirname(__FILE__), 'issue110.sql', false);
-        ok($created === $expected, 'simple select with distinct option');
+        $this->assertSame($expected, $created, 'simple select with distinct option');
 
     }
 }

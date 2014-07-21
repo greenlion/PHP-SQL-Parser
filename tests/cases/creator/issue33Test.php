@@ -53,7 +53,7 @@ class issue33Test extends \PHPUnit_Framework_TestCase {
         $creator = new PHPSQLCreator($parser->parsed);
         $created = $creator->created;
         $expected = getExpectedValue(dirname(__FILE__), 'issue33a.sql', false);
-        ok($created === $expected, 'CREATE TABLE statement with (LIKE)');
+        $this->assertSame($expected, $created, 'CREATE TABLE statement with (LIKE)');
 
 
         $parser = new PHPSQLParser();
@@ -63,7 +63,7 @@ class issue33Test extends \PHPUnit_Framework_TestCase {
         $creator = new PHPSQLCreator($parser->parsed);
         $created = $creator->created;
         $expected = getExpectedValue(dirname(__FILE__), 'issue33b.sql', false);
-        ok($created === $expected, 'CREATE TABLE statement with LIKE');
+        $this->assertSame($expected, $created, 'CREATE TABLE statement with LIKE');
 
 
         $parser = new PHPSQLParser();
@@ -73,7 +73,7 @@ class issue33Test extends \PHPUnit_Framework_TestCase {
         $creator = new PHPSQLCreator($parser->parsed);
         $created = $creator->created;
         $expected = getExpectedValue(dirname(__FILE__), 'issue33c.sql', false);
-        ok($created === $expected, 'CREATE TABLE statement with named primary key and check');
+        $this->assertSame($expected, $created, 'CREATE TABLE statement with named primary key and check');
 
 
         $parser = new PHPSQLParser();
@@ -89,7 +89,7 @@ class issue33Test extends \PHPUnit_Framework_TestCase {
             $created = "";
         }
         $expected = getExpectedValue(dirname(__FILE__), 'issue33d.sql', false);
-        ok($created === $expected, 'CREATE TABLE statement with not named primary key and check');
+        $this->assertSame($expected, $created, 'CREATE TABLE statement with not named primary key and check');
 
 
         $parser = new PHPSQLParser();
@@ -99,7 +99,7 @@ class issue33Test extends \PHPUnit_Framework_TestCase {
         $creator = new PHPSQLCreator($parser->parsed);
         $created = $creator->created;
         $expected = getExpectedValue(dirname(__FILE__), 'issue33e.sql', false);
-        ok($created === $expected, 'CREATE TABLE statement with named primary key, index type and check');
+        $this->assertSame($expected, $created, 'CREATE TABLE statement with named primary key, index type and check');
 
 
         $parser = new PHPSQLParser();
@@ -114,7 +114,7 @@ class issue33Test extends \PHPUnit_Framework_TestCase {
         $creator = new PHPSQLCreator($parser->parsed);
         $created = $creator->created;
         $expected = getExpectedValue(dirname(__FILE__), 'issue33f.sql', false);
-        ok($created === $expected, 'CREATE TABLE statement columns and options');
+        $this->assertSame($expected, $created, 'CREATE TABLE statement columns and options');
 
 
         $parser = new PHPSQLParser();
@@ -124,7 +124,7 @@ class issue33Test extends \PHPUnit_Framework_TestCase {
         $creator = new PHPSQLCreator($parser->parsed);
         $created = $creator->created;
         $expected = getExpectedValue(dirname(__FILE__), 'issue33g.sql', false);
-        ok($created === $expected, 'CREATE TABLE statement with primary key with index options and check');
+        $this->assertSame($expected, $created, 'CREATE TABLE statement with primary key with index options and check');
 
 
         $parser = new PHPSQLParser();
@@ -134,7 +134,7 @@ class issue33Test extends \PHPUnit_Framework_TestCase {
         $creator = new PHPSQLCreator($parser->parsed);
         $created = $creator->created;
         $expected = getExpectedValue(dirname(__FILE__), 'issue33h.sql', false);
-        ok($created === $expected, 'CREATE TABLE statement with table options separated by different characters');
+        $this->assertSame($expected, $created, 'CREATE TABLE statement with table options separated by different characters');
 
 
         $parser = new PHPSQLParser();
@@ -144,7 +144,7 @@ class issue33Test extends \PHPUnit_Framework_TestCase {
         $creator = new PHPSQLCreator($parser->parsed);
         $created = $creator->created;
         $expected = getExpectedValue(dirname(__FILE__), 'issue33i.sql', false);
-        ok($created === $expected, 'CREATE TABLE statement with foreign key references');
+        $this->assertSame($expected, $created, 'CREATE TABLE statement with foreign key references');
 
 
         $parser = new PHPSQLParser();
@@ -159,7 +159,7 @@ class issue33Test extends \PHPUnit_Framework_TestCase {
         $creator = new PHPSQLCreator($parser->parsed);
         $created = $creator->created;
         $expected = getExpectedValue(dirname(__FILE__), 'issue33j.sql', false);
-        ok($created === $expected, 'simple CREATE TEMPORARY TABLE statement with positions');
+        $this->assertSame($expected, $created, 'simple CREATE TEMPORARY TABLE statement with positions');
 
 
         $parser = new PHPSQLParser();
@@ -169,7 +169,7 @@ class issue33Test extends \PHPUnit_Framework_TestCase {
         $creator = new PHPSQLCreator($parser->parsed);
         $created = $creator->created;
         $expected = getExpectedValue(dirname(__FILE__), 'issue33k.sql', false);
-        ok($created === $expected, 'CREATE TABLE statement with primary key column and multiple index options and check');
+        $this->assertSame($expected, $created, 'CREATE TABLE statement with primary key column and multiple index options and check');
 
 
         $parser = new PHPSQLParser();
@@ -179,7 +179,7 @@ class issue33Test extends \PHPUnit_Framework_TestCase {
         $creator = new PHPSQLCreator($parser->parsed);
         $created = $creator->created;
         $expected = getExpectedValue(dirname(__FILE__), 'issue33l.sql', false);
-        ok($created === $expected, 'CREATE TABLE statement with select statement, replace duplicates');
+        $this->assertSame($expected, $created, 'CREATE TABLE statement with select statement, replace duplicates');
 
 
         $parser = new PHPSQLParser();
@@ -189,7 +189,7 @@ class issue33Test extends \PHPUnit_Framework_TestCase {
         $creator = new PHPSQLCreator($parser->parsed);
         $created = $creator->created;
         $expected = getExpectedValue(dirname(__FILE__), 'issue33m.sql', false);
-        ok($created === $expected, 'CREATE TABLE statement multi-param column type');
+        $this->assertSame($expected, $created, 'CREATE TABLE statement multi-param column type');
 
     }
 }

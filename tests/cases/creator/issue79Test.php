@@ -52,7 +52,7 @@ class issue79Test extends \PHPUnit_Framework_TestCase {
         $creator = new PHPSQLCreator($parser->parsed);
         $created = $creator->created;
         $expected = getExpectedValue(dirname(__FILE__), 'issue79a.sql', false);
-        ok($created === $expected, 'User variable within WHERE clause');
+        $this->assertSame($expected, $created, 'User variable within WHERE clause');
 
     }
 }

@@ -52,7 +52,7 @@ class issue94Test extends \PHPUnit_Framework_TestCase {
         $creator = new PHPSQLCreator($parser->parsed);
         $created = $creator->created;
         $expected = getExpectedValue(dirname(__FILE__), 'issue94.sql', false);
-        ok($created === $expected, 'creating date_add with interval');
+        $this->assertSame($expected, $created, 'creating date_add with interval');
 
     }
 }

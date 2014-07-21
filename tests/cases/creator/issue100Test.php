@@ -53,7 +53,7 @@ class issue100Test extends \PHPUnit_Framework_TestCase {
         $creator = new PHPSQLCreator();
         $created = $creator->create($p);
         $expected = getExpectedValue(dirname(__FILE__), 'issue100.sql', false);
-        ok($created === $expected, 'lost alias for constants');
+        $this->assertSame($expected, $created, 'lost alias for constants');
 
     }
 }

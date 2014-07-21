@@ -53,7 +53,7 @@ class issue126Test extends \PHPUnit_Framework_TestCase {
         $creator = new PHPSQLCreator();
         $created = $creator->create($p);
         $expected = getExpectedValue(dirname(__FILE__), 'issue126.sql', false);
-        ok($created === $expected, 'delete statement');
+        $this->assertSame($expected, $created, 'delete statement');
 
     }
 }

@@ -53,7 +53,7 @@ class issue86Test extends \PHPUnit_Framework_TestCase {
         $creator = new PHPSQLCreator($parser->parsed);
         $created = $creator->created;
         $expected = getExpectedValue(dirname(__FILE__), 'issue86.sql', false);
-        ok($created === $expected, 'Expression pos should be handled within GROUP BY.');
+        $this->assertSame($expected, $created, 'Expression pos should be handled within GROUP BY.');
 
     }
 }

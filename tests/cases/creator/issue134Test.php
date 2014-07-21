@@ -57,7 +57,7 @@ class issue134Test extends \PHPUnit_Framework_TestCase {
         $creator = new PHPSQLCreator();
         $created = $creator->create($p);
         $expected = getExpectedValue(dirname(__FILE__), 'issue134.sql', false);
-        ok($created === $expected, 'a straight_join within from clause');
+        $this->assertSame($expected, $created, 'a straight_join within from clause');
 
     }
 }

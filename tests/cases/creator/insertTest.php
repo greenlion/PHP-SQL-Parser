@@ -50,7 +50,7 @@ class insertTest extends \PHPUnit_Framework_TestCase {
         $creator = new PHPSQLCreator($parser->parsed);
         $created = $creator->created;
         $expected = getExpectedValue(dirname(__FILE__), 'insert1.sql', false);
-        ok($created === $expected, 'multiple records within INSERT');
+        $this->assertSame($expected, $created, 'multiple records within INSERT');
 
 
         $sql = "INSERT INTO test (`name`, `test`) VALUES ('\'Superman\'', '')";
@@ -58,7 +58,7 @@ class insertTest extends \PHPUnit_Framework_TestCase {
         $creator = new PHPSQLCreator($parser->parsed);
         $created = $creator->created;
         $expected = getExpectedValue(dirname(__FILE__), 'insert2.sql', false);
-        ok($created === $expected, 'a simple INSERT statement');
+        $this->assertSame($expected, $created, 'a simple INSERT statement');
 
 
         $sql = "INSERT INTO test (`name`, `test`) VALUES ('\'Superman\'', ''), ('\'sdfsd\'', '')";
@@ -66,7 +66,7 @@ class insertTest extends \PHPUnit_Framework_TestCase {
         $creator = new PHPSQLCreator($parser->parsed);
         $created = $creator->created;
         $expected = getExpectedValue(dirname(__FILE__), 'insert3.sql', false);
-        ok($created === $expected, 'multiple records within INSERT (2)');
+        $this->assertSame($expected, $created, 'multiple records within INSERT (2)');
 
     }
 }

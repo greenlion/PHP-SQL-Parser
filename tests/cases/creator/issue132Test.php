@@ -53,7 +53,7 @@ class issue132Test extends \PHPUnit_Framework_TestCase {
         $creator = new PHPSQLCreator();
         $created = $creator->create($p);
         $expected = getExpectedValue(dirname(__FILE__), 'issue132.sql', false);
-        ok($created === $expected, 'lost alias of expression');
+        $this->assertSame($expected, $created, 'lost alias of expression');
 
     }
 }

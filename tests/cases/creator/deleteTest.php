@@ -50,7 +50,7 @@ class deleteTest extends \PHPUnit_Framework_TestCase {
         $creator = new PHPSQLCreator($parser->parsed);
         $created = $creator->created;
         $expected = getExpectedValue(dirname(__FILE__), 'delete.sql', false);
-        ok($created === $expected, 'a multi-table delete statement');
+        $this->assertSame($expected, $created, 'a multi-table delete statement');
 
     }
 }

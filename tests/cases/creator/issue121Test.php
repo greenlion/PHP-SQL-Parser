@@ -53,7 +53,7 @@ class issue121Test extends \PHPUnit_Framework_TestCase {
         $creator = new PHPSQLCreator();
         $created = $creator->create($p);
         $expected = getExpectedValue(dirname(__FILE__), 'issue121.sql', false);
-        ok($created === $expected, 'create table with default value');
+        $this->assertSame($expected, $created, 'create table with default value');
 
     }
 }

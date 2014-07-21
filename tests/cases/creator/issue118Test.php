@@ -53,7 +53,7 @@ class issue118Test extends \PHPUnit_Framework_TestCase {
         $creator = new PHPSQLCreator();
         $created = $creator->create($p);
         $expected = getExpectedValue(dirname(__FILE__), 'issue118.sql', false);
-        ok($created === $expected, 'alias within group by');
+        $this->assertSame($expected, $created, 'alias within group by');
 
     }
 }

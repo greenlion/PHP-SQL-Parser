@@ -50,7 +50,7 @@ class joinTest extends \PHPUnit_Framework_TestCase {
         $creator = new PHPSQLCreator($parser->parsed);
         $created = $creator->created;
         $expected = getExpectedValue(dirname(__FILE__), 'join.sql', false);
-        ok($created === $expected, 'a join');
+        $this->assertSame($expected, $created, 'a join');
     }
 }
 

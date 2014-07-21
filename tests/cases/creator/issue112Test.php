@@ -52,7 +52,7 @@ class issue112Test extends \PHPUnit_Framework_TestCase {
         $creator = new PHPSQLCreator($parser->parsed);
         $created = $creator->created;
         $expected = getExpectedValue(dirname(__FILE__), 'issue112.sql', false);
-        ok($created === $expected, 'select with having clause');
+        $this->assertSame($expected, $created, 'select with having clause');
 
     }
 }

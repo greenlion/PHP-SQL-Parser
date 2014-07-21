@@ -62,7 +62,7 @@ class magnusTest extends \PHPUnit_Framework_TestCase {
         $creator = new PHPSQLCreator();
         $created = $creator->create($parsed);
         $expected = getExpectedValue(dirname(__FILE__), 'magnus.sql', false);
-        ok($created === $expected, 'Aliases for functions.');
+        $this->assertSame($expected, $created, 'Aliases for functions.');
 
     }
 }

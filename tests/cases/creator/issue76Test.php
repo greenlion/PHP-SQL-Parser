@@ -52,14 +52,14 @@ class issue76Test extends \PHPUnit_Framework_TestCase {
         $creator = new PHPSQLCreator($parser->parsed);
         $created = $creator->created;
         $expected = getExpectedValue(dirname(__FILE__), 'issue76a.sql', false);
-        ok($created === $expected, 'Expressions in functions and aggregates.');
+        $this->assertSame($expected, $created, 'Expressions in functions and aggregates.');
 
         $sql = "SELECT AVG(2.0 * foo, x) FROM bar";
         $parser = new PHPSQLParser($sql, true);
         $creator = new PHPSQLCreator($parser->parsed);
         $created = $creator->created;
         $expected = getExpectedValue(dirname(__FILE__), 'issue76b.sql', false);
-        ok($created === $expected, 'Expressions in functions and aggregates with additional parameters.');
+        $this->assertSame($expected, $created, 'Expressions in functions and aggregates with additional parameters.');
 
     }
 }

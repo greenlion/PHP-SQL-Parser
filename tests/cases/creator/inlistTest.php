@@ -50,7 +50,7 @@ class inlistTest extends \PHPUnit_Framework_TestCase {
         $creator = new PHPSQLCreator($parser->parsed);
         $created = $creator->created;
         $expected = getExpectedValue(dirname(__FILE__), 'inlist.sql', false);
-        ok($created === $expected, 'a subquery and in-lists');
+        $this->assertSame($expected, $created, 'a subquery and in-lists');
 
     }
 }

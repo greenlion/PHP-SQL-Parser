@@ -50,7 +50,7 @@ class whereTest extends \PHPUnit_Framework_TestCase {
         $creator = new PHPSQLCreator($parser->parsed);
         $created = $creator->created;
         $expected = getExpectedValue(dirname(__FILE__), 'where.sql', false);
-        ok($created === $expected, 'expressions with function within WHERE clause');
+        $this->assertSame($expected, $created, 'expressions with function within WHERE clause');
 
     }
 }

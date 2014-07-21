@@ -57,7 +57,7 @@ class issue104Test extends \PHPUnit_Framework_TestCase {
         $creator = new PHPSQLCreator($parser->parsed);
         $created = $creator->created;
         $expected = getExpectedValue(dirname(__FILE__), 'issue104.sql', false);
-        ok($created === $expected, 'ref clause parentheses');
+        $this->assertSame($expected, $created, 'ref clause parentheses');
 
     }
 }
