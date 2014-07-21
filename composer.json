@@ -45,28 +45,5 @@
     {
     	"squizlabs/php_codesniffer": ">=1.5.1",
         "phpunit/phpunit": ">=4.0.14"
-    },
-    "repositories": [
-        {
-            "type": "package",
-            "package": 
-            {
-                "name": "greenlion/php-sql-parser",
-                "version": "4.0.0",
-                "dist": 
-                {
-                    "type": "zip",
-                    "url": "https://github.com/greenlion/PHP-SQL-Parser/releases/download/v4.0.0/php-sql-parser-4.0.0.zip"
-                }
-            }
-        },
-        {
-            "type": "git",
-            "url": "https://github.com/greenlion/PHP-SQL-Parser.git"
-        },
-        {
-            "type": "svn",
-            "url": "http://php-sql-parser.googlecode.com/svn/trunk/"
-        }
-    ]
+    }
 }
