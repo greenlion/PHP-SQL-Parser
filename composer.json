@@ -64,7 +64,7 @@
         },
         {
             "type": "svn",
-            "url": "http://php-sql-parser.googlecode.com/svn/"
+            "url": "http://php-sql-parser.googlecode.com/svn/trunk/"
         }
     ]
 }
