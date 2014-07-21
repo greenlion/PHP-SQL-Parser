@@ -53,9 +53,9 @@ class fromTest extends \PHPUnit_Framework_TestCase {
         $parser->parse($sql);
         $p = $parser->parsed;
 
-        ok(count($p) == 3 && count($p['FROM']) == 1);
-        ok($p['FROM'][0]['alias']['name']=='an_alias');
-
+        $this->assertEquals(3, count($p));
+        $this->assertEquals(1, count($p['FROM']));
+        $this->assertEquals('an_alias', $p['FROM'][0]['alias']['name']);
 
 
         $sql = 'select DISTINCT 1+2   c1, 1+ 2 as 
@@ -68,7 +68,7 @@ class fromTest extends \PHPUnit_Framework_TestCase {
         $parser = new PHPSQLParser($sql);
         $p=$parser->parsed;
 
-        ok(count($p['SELECT']) == 8, 'seven selects');
+        $this->assertEquals(8, count($p['SELECT']), 'seven selects');
         $this->assertEquals('DISTINCT', $p['SELECT'][0]['base_expr']);
         $this->assertEquals('c1', $p['SELECT'][1]['alias']['name']);
         $this->assertEquals('`c2`', $p['SELECT'][2]['alias']['name']);

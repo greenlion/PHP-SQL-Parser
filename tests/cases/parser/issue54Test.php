@@ -61,7 +61,7 @@ class issue54Test extends \PHPUnit_Framework_TestCase {
         $parser->parse($sql);
         $p = $parser->parsed;
 
-        ok($errorNumber === 0, 'No notice should be thrown');
+        $this->assertSame(0, $errorNumber, 'No notice should be thrown');
         $old_error_handler = set_error_handler($old_error_handler);
 
         $expected = getExpectedValue(dirname(__FILE__), 'issue54.serialized');

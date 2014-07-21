@@ -56,14 +56,14 @@ class customfunctionTest extends \PHPUnit_Framework_TestCase {
         } catch (Exception $e) {
             $p = array();
         }
-        ok($p['SELECT'][0]['expr_type'] === ExpressionType::CUSTOM_FUNCTION, 'custom function within SELECT clause');
+        $this->assertSame(ExpressionType::CUSTOM_FUNCTION, $p['SELECT'][0]['expr_type'], 'custom function within SELECT clause');
 
 
         $parser = new PHPSQLParser();
         $parser->addCustomFunction("percentile");
         $parser->addCustomFunction("foo_bar");
         $p = $parser->getCustomFunctions();
-        eq_array($p, array("PERCENTILE", "FOO_BAR"), 'custom function list');
+        $this->assertEquals(array("PERCENTILE", "FOO_BAR"), $p, 'custom function list');
 
 
         $parser = new PHPSQLParser();
@@ -71,7 +71,7 @@ class customfunctionTest extends \PHPUnit_Framework_TestCase {
         $parser->addCustomFunction("foo_bar");
         $parser->removeCustomFunction('percentile');
         $p = $parser->getCustomFunctions();
-        eq_array($p, array("FOO_BAR"), 'remove custom function from list');
+        $this->assertEquals(array("FOO_BAR"), $p, 'remove custom function from list');
 
     }
 }

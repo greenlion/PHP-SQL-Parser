@@ -51,7 +51,9 @@ class selectTest extends \PHPUnit_Framework_TestCase {
         1';
         $p=$parser->parse($sql);
 
-        ok(count($p) == 1 && count($p['SELECT']) == 1);
+        $this->assertEquals(1, count($p));
+        $this->assertEquals(1, count($p['SELECT']));
+
         $this->assertEquals('const', $p['SELECT'][0]['expr_type']);
         $this->assertEquals('1', $p['SELECT'][0]['base_expr']);
         $this->assertEquals('', $p['SELECT'][0]['sub_tree']);
@@ -63,11 +65,14 @@ class selectTest extends \PHPUnit_Framework_TestCase {
         $parser->parse($sql);
         $p = $parser->parsed;
 
-        ok(count($p) == 3 && count($p['SELECT']) == 8);
-        $this->assertEquals('terminate', $p['SELECT'][count($p['SELECT'])-1]['base_expr']);
-        ok(count($p) == 3 && count($p['FROM']) == 1);
-        ok(count($p) == 3 && count($p['WHERE']) == 3);
+        $this->assertEquals(3, count($p));
+        $this->assertEquals(8, count($p['SELECT']));
 
+        $this->assertEquals('terminate', $p['SELECT'][count($p['SELECT'])-1]['base_expr']);
+
+        $this->assertEquals(3, count($p));
+        $this->assertEquals(1, count($p['FROM']));
+        $this->assertEquals(3, count($p['WHERE']));
 
         $parser->parse('SELECT NOW( ),now(),sysdate( ),sysdate () as now');
         $this->assertEquals('sysdate', $parser->parsed['SELECT'][3]['base_expr']);

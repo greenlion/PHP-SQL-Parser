@@ -51,15 +51,15 @@ class issue60Test extends \PHPUnit_Framework_TestCase {
         FROM users";
         $parser = new PHPSQLParser($sql, true);
         $p = $parser->parsed;
-        ok($p['SELECT'][1]['position'] === 11, 'wrong usage of keyword password');
-        ok($p['SELECT'][1]['expr_type'] === 'colref', 'password should be a colref here');
+        $this->assertSame(11, $p['SELECT'][1]['position'], 'wrong usage of keyword password');
+        $this->assertSame('colref', $p['SELECT'][1]['expr_type'], 'password should be a colref here');
 
 
         $sql = "SET PASSWORD = PASSWORD('haha')";
         $parser = new PHPSQLParser($sql, true);
         $p = $parser->parsed;
-        ok($p['SET'][0]['sub_tree'][0]['expr_type'] === 'colref', 'set the password column of mysql.user');
-        ok($p['SET'][0]['sub_tree'][2]['expr_type'] === 'function', 'set password value');
+        $this->assertSame('colref', $p['SET'][0]['sub_tree'][0]['expr_type'], 'set the password column of mysql.user');
+        $this->assertSame('function', $p['SET'][0]['sub_tree'][2]['expr_type'], 'set password value');
 
     }
 }

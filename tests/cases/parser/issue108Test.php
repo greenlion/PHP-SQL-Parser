@@ -62,8 +62,8 @@ class issue108Test extends \PHPUnit_Framework_TestCase {
         } catch (Exception $e) {
             $p = array();
         }
-        ok($p['TABLE']['create-def']['sub_tree'][3]['expr_type'] === ExpressionType::INDEX, 'position calculation should handle INDEX');
 
+        $this->assertSame(ExpressionType::INDEX, $p['TABLE']['create-def']['sub_tree'][3]['expr_type'], 'position calculation should handle INDEX');
     }
 }
 

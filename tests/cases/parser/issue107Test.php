@@ -61,7 +61,8 @@ class issue107Test extends \PHPUnit_Framework_TestCase {
         } catch (Exception $e) {
             $p = array();
         }
-        ok($p['TABLE']['create-def']['sub_tree'][1]['sub_tree'][1]['sub_tree'][5]['expr_type'] === ExpressionType::DEF_VALUE,
+        
+        $this->assertSame(ExpressionType::DEF_VALUE, $p['TABLE']['create-def']['sub_tree'][1]['sub_tree'][1]['sub_tree'][5]['expr_type'],
                 'column definition with DEFAULT value');
 
     }
