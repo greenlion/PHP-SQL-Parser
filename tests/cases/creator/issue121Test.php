@@ -38,15 +38,23 @@
  * @version   SVN: $Id$
  * 
  */
-namespace PHPSQLParser;
-require_once dirname(__FILE__) . '/../../test-more.php';
+namespace PHPSQLParser\Test\Creator;
+use PHPSQLParser\PHPSQLParser;
+use PHPSQLParser\PHPSQLCreator;
 
-$query = "CREATE TABLE t (mv DECIMAL(3) DEFAULT 10)";
-$parser = new PHPSQLParser();
-$p = $parser->parse($query);
-$creator = new PHPSQLCreator();
-$created = $creator->create($p);
-$expected = getExpectedValue(dirname(__FILE__), 'issue121.sql', false);
-ok($created === $expected, 'create table with default value');
+class issue121Test extends \PHPUnit_Framework_TestCase {
+	
+    public function testIssue121() {
 
-?>
+
+        $query = "CREATE TABLE t (mv DECIMAL(3) DEFAULT 10)";
+        $parser = new PHPSQLParser();
+        $p = $parser->parse($query);
+        $creator = new PHPSQLCreator();
+        $created = $creator->create($p);
+        $expected = getExpectedValue(dirname(__FILE__), 'issue121.sql', false);
+        ok($created === $expected, 'create table with default value');
+
+    }
+}
+

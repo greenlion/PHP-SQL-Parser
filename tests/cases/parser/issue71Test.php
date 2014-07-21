@@ -38,19 +38,27 @@
  * @version   SVN: $Id$
  * 
  */
-namespace PHPSQLParser;
-require_once dirname(__FILE__) . '/../../test-more.php';
+namespace PHPSQLParser\Test\Parser;
+use PHPSQLParser\PHPSQLParser;
+use PHPSQLParser\PHPSQLCreator;
 
-$sql = "select * from table1 as event";
-$parser = new PHPSQLParser($sql);
-$p = $parser->parsed;
-$expected = getExpectedValue(dirname(__FILE__), 'issue71a.serialized');
-eq_array($p, $expected, 'infinite loop on table alias "event"');
+class issue71Test extends \PHPUnit_Framework_TestCase {
+	
+    public function testIssue71() {
 
-$sql = "select acol from table as data";
-$parser = new PHPSQLParser($sql);
-$p = $parser->parsed;
-$expected = getExpectedValue(dirname(__FILE__), 'issue71b.serialized');
-eq_array($p, $expected, 'infinite loop on table alias "data"');
 
-?>
+        $sql = "select * from table1 as event";
+        $parser = new PHPSQLParser($sql);
+        $p = $parser->parsed;
+        $expected = getExpectedValue(dirname(__FILE__), 'issue71a.serialized');
+        eq_array($p, $expected, 'infinite loop on table alias "event"');
+
+        $sql = "select acol from table as data";
+        $parser = new PHPSQLParser($sql);
+        $p = $parser->parsed;
+        $expected = getExpectedValue(dirname(__FILE__), 'issue71b.serialized');
+        eq_array($p, $expected, 'infinite loop on table alias "data"');
+
+    }
+}
+

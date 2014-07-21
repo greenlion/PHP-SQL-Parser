@@ -38,24 +38,32 @@
  * @version   SVN: $Id$
  * 
  */
-namespace PHPSQLParser;
-use PHPSQLParser\utils\ExpressionType;
+namespace PHPSQLParser\Test\Parser;
+use PHPSQLParser\PHPSQLParser;
+use PHPSQLParser\PHPSQLCreator;
+        use PHPSQLParser\utils\ExpressionType;
 
-require_once dirname(__FILE__) . '/../../test-more.php';
 
-try {
-    $sql = "CREATE TABLE IF NOT EXISTS `engine4_urdemo_causebug` (
-  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
-  `extra` int(11)  NOT NULL DEFAULT 56,
-  PRIMARY KEY (`id`),
-  INDEX client_idx (id)
-) ENGINE=InnoDB;";
-    $parser = new PHPSQLParser($sql);
-    $p = $parser->parsed;
-} catch (Exception $e) {
-    $p = array();
+class issue107Test extends \PHPUnit_Framework_TestCase {
+	
+    public function testIssue107() {
+
+
+        try {
+            $sql = "CREATE TABLE IF NOT EXISTS `engine4_urdemo_causebug` (
+          `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+          `extra` int(11)  NOT NULL DEFAULT 56,
+          PRIMARY KEY (`id`),
+          INDEX client_idx (id)
+        ) ENGINE=InnoDB;";
+            $parser = new PHPSQLParser($sql);
+            $p = $parser->parsed;
+        } catch (Exception $e) {
+            $p = array();
+        }
+        ok($p['TABLE']['create-def']['sub_tree'][1]['sub_tree'][1]['sub_tree'][5]['expr_type'] === ExpressionType::DEF_VALUE,
+                'column definition with DEFAULT value');
+
+    }
 }
-ok($p['TABLE']['create-def']['sub_tree'][1]['sub_tree'][1]['sub_tree'][5]['expr_type'] === ExpressionType::DEF_VALUE,
-        'column definition with DEFAULT value');
 
-?>

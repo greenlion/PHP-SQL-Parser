@@ -38,47 +38,55 @@
  * @version   SVN: $Id$
  * 
  */
-namespace PHPSQLParser;
-require_once dirname(__FILE__) . '/../../test-more.php';
+namespace PHPSQLParser\Test\Parser;
+use PHPSQLParser\PHPSQLParser;
+use PHPSQLParser\PHPSQLCreator;
 
-// optimizer/index hints
-// TODO: not solved
-$parser = new PHPSQLParser();
-$sql = "insert /* +APPEND */ into TableName (Col1,col2) values(1,'pol')";
-$parser->parse($sql, true);
-$p = $parser->parsed;
-$expected = getExpectedValue(dirname(__FILE__), 'issue56a.serialized');
-eq_array($p, $expected, 'optimizer hint within INSERT');
+class issue56Test extends \PHPUnit_Framework_TestCase {
+	
+    public function testIssue56() {
 
-// optimizer/index hints
-// TODO: not solved
-$parser = new PHPSQLParser();
-$sql = "insert /* a comment -- haha */ into TableName (Col1,col2) values(1,'pol')";
-$parser->parse($sql, true);
-$p = $parser->parsed;
-$expected = getExpectedValue(dirname(__FILE__), 'issue56a.serialized');
-eq_array($p, $expected, 'multiline comment with inline comment inside');
 
-// inline comment
-// TODO: not solved
-$sql = "SELECT acol -- an inline comment
-FROM --another comment
-table
-WHERE x = 1";
-$parser->parse($sql, true);
-$p = $parser->parsed;
-$expected = getExpectedValue(dirname(__FILE__), 'issue56b.serialized');
-eq_array($p, $expected, 'inline comment should not fail, issue 56');
+        // optimizer/index hints
+        // TODO: not solved
+        $parser = new PHPSQLParser();
+        $sql = "insert /* +APPEND */ into TableName (Col1,col2) values(1,'pol')";
+        $parser->parse($sql, true);
+        $p = $parser->parsed;
+        $expected = getExpectedValue(dirname(__FILE__), 'issue56a.serialized');
+        eq_array($p, $expected, 'optimizer hint within INSERT');
 
-// inline comment
-// TODO: not solved
-$sql = "SELECT acol -- an /*inline comment
-FROM --another */comment
-table
-WHERE x = 1";
-$parser->parse($sql, true);
-$p = $parser->parsed;
-$expected = getExpectedValue(dirname(__FILE__), 'issue56b.serialized');
-eq_array($p, $expected, 'inline comment with multiline comment inside');
+        // optimizer/index hints
+        // TODO: not solved
+        $parser = new PHPSQLParser();
+        $sql = "insert /* a comment -- haha */ into TableName (Col1,col2) values(1,'pol')";
+        $parser->parse($sql, true);
+        $p = $parser->parsed;
+        $expected = getExpectedValue(dirname(__FILE__), 'issue56a.serialized');
+        eq_array($p, $expected, 'multiline comment with inline comment inside');
 
-?>
+        // inline comment
+        // TODO: not solved
+        $sql = "SELECT acol -- an inline comment
+        FROM --another comment
+        table
+        WHERE x = 1";
+        $parser->parse($sql, true);
+        $p = $parser->parsed;
+        $expected = getExpectedValue(dirname(__FILE__), 'issue56b.serialized');
+        eq_array($p, $expected, 'inline comment should not fail, issue 56');
+
+        // inline comment
+        // TODO: not solved
+        $sql = "SELECT acol -- an /*inline comment
+        FROM --another */comment
+        table
+        WHERE x = 1";
+        $parser->parse($sql, true);
+        $p = $parser->parsed;
+        $expected = getExpectedValue(dirname(__FILE__), 'issue56b.serialized');
+        eq_array($p, $expected, 'inline comment with multiline comment inside');
+
+    }
+}
+

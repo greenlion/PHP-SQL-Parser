@@ -38,42 +38,50 @@
  * @version   SVN: $Id$
  * 
  */
-namespace PHPSQLParser;
-require_once dirname(__FILE__) . '/../../test-more.php';
+namespace PHPSQLParser\Test\Creator;
+use PHPSQLParser\PHPSQLParser;
+use PHPSQLParser\PHPSQLCreator;
 
-$sql = "show columns from `foo.bar`";
-$parser = new PHPSQLParser($sql);
-$creator = new PHPSQLCreator($parser->parsed);
-$created = $creator->created;
-$expected = getExpectedValue(dirname(__FILE__), 'issue78a.sql', false);
-ok($created === $expected, 'show columns from');
+class issue78Test extends \PHPUnit_Framework_TestCase {
+	
+    public function testIssue78() {
 
-$sql = "show CREATE DATABASE `foo`";
-$parser = new PHPSQLParser($sql);
-$creator = new PHPSQLCreator($parser->parsed);
-$created = $creator->created;
-$expected = getExpectedValue(dirname(__FILE__), 'issue78b.sql', false);
-ok($created === $expected, 'show create database');
 
-$sql = "show DATABASES LIKE '%bar%'";
-$parser = new PHPSQLParser($sql, true);
-$creator = new PHPSQLCreator($parser->parsed);
-$created = $creator->created;
-$expected = getExpectedValue(dirname(__FILE__), 'issue78c.sql', false);
-ok($created === $expected, 'show databases like');
+        $sql = "show columns from `foo.bar`";
+        $parser = new PHPSQLParser($sql);
+        $creator = new PHPSQLCreator($parser->parsed);
+        $created = $creator->created;
+        $expected = getExpectedValue(dirname(__FILE__), 'issue78a.sql', false);
+        ok($created === $expected, 'show columns from');
 
-$sql = "SHOW ENGINE foo STATUS";
-$parser = new PHPSQLParser($sql, true);
-$creator = new PHPSQLCreator($parser->parsed);
-$created = $creator->created;
-$expected = getExpectedValue(dirname(__FILE__), 'issue78d.sql', false);
-ok($created === $expected, 'show engine status');
+        $sql = "show CREATE DATABASE `foo`";
+        $parser = new PHPSQLParser($sql);
+        $creator = new PHPSQLCreator($parser->parsed);
+        $created = $creator->created;
+        $expected = getExpectedValue(dirname(__FILE__), 'issue78b.sql', false);
+        ok($created === $expected, 'show create database');
 
-$sql = "SHOW FULL COLUMNS FROM `foo.bar` FROM hohoho LIKE '%xmas%'";
-$parser = new PHPSQLParser($sql, true);
-$creator = new PHPSQLCreator($parser->parsed);
-$created = $creator->created;
-$expected = getExpectedValue(dirname(__FILE__), 'issue78e.sql', false);
-ok($created === $expected, 'show full columns from like');
+        $sql = "show DATABASES LIKE '%bar%'";
+        $parser = new PHPSQLParser($sql, true);
+        $creator = new PHPSQLCreator($parser->parsed);
+        $created = $creator->created;
+        $expected = getExpectedValue(dirname(__FILE__), 'issue78c.sql', false);
+        ok($created === $expected, 'show databases like');
 
-?>
+        $sql = "SHOW ENGINE foo STATUS";
+        $parser = new PHPSQLParser($sql, true);
+        $creator = new PHPSQLCreator($parser->parsed);
+        $created = $creator->created;
+        $expected = getExpectedValue(dirname(__FILE__), 'issue78d.sql', false);
+        ok($created === $expected, 'show engine status');
+
+        $sql = "SHOW FULL COLUMNS FROM `foo.bar` FROM hohoho LIKE '%xmas%'";
+        $parser = new PHPSQLParser($sql, true);
+        $creator = new PHPSQLCreator($parser->parsed);
+        $created = $creator->created;
+        $expected = getExpectedValue(dirname(__FILE__), 'issue78e.sql', false);
+        ok($created === $expected, 'show full columns from like');
+
+    }
+}
+

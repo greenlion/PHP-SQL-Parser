@@ -38,38 +38,44 @@
  * @version   SVN: $Id$
  * 
  */
-namespace PHPSQLParser;
-require_once dirname(__FILE__) . '/../../test-more.php';
+namespace PHPSQLParser\Test\Parser;
+use PHPSQLParser\PHPSQLParser;
+use PHPSQLParser\PHPSQLCreator;
 
-$parser = new PHPSQLParser();
+class allcolumnsTest extends \PHPUnit_Framework_TestCase {
+	
+    public function testAllcolumns() {
+        $parser = new PHPSQLParser();
 
-$sql="SELECT * FROM FAILED_LOGIN_ATTEMPTS WHERE ip='192.168.50.5'";
-$p = $parser->parse($sql);
-$expected = getExpectedValue(dirname(__FILE__), 'allcolumns1.serialized');
-eq_array($p, $expected, 'single all column alias');
-
-
-$sql="SELECT a * b FROM tests";
-$p = $parser->parse($sql);
-$expected = getExpectedValue(dirname(__FILE__), 'allcolumns2.serialized');
-eq_array($p, $expected, 'multiply two columns');
+        $sql="SELECT * FROM FAILED_LOGIN_ATTEMPTS WHERE ip='192.168.50.5'";
+        $p = $parser->parse($sql);
+        $expected = getExpectedValue(dirname(__FILE__), 'allcolumns1.serialized');
+        eq_array($p, $expected, 'single all column alias');
 
 
-$sql="SELECT count(*) FROM tests";
-$p = $parser->parse($sql);
-$expected = getExpectedValue(dirname(__FILE__), 'allcolumns3.serialized');
-eq_array($p, $expected, 'special function count(*)');
+        $sql="SELECT a * b FROM tests";
+        $p = $parser->parse($sql);
+        $expected = getExpectedValue(dirname(__FILE__), 'allcolumns2.serialized');
+        eq_array($p, $expected, 'multiply two columns');
 
 
-$sql="SELECT a.* FROM FAILED_LOGIN_ATTEMPTS a";
-$p = $parser->parse($sql);
-$expected = getExpectedValue(dirname(__FILE__), 'allcolumns4.serialized');
-eq_array($p, $expected, 'single all column alias with table alias');
+        $sql="SELECT count(*) FROM tests";
+        $p = $parser->parse($sql);
+        $expected = getExpectedValue(dirname(__FILE__), 'allcolumns3.serialized');
+        eq_array($p, $expected, 'special function count(*)');
 
 
-$sql="SELECT a, * FROM tests";
-$p = $parser->parse($sql);
-$expected = getExpectedValue(dirname(__FILE__), 'allcolumns5.serialized');
-eq_array($p, $expected, 'column reference and a single all column alias');
+        $sql="SELECT a.* FROM FAILED_LOGIN_ATTEMPTS a";
+        $p = $parser->parse($sql);
+        $expected = getExpectedValue(dirname(__FILE__), 'allcolumns4.serialized');
+        eq_array($p, $expected, 'single all column alias with table alias');
 
-?>
+
+        $sql="SELECT a, * FROM tests";
+        $p = $parser->parse($sql);
+        $expected = getExpectedValue(dirname(__FILE__), 'allcolumns5.serialized');
+        eq_array($p, $expected, 'column reference and a single all column alias');
+
+    }
+}
+

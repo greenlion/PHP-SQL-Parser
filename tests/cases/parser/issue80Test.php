@@ -38,19 +38,27 @@
  * @version   SVN: $Id$
  * 
  */
-namespace PHPSQLParser;
-require_once dirname(__FILE__) . '/../../test-more.php';
+namespace PHPSQLParser\Test\Parser;
+use PHPSQLParser\PHPSQLParser;
+use PHPSQLParser\PHPSQLCreator;
 
-$sql = "SELECT * FROM `model` WHERE `marker`='this_model' ORDER BY `test`";
-$parser = new PHPSQLParser($sql, true);
-$p = $parser->parsed;
-$expected = getExpectedValue(dirname(__FILE__), 'issue80a.serialized');
-eq_array($p, $expected, 'quoted column names');
+class issue80Test extends \PHPUnit_Framework_TestCase {
+	
+    public function testIssue80() {
 
-$sql = "SELECT x+3 `test` FROM `model` WHERE `marker`='this_model' ORDER BY `test`";
-$parser->parse($sql, true);
-$p = $parser->parsed;
-$expected = getExpectedValue(dirname(__FILE__), 'issue80b.serialized');
-eq_array($p, $expected, 'quoted names and aliases');
 
-?>
+        $sql = "SELECT * FROM `model` WHERE `marker`='this_model' ORDER BY `test`";
+        $parser = new PHPSQLParser($sql, true);
+        $p = $parser->parsed;
+        $expected = getExpectedValue(dirname(__FILE__), 'issue80a.serialized');
+        eq_array($p, $expected, 'quoted column names');
+
+        $sql = "SELECT x+3 `test` FROM `model` WHERE `marker`='this_model' ORDER BY `test`";
+        $parser->parse($sql, true);
+        $p = $parser->parsed;
+        $expected = getExpectedValue(dirname(__FILE__), 'issue80b.serialized');
+        eq_array($p, $expected, 'quoted names and aliases');
+
+    }
+}
+

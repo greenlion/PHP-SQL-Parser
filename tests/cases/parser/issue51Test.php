@@ -38,15 +38,23 @@
  * @version   SVN: $Id$
  * 
  */
-namespace PHPSQLParser;
-require_once dirname(__FILE__) . '/../../test-more.php';
+namespace PHPSQLParser\Test\Parser;
+use PHPSQLParser\PHPSQLParser;
+use PHPSQLParser\PHPSQLCreator;
 
-$parser = new PHPSQLParser();
+class issue51Test extends \PHPUnit_Framework_TestCase {
+	
+    public function testIssue51() {
 
-$sql = "SELECT CAST( 12 AS decimal( 9, 3 ) )";
-$parser->parse($sql, true);
-$p = $parser->parsed;
-$expected = getExpectedValue(dirname(__FILE__), 'issue51.serialized');
-eq_array($p, $expected, 'should not die if query contains cast expression');
 
-?>
+        $parser = new PHPSQLParser();
+
+        $sql = "SELECT CAST( 12 AS decimal( 9, 3 ) )";
+        $parser->parse($sql, true);
+        $p = $parser->parsed;
+        $expected = getExpectedValue(dirname(__FILE__), 'issue51.serialized');
+        eq_array($p, $expected, 'should not die if query contains cast expression');
+
+    }
+}
+

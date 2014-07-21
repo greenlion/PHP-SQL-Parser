@@ -38,15 +38,23 @@
  * @version   SVN: $Id$
  * 
  */
-namespace PHPSQLParser;
-require_once dirname(__FILE__) . '/../../test-more.php';
+namespace PHPSQLParser\Test\Creator;
+use PHPSQLParser\PHPSQLParser;
+use PHPSQLParser\PHPSQLCreator;
 
-$query = "SELECT f FROM t ORDER BY (f-0.0)";
-$parser = new PHPSQLParser();
-$p = $parser->parse($query);
-$creator = new PHPSQLCreator();
-$created = $creator->create($p);
-$expected = getExpectedValue(dirname(__FILE__), 'issue141.sql', false);
-ok($created === $expected, 'bracket expressions within order-by');
+class issue141Test extends \PHPUnit_Framework_TestCase {
+	
+    public function testIssue141() {
 
-?>
+
+        $query = "SELECT f FROM t ORDER BY (f-0.0)";
+        $parser = new PHPSQLParser();
+        $p = $parser->parse($query);
+        $creator = new PHPSQLCreator();
+        $created = $creator->create($p);
+        $expected = getExpectedValue(dirname(__FILE__), 'issue141.sql', false);
+        ok($created === $expected, 'bracket expressions within order-by');
+
+    }
+}
+

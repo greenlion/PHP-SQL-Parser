@@ -38,14 +38,20 @@
  * @version   SVN: $Id$
  * 
  */
-namespace PHPSQLParser;
-require_once dirname(__FILE__) . '/../../test-more.php';
+namespace PHPSQLParser\Test\Creator;
+use PHPSQLParser\PHPSQLParser;
+use PHPSQLParser\PHPSQLCreator;
 
-$sql = 'SELECT 	SUM( 10 ) as test FROM account';
-$parser = new PHPSQLParser($sql);
-$creator = new PHPSQLCreator($parser->parsed);
-$created = $creator->created;
-$expected = getExpectedValue(dirname(__FILE__), 'function.sql', false);
-ok($created === $expected, 'a function');
+class functionTest extends \PHPUnit_Framework_TestCase {
+	
+    public function testFunction() {
+        $sql = 'SELECT 	SUM( 10 ) as test FROM account';
+        $parser = new PHPSQLParser($sql);
+        $creator = new PHPSQLCreator($parser->parsed);
+        $created = $creator->created;
+        $expected = getExpectedValue(dirname(__FILE__), 'function.sql', false);
+        ok($created === $expected, 'a function');
 
-?>
+    }
+}
+

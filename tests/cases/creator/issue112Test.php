@@ -38,14 +38,22 @@
  * @version   SVN: $Id$
  * 
  */
-namespace PHPSQLParser;
-require_once dirname(__FILE__) . '/../../test-more.php';
+namespace PHPSQLParser\Test\Creator;
+use PHPSQLParser\PHPSQLParser;
+use PHPSQLParser\PHPSQLCreator;
 
-$sql = 'SELECT user, MAX(salary) FROM users GROUP BY user HAVING MAX(salary) > 10';
-$parser = new PHPSQLParser($sql);
-$creator = new PHPSQLCreator($parser->parsed);
-$created = $creator->created;
-$expected = getExpectedValue(dirname(__FILE__), 'issue112.sql', false);
-ok($created === $expected, 'select with having clause');
+class issue112Test extends \PHPUnit_Framework_TestCase {
+	
+    public function testIssue112() {
 
-?>
+
+        $sql = 'SELECT user, MAX(salary) FROM users GROUP BY user HAVING MAX(salary) > 10';
+        $parser = new PHPSQLParser($sql);
+        $creator = new PHPSQLCreator($parser->parsed);
+        $created = $creator->created;
+        $expected = getExpectedValue(dirname(__FILE__), 'issue112.sql', false);
+        ok($created === $expected, 'select with having clause');
+
+    }
+}
+

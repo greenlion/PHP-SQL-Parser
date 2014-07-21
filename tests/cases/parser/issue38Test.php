@@ -38,14 +38,22 @@
  * @version   SVN: $Id$
  * 
  */
-namespace PHPSQLParser;
-require_once dirname(__FILE__) . '/../../test-more.php';
+namespace PHPSQLParser\Test\Parser;
+use PHPSQLParser\PHPSQLParser;
+use PHPSQLParser\PHPSQLCreator;
 
-$sql = "SELECT * FROM `table` `t` WHERE ( ( UNIX_TIMESTAMP() + 3600 ) > `t`.`expires` ) ";
-$parser = new PHPSQLParser();
-$parser->parse($sql);
-$p = $parser->parsed;
-$expected = getExpectedValue(dirname(__FILE__), 'issue38.serialized');
-eq_array($p, $expected, 'function within WHERE and quoted table + quoted columns');
+class issue38Test extends \PHPUnit_Framework_TestCase {
+	
+    public function testIssue38() {
 
-?>
+
+        $sql = "SELECT * FROM `table` `t` WHERE ( ( UNIX_TIMESTAMP() + 3600 ) > `t`.`expires` ) ";
+        $parser = new PHPSQLParser();
+        $parser->parse($sql);
+        $p = $parser->parsed;
+        $expected = getExpectedValue(dirname(__FILE__), 'issue38.serialized');
+        eq_array($p, $expected, 'function within WHERE and quoted table + quoted columns');
+
+    }
+}
+

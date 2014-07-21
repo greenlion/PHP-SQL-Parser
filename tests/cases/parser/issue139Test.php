@@ -38,13 +38,21 @@
  * @version   SVN: $Id$
  * 
  */
-namespace PHPSQLParser;
-require_once dirname(__FILE__) . '/../../test-more.php';
+namespace PHPSQLParser\Test\Parser;
+use PHPSQLParser\PHPSQLParser;
+use PHPSQLParser\PHPSQLCreator;
 
-$sql = "SELECT x,y,z FROM tableA WHERE x<5 limit 2 offset 0";
-$parser = new PHPSQLParser($sql, true);
-$p = $parser->parsed;
-$expected = getExpectedValue(dirname(__FILE__), 'issue139.serialized');
-eq_array($p, $expected, 'lowercase OFFSET should not fail');
+class issue139Test extends \PHPUnit_Framework_TestCase {
+	
+    public function testIssue139() {
 
-?>
+
+        $sql = "SELECT x,y,z FROM tableA WHERE x<5 limit 2 offset 0";
+        $parser = new PHPSQLParser($sql, true);
+        $p = $parser->parsed;
+        $expected = getExpectedValue(dirname(__FILE__), 'issue139.serialized');
+        eq_array($p, $expected, 'lowercase OFFSET should not fail');
+
+    }
+}
+

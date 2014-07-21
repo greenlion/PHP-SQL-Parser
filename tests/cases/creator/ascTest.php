@@ -38,14 +38,20 @@
  * @version   SVN: $Id$
  * 
  */
-namespace PHPSQLParser;
-require_once dirname(__FILE__) . '/../../test-more.php';
+namespace PHPSQLParser\Test\Creator;
+use PHPSQLParser\PHPSQLParser;
+use PHPSQLParser\PHPSQLCreator;
 
-$sql = "SELECT qid FROM QUESTIONS WHERE gid='1' and language='de-informal' ORDER BY question_order, title ASC";
-$parser = new PHPSQLParser($sql);
-$creator = new PHPSQLCreator($parser->parsed);
-$created = $creator->created;
-$expected = getExpectedValue(dirname(__FILE__), 'asc.sql', false);
-ok($created === $expected, 'explicit ASC statement');
+class ascTest extends \PHPUnit_Framework_TestCase {
+	
+    public function testAsc() {
+        $sql = "SELECT qid FROM QUESTIONS WHERE gid='1' and language='de-informal' ORDER BY question_order, title ASC";
+        $parser = new PHPSQLParser($sql);
+        $creator = new PHPSQLCreator($parser->parsed);
+        $created = $creator->created;
+        $expected = getExpectedValue(dirname(__FILE__), 'asc.sql', false);
+        ok($created === $expected, 'explicit ASC statement');
 
-?>
+    }
+}
+

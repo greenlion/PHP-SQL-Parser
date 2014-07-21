@@ -38,15 +38,23 @@
  * @version   SVN: $Id$
  * 
  */
-namespace PHPSQLParser;
-require_once dirname(__FILE__) . '/../../test-more.php';
+namespace PHPSQLParser\Test\Creator;
+use PHPSQLParser\PHPSQLParser;
+use PHPSQLParser\PHPSQLCreator;
 
-$query = "select (c1 - c2) AS c3 from t1";
-$parser = new PHPSQLParser();
-$p = $parser->parse($query);
-$creator = new PHPSQLCreator();
-$created = $creator->create($p);
-$expected = getExpectedValue(dirname(__FILE__), 'issue132.sql', false);
-ok($created === $expected, 'lost alias of expression');
+class issue132Test extends \PHPUnit_Framework_TestCase {
+	
+    public function testIssue132() {
 
-?>
+
+        $query = "select (c1 - c2) AS c3 from t1";
+        $parser = new PHPSQLParser();
+        $p = $parser->parse($query);
+        $creator = new PHPSQLCreator();
+        $created = $creator->create($p);
+        $expected = getExpectedValue(dirname(__FILE__), 'issue132.sql', false);
+        ok($created === $expected, 'lost alias of expression');
+
+    }
+}
+

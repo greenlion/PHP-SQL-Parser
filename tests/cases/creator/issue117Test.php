@@ -38,15 +38,23 @@
  * @version   SVN: $Id$
  * 
  */
-namespace PHPSQLParser;
-require_once dirname(__FILE__) . '/../../test-more.php';
+namespace PHPSQLParser\Test\Creator;
+use PHPSQLParser\PHPSQLParser;
+use PHPSQLParser\PHPSQLCreator;
 
-$sql = "(SELECT x FROM table) ORDER BY x";
-$parser = new PHPSQLParser();
-$p = $parser->parse($sql);
-$creator = new PHPSQLCreator();
-$created = $creator->create($p);
-$expected = getExpectedValue(dirname(__FILE__), 'issue117.sql', false);
-ok($created === $expected, 'parentheses on the first position of statement');
+class issue117Test extends \PHPUnit_Framework_TestCase {
+	
+    public function testIssue117() {
 
-?>
+
+        $sql = "(SELECT x FROM table) ORDER BY x";
+        $parser = new PHPSQLParser();
+        $p = $parser->parse($sql);
+        $creator = new PHPSQLCreator();
+        $created = $creator->create($p);
+        $expected = getExpectedValue(dirname(__FILE__), 'issue117.sql', false);
+        ok($created === $expected, 'parentheses on the first position of statement');
+
+    }
+}
+

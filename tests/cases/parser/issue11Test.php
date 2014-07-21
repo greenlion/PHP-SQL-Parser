@@ -38,15 +38,23 @@
  * @version   SVN: $Id$
  * 
  */
-namespace PHPSQLParser;
-require_once dirname(__FILE__) . '/../../test-more.php';
+namespace PHPSQLParser\Test\Parser;
+use PHPSQLParser\PHPSQLParser;
+use PHPSQLParser\PHPSQLCreator;
 
-$test    = str_repeat('0', 18000);
-$query  = "UPDATE club SET logo='$test' WHERE id=1";
- 
-$parser = new PHPSQLParser();
-$p = $parser->parse($query);
-$expected = getExpectedValue(dirname(__FILE__), 'issue11.serialized');
-eq_array($p, $expected, 'very long statement');
+class issue11Test extends \PHPUnit_Framework_TestCase {
+	
+    public function testIssue11() {
 
-?>
+
+        $test    = str_repeat('0', 18000);
+        $query  = "UPDATE club SET logo='$test' WHERE id=1";
+         
+        $parser = new PHPSQLParser();
+        $p = $parser->parse($query);
+        $expected = getExpectedValue(dirname(__FILE__), 'issue11.serialized');
+        eq_array($p, $expected, 'very long statement');
+
+    }
+}
+

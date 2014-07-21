@@ -38,15 +38,23 @@
  * @version   SVN: $Id$
  * 
  */
-namespace PHPSQLParser;
-require_once dirname(__FILE__) . '/../../test-more.php';
+namespace PHPSQLParser\Test\Parser;
+use PHPSQLParser\PHPSQLParser;
+use PHPSQLParser\PHPSQLCreator;
 
-$parser = new PHPSQLParser();
+class issue42Test extends \PHPUnit_Framework_TestCase {
+	
+    public function testIssue42() {
 
-$sql = "SELECT 'a string with an escaped quote \' in it' AS some_alias FROM some_table";
-$parser->parse($sql, true);
-$p = $parser->parsed;
-$expected = getExpectedValue(dirname(__FILE__), 'issue42.serialized');
-eq_array($p, $expected, 'escaped quote in string constant');
 
-?>
+        $parser = new PHPSQLParser();
+
+        $sql = "SELECT 'a string with an escaped quote \' in it' AS some_alias FROM some_table";
+        $parser->parse($sql, true);
+        $p = $parser->parsed;
+        $expected = getExpectedValue(dirname(__FILE__), 'issue42.serialized');
+        eq_array($p, $expected, 'escaped quote in string constant');
+
+    }
+}
+

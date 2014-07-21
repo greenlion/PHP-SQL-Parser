@@ -38,14 +38,22 @@
  * @version   SVN: $Id$
  * 
  */
-namespace PHPSQLParser;
-require_once dirname(__FILE__) . '/../../test-more.php';
+namespace PHPSQLParser\Test\Creator;
+use PHPSQLParser\PHPSQLParser;
+use PHPSQLParser\PHPSQLCreator;
 
-$sql = "SELECT haha(foo, bar);";
-$parser = new PHPSQLParser($sql);
-$creator = new PHPSQLCreator($parser->parsed);
-$created = $creator->created;
-$expected = getExpectedValue(dirname(__FILE__), 'issue85.sql', false);
-ok($created === $expected, 'SELECT statements without FROM (wtf?)');
+class issue85Test extends \PHPUnit_Framework_TestCase {
+	
+    public function testIssue85() {
 
-?>
+
+        $sql = "SELECT haha(foo, bar);";
+        $parser = new PHPSQLParser($sql);
+        $creator = new PHPSQLCreator($parser->parsed);
+        $created = $creator->created;
+        $expected = getExpectedValue(dirname(__FILE__), 'issue85.sql', false);
+        ok($created === $expected, 'SELECT statements without FROM (wtf?)');
+
+    }
+}
+

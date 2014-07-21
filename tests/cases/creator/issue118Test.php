@@ -38,15 +38,23 @@
  * @version   SVN: $Id$
  * 
  */
-namespace PHPSQLParser;
-require_once dirname(__FILE__) . '/../../test-more.php';
+namespace PHPSQLParser\Test\Creator;
+use PHPSQLParser\PHPSQLParser;
+use PHPSQLParser\PHPSQLCreator;
 
-$query = "select organism_name as reference from organisms group by reference";
-$parser = new PHPSQLParser();
-$p = $parser->parse($query);
-$creator = new PHPSQLCreator();
-$created = $creator->create($p);
-$expected = getExpectedValue(dirname(__FILE__), 'issue118.sql', false);
-ok($created === $expected, 'alias within group by');
+class issue118Test extends \PHPUnit_Framework_TestCase {
+	
+    public function testIssue118() {
 
-?>
+
+        $query = "select organism_name as reference from organisms group by reference";
+        $parser = new PHPSQLParser();
+        $p = $parser->parse($query);
+        $creator = new PHPSQLCreator();
+        $created = $creator->create($p);
+        $expected = getExpectedValue(dirname(__FILE__), 'issue118.sql', false);
+        ok($created === $expected, 'alias within group by');
+
+    }
+}
+

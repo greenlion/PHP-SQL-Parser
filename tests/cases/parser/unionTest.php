@@ -38,26 +38,32 @@
  * @version   SVN: $Id$
  * 
  */
-namespace PHPSQLParser;
-require_once dirname(__FILE__) . '/../../test-more.php';
+namespace PHPSQLParser\Test\Parser;
+use PHPSQLParser\PHPSQLParser;
+use PHPSQLParser\PHPSQLCreator;
 
-$parser = new PHPSQLParser();
+class unionTest extends \PHPUnit_Framework_TestCase {
+	
+    public function testUnion() {
+        $parser = new PHPSQLParser();
 
-$sql = 'SELECT colA From test a
-union
-SELECT colB from test 
-as b';
-$p = $parser->parse($sql, true);
-$expected = getExpectedValue(dirname(__FILE__), 'union1.serialized');
-eq_array($p, $expected, 'simple union');
+        $sql = 'SELECT colA From test a
+        union
+        SELECT colB from test 
+        as b';
+        $p = $parser->parse($sql, true);
+        $expected = getExpectedValue(dirname(__FILE__), 'union1.serialized');
+        eq_array($p, $expected, 'simple union');
 
 
-// TODO: the order-by clause has not been parsed
-$sql = '(SELECT colA From test a)
-        union all
-        (SELECT colB from test b) order by 1';
-$p = $parser->parse($sql, true);
-$expected = getExpectedValue(dirname(__FILE__), 'union2.serialized');
-eq_array($p, $expected, 'mysql union with order-by');
+        // TODO: the order-by clause has not been parsed
+        $sql = '(SELECT colA From test a)
+                union all
+                (SELECT colB from test b) order by 1';
+        $p = $parser->parse($sql, true);
+        $expected = getExpectedValue(dirname(__FILE__), 'union2.serialized');
+        eq_array($p, $expected, 'mysql union with order-by');
 
-?>
+    }
+}
+

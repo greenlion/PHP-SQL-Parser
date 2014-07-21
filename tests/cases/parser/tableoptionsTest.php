@@ -38,23 +38,29 @@
  * @version   SVN: $Id$
  * 
  */
-namespace PHPSQLParser;
-require_once dirname(__FILE__) . '/../../test-more.php';
+namespace PHPSQLParser\Test\Parser;
+use PHPSQLParser\PHPSQLParser;
+use PHPSQLParser\PHPSQLCreator;
 
-$parser = new PHPSQLParser();
-$sql = "CREATE TABLE hohoho () AUTO_INCREMENT = 1 DEFAULT CHARACTER SET _utf8 PASSWORD 'test123'";
-$parser->parse($sql);
-$p = $parser->parsed;
-$expected = getExpectedValue(dirname(__FILE__), 'tableoptions1.serialized');
-eq_array($p, $expected, 'CREATE TABLE statement with table options');
+class tableoptionsTest extends \PHPUnit_Framework_TestCase {
+	
+    public function testTableoptions() {
+        $parser = new PHPSQLParser();
+        $sql = "CREATE TABLE hohoho () AUTO_INCREMENT = 1 DEFAULT CHARACTER SET _utf8 PASSWORD 'test123'";
+        $parser->parse($sql);
+        $p = $parser->parsed;
+        $expected = getExpectedValue(dirname(__FILE__), 'tableoptions1.serialized');
+        eq_array($p, $expected, 'CREATE TABLE statement with table options');
 
 
-// TODO: the union statement within the CREATE TABLE has not been parsed
-$parser = new PHPSQLParser();
-$sql = "CREATE TABLE hohoho () UNION (tableA, tableB,tableC)";
-$parser->parse($sql);
-$p = $parser->parsed;
-$expected = getExpectedValue(dirname(__FILE__), 'tableoptions2.serialized');
-eq_array($p, $expected, 'CREATE TABLE statement with UNION table option');
+        // TODO: the union statement within the CREATE TABLE has not been parsed
+        $parser = new PHPSQLParser();
+        $sql = "CREATE TABLE hohoho () UNION (tableA, tableB,tableC)";
+        $parser->parse($sql);
+        $p = $parser->parsed;
+        $expected = getExpectedValue(dirname(__FILE__), 'tableoptions2.serialized');
+        eq_array($p, $expected, 'CREATE TABLE statement with UNION table option');
 
-?>
+    }
+}
+

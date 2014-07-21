@@ -38,13 +38,21 @@
  * @version   SVN: $Id$
  * 
  */
-namespace PHPSQLParser;
-require_once dirname(__FILE__) . '/../../test-more.php';
+namespace PHPSQLParser\Test\Parser;
+use PHPSQLParser\PHPSQLParser;
+use PHPSQLParser\PHPSQLCreator;
 
-$sql = "UPDATE db.`tablename` SET a=1";
-$parser = new PHPSQLParser($sql, true);
-$p = $parser->parsed;
-$expected = getExpectedValue(dirname(__FILE__), 'issue122.serialized');
-eq_array($p, $expected, 'no_quotes property has been corrected');
+class issue122Test extends \PHPUnit_Framework_TestCase {
+	
+    public function testIssue122() {
 
-?>
+
+        $sql = "UPDATE db.`tablename` SET a=1";
+        $parser = new PHPSQLParser($sql, true);
+        $p = $parser->parsed;
+        $expected = getExpectedValue(dirname(__FILE__), 'issue122.serialized');
+        eq_array($p, $expected, 'no_quotes property has been corrected');
+
+    }
+}
+

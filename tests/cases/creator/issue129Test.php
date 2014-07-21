@@ -38,15 +38,23 @@
  * @version   SVN: $Id$
  * 
  */
-namespace PHPSQLParser;
-require_once dirname(__FILE__) . '/../../test-more.php';
+namespace PHPSQLParser\Test\Creator;
+use PHPSQLParser\PHPSQLParser;
+use PHPSQLParser\PHPSQLCreator;
 
-$query  = "DROP TEMPORARY TABLE IF EXISTS t1, t2 CASCADE";
-$parser = new PHPSQLParser();
-$p = $parser->parse($query);
-$creator = new PHPSQLCreator();
-$created = $creator->create($p);
-$expected = getExpectedValue(dirname(__FILE__), 'issue129.sql', false);
-ok($created === $expected, 'drop table should not fail');
+class issue129Test extends \PHPUnit_Framework_TestCase {
+	
+    public function testIssue129() {
 
-?>
+
+        $query  = "DROP TEMPORARY TABLE IF EXISTS t1, t2 CASCADE";
+        $parser = new PHPSQLParser();
+        $p = $parser->parse($query);
+        $creator = new PHPSQLCreator();
+        $created = $creator->create($p);
+        $expected = getExpectedValue(dirname(__FILE__), 'issue129.sql', false);
+        ok($created === $expected, 'drop table should not fail');
+
+    }
+}
+

@@ -38,17 +38,23 @@
  * @version   SVN: $Id$
  * 
  */
-namespace PHPSQLParser;
-require_once dirname(__FILE__) . '/../../test-more.php';
+namespace PHPSQLParser\Test\Parser;
+use PHPSQLParser\PHPSQLParser;
+use PHPSQLParser\PHPSQLCreator;
 
-$parser = new PHPSQLParser();
+class gtltopTest extends \PHPUnit_Framework_TestCase {
+	
+    public function testGtltop() {
+        $parser = new PHPSQLParser();
 
-$sql = 'SELECT c1
-          from some_table an_alias
-	where d>=0 and d>0 and d>1 and d>-1 and d<2 and d<>0  or d <> 0 or d<>"test1" or d <> "test2";';
-$parser->parse($sql);
-$p = $parser->parsed;
-$expected = getExpectedValue(dirname(__FILE__), 'gtltop.serialized');
-eq_array($p, $expected, 'a lot of where clauses');
+        $sql = 'SELECT c1
+                  from some_table an_alias
+        	where d>=0 and d>0 and d>1 and d>-1 and d<2 and d<>0  or d <> 0 or d<>"test1" or d <> "test2";';
+        $parser->parse($sql);
+        $p = $parser->parsed;
+        $expected = getExpectedValue(dirname(__FILE__), 'gtltop.serialized');
+        eq_array($p, $expected, 'a lot of where clauses');
 
-?>
+    }
+}
+

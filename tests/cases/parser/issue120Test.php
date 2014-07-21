@@ -38,16 +38,24 @@
  * @version   SVN: $Id$
  * 
  */
-namespace PHPSQLParser;
-require_once dirname(__FILE__) . '/../../test-more.php';
+namespace PHPSQLParser\Test\Parser;
+use PHPSQLParser\PHPSQLParser;
+use PHPSQLParser\PHPSQLCreator;
 
-$sql = "(
-SELECT CNAME
-FROM COCKTAIL
-)";
-$parser = new PHPSQLParser($sql, true);
-$p = $parser->parsed;
-$expected = getExpectedValue(dirname(__FILE__), 'issue120.serialized');
-eq_array($p, $expected, 'parentheses around select');
+class issue120Test extends \PHPUnit_Framework_TestCase {
+	
+    public function testIssue120() {
 
-?>
+
+        $sql = "(
+        SELECT CNAME
+        FROM COCKTAIL
+        )";
+        $parser = new PHPSQLParser($sql, true);
+        $p = $parser->parsed;
+        $expected = getExpectedValue(dirname(__FILE__), 'issue120.serialized');
+        eq_array($p, $expected, 'parentheses around select');
+
+    }
+}
+

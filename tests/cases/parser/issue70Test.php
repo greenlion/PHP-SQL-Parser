@@ -38,13 +38,21 @@
  * @version   SVN: $Id$
  * 
  */
-namespace PHPSQLParser;
-require_once dirname(__FILE__) . '/../../test-more.php';
+namespace PHPSQLParser\Test\Parser;
+use PHPSQLParser\PHPSQLParser;
+use PHPSQLParser\PHPSQLCreator;
 
-$sql = "select `column` from table where col=\"value\"";
-$parser = new PHPSQLParser($sql, true);
-$p = $parser->parsed;
-$expected = getExpectedValue(dirname(__FILE__), 'issue70.serialized');
-eq_array($p, $expected, 'quotes after an operator should not fail.');
+class issue70Test extends \PHPUnit_Framework_TestCase {
+	
+    public function testIssue70() {
 
-?>
+
+        $sql = "select `column` from table where col=\"value\"";
+        $parser = new PHPSQLParser($sql, true);
+        $p = $parser->parsed;
+        $expected = getExpectedValue(dirname(__FILE__), 'issue70.serialized');
+        eq_array($p, $expected, 'quotes after an operator should not fail.');
+
+    }
+}
+

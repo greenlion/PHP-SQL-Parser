@@ -38,15 +38,23 @@
  * @version   SVN: $Id$
  * 
  */
-namespace PHPSQLParser;
-require_once dirname(__FILE__) . '/../../test-more.php';
+namespace PHPSQLParser\Test\Creator;
+use PHPSQLParser\PHPSQLParser;
+use PHPSQLParser\PHPSQLCreator;
+
+class issue86Test extends \PHPUnit_Framework_TestCase {
+	
+    public function testIssue86() {
 
 
-$sql = "SELECT * FROM cities GROUP BY 1,2";
-$parser = new PHPSQLParser($sql);
-$creator = new PHPSQLCreator($parser->parsed);
-$created = $creator->created;
-$expected = getExpectedValue(dirname(__FILE__), 'issue86.sql', false);
-ok($created === $expected, 'Expression pos should be handled within GROUP BY.');
 
-?>
+        $sql = "SELECT * FROM cities GROUP BY 1,2";
+        $parser = new PHPSQLParser($sql);
+        $creator = new PHPSQLCreator($parser->parsed);
+        $created = $creator->created;
+        $expected = getExpectedValue(dirname(__FILE__), 'issue86.sql', false);
+        ok($created === $expected, 'Expression pos should be handled within GROUP BY.');
+
+    }
+}
+

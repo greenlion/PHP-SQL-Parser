@@ -38,19 +38,27 @@
  * @version   SVN: $Id$
  * 
  */
-namespace PHPSQLParser;
-require_once dirname(__FILE__) . '/../../test-more.php';
+namespace PHPSQLParser\Test\Creator;
+use PHPSQLParser\PHPSQLParser;
+use PHPSQLParser\PHPSQLCreator;
 
-$query = "select t1.*
-from Table1 t1
-STRAIGHT_JOIN  Table2 t2
-on t1.CommonID = t2.CommonID
-where t1.FilterID = 1";
-$parser = new PHPSQLParser();
-$p = $parser->parse($query);
-$creator = new PHPSQLCreator();
-$created = $creator->create($p);
-$expected = getExpectedValue(dirname(__FILE__), 'issue134.sql', false);
-ok($created === $expected, 'a straight_join within from clause');
+class issue134Test extends \PHPUnit_Framework_TestCase {
+	
+    public function testIssue134() {
 
-?>
+
+        $query = "select t1.*
+        from Table1 t1
+        STRAIGHT_JOIN  Table2 t2
+        on t1.CommonID = t2.CommonID
+        where t1.FilterID = 1";
+        $parser = new PHPSQLParser();
+        $p = $parser->parse($query);
+        $creator = new PHPSQLCreator();
+        $created = $creator->create($p);
+        $expected = getExpectedValue(dirname(__FILE__), 'issue134.sql', false);
+        ok($created === $expected, 'a straight_join within from clause');
+
+    }
+}
+

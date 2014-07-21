@@ -38,13 +38,21 @@
  * @version   SVN: $Id$
  * 
  */
-namespace PHPSQLParser;
-require_once dirname(__FILE__) . '/../../test-more.php';
+namespace PHPSQLParser\Test\Parser;
+use PHPSQLParser\PHPSQLParser;
+use PHPSQLParser\PHPSQLCreator;
 
-$sql = "select`title`from`table`";
-$parser = new PHPSQLParser($sql, true);
-$p = $parser->parsed;
-$expected = getExpectedValue(dirname(__FILE__), 'issue137.serialized');
-eq_array($p, $expected, 'SQL statements without whitespace');
+class issue137Test extends \PHPUnit_Framework_TestCase {
+	
+    public function testIssue137() {
 
-?>
+
+        $sql = "select`title`from`table`";
+        $parser = new PHPSQLParser($sql, true);
+        $p = $parser->parsed;
+        $expected = getExpectedValue(dirname(__FILE__), 'issue137.serialized');
+        eq_array($p, $expected, 'SQL statements without whitespace');
+
+    }
+}
+

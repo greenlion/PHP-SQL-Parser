@@ -38,13 +38,21 @@
  * @version   SVN: $Id$
  * 
  */
-namespace PHPSQLParser;
-require_once dirname(__FILE__) . '/../../test-more.php';
+namespace PHPSQLParser\Test\Parser;
+use PHPSQLParser\PHPSQLParser;
+use PHPSQLParser\PHPSQLCreator;
 
-$sql = "update table set col=@max";
-$parser = new PHPSQLParser($sql);
-$p = $parser->parsed;
-$expected = getExpectedValue(dirname(__FILE__), 'issue72.serialized');
-eq_array($p, $expected, 'user defined variables should not fail');
+class issue72Test extends \PHPUnit_Framework_TestCase {
+	
+    public function testIssue72() {
 
-?>
+
+        $sql = "update table set col=@max";
+        $parser = new PHPSQLParser($sql);
+        $p = $parser->parsed;
+        $expected = getExpectedValue(dirname(__FILE__), 'issue72.serialized');
+        eq_array($p, $expected, 'user defined variables should not fail');
+
+    }
+}
+

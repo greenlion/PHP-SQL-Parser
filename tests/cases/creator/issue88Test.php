@@ -38,15 +38,23 @@
  * @version   SVN: $Id$
  * 
  */
-namespace PHPSQLParser;
-require_once dirname(__FILE__) . '/../../test-more.php';
+namespace PHPSQLParser\Test\Creator;
+use PHPSQLParser\PHPSQLParser;
+use PHPSQLParser\PHPSQLCreator;
+
+class issue88Test extends \PHPUnit_Framework_TestCase {
+	
+    public function testIssue88() {
 
 
-$sql = "select (some_field = 'string') from table;";
-$parser = new PHPSQLParser($sql, true);
-$creator = new PHPSQLCreator($parser->parsed);
-$created = $creator->created;
-$expected = getExpectedValue(dirname(__FILE__), 'issue88.sql', false);
-ok($created === $expected, 'Expression subtree should handle bracket_expressions.');
 
-?>
+        $sql = "select (some_field = 'string') from table;";
+        $parser = new PHPSQLParser($sql, true);
+        $creator = new PHPSQLCreator($parser->parsed);
+        $created = $creator->created;
+        $expected = getExpectedValue(dirname(__FILE__), 'issue88.sql', false);
+        ok($created === $expected, 'Expression subtree should handle bracket_expressions.');
+
+    }
+}
+

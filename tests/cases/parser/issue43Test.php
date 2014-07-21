@@ -38,17 +38,25 @@
  * @version   SVN: $Id$
  * 
  */
-namespace PHPSQLParser;
-require_once dirname(__FILE__) . '/../../test-more.php';
+namespace PHPSQLParser\Test\Parser;
+use PHPSQLParser\PHPSQLParser;
+use PHPSQLParser\PHPSQLCreator;
 
-$parser = new PHPSQLParser();
+class issue43Test extends \PHPUnit_Framework_TestCase {
+	
+    public function testIssue43() {
 
-$sql = "SELECT title, introtext
-FROM kj9un_content
-WHERE `id`='159'";
-$parser->parse($sql);
-$p = $parser->parsed;
-$expected = getExpectedValue(dirname(__FILE__), 'issue43.serialized');
-eq_array($p, $expected, 'problem with linefeed after tablename');
 
-?>
+        $parser = new PHPSQLParser();
+
+        $sql = "SELECT title, introtext
+        FROM kj9un_content
+        WHERE `id`='159'";
+        $parser->parse($sql);
+        $p = $parser->parsed;
+        $expected = getExpectedValue(dirname(__FILE__), 'issue43.serialized');
+        eq_array($p, $expected, 'problem with linefeed after tablename');
+
+    }
+}
+

@@ -38,13 +38,21 @@
  * @version   SVN: $Id$
  * 
  */
-namespace PHPSQLParser;
-require_once dirname(__FILE__) . '/../../test-more.php';
+namespace PHPSQLParser\Test\Parser;
+use PHPSQLParser\PHPSQLParser;
+use PHPSQLParser\PHPSQLCreator;
 
-$sql="select 1 as `a` order by `a`";
-$parser = new PHPSQLParser($sql, true);
-$p = $parser->parsed;
-$expected = getExpectedValue(dirname(__FILE__), 'issue93.serialized');
-eq_array($p, $expected, 'simple query');
+class issue93Test extends \PHPUnit_Framework_TestCase {
+	
+    public function testIssue93() {
 
-?>
+
+        $sql="select 1 as `a` order by `a`";
+        $parser = new PHPSQLParser($sql, true);
+        $p = $parser->parsed;
+        $expected = getExpectedValue(dirname(__FILE__), 'issue93.serialized');
+        eq_array($p, $expected, 'simple query');
+
+    }
+}
+

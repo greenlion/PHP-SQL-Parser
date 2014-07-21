@@ -38,15 +38,23 @@
  * @version   SVN: $Id$
  * 
  */
-namespace PHPSQLParser;
-require_once dirname(__FILE__) . '/../../test-more.php';
+namespace PHPSQLParser\Test\Parser;
+use PHPSQLParser\PHPSQLParser;
+use PHPSQLParser\PHPSQLCreator;
 
-$parser = new PHPSQLParser();
+class issue37Test extends \PHPUnit_Framework_TestCase {
+	
+    public function testIssue37() {
 
-$sql = "INSERT INTO test (`name`, `test`) VALUES ('Hello this is what happens\n when new lines are involved', '')";
-$parser->parse($sql);
-$p = $parser->parsed;
-$expected = getExpectedValue(dirname(__FILE__), 'issue37.serialized');
-eq_array($p, $expected, 'INSERT statement with newline character');
 
-?>
+        $parser = new PHPSQLParser();
+
+        $sql = "INSERT INTO test (`name`, `test`) VALUES ('Hello this is what happens\n when new lines are involved', '')";
+        $parser->parse($sql);
+        $p = $parser->parsed;
+        $expected = getExpectedValue(dirname(__FILE__), 'issue37.serialized');
+        eq_array($p, $expected, 'INSERT statement with newline character');
+
+    }
+}
+

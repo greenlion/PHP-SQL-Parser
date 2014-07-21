@@ -38,16 +38,24 @@
  * @version   SVN: $Id$
  * 
  */
-namespace PHPSQLParser;
-require_once dirname(__FILE__) . '/../../test-more.php';
+namespace PHPSQLParser\Test\Creator;
+use PHPSQLParser\PHPSQLParser;
+use PHPSQLParser\PHPSQLCreator;
+
+class count_distinctTest extends \PHPUnit_Framework_TestCase {
+	
+    public function testCount_distinct() {
 
 
 
-$sql = "SELECT COUNT(DISTINCT bla) FROM foo";
-$parser = new PHPSQLParser($sql);
-$creator = new PHPSQLCreator($parser->parsed);
-$created = $creator->created;
-$expected = getExpectedValue(dirname(__FILE__), 'distinct.sql', false);
-ok($created === $expected, 'count(distinct x)');
 
-?>
+        $sql = "SELECT COUNT(DISTINCT bla) FROM foo";
+        $parser = new PHPSQLParser($sql);
+        $creator = new PHPSQLCreator($parser->parsed);
+        $created = $creator->created;
+        $expected = getExpectedValue(dirname(__FILE__), 'distinct.sql', false);
+        ok($created === $expected, 'count(distinct x)');
+
+    }
+}
+

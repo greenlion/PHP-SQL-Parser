@@ -38,14 +38,20 @@
  * @version   SVN: $Id$
  * 
  */
-namespace PHPSQLParser;
-require_once dirname(__FILE__) . '/../../test-more.php';
+namespace PHPSQLParser\Test\Creator;
+use PHPSQLParser\PHPSQLParser;
+use PHPSQLParser\PHPSQLCreator;
 
-$sql = "UPDATE `table` SET a = 15, b = 'haha' WHERE x = now()";
-$parser = new PHPSQLParser($sql);
-$creator = new PHPSQLCreator($parser->parsed);
-$created = $creator->created;
-$expected = getExpectedValue(dirname(__FILE__), 'update.sql', false);
-ok($created === $expected, 'UPDATE with function');
+class updateTest extends \PHPUnit_Framework_TestCase {
+	
+    public function testUpdate() {
+        $sql = "UPDATE `table` SET a = 15, b = 'haha' WHERE x = now()";
+        $parser = new PHPSQLParser($sql);
+        $creator = new PHPSQLCreator($parser->parsed);
+        $created = $creator->created;
+        $expected = getExpectedValue(dirname(__FILE__), 'update.sql', false);
+        ok($created === $expected, 'UPDATE with function');
 
-?>
+    }
+}
+

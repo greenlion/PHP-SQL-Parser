@@ -38,22 +38,28 @@
  * @version   SVN: $Id$
  * 
  */
-namespace PHPSQLParser;
-use PHPSQLParser\exceptions\UnableToCalculatePositionException;
+namespace PHPSQLParser\Test\Parser;
+use PHPSQLParser\PHPSQLParser;
+use PHPSQLParser\PHPSQLCreator;
+        use PHPSQLParser\exceptions\UnableToCalculatePositionException;
 
-require_once dirname(__FILE__) . '/../../test-more.php';
 
-// that is an issue written as comment into the ParserManual...
-$sql = "SELECT FROM some_table a LEFT JOIN another_table AS b ON FIND_IN_SET(a.id, b.ids_collection)";
+class manualTest extends \PHPUnit_Framework_TestCase {
+	
+    public function testManual() {
+        // that is an issue written as comment into the ParserManual...
+        $sql = "SELECT FROM some_table a LEFT JOIN another_table AS b ON FIND_IN_SET(a.id, b.ids_collection)";
 
-try {
-	$parser = new PHPSQLParser($sql, true);
-} catch (UnableToCalculatePositionException $e) {
-    echo $e->getMessage();
+        try {
+        	$parser = new PHPSQLParser($sql, true);
+        } catch (UnableToCalculatePositionException $e) {
+            echo $e->getMessage();
+        }
+
+        $p = $parser->parsed;
+        $expected = getExpectedValue(dirname(__FILE__), 'manual.serialized');
+        eq_array($p, $expected, 'no select expression');
+
+    }
 }
 
-$p = $parser->parsed;
-$expected = getExpectedValue(dirname(__FILE__), 'manual.serialized');
-eq_array($p, $expected, 'no select expression');
-
-?>

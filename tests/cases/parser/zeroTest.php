@@ -38,15 +38,21 @@
  * @version   SVN: $Id$
  * 
  */
-namespace PHPSQLParser;
-require_once dirname(__FILE__) . '/../../test-more.php';
+namespace PHPSQLParser\Test\Parser;
+use PHPSQLParser\PHPSQLParser;
+use PHPSQLParser\PHPSQLCreator;
 
-$parser = new PHPSQLParser();
-$sql = 'SELECT c1
-          from some_table an_alias
-	where d > 0;';
-$parser->parse($sql);
-$p = $parser->parsed;
-ok($parser->parsed['WHERE'][2]['base_expr'] == '0');
+class zeroTest extends \PHPUnit_Framework_TestCase {
+	
+    public function testZero() {
+        $parser = new PHPSQLParser();
+        $sql = 'SELECT c1
+                  from some_table an_alias
+        	where d > 0;';
+        $parser->parse($sql);
+        $p = $parser->parsed;
+        ok($parser->parsed['WHERE'][2]['base_expr'] == '0');
 
-?>
+    }
+}
+

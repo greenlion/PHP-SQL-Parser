@@ -38,13 +38,21 @@
  * @version   SVN: $Id$
  * 
  */
-namespace PHPSQLParser;
-require_once dirname(__FILE__) . '/../../test-more.php';
+namespace PHPSQLParser\Test\Parser;
+use PHPSQLParser\PHPSQLParser;
+use PHPSQLParser\PHPSQLCreator;
 
-$sql = "select webid, floor(iz/2.) as `fl` from MDR1.Tweb512 as `w` where w.webid < 100";
-$parser = new PHPSQLParser($sql);
-$p = $parser->parsed;
-$expected = getExpectedValue(dirname(__FILE__), 'issue98.serialized');
-eq_array($p, $expected, 'alias with quotes');
+class issue98Test extends \PHPUnit_Framework_TestCase {
+	
+    public function testIssue98() {
 
-?>
+
+        $sql = "select webid, floor(iz/2.) as `fl` from MDR1.Tweb512 as `w` where w.webid < 100";
+        $parser = new PHPSQLParser($sql);
+        $p = $parser->parsed;
+        $expected = getExpectedValue(dirname(__FILE__), 'issue98.serialized');
+        eq_array($p, $expected, 'alias with quotes');
+
+    }
+}
+

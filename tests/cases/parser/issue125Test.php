@@ -38,13 +38,21 @@
  * @version   SVN: $Id$
  * 
  */
-namespace PHPSQLParser;
-require_once dirname(__FILE__) . '/../../test-more.php';
+namespace PHPSQLParser\Test\Parser;
+use PHPSQLParser\PHPSQLParser;
+use PHPSQLParser\PHPSQLCreator;
 
-$sql = "select t1.* from t1 left outer join t2 on left(t1.c1,6) = t2.c2";
-$parser = new PHPSQLParser($sql);
-$p = $parser->parsed;
-$expected = getExpectedValue(dirname(__FILE__), 'issue125.serialized');
-eq_array($p, $expected, 'LEFT as function within the ref clause');
+class issue125Test extends \PHPUnit_Framework_TestCase {
+	
+    public function testIssue125() {
 
-?>
+
+        $sql = "select t1.* from t1 left outer join t2 on left(t1.c1,6) = t2.c2";
+        $parser = new PHPSQLParser($sql);
+        $p = $parser->parsed;
+        $expected = getExpectedValue(dirname(__FILE__), 'issue125.serialized');
+        eq_array($p, $expected, 'LEFT as function within the ref clause');
+
+    }
+}
+

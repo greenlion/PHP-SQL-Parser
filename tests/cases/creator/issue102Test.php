@@ -38,14 +38,22 @@
  * @version   SVN: $Id$
  * 
  */
-namespace PHPSQLParser;
-require_once dirname(__FILE__) . '/../../test-more.php';
+namespace PHPSQLParser\Test\Creator;
+use PHPSQLParser\PHPSQLParser;
+use PHPSQLParser\PHPSQLCreator;
 
-$sql = "SELECT IF(f = 0 || f = 1, 1, 0) FROM tbl";
-$parser = new PHPSQLParser($sql, true);
-$creator = new PHPSQLCreator($parser->parsed);
-$created = $creator->created;
-$expected = getExpectedValue(dirname(__FILE__), 'issue102.sql', false);
-ok($created === $expected, 'pipes as OR');
+class issue102Test extends \PHPUnit_Framework_TestCase {
+	
+    public function testIssue102() {
 
-?>
+
+        $sql = "SELECT IF(f = 0 || f = 1, 1, 0) FROM tbl";
+        $parser = new PHPSQLParser($sql, true);
+        $creator = new PHPSQLCreator($parser->parsed);
+        $created = $creator->created;
+        $expected = getExpectedValue(dirname(__FILE__), 'issue102.sql', false);
+        ok($created === $expected, 'pipes as OR');
+
+    }
+}
+

@@ -38,15 +38,23 @@
  * @version   SVN: $Id$
  * 
  */
-namespace PHPSQLParser;
-require_once dirname(__FILE__) . '/../../test-more.php';
+namespace PHPSQLParser\Test\Parser;
+use PHPSQLParser\PHPSQLParser;
+use PHPSQLParser\PHPSQLCreator;
 
-$parser = new PHPSQLParser();
+class issue45Test extends \PHPUnit_Framework_TestCase {
+	
+    public function testIssue45() {
 
-$sql = 'SELECT a from b left join c on c.a = b.a and (c.b. = b.b) where a.a > 1';
-$parser->parse($sql, true);
-$p = $parser->parsed;
-$expected = getExpectedValue(dirname(__FILE__), 'issue45.serialized');
-eq_array($p, $expected, 'issue 45 position problem');
 
-?>
+        $parser = new PHPSQLParser();
+
+        $sql = 'SELECT a from b left join c on c.a = b.a and (c.b. = b.b) where a.a > 1';
+        $parser->parse($sql, true);
+        $p = $parser->parsed;
+        $expected = getExpectedValue(dirname(__FILE__), 'issue45.serialized');
+        eq_array($p, $expected, 'issue 45 position problem');
+
+    }
+}
+

@@ -38,18 +38,23 @@
  * @version   SVN: $Id$
  * 
  */
-namespace PHPSQLParser;
-require_once dirname(__FILE__) . '/../../test-more.php';
+namespace PHPSQLParser\Test\Creator;
+use PHPSQLParser\PHPSQLParser;
+use PHPSQLParser\PHPSQLCreator;
 
+class leftTest extends \PHPUnit_Framework_TestCase {
+	
+    public function testLeft() {
+        $sql = 'SELECT *
+            FROM (t1 LEFT JOIN t2 ON t1.a=t2.a)
+                 LEFT JOIN t3
+                 ON t2.b=t3.b OR t2.b IS NULL';
+        $parser = new PHPSQLParser($sql);
+        $creator = new PHPSQLCreator($parser->parsed);
+        $created = $creator->created;
+        $expected = getExpectedValue(dirname(__FILE__), 'left.sql', false);
+        ok($created === $expected, 'left joins and table-expression');
 
-$sql = 'SELECT *
-    FROM (t1 LEFT JOIN t2 ON t1.a=t2.a)
-         LEFT JOIN t3
-         ON t2.b=t3.b OR t2.b IS NULL';
-$parser = new PHPSQLParser($sql);
-$creator = new PHPSQLCreator($parser->parsed);
-$created = $creator->created;
-$expected = getExpectedValue(dirname(__FILE__), 'left.sql', false);
-ok($created === $expected, 'left joins and table-expression');
+    }
+}
 
-?>

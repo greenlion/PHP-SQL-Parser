@@ -38,35 +38,41 @@
  * @version   SVN: $Id: asc.php 1330 2014-04-15 11:30:07Z phosco@gmx.de $
  * 
  */
-namespace PHPSQLParser;
-use Exception;
-use PHPSQLParser\utils\ExpressionType;
+namespace PHPSQLParser\Test\Parser;
+use PHPSQLParser\PHPSQLParser;
+use PHPSQLParser\PHPSQLCreator;
+        use Exception;
+        use PHPSQLParser\utils\ExpressionType;
 
-require_once dirname(__FILE__) . '/../../test-more.php';
 
-try {
-    $sql = "SELECT PERCENTILE(xyz, 90) as percentile from some_table";
-    $parser = new PHPSQLParser();
-    $parser->addCustomFunction("percentile");
-    $p = $parser->parse($sql, true);
-} catch (Exception $e) {
-    $p = array();
+class customfunctionTest extends \PHPUnit_Framework_TestCase {
+	
+    public function testCustomfunction() {
+        try {
+            $sql = "SELECT PERCENTILE(xyz, 90) as percentile from some_table";
+            $parser = new PHPSQLParser();
+            $parser->addCustomFunction("percentile");
+            $p = $parser->parse($sql, true);
+        } catch (Exception $e) {
+            $p = array();
+        }
+        ok($p['SELECT'][0]['expr_type'] === ExpressionType::CUSTOM_FUNCTION, 'custom function within SELECT clause');
+
+
+        $parser = new PHPSQLParser();
+        $parser->addCustomFunction("percentile");
+        $parser->addCustomFunction("foo_bar");
+        $p = $parser->getCustomFunctions();
+        eq_array($p, array("PERCENTILE", "FOO_BAR"), 'custom function list');
+
+
+        $parser = new PHPSQLParser();
+        $parser->addCustomFunction("percentile");
+        $parser->addCustomFunction("foo_bar");
+        $parser->removeCustomFunction('percentile');
+        $p = $parser->getCustomFunctions();
+        eq_array($p, array("FOO_BAR"), 'remove custom function from list');
+
+    }
 }
-ok($p['SELECT'][0]['expr_type'] === ExpressionType::CUSTOM_FUNCTION, 'custom function within SELECT clause');
 
-
-$parser = new PHPSQLParser();
-$parser->addCustomFunction("percentile");
-$parser->addCustomFunction("foo_bar");
-$p = $parser->getCustomFunctions();
-eq_array($p, array("PERCENTILE", "FOO_BAR"), 'custom function list');
-
-
-$parser = new PHPSQLParser();
-$parser->addCustomFunction("percentile");
-$parser->addCustomFunction("foo_bar");
-$parser->removeCustomFunction('percentile');
-$p = $parser->getCustomFunctions();
-eq_array($p, array("FOO_BAR"), 'remove custom function from list');
-
-?>

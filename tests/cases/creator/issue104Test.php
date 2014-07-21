@@ -38,19 +38,27 @@
  * @version   SVN: $Id$
  * 
  */
-namespace PHPSQLParser;
-require_once dirname(__FILE__) . '/../../test-more.php';
+namespace PHPSQLParser\Test\Creator;
+use PHPSQLParser\PHPSQLParser;
+use PHPSQLParser\PHPSQLCreator;
 
-$sql = "SELECT a.*
-FROM iuz6l_menu_types AS a
-LEFT JOIN iuz6l_menu AS b ON b.menutype = a.menutype AND b.home != 0
-LEFT JOIN iuz6l_languages AS l ON (l.lang_code = language)
-WHERE (b.client_id = 0 OR b.client_id IS NULL)";
+class issue104Test extends \PHPUnit_Framework_TestCase {
+	
+    public function testIssue104() {
 
-$parser = new PHPSQLParser($sql);
-$creator = new PHPSQLCreator($parser->parsed);
-$created = $creator->created;
-$expected = getExpectedValue(dirname(__FILE__), 'issue104.sql', false);
-ok($created === $expected, 'ref clause parentheses');
 
-?>
+        $sql = "SELECT a.*
+        FROM iuz6l_menu_types AS a
+        LEFT JOIN iuz6l_menu AS b ON b.menutype = a.menutype AND b.home != 0
+        LEFT JOIN iuz6l_languages AS l ON (l.lang_code = language)
+        WHERE (b.client_id = 0 OR b.client_id IS NULL)";
+
+        $parser = new PHPSQLParser($sql);
+        $creator = new PHPSQLCreator($parser->parsed);
+        $created = $creator->created;
+        $expected = getExpectedValue(dirname(__FILE__), 'issue104.sql', false);
+        ok($created === $expected, 'ref clause parentheses');
+
+    }
+}
+

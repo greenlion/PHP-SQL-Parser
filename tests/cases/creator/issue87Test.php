@@ -38,15 +38,23 @@
  * @version   SVN: $Id$
  * 
  */
-namespace PHPSQLParser;
-require_once dirname(__FILE__) . '/../../test-more.php';
+namespace PHPSQLParser\Test\Creator;
+use PHPSQLParser\PHPSQLParser;
+use PHPSQLParser\PHPSQLCreator;
+
+class issue87Test extends \PHPUnit_Framework_TestCase {
+	
+    public function testIssue87() {
 
 
-$sql = "RENAME TABLE a TO b, `c` to `a`, foo.bar to hello.world";
-$parser = new PHPSQLParser($sql);
-$creator = new PHPSQLCreator($parser->parsed);
-$created = $creator->created;
-$expected = getExpectedValue(dirname(__FILE__), 'issue87.sql', false);
-ok($created === $expected, 'RENAME multiple tables');
 
-?>
+        $sql = "RENAME TABLE a TO b, `c` to `a`, foo.bar to hello.world";
+        $parser = new PHPSQLParser($sql);
+        $creator = new PHPSQLCreator($parser->parsed);
+        $created = $creator->created;
+        $expected = getExpectedValue(dirname(__FILE__), 'issue87.sql', false);
+        ok($created === $expected, 'RENAME multiple tables');
+
+    }
+}
+

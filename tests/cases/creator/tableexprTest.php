@@ -38,15 +38,21 @@
  * @version   SVN: $Id$
  * 
  */
-namespace PHPSQLParser;
-require_once dirname(__FILE__) . '/../../test-more.php';
+namespace PHPSQLParser\Test\Creator;
+use PHPSQLParser\PHPSQLParser;
+use PHPSQLParser\PHPSQLCreator;
 
-$sql = "SELECT * FROM t1 LEFT JOIN (t2, t3, t4)
-                 ON (t2.a=t1.a AND t3.b=t1.b AND t4.c=t1.c)";
-$parser = new PHPSQLParser($sql);
-$creator = new PHPSQLCreator($parser->parsed);
-$created = $creator->created;
-$expected = getExpectedValue(dirname(__FILE__), 'tableexpr.sql', false);
-ok($created === $expected, 'table-expression on second position');
+class tableexprTest extends \PHPUnit_Framework_TestCase {
+	
+    public function testTableexpr() {
+        $sql = "SELECT * FROM t1 LEFT JOIN (t2, t3, t4)
+                         ON (t2.a=t1.a AND t3.b=t1.b AND t4.c=t1.c)";
+        $parser = new PHPSQLParser($sql);
+        $creator = new PHPSQLCreator($parser->parsed);
+        $created = $creator->created;
+        $expected = getExpectedValue(dirname(__FILE__), 'tableexpr.sql', false);
+        ok($created === $expected, 'table-expression on second position');
 
-?>
+    }
+}
+

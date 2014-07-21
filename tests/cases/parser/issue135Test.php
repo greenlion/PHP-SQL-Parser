@@ -38,13 +38,21 @@
  * @version   SVN: $Id$
  * 
  */
-namespace PHPSQLParser;
-require_once dirname(__FILE__) . '/../../test-more.php';
+namespace PHPSQLParser\Test\Parser;
+use PHPSQLParser\PHPSQLParser;
+use PHPSQLParser\PHPSQLCreator;
 
-$sql = "SELECT x,y,z FROM tableA WHERE x<5 GROUP BY STD(y)";
-$parser = new PHPSQLParser($sql, true);
-$p = $parser->parsed;
-$expected = getExpectedValue(dirname(__FILE__), 'issue135.serialized');
-eq_array($p, $expected, 'STD must be an aggregate function');
+class issue135Test extends \PHPUnit_Framework_TestCase {
+	
+    public function testIssue135() {
 
-?>
+
+        $sql = "SELECT x,y,z FROM tableA WHERE x<5 GROUP BY STD(y)";
+        $parser = new PHPSQLParser($sql, true);
+        $p = $parser->parsed;
+        $expected = getExpectedValue(dirname(__FILE__), 'issue135.serialized');
+        eq_array($p, $expected, 'STD must be an aggregate function');
+
+    }
+}
+

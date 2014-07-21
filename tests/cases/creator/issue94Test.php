@@ -38,14 +38,22 @@
  * @version   SVN: $Id$
  * 
  */
-namespace PHPSQLParser;
-require_once dirname(__FILE__) . '/../../test-more.php';
+namespace PHPSQLParser\Test\Creator;
+use PHPSQLParser\PHPSQLParser;
+use PHPSQLParser\PHPSQLCreator;
 
-$sql = 'SELECT DATE_ADD(NOW(), INTERVAL 1 MONTH) AS next_month';
-$parser = new PHPSQLParser($sql);
-$creator = new PHPSQLCreator($parser->parsed);
-$created = $creator->created;
-$expected = getExpectedValue(dirname(__FILE__), 'issue94.sql', false);
-ok($created === $expected, 'creating date_add with interval');
+class issue94Test extends \PHPUnit_Framework_TestCase {
+	
+    public function testIssue94() {
 
-?>
+
+        $sql = 'SELECT DATE_ADD(NOW(), INTERVAL 1 MONTH) AS next_month';
+        $parser = new PHPSQLParser($sql);
+        $creator = new PHPSQLCreator($parser->parsed);
+        $created = $creator->created;
+        $expected = getExpectedValue(dirname(__FILE__), 'issue94.sql', false);
+        ok($created === $expected, 'creating date_add with interval');
+
+    }
+}
+

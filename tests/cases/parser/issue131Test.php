@@ -38,13 +38,21 @@
  * @version   SVN: $Id$
  * 
  */
-namespace PHPSQLParser;
-require_once dirname(__FILE__) . '/../../test-more.php';
+namespace PHPSQLParser\Test\Parser;
+use PHPSQLParser\PHPSQLParser;
+use PHPSQLParser\PHPSQLCreator;
 
-$sql = "create unique index i1 using BTREE on t1 (c1(5) DESC, `col 2`(8) ASC) ALGORITHM=DEFAULT using hash LOCK=SHARED";
-$parser = new PHPSQLParser($sql, true);
-$p = $parser->parsed;
-$expected = getExpectedValue(dirname(__FILE__), 'issue131.serialized');
-eq_array($p, $expected, 'create index statement');
+class issue131Test extends \PHPUnit_Framework_TestCase {
+	
+    public function testIssue131() {
 
-?>
+
+        $sql = "create unique index i1 using BTREE on t1 (c1(5) DESC, `col 2`(8) ASC) ALGORITHM=DEFAULT using hash LOCK=SHARED";
+        $parser = new PHPSQLParser($sql, true);
+        $p = $parser->parsed;
+        $expected = getExpectedValue(dirname(__FILE__), 'issue131.serialized');
+        eq_array($p, $expected, 'create index statement');
+
+    }
+}
+

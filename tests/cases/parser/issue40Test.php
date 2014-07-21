@@ -38,22 +38,30 @@
  * @version   SVN: $Id$
  * 
  */
-namespace PHPSQLParser;
-require_once dirname(__FILE__) . '/../../test-more.php';
+namespace PHPSQLParser\Test\Parser;
+use PHPSQLParser\PHPSQLParser;
+use PHPSQLParser\PHPSQLCreator;
 
-$parser = new PHPSQLParser();
-
-$sql = "select a from t where x = \"a'b\\cd\" and y = 'ef\"gh'";
-$parser->parse($sql);
-$p = $parser->parsed;
-$expected = getExpectedValue(dirname(__FILE__), 'issue40a.serialized');
-eq_array($p, $expected, 'escaped characters 1');
+class issue40Test extends \PHPUnit_Framework_TestCase {
+	
+    public function testIssue40() {
 
 
-$sql = "select a from t where x = \"abcd\" and y = 'efgh'";
-$parser->parse($sql);
-$p = $parser->parsed;
-$expected = getExpectedValue(dirname(__FILE__), 'issue40b.serialized');
-eq_array($p, $expected, 'escaped characters 2');
+        $parser = new PHPSQLParser();
 
-?>
+        $sql = "select a from t where x = \"a'b\\cd\" and y = 'ef\"gh'";
+        $parser->parse($sql);
+        $p = $parser->parsed;
+        $expected = getExpectedValue(dirname(__FILE__), 'issue40a.serialized');
+        eq_array($p, $expected, 'escaped characters 1');
+
+
+        $sql = "select a from t where x = \"abcd\" and y = 'efgh'";
+        $parser->parse($sql);
+        $p = $parser->parsed;
+        $expected = getExpectedValue(dirname(__FILE__), 'issue40b.serialized');
+        eq_array($p, $expected, 'escaped characters 2');
+
+    }
+}
+

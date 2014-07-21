@@ -38,14 +38,22 @@
  * @version   SVN: $Id$
  * 
  */
-namespace PHPSQLParser;
-require_once dirname(__FILE__) . '/../../test-more.php';
+namespace PHPSQLParser\Test\Parser;
+use PHPSQLParser\PHPSQLParser;
+use PHPSQLParser\PHPSQLCreator;
 
-$parser = new PHPSQLParser();
-$sql = "SELECT SUM(1) * 100 as number";
-$parser->parse($sql);
-$p = $parser->parsed;
-$expected = getExpectedValue(dirname(__FILE__), 'issue82.serialized');
-eq_array($p, $expected, 'operator * problem');
+class issue82Test extends \PHPUnit_Framework_TestCase {
+	
+    public function testIssue82() {
 
-?>
+
+        $parser = new PHPSQLParser();
+        $sql = "SELECT SUM(1) * 100 as number";
+        $parser->parse($sql);
+        $p = $parser->parsed;
+        $expected = getExpectedValue(dirname(__FILE__), 'issue82.serialized');
+        eq_array($p, $expected, 'operator * problem');
+
+    }
+}
+

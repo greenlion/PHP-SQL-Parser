@@ -38,14 +38,20 @@
  * @version   SVN: $Id$
  * 
  */
-namespace PHPSQLParser;
-require_once dirname(__FILE__) . '/../../test-more.php';
+namespace PHPSQLParser\Test\Parser;
+use PHPSQLParser\PHPSQLParser;
+use PHPSQLParser\PHPSQLCreator;
 
-$parser = new PHPSQLParser();
+class dropTest extends \PHPUnit_Framework_TestCase {
+	
+    public function testDrop() {
+        $parser = new PHPSQLParser();
 
-$sql = "drop table if exists xyz cascade";
-$p = $parser->parse($sql, true);
-$expected = getExpectedValue(dirname(__FILE__), 'drop.serialized');
-eq_array($p, $expected, 'drop table statement');
+        $sql = "drop table if exists xyz cascade";
+        $p = $parser->parse($sql, true);
+        $expected = getExpectedValue(dirname(__FILE__), 'drop.serialized');
+        eq_array($p, $expected, 'drop table statement');
 
-?>
+    }
+}
+

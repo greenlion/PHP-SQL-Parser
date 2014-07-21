@@ -38,13 +38,21 @@
  * @version   SVN: $Id$
  * 
  */
-namespace PHPSQLParser;
-require_once dirname(__FILE__) . '/../../test-more.php';
+namespace PHPSQLParser\Test\Parser;
+use PHPSQLParser\PHPSQLParser;
+use PHPSQLParser\PHPSQLCreator;
 
-$sql = 'SELECT DISTINCT colA * colB From test t';
-$parser = new PHPSQLParser();
-$p = $parser->parse($sql);
-$expected = getExpectedValue(dirname(__FILE__), 'issue91.serialized');
-eq_array($p, $expected, 'distinct select');
+class issue91Test extends \PHPUnit_Framework_TestCase {
+	
+    public function testIssue91() {
 
-?>
+
+        $sql = 'SELECT DISTINCT colA * colB From test t';
+        $parser = new PHPSQLParser();
+        $p = $parser->parse($sql);
+        $expected = getExpectedValue(dirname(__FILE__), 'issue91.serialized');
+        eq_array($p, $expected, 'distinct select');
+
+    }
+}
+

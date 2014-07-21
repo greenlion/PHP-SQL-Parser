@@ -38,15 +38,23 @@
  * @version   SVN: $Id$
  * 
  */
-namespace PHPSQLParser;
-require_once dirname(__FILE__) . '/../../test-more.php';
+namespace PHPSQLParser\Test\Parser;
+use PHPSQLParser\PHPSQLParser;
+use PHPSQLParser\PHPSQLCreator;
 
-$parser = new PHPSQLParser();
+class issue39Test extends \PHPUnit_Framework_TestCase {
+	
+    public function testIssue39() {
 
-$sql = "SELECT COUNT(DISTINCT bla) FROM foo";
-$parser->parse($sql);
-$p = $parser->parsed;
-$expected = getExpectedValue(dirname(__FILE__), 'issue39.serialized');
-eq_array($p, $expected, 'count(distinct x)');
 
-?>
+        $parser = new PHPSQLParser();
+
+        $sql = "SELECT COUNT(DISTINCT bla) FROM foo";
+        $parser->parse($sql);
+        $p = $parser->parsed;
+        $expected = getExpectedValue(dirname(__FILE__), 'issue39.serialized');
+        eq_array($p, $expected, 'count(distinct x)');
+
+    }
+}
+

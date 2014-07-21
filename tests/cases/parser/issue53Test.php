@@ -38,29 +38,37 @@
  * @version   SVN: $Id$
  * 
  */
-namespace PHPSQLParser;
-require_once dirname(__FILE__) . '/../../test-more.php';
+namespace PHPSQLParser\Test\Parser;
+use PHPSQLParser\PHPSQLParser;
+use PHPSQLParser\PHPSQLCreator;
 
-$parser = new PHPSQLParser();
-
-$sql = "SELECT * FROM table WHERE a=1 ORDER BY c DESC LIMIT 10 OFFSET 20";
-$parser->parse($sql, false);
-$p = $parser->parsed;
-$expected = getExpectedValue(dirname(__FILE__), 'issue53a.serialized');
-eq_array($p, $expected, 'limit with offset');
+class issue53Test extends \PHPUnit_Framework_TestCase {
+	
+    public function testIssue53() {
 
 
-$sql = "SELECT * FROM table WHERE a=1 ORDER BY c DESC LIMIT 20, 10";
-$parser->parse($sql, false);
-$p = $parser->parsed;
-$expected = getExpectedValue(dirname(__FILE__), 'issue53a.serialized');
-eq_array($p, $expected, 'limit with comma-separated offset');
+        $parser = new PHPSQLParser();
+
+        $sql = "SELECT * FROM table WHERE a=1 ORDER BY c DESC LIMIT 10 OFFSET 20";
+        $parser->parse($sql, false);
+        $p = $parser->parsed;
+        $expected = getExpectedValue(dirname(__FILE__), 'issue53a.serialized');
+        eq_array($p, $expected, 'limit with offset');
 
 
-$sql = "SELECT * FROM table WHERE a=1 ORDER BY c DESC LIMIT 10";
-$parser->parse($sql, false);
-$p = $parser->parsed;
-$expected = getExpectedValue(dirname(__FILE__), 'issue53b.serialized');
-eq_array($p, $expected, 'limit without offset');
+        $sql = "SELECT * FROM table WHERE a=1 ORDER BY c DESC LIMIT 20, 10";
+        $parser->parse($sql, false);
+        $p = $parser->parsed;
+        $expected = getExpectedValue(dirname(__FILE__), 'issue53a.serialized');
+        eq_array($p, $expected, 'limit with comma-separated offset');
 
-?>
+
+        $sql = "SELECT * FROM table WHERE a=1 ORDER BY c DESC LIMIT 10";
+        $parser->parse($sql, false);
+        $p = $parser->parsed;
+        $expected = getExpectedValue(dirname(__FILE__), 'issue53b.serialized');
+        eq_array($p, $expected, 'limit without offset');
+
+    }
+}
+

@@ -38,21 +38,29 @@
  * @version   SVN: $Id$
  * 
  */
-namespace PHPSQLParser;
-require_once dirname(__FILE__) . '/../../test-more.php';
+namespace PHPSQLParser\Test\Parser;
+use PHPSQLParser\PHPSQLParser;
+use PHPSQLParser\PHPSQLCreator;
 
-$parser = new PHPSQLParser();
-$sql = "GROUP BY a, b, table.c";
-$parser->parse($sql);
-$p = $parser->parsed;
-$expected = getExpectedValue(dirname(__FILE__), 'issue55a.serialized');
-eq_array($p, $expected, 'partial SQL statement - group by clause');
+class issue55Test extends \PHPUnit_Framework_TestCase {
+	
+    public function testIssue55() {
 
 
-$sql = "ORDER BY a ASC, b DESC, table.c ASC";
-$parser->parse($sql);
-$p = $parser->parsed;
-$expected = getExpectedValue(dirname(__FILE__), 'issue55b.serialized');
-eq_array($p, $expected, 'partial SQL statement - order by clause');
+        $parser = new PHPSQLParser();
+        $sql = "GROUP BY a, b, table.c";
+        $parser->parse($sql);
+        $p = $parser->parsed;
+        $expected = getExpectedValue(dirname(__FILE__), 'issue55a.serialized');
+        eq_array($p, $expected, 'partial SQL statement - group by clause');
 
-?>
+
+        $sql = "ORDER BY a ASC, b DESC, table.c ASC";
+        $parser->parse($sql);
+        $p = $parser->parsed;
+        $expected = getExpectedValue(dirname(__FILE__), 'issue55b.serialized');
+        eq_array($p, $expected, 'partial SQL statement - order by clause');
+
+    }
+}
+

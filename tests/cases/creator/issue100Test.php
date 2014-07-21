@@ -38,15 +38,23 @@
  * @version   SVN: $Id$
  * 
  */
-namespace PHPSQLParser;
-require_once dirname(__FILE__) . '/../../test-more.php';
+namespace PHPSQLParser\Test\Creator;
+use PHPSQLParser\PHPSQLParser;
+use PHPSQLParser\PHPSQLCreator;
 
-$query  = "SELECT 0 AS Zero FROM table";
-$parser = new PHPSQLParser();
-$p = $parser->parse($query);
-$creator = new PHPSQLCreator();
-$created = $creator->create($p);
-$expected = getExpectedValue(dirname(__FILE__), 'issue100.sql', false);
-ok($created === $expected, 'lost alias for constants');
+class issue100Test extends \PHPUnit_Framework_TestCase {
+	
+    public function testIssue100() {
 
-?>
+
+        $query  = "SELECT 0 AS Zero FROM table";
+        $parser = new PHPSQLParser();
+        $p = $parser->parse($query);
+        $creator = new PHPSQLCreator();
+        $created = $creator->create($p);
+        $expected = getExpectedValue(dirname(__FILE__), 'issue100.sql', false);
+        ok($created === $expected, 'lost alias for constants');
+
+    }
+}
+

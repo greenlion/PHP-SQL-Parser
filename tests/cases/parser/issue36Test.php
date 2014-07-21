@@ -38,29 +38,37 @@
  * @version   SVN: $Id$
  * 
  */
-namespace PHPSQLParser;
-require_once dirname(__FILE__) . '/../../test-more.php';
+namespace PHPSQLParser\Test\Parser;
+use PHPSQLParser\PHPSQLParser;
+use PHPSQLParser\PHPSQLCreator;
 
-$parser = new PHPSQLParser();
-
-$sql = "INSERT INTO test (`name`, `test`) VALUES ('\'Superman\'', ''), ('\'Superman\'', '')";
-$parser->parse($sql);
-$p = $parser->parsed;
-$expected = getExpectedValue(dirname(__FILE__), 'issue36a.serialized');
-eq_array($p, $expected, 'INSERT statement with escaped quotes and multiple records');
+class issue36Test extends \PHPUnit_Framework_TestCase {
+	
+    public function testIssue36() {
 
 
-$sql = "INSERT INTO test (`name`, `test`) VALUES ('\'Superman\'', '')";
-$parser->parse($sql);
-$p = $parser->parsed;
-$expected = getExpectedValue(dirname(__FILE__), 'issue36b.serialized');
-eq_array($p, $expected, 'INSERT statement with escaped quotes and one record');
+        $parser = new PHPSQLParser();
+
+        $sql = "INSERT INTO test (`name`, `test`) VALUES ('\'Superman\'', ''), ('\'Superman\'', '')";
+        $parser->parse($sql);
+        $p = $parser->parsed;
+        $expected = getExpectedValue(dirname(__FILE__), 'issue36a.serialized');
+        eq_array($p, $expected, 'INSERT statement with escaped quotes and multiple records');
 
 
-$sql = "INSERT INTO test (`name`, `test`) VALUES ('\'Superman\'', ''), ('\'sdfsd\'', '')";
-$parser->parse($sql);
-$p = $parser->parsed;
-$expected = getExpectedValue(dirname(__FILE__), 'issue36c.serialized');
-eq_array($p, $expected, 'INSERT statement with escaped quotes and multiple records (2)');
+        $sql = "INSERT INTO test (`name`, `test`) VALUES ('\'Superman\'', '')";
+        $parser->parse($sql);
+        $p = $parser->parsed;
+        $expected = getExpectedValue(dirname(__FILE__), 'issue36b.serialized');
+        eq_array($p, $expected, 'INSERT statement with escaped quotes and one record');
 
-?>
+
+        $sql = "INSERT INTO test (`name`, `test`) VALUES ('\'Superman\'', ''), ('\'sdfsd\'', '')";
+        $parser->parse($sql);
+        $p = $parser->parsed;
+        $expected = getExpectedValue(dirname(__FILE__), 'issue36c.serialized');
+        eq_array($p, $expected, 'INSERT statement with escaped quotes and multiple records (2)');
+
+    }
+}
+

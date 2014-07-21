@@ -38,15 +38,23 @@
  * @version   SVN: $Id$
  * 
  */
-namespace PHPSQLParser;
-require_once dirname(__FILE__) . '/../../test-more.php';
+namespace PHPSQLParser\Test\Parser;
+use PHPSQLParser\PHPSQLParser;
+use PHPSQLParser\PHPSQLCreator;
 
-$parser = new PHPSQLParser();
+class issue41Test extends \PHPUnit_Framework_TestCase {
+	
+    public function testIssue41() {
 
-$sql = "SELECT * FROM v\$mytable";
-$parser->parse($sql, true);
-$p = $parser->parsed;
-$expected = getExpectedValue(dirname(__FILE__), 'issue41.serialized');
-eq_array($p, $expected, 'escaped $ in tablename');
 
-?>
+        $parser = new PHPSQLParser();
+
+        $sql = "SELECT * FROM v\$mytable";
+        $parser->parse($sql, true);
+        $p = $parser->parsed;
+        $expected = getExpectedValue(dirname(__FILE__), 'issue41.serialized');
+        eq_array($p, $expected, 'escaped $ in tablename');
+
+    }
+}
+

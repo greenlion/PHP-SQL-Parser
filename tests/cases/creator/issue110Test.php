@@ -38,14 +38,22 @@
  * @version   SVN: $Id$
  * 
  */
-namespace PHPSQLParser;
-require_once dirname(__FILE__) . '/../../test-more.php';
+namespace PHPSQLParser\Test\Creator;
+use PHPSQLParser\PHPSQLParser;
+use PHPSQLParser\PHPSQLCreator;
 
-$sql = 'SELECT DISTINCT a FROM b';
-$parser = new PHPSQLParser($sql);
-$creator = new PHPSQLCreator($parser->parsed);
-$created = $creator->created;
-$expected = getExpectedValue(dirname(__FILE__), 'issue110.sql', false);
-ok($created === $expected, 'simple select with distinct option');
+class issue110Test extends \PHPUnit_Framework_TestCase {
+	
+    public function testIssue110() {
 
-?>
+
+        $sql = 'SELECT DISTINCT a FROM b';
+        $parser = new PHPSQLParser($sql);
+        $creator = new PHPSQLCreator($parser->parsed);
+        $created = $creator->created;
+        $expected = getExpectedValue(dirname(__FILE__), 'issue110.sql', false);
+        ok($created === $expected, 'simple select with distinct option');
+
+    }
+}
+

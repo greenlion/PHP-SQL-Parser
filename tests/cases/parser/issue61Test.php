@@ -38,13 +38,21 @@
  * @version   SVN: $Id$
  * 
  */
-namespace PHPSQLParser;
-require_once dirname(__FILE__) . '/../../test-more.php';
+namespace PHPSQLParser\Test\Parser;
+use PHPSQLParser\PHPSQLParser;
+use PHPSQLParser\PHPSQLCreator;
 
-$sql = "SELECT lcase(dummy.b) FROM dummy ORDER BY dummy.a, LCASE(dummy.b)";
-$parser = new PHPSQLParser($sql);
-$p = $parser->parsed;
-$expected = getExpectedValue(dirname(__FILE__), 'issue61.serialized');
-eq_array($p, $expected, 'functions/expressions within ORDER-BY');
+class issue61Test extends \PHPUnit_Framework_TestCase {
+	
+    public function testIssue61() {
 
-?>
+
+        $sql = "SELECT lcase(dummy.b) FROM dummy ORDER BY dummy.a, LCASE(dummy.b)";
+        $parser = new PHPSQLParser($sql);
+        $p = $parser->parsed;
+        $expected = getExpectedValue(dirname(__FILE__), 'issue61.serialized');
+        eq_array($p, $expected, 'functions/expressions within ORDER-BY');
+
+    }
+}
+

@@ -38,13 +38,21 @@
  * @version   SVN: $Id$
  * 
  */
-namespace PHPSQLParser;
-require_once dirname(__FILE__) . '/../../test-more.php';
+namespace PHPSQLParser\Test\Parser;
+use PHPSQLParser\PHPSQLParser;
+use PHPSQLParser\PHPSQLCreator;
 
-$sql = "select i1, count(*) cnt from test.s1 group by i1";
-$parser = new PHPSQLParser($sql);
-$p = $parser->parsed;
-$expected = getExpectedValue(dirname(__FILE__), 'issue65.serialized');
-eq_array($p, $expected, 'It treats the alias as a colref.');
+class issue65Test extends \PHPUnit_Framework_TestCase {
+	
+    public function testIssue65() {
 
-?>
+
+        $sql = "select i1, count(*) cnt from test.s1 group by i1";
+        $parser = new PHPSQLParser($sql);
+        $p = $parser->parsed;
+        $expected = getExpectedValue(dirname(__FILE__), 'issue65.serialized');
+        eq_array($p, $expected, 'It treats the alias as a colref.');
+
+    }
+}
+

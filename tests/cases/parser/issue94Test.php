@@ -38,14 +38,22 @@
  * @version   SVN: $Id$
  * 
  */
-namespace PHPSQLParser;
-require_once dirname(__FILE__) . '/../../test-more.php';
+namespace PHPSQLParser\Test\Parser;
+use PHPSQLParser\PHPSQLParser;
+use PHPSQLParser\PHPSQLCreator;
+
+class issue94Test extends \PHPUnit_Framework_TestCase {
+	
+    public function testIssue94() {
 
 
-$sql = 'SELECT DATE_ADD(NOW(), INTERVAL 1 MONTH) AS next_month';
-$parser = new PHPSQLParser();
-$p = $parser->parse($sql);
-$expected = getExpectedValue(dirname(__FILE__), 'issue94.serialized');
-eq_array($p, $expected, 'date_add()');
 
-?>
+        $sql = 'SELECT DATE_ADD(NOW(), INTERVAL 1 MONTH) AS next_month';
+        $parser = new PHPSQLParser();
+        $p = $parser->parse($sql);
+        $expected = getExpectedValue(dirname(__FILE__), 'issue94.serialized');
+        eq_array($p, $expected, 'date_add()');
+
+    }
+}
+

@@ -38,15 +38,23 @@
  * @version   SVN: $Id$
  * 
  */
-namespace PHPSQLParser;
-require_once dirname(__FILE__) . '/../../test-more.php';
+namespace PHPSQLParser\Test\Creator;
+use PHPSQLParser\PHPSQLParser;
+use PHPSQLParser\PHPSQLCreator;
 
-$sql = "SELECT tab.col AS `tab.col`, tab2.col AS `tab2.col` FROM tab, tab2";
-$parser = new PHPSQLParser($sql);
-$p = $parser->parsed;
-$creator = new PHPSQLCreator();
-$created = $creator->create($p);
-$expected = getExpectedValue(dirname(__FILE__), 'issue101.sql', false);
-ok($created === $expected, 'alias with quotes');
+class issue101Test extends \PHPUnit_Framework_TestCase {
+	
+    public function testIssue101() {
 
-?>
+
+        $sql = "SELECT tab.col AS `tab.col`, tab2.col AS `tab2.col` FROM tab, tab2";
+        $parser = new PHPSQLParser($sql);
+        $p = $parser->parsed;
+        $creator = new PHPSQLCreator();
+        $created = $creator->create($p);
+        $expected = getExpectedValue(dirname(__FILE__), 'issue101.sql', false);
+        ok($created === $expected, 'alias with quotes');
+
+    }
+}
+
