@@ -40,31 +40,16 @@
  */
 namespace PHPSQLParser\Test\Parser;
 use PHPSQLParser\PHPSQLParser;
-use PHPSQLParser\PHPSQLCreator;
-        use PHPSQLParser\exceptions\UnableToCalculatePositionException;
-
 
 class issue46Test extends \PHPUnit_Framework_TestCase {
-	
-    public function testIssue46() {
 
-
-        $testname = "issue 46, throws exception on error";
-        try {
-
-            $parser = new PHPSQLParser();
-            $sql = "SELECT abc'haha'";
-            $parser->parse($sql, true);
-
-            $p = $parser->parsed;
-            print_r($p);
-
-            fail($testname);
-
-        } catch (UnableToCalculatePositionException $e) {
-            ok(true, $testname);
-        }
-
+	/**
+	 * @expectedException \PHPSQLParser\exceptions\UnableToCalculatePositionException
+	 */
+	public function testIssue46() {
+		$parser = new PHPSQLParser();
+		$sql = "SELECT abc'haha'";
+		$parser->parse($sql, true);
     }
 }
 
