@@ -43,12 +43,6 @@
 namespace PHPSQLParser\processors;
 use PHPSQLParser\utils\ExpressionType;
 
-require_once dirname(__FILE__) . '/AbstractProcessor.php';
-require_once dirname(__FILE__) . '/ColumnListProcessor.php';
-require_once dirname(__FILE__) . '/ExpressionListProcessor.php';
-require_once dirname(__FILE__) . '/PartitionDefinitionProcessor.php';
-require_once dirname(__FILE__) . '/../utils/ExpressionType.php';
-
 /**
  * This class processes the PARTITION BY statements within CREATE TABLE.
  *

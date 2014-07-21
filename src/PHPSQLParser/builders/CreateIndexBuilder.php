@@ -40,10 +40,6 @@
  */
 
 namespace PHPSQLParser\builders;
-require_once dirname(__FILE__) . '/CreateIndexTypeBuilder.php';
-require_once dirname(__FILE__) . '/CreateIndexTableBuilder.php';
-require_once dirname(__FILE__) . '/CreateIndexOptionsBuilder.php';
-require_once dirname(__FILE__) . '/Builder.php';
 
 /**
  * This class implements the builder for the CREATE INDEX statement. You can overwrite

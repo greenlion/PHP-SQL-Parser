@@ -42,15 +42,6 @@
 namespace PHPSQLParser\builders;
 use PHPSQLParser\exceptions\UnableToCreateSQLException;
 
-require_once dirname(__FILE__) . '/../exceptions/UnableToCreateSQLException.php';
-require_once dirname(__FILE__) . '/ColumnReferenceBuilder.php';
-require_once dirname(__FILE__) . '/InsertColumnListBuilder.php';
-require_once dirname(__FILE__) . '/SubQueryBuilder.php';
-require_once dirname(__FILE__) . '/SelectBracketExpressionBuilder.php';
-require_once dirname(__FILE__) . '/TableBuilder.php';
-require_once dirname(__FILE__) . '/ReservedBuilder.php';
-require_once dirname(__FILE__) . '/Builder.php';
-
 /**
  * This class implements the builder for the [INSERT] statement parts. 
  * You can overwrite all functions to achieve another handling.

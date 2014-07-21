@@ -42,9 +42,6 @@
 namespace PHPSQLParser\builders;
 use PHPSQLParser\utils\ExpressionType;
 
-require_once dirname(__FILE__) . '/../utils/ExpressionType.php';
-require_once dirname(__FILE__) . '/Builder.php';
-
 /**
  * This class implements the builder for index column entries of the column-list 
  * parts of CREATE TABLE. 

@@ -42,10 +42,6 @@
 namespace PHPSQLParser\builders;
 use PHPSQLParser\utils\ExpressionType;
 
-require_once dirname(__FILE__) . '/../utils/ExpressionType.php';
-require_once dirname(__FILE__) . '/SubTreeBuilder.php';
-require_once dirname(__FILE__) . '/Builder.php';
-
 /**
  * This class implements the builder list of values for the IN statement. 
  * You can overwrite all functions to achieve another handling.

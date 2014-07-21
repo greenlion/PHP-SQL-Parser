@@ -42,14 +42,6 @@
 namespace PHPSQLParser\builders;
 use PHPSQLParser\utils\ExpressionType;
 
-require_once dirname(__FILE__) . '/RefClauseBuilder.php';
-require_once dirname(__FILE__) . '/RefTypeBuilder.php';
-require_once dirname(__FILE__) . '/JoinBuilder.php';
-require_once dirname(__FILE__) . '/AliasBuilder.php';
-require_once dirname(__FILE__) . '/Builder.php';
-require_once dirname(__FILE__) . '/SelectStatementBuilder.php';
-require_once dirname(__FILE__) . '/../utils/ExpressionType.php';
-
 /**
  * This class implements the builder for queries within parentheses (no subqueries). 
  * You can overwrite all functions to achieve another handling.

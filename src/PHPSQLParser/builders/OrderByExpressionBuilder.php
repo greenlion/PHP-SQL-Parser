@@ -40,8 +40,6 @@
  */
 
 namespace PHPSQLParser\builders;
-require_once dirname(__FILE__) . '/WhereExpressionBuilder.php';
-require_once dirname(__FILE__) . '/DirectionBuilder.php';
 
 /**
  * This class implements the builder for expressions within the ORDER-BY part. 

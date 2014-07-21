@@ -42,12 +42,6 @@
 namespace PHPSQLParser\builders;
 use PHPSQLParser\utils\ExpressionType;
 
-require_once dirname(__FILE__) . '/../utils/ExpressionType.php';
-require_once dirname(__FILE__) . '/CreateTableBuilder.php';
-require_once dirname(__FILE__) . '/CreateIndexBuilder.php';
-require_once dirname(__FILE__) . '/SubTreeBuilder.php';
-require_once dirname(__FILE__) . '/Builder.php';
-
 /**
  * This class implements the builder for the [CREATE] part. You can overwrite
  * all functions to achieve another handling.

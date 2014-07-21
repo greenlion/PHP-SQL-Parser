@@ -40,10 +40,6 @@
  */
 
 namespace PHPSQLParser\builders;
-require_once dirname(__FILE__) . '/CreateTableDefinitionBuilder.php';
-require_once dirname(__FILE__) . '/CreateTableSelectOptionBuilder.php';
-require_once dirname(__FILE__) . '/CreateTableOptionsBuilder.php';
-require_once dirname(__FILE__) . '/Builder.php';
 
 /**
  * This class implements the builder for the CREATE TABLE statement. You can overwrite

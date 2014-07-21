@@ -40,10 +40,6 @@
  */
 
 namespace PHPSQLParser\builders;
-require_once dirname(__FILE__) . '/InsertBuilder.php';
-require_once dirname(__FILE__) . '/ValuesBuilder.php';
-require_once dirname(__FILE__) . '/SelectStatementBuilder.php';
-require_once dirname(__FILE__) . '/Builder.php';
 
 /**
  * This class implements the builder for the whole Insert statement. You can overwrite

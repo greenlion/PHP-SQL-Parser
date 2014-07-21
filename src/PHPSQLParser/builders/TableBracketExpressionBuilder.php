@@ -43,16 +43,6 @@ namespace PHPSQLParser\builders;
 use PHPSQLParser\exceptions\UnableToCreateSQLException;
 use PHPSQLParser\utils\ExpressionType;
 
-require_once dirname(__FILE__) . '/../exceptions/UnableToCreateSQLException.php';
-require_once dirname(__FILE__) . '/../utils/ExpressionType.php';
-require_once dirname(__FILE__) . '/ColumnDefinitionBuilder.php';
-require_once dirname(__FILE__) . '/PrimaryKeyBuilder.php';
-require_once dirname(__FILE__) . '/ForeignKeyBuilder.php';
-require_once dirname(__FILE__) . '/CheckBuilder.php';
-require_once dirname(__FILE__) . '/LikeExpressionBuilder.php';
-require_once dirname(__FILE__) . '/IndexKeyBuilder.php';
-require_once dirname(__FILE__) . '/Builder.php';
-
 /**
  * This class implements the builder for the table expressions 
  * within the create definitions of CREATE TABLE. 
