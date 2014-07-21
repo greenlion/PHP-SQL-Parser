@@ -45,8 +45,6 @@ use PHPSQLParser\PHPSQLCreator;
 class issue100Test extends \PHPUnit_Framework_TestCase {
 	
     public function testIssue100() {
-
-
         $query  = "SELECT 0 AS Zero FROM table";
         $parser = new PHPSQLParser();
         $p = $parser->parse($query);

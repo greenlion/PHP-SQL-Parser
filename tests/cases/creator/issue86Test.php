@@ -45,9 +45,6 @@ use PHPSQLParser\PHPSQLCreator;
 class issue86Test extends \PHPUnit_Framework_TestCase {
 	
     public function testIssue86() {
-
-
-
         $sql = "SELECT * FROM cities GROUP BY 1,2";
         $parser = new PHPSQLParser($sql);
         $creator = new PHPSQLCreator($parser->parsed);

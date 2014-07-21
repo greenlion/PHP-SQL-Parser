@@ -45,9 +45,6 @@ use PHPSQLParser\PHPSQLCreator;
 class issue87Test extends \PHPUnit_Framework_TestCase {
 	
     public function testIssue87() {
-
-
-
         $sql = "RENAME TABLE a TO b, `c` to `a`, foo.bar to hello.world";
         $parser = new PHPSQLParser($sql);
         $creator = new PHPSQLCreator($parser->parsed);

@@ -45,8 +45,6 @@ use PHPSQLParser\PHPSQLCreator;
 class issue134Test extends \PHPUnit_Framework_TestCase {
 	
     public function testIssue134() {
-
-
         $query = "select t1.*
         from Table1 t1
         STRAIGHT_JOIN  Table2 t2

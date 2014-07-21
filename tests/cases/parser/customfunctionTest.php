@@ -40,9 +40,7 @@
  */
 namespace PHPSQLParser\Test\Parser;
 use PHPSQLParser\PHPSQLParser;
-use PHPSQLParser\PHPSQLCreator;
-        use Exception;
-        use PHPSQLParser\utils\ExpressionType;
+use PHPSQLParser\utils\ExpressionType;
 
 
 class customfunctionTest extends \PHPUnit_Framework_TestCase {
@@ -53,7 +51,7 @@ class customfunctionTest extends \PHPUnit_Framework_TestCase {
             $parser = new PHPSQLParser();
             $parser->addCustomFunction("percentile");
             $p = $parser->parse($sql, true);
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             $p = array();
         }
         $this->assertSame(ExpressionType::CUSTOM_FUNCTION, $p['SELECT'][0]['expr_type'], 'custom function within SELECT clause');

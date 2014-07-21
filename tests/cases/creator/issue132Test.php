@@ -45,8 +45,6 @@ use PHPSQLParser\PHPSQLCreator;
 class issue132Test extends \PHPUnit_Framework_TestCase {
 	
     public function testIssue132() {
-
-
         $query = "select (c1 - c2) AS c3 from t1";
         $parser = new PHPSQLParser();
         $p = $parser->parse($query);

@@ -45,8 +45,6 @@ use PHPSQLParser\PHPSQLCreator;
 class issue78Test extends \PHPUnit_Framework_TestCase {
 	
     public function testIssue78() {
-
-
         $sql = "show columns from `foo.bar`";
         $parser = new PHPSQLParser($sql);
         $creator = new PHPSQLCreator($parser->parsed);

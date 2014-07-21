@@ -45,9 +45,6 @@ use PHPSQLParser\PHPSQLCreator;
 class issue57Test extends \PHPUnit_Framework_TestCase {
 	
     public function testIssue57() {
-
-
-
         $sql = "SELECT a.*, SUM(b.home) AS home,b.language,l.image,l.sef,l.title_native
         FROM iuz6l_menu_types AS a
         LEFT JOIN iuz6l_menu AS b ON b.menutype = a.menutype AND b.home != 0

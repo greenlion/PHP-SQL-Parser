@@ -45,8 +45,6 @@ use PHPSQLParser\PHPSQLCreator;
 class issue127Test extends \PHPUnit_Framework_TestCase {
 	
     public function testIssue127() {
-
-
         $query = "UPDATE t1 SET c1 = -c2";
         $parser = new PHPSQLParser();
         $p = $parser->parse($query);

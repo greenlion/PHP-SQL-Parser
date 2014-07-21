@@ -45,8 +45,6 @@ use PHPSQLParser\PHPSQLCreator;
 class issue106Test extends \PHPUnit_Framework_TestCase {
 	
     public function testIssue106() {
-
-
         $sql = "SELECT dbo.fn_GetDayOfWeekMonIs0(DATEADD(SECOND, -21600, calls_cstm.date_logged_c)) AS 'Date'
         FROM calls
         LEFT JOIN calls_cstm ON calls.id = calls_cstm.id_c

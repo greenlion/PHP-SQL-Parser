@@ -45,8 +45,6 @@ use PHPSQLParser\PHPSQLCreator;
 class issue94Test extends \PHPUnit_Framework_TestCase {
 	
     public function testIssue94() {
-
-
         $sql = 'SELECT DATE_ADD(NOW(), INTERVAL 1 MONTH) AS next_month';
         $parser = new PHPSQLParser($sql);
         $creator = new PHPSQLCreator($parser->parsed);

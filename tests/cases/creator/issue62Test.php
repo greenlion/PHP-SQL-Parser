@@ -45,8 +45,6 @@ use PHPSQLParser\PHPSQLCreator;
 class issue62Test extends \PHPUnit_Framework_TestCase {
 	
     public function testIssue62() {
-
-
         $query  = "SELECT col FROM table1 GROUP BY col";
         $parser = new PHPSQLParser();
         $p = $parser->parse($query);

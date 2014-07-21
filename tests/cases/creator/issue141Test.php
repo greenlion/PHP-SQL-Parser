@@ -45,8 +45,6 @@ use PHPSQLParser\PHPSQLCreator;
 class issue141Test extends \PHPUnit_Framework_TestCase {
 	
     public function testIssue141() {
-
-
         $query = "SELECT f FROM t ORDER BY (f-0.0)";
         $parser = new PHPSQLParser();
         $p = $parser->parse($query);

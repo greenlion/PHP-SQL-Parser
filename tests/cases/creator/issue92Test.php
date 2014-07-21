@@ -45,9 +45,6 @@ use PHPSQLParser\PHPSQLCreator;
 class issue92Test extends \PHPUnit_Framework_TestCase {
 	
     public function testIssue92() {
-
-
-
         $sql = "SELECT cid*2 FROM cities ORDER BY country";
         $parser = new PHPSQLParser($sql);
         $creator = new PHPSQLCreator($parser->parsed);

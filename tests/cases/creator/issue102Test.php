@@ -45,8 +45,6 @@ use PHPSQLParser\PHPSQLCreator;
 class issue102Test extends \PHPUnit_Framework_TestCase {
 	
     public function testIssue102() {
-
-
         $sql = "SELECT IF(f = 0 || f = 1, 1, 0) FROM tbl";
         $parser = new PHPSQLParser($sql, true);
         $creator = new PHPSQLCreator($parser->parsed);

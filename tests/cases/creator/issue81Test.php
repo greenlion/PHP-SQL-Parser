@@ -45,8 +45,6 @@ use PHPSQLParser\PHPSQLCreator;
 class issue81Test extends \PHPUnit_Framework_TestCase {
 	
     public function testIssue81() {
-
-
         $sql = "SELECT NOW()";
         $parser = new PHPSQLParser($sql, true);
         $creator = new PHPSQLCreator($parser->parsed);

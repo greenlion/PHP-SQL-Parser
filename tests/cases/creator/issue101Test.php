@@ -45,8 +45,6 @@ use PHPSQLParser\PHPSQLCreator;
 class issue101Test extends \PHPUnit_Framework_TestCase {
 	
     public function testIssue101() {
-
-
         $sql = "SELECT tab.col AS `tab.col`, tab2.col AS `tab2.col` FROM tab, tab2";
         $parser = new PHPSQLParser($sql);
         $p = $parser->parsed;

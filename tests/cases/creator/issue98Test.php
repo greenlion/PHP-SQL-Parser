@@ -45,8 +45,6 @@ use PHPSQLParser\PHPSQLCreator;
 class issue98Test extends \PHPUnit_Framework_TestCase {
 	
     public function testIssue98() {
-
-
         $sql = 'SELECT mn AS `next_month` FROM DateAndTime `dt`';
         $parser = new PHPSQLParser($sql);
         $creator = new PHPSQLCreator($parser->parsed);

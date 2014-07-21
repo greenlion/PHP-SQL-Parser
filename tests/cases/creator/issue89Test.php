@@ -45,9 +45,6 @@ use PHPSQLParser\PHPSQLCreator;
 class issue89Test extends \PHPUnit_Framework_TestCase {
 	
     public function testIssue89() {
-
-
-
         $sql = "select ut.id, ut.numero_cartella, ut.nome, ut.cognome, floor(DATEDIFF(de.`data`,ut.data_di_nascita)/365) as eta,
         sx.valore as sesso, cd.valore as diagnosi_prevalente, co.valore as consapevolezza,
         DATEDIFF(de.`data`,az.data_inizio_assistenza) as durata_assistenza_giorni, ld.valore as luogo_decesso,

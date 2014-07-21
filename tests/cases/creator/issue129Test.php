@@ -45,8 +45,6 @@ use PHPSQLParser\PHPSQLCreator;
 class issue129Test extends \PHPUnit_Framework_TestCase {
 	
     public function testIssue129() {
-
-
         $query  = "DROP TEMPORARY TABLE IF EXISTS t1, t2 CASCADE";
         $parser = new PHPSQLParser();
         $p = $parser->parse($query);

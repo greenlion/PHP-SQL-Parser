@@ -45,8 +45,6 @@ use PHPSQLParser\PHPSQLCreator;
 class issue117Test extends \PHPUnit_Framework_TestCase {
 	
     public function testIssue117() {
-
-
         $sql = "(SELECT x FROM table) ORDER BY x";
         $parser = new PHPSQLParser();
         $p = $parser->parse($sql);

@@ -45,8 +45,6 @@ use PHPSQLParser\PHPSQLCreator;
 class issue83Test extends \PHPUnit_Framework_TestCase {
 	
     public function testIssue83() {
-
-
         $parser = new PHPSQLParser();
         $sql = "INSERT INTO newTablename SELECT field1, field2, field3 FROM oldTablename where field1 > 100";
         $parser->parse($sql, true);

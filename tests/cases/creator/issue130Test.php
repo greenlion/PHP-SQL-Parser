@@ -45,8 +45,6 @@ use PHPSQLParser\PHPSQLCreator;
 class issue130Test extends \PHPUnit_Framework_TestCase {
 	
     public function testIssue130() {
-
-
         $query = "select * from t1 order by c2-c1";
         $parser = new PHPSQLParser();
         $p = $parser->parse($query);

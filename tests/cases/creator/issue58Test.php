@@ -45,9 +45,6 @@ use PHPSQLParser\PHPSQLCreator;
 class issue58Test extends \PHPUnit_Framework_TestCase {
 	
     public function testIssue58() {
-
-
-
         $sql = "SELECT a.* FROM tabla_a a WHERE (a.client_id in (1,2,3))";
         $parser = new PHPSQLParser($sql);
         $creator = new PHPSQLCreator($parser->parsed);

@@ -45,9 +45,6 @@ use PHPSQLParser\PHPSQLCreator;
 class issue66Test extends \PHPUnit_Framework_TestCase {
 	
     public function testIssue66() {
-
-
-
         $sql = "SELECT SUM(value)/(ABS(2)) as x FROM table";
         $parser = new PHPSQLParser($sql);
         $creator = new PHPSQLCreator($parser->parsed);

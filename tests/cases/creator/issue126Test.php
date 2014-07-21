@@ -45,8 +45,6 @@ use PHPSQLParser\PHPSQLCreator;
 class issue126Test extends \PHPUnit_Framework_TestCase {
 	
     public function testIssue126() {
-
-
         $query = "DELETE FROM t1";
         $parser = new PHPSQLParser();
         $p = $parser->parse($query);

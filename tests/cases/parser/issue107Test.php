@@ -40,15 +40,12 @@
  */
 namespace PHPSQLParser\Test\Parser;
 use PHPSQLParser\PHPSQLParser;
-use PHPSQLParser\PHPSQLCreator;
-        use PHPSQLParser\utils\ExpressionType;
+use PHPSQLParser\utils\ExpressionType;
 
 
 class issue107Test extends \PHPUnit_Framework_TestCase {
 	
     public function testIssue107() {
-
-
         try {
             $sql = "CREATE TABLE IF NOT EXISTS `engine4_urdemo_causebug` (
           `id` int(11) unsigned NOT NULL AUTO_INCREMENT,

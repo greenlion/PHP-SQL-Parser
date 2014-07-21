@@ -45,8 +45,6 @@ use PHPSQLParser\PHPSQLCreator;
 class issue112Test extends \PHPUnit_Framework_TestCase {
 	
     public function testIssue112() {
-
-
         $sql = 'SELECT user, MAX(salary) FROM users GROUP BY user HAVING MAX(salary) > 10';
         $parser = new PHPSQLParser($sql);
         $creator = new PHPSQLCreator($parser->parsed);

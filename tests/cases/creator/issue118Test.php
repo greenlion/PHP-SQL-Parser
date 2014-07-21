@@ -45,8 +45,6 @@ use PHPSQLParser\PHPSQLCreator;
 class issue118Test extends \PHPUnit_Framework_TestCase {
 	
     public function testIssue118() {
-
-
         $query = "select organism_name as reference from organisms group by reference";
         $parser = new PHPSQLParser();
         $p = $parser->parse($query);

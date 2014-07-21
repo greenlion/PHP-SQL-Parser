@@ -45,8 +45,6 @@ use PHPSQLParser\PHPSQLCreator;
 class issue105Test extends \PHPUnit_Framework_TestCase {
 	
     public function testIssue105() {
-
-
         $sql = "SELECT users0.user_name AS 'CIS UserName'
         	,calls.description AS 'Description'
         	,contacts2.first_name AS 'Contacts First Name'

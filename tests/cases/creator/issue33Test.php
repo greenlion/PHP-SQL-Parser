@@ -45,8 +45,6 @@ use PHPSQLParser\PHPSQLCreator;
 class issue33Test extends \PHPUnit_Framework_TestCase {
 	
     public function testIssue33() {
-
-
         $parser = new PHPSQLParser();
         $sql = "CREATE TABLE hohoho (LIKE xyz)";
         $parser->parse($sql, true);

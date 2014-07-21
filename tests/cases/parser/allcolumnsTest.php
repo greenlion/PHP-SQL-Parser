@@ -40,7 +40,6 @@
  */
 namespace PHPSQLParser\Test\Parser;
 use PHPSQLParser\PHPSQLParser;
-use PHPSQLParser\PHPSQLCreator;
 
 class allcolumnsTest extends \PHPUnit_Framework_TestCase {
 	

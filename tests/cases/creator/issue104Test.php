@@ -45,8 +45,6 @@ use PHPSQLParser\PHPSQLCreator;
 class issue104Test extends \PHPUnit_Framework_TestCase {
 	
     public function testIssue104() {
-
-
         $sql = "SELECT a.*
         FROM iuz6l_menu_types AS a
         LEFT JOIN iuz6l_menu AS b ON b.menutype = a.menutype AND b.home != 0

@@ -45,8 +45,6 @@ use PHPSQLParser\PHPSQLCreator;
 class issue110Test extends \PHPUnit_Framework_TestCase {
 	
     public function testIssue110() {
-
-
         $sql = 'SELECT DISTINCT a FROM b';
         $parser = new PHPSQLParser($sql);
         $creator = new PHPSQLCreator($parser->parsed);

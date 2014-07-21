@@ -45,8 +45,6 @@ use PHPSQLParser\PHPSQLCreator;
 class issue76Test extends \PHPUnit_Framework_TestCase {
 	
     public function testIssue76() {
-
-
         $sql = "SELECT AVG(2.0 * foo) FROM bar";
         $parser = new PHPSQLParser($sql, true);
         $creator = new PHPSQLCreator($parser->parsed);

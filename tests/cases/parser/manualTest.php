@@ -40,8 +40,7 @@
  */
 namespace PHPSQLParser\Test\Parser;
 use PHPSQLParser\PHPSQLParser;
-use PHPSQLParser\PHPSQLCreator;
-        use PHPSQLParser\exceptions\UnableToCalculatePositionException;
+use PHPSQLParser\exceptions\UnableToCalculatePositionException;
 
 
 class manualTest extends \PHPUnit_Framework_TestCase {
