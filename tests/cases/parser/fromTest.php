@@ -69,14 +69,14 @@ class fromTest extends \PHPUnit_Framework_TestCase {
         $p=$parser->parsed;
 
         ok(count($p['SELECT']) == 8, 'seven selects');
-        ok($p['SELECT'][0]['base_expr'] == 'DISTINCT');
-        ok($p['SELECT'][1]['alias']['name'] == 'c1');
-        ok($p['SELECT'][2]['alias']['name'] == '`c2`');
-        ok($p['SELECT'][3]['alias']['name'] == '', 'no alias on sum(c2)');
-        ok($p['SELECT'][4]['alias']['name'] == 'sum_c3');
-        ok($p['SELECT'][5]['alias']['name'] == 'case_statement', 'case statement');
-        ok($p['SELECT'][6]['alias']['name'] == '', 'no alias on t4.c1');
-        ok($p['SELECT'][7]['alias']['name'] == 'subquery');
+        $this->assertEquals('DISTINCT', $p['SELECT'][0]['base_expr']);
+        $this->assertEquals('c1', $p['SELECT'][1]['alias']['name']);
+        $this->assertEquals('`c2`', $p['SELECT'][2]['alias']['name']);
+        $this->assertEquals('', 'no alias on sum(c2)', $p['SELECT'][3]['alias']['name']);
+        $this->assertEquals('sum_c3', $p['SELECT'][4]['alias']['name']);
+        $this->assertEquals('case_statement', 'case statement', $p['SELECT'][5]['alias']['name']);
+        $this->assertEquals('', 'no alias on t4.c1', $p['SELECT'][6]['alias']['name']);
+        $this->assertEquals('subquery', $p['SELECT'][7]['alias']['name']);
 
     }
 }

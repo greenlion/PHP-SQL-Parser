@@ -51,7 +51,7 @@ class zeroTest extends \PHPUnit_Framework_TestCase {
         	where d > 0;';
         $parser->parse($sql);
         $p = $parser->parsed;
-        ok($parser->parsed['WHERE'][2]['base_expr'] == '0');
+        $this->assertEquals('0', $parser->parsed['WHERE'][2]['base_expr']);
 
     }
 }

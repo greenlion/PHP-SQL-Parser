@@ -51,9 +51,9 @@ class backtickTest extends \PHPUnit_Framework_TestCase {
                   from some_table an_alias group by `an alias`, `alias2`;';
         $parser->parse($sql);
         $p = $parser->parsed;
-        ok($parser->parsed['SELECT'][0]['alias']['name'] == '`an alias`');
-        ok($parser->parsed['SELECT'][0]['sub_tree'][4]['base_expr'] == 'c1.`some column`');
-        ok($parser->parsed['GROUP'][0]['expr_type'] == 'alias');
+        $this->assertEquals('`an alias`', $parser->parsed['SELECT'][0]['alias']['name']);
+        $this->assertEquals('c1.`some column`', $parser->parsed['SELECT'][0]['sub_tree'][4]['base_expr']);
+        $this->assertEquals('alias', $parser->parsed['GROUP'][0]['expr_type']);
 
 
         $sql = "INSERT INTO test (`name`) VALUES ('ben\\'s test containing an escaped quote')";
