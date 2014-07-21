@@ -33,7 +33,9 @@
     },
     "autoload": 
     {
-        "files": [ "src/PHPSQLParser/PHPSQLCreator.php", "src/PHPSQLParser/PHPSQLParser.php" ]
+		"psr-0": {
+			"PHPSQLParser": "src/"
+		}
     },
     "require": 
     {
