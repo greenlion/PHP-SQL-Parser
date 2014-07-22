@@ -51,17 +51,6 @@ use PHPSQLParser\builders\RenameStatementBuilder;
 use PHPSQLParser\builders\ShowStatementBuilder;
 use PHPSQLParser\builders\BracketStatementBuilder;
 
-require_once dirname(__FILE__) . '/exceptions/UnsupportedFeatureException.php';
-require_once dirname(__FILE__) . '/builders/SelectStatementBuilder.php';
-require_once dirname(__FILE__) . '/builders/DeleteStatementBuilder.php';
-require_once dirname(__FILE__) . '/builders/UpdateStatementBuilder.php';
-require_once dirname(__FILE__) . '/builders/InsertStatementBuilder.php';
-require_once dirname(__FILE__) . '/builders/CreateStatementBuilder.php';
-require_once dirname(__FILE__) . '/builders/DropStatementBuilder.php';
-require_once dirname(__FILE__) . '/builders/RenameStatementBuilder.php';
-require_once dirname(__FILE__) . '/builders/ShowStatementBuilder.php';
-require_once dirname(__FILE__) . '/builders/BracketStatementBuilder.php';
-
 /**
  * This class generates SQL from the output of the PHPSQLParser. 
  *

@@ -40,10 +40,6 @@
  */
 
 namespace PHPSQLParser\builders;
-require_once dirname(__FILE__) . '/LikeBuilder.php';
-require_once dirname(__FILE__) . '/SelectStatementBuilder.php';
-require_once dirname(__FILE__) . '/CreateBuilder.php';
-require_once dirname(__FILE__) . '/Builder.php';
 
 /**
  * This class implements the builder for the whole Create statement. You can overwrite

@@ -40,7 +40,6 @@
  */
 
 namespace PHPSQLParser\processors;
-require_once dirname(__FILE__) . '/SQLChunkProcessor.php';
 
 /**
  * This class processes the base SQL statements.

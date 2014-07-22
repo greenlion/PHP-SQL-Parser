@@ -44,9 +44,6 @@ namespace PHPSQLParser\processors;
 use PHPSQLParser\lexer\PHPSQLLexer;
 use PHPSQLParser\utils\ExpressionType;
 
-require_once dirname(__FILE__) . '/../utils/ExpressionType.php';
-require_once dirname(__FILE__) . '/../lexer/PHPSQLLexer.php';
-
 /**
  * This class contains some general functions for a processor.
  * 

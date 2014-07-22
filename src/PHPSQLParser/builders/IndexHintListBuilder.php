@@ -40,7 +40,6 @@
  */
 
 namespace PHPSQLParser\builders;
-require_once dirname(__FILE__) . '/Builder.php';
 
 /**
  * This class implements the builder for index hint lists. 

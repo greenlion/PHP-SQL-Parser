@@ -42,10 +42,6 @@
 namespace PHPSQLParser\builders;
 use PHPSQLParser\utils\ExpressionType;
 
-require_once dirname(__FILE__) . '/../utils/ExpressionType.php';
-require_once dirname(__FILE__) . '/DirectionBuilder.php';
-require_once dirname(__FILE__) . '/Builder.php';
-
 /**
  * This class implements the builder for an alias within the ORDER-BY clause. 
  * You can overwrite all functions to achieve another handling.

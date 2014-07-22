@@ -43,9 +43,6 @@
 namespace PHPSQLParser\lexer;
 use PHPSQLParser\exceptions\InvalidParameterException;
 
-require_once dirname(__FILE__) . '/LexerSplitter.php';
-require_once dirname(__FILE__) . '/../exceptions/InvalidParameterException.php';
-
 /**
  * This class splits the SQL string into little parts, which the parser can
  * use to build the result array.

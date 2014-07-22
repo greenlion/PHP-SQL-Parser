@@ -39,8 +39,6 @@
  * 
  */
 namespace PHPSQLParser;
-require_once dirname(__FILE__) . '/../../../src/PHPSQLParser/PHPSQLParser.php';
-require_once dirname(__FILE__) . '/../../../src/PHPSQLParser/PHPSQLCreator.php';
 require_once dirname(__FILE__) . '/../../test-more.php';
 $query = "CREATE TABLE t1 (c1 CHAR(3),c2 CHAR(3),KEY(c1))";
 $parser = new PHPSQLParser();

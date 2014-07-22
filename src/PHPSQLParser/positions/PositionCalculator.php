@@ -45,10 +45,6 @@ use PHPSQLParser\utils\PHPSQLParserConstants;
 use PHPSQLParser\exceptions\UnableToCalculatePositionException;
 use PHPSQLParser\utils\ExpressionType;
 
-require_once dirname(__FILE__) . '/../utils/PHPSQLParserConstants.php';
-require_once dirname(__FILE__) . '/../exceptions/UnableToCalculatePositionException.php';
-require_once dirname(__FILE__) . '/../utils/ExpressionType.php';
-
 /**
  * This class implements the calculator for the string positions of the 
  * base_expr elements within the output of the PHPSQLParser.

@@ -42,14 +42,6 @@
 namespace PHPSQLParser\builders;
 use PHPSQLParser\utils\ExpressionType;
 
-require_once dirname(__FILE__) . '/../utils/ExpressionType.php';
-require_once dirname(__FILE__) . '/AliasBuilder.php';
-require_once dirname(__FILE__) . '/IndexHintListBuilder.php';
-require_once dirname(__FILE__) . '/JoinBuilder.php';
-require_once dirname(__FILE__) . '/RefTypeBuilder.php';
-require_once dirname(__FILE__) . '/RefClauseBuilder.php';
-require_once dirname(__FILE__) . '/Builder.php';
-
 /**
  * This class implements the builder for the table name and join options. 
  * You can overwrite all functions to achieve another handling.

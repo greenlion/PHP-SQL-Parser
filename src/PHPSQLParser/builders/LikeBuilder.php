@@ -42,10 +42,6 @@
 namespace PHPSQLParser\builders;
 use PHPSQLParser\exceptions\UnableToCreateSQLException;
 
-require_once dirname(__FILE__) . '/../exceptions/UnableToCreateSQLException.php';
-require_once dirname(__FILE__) . '/TableBuilder.php';
-require_once dirname(__FILE__) . '/Builder.php';
-
 /**
  * This class implements the builder for the LIKE statement part of CREATE TABLE. 
  * You can overwrite all functions to achieve another handling.

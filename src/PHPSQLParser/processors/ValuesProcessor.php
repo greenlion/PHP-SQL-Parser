@@ -42,11 +42,6 @@
 namespace PHPSQLParser\processors;
 use PHPSQLParser\utils\ExpressionType;
 
-require_once dirname(__FILE__) . '/../utils/ExpressionType.php';
-require_once dirname(__FILE__) . '/RecordProcessor.php';
-require_once dirname(__FILE__) . '/ExpressionListProcessor.php';
-require_once dirname(__FILE__) . '/AbstractProcessor.php';
-
 /**
  * This class processes the VALUES statements.
  *

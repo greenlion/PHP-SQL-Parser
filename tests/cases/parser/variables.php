@@ -39,7 +39,6 @@
  * 
  */
 namespace PHPSQLParser;
-require_once dirname(__FILE__) . '/../../../src/PHPSQLParser/PHPSQLParser.php';
 require_once dirname(__FILE__) . '/../../test-more.php';
 
 $sql = "SELECT @t1, @`t2`, @t3, @t4 := @t1+@'t2'+@t3;";

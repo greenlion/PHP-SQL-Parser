@@ -43,16 +43,6 @@ namespace PHPSQLParser\builders;
 use PHPSQLParser\exceptions\UnableToCreateSQLException;
 use PHPSQLParser\utils\ExpressionType;
 
-require_once dirname(__FILE__) . '/../utils/ExpressionType.php';
-require_once dirname(__FILE__) . '/../exceptions/UnableToCreateSQLException.php';
-require_once dirname(__FILE__) . '/ColumnListBuilder.php';
-require_once dirname(__FILE__) . '/ConstraintBuilder.php';
-require_once dirname(__FILE__) . '/ReservedBuilder.php';
-require_once dirname(__FILE__) . '/IndexTypeBuilder.php';
-require_once dirname(__FILE__) . '/IndexSizeBuilder.php';
-require_once dirname(__FILE__) . '/IndexParserBuilder.php';
-require_once dirname(__FILE__) . '/Builder.php';
-
 /**
  * This class implements the builder for the PRIMARY KEY  statement part of CREATE TABLE. 
  * You can overwrite all functions to achieve another handling.

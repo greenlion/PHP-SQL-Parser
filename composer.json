@@ -33,7 +33,9 @@
     },
     "autoload": 
     {
-        "files": [ "src/PHPSQLParser/PHPSQLCreator.php", "src/PHPSQLParser/PHPSQLParser.php" ]
+		"psr-0": {
+			"PHPSQLParser": "src/"
+		}
     },
     "require": 
     {
@@ -64,7 +66,7 @@
         },
         {
             "type": "svn",
-            "url": "http://php-sql-parser.googlecode.com/svn/"
+            "url": "http://php-sql-parser.googlecode.com/svn/trunk/"
         }
     ]
 }

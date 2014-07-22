@@ -44,12 +44,6 @@ use PHPSQLParser\utils\ExpressionType;
 use PHPSQLParser\utils\ExpressionToken;
 use PHPSQLParser\utils\PHPSQLParserConstants;
 
-require_once dirname(__FILE__) . '/AbstractProcessor.php';
-require_once dirname(__FILE__) . '/DefaultProcessor.php';
-require_once dirname(__FILE__) . '/../utils/PHPSQLParserConstants.php';
-require_once dirname(__FILE__) . '/../utils/ExpressionToken.php';
-require_once dirname(__FILE__) . '/../utils/ExpressionType.php';
-
 /**
  * This class processes expression lists.
  *

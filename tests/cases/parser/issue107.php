@@ -41,8 +41,6 @@
 namespace PHPSQLParser;
 use PHPSQLParser\utils\ExpressionType;
 
-require_once dirname(__FILE__) . '/../../../src/PHPSQLParser/PHPSQLParser.php';
-require_once dirname(__FILE__) . '/../../../src/PHPSQLParser/utils/ExpressionType.php';
 require_once dirname(__FILE__) . '/../../test-more.php';
 
 try {

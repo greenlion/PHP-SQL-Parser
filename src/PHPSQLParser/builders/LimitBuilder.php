@@ -42,9 +42,6 @@
 namespace PHPSQLParser\builders;
 use PHPSQLParser\exceptions\UnableToCreateSQLException;
 
-require_once dirname(__FILE__) . '/../exceptions/UnableToCreateSQLException.php';
-require_once dirname(__FILE__) . '/Builder.php';
-
 /**
  * This class implements the builder LIMIT statement. 
  * You can overwrite all functions to achieve another handling.
