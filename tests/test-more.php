@@ -38,6 +38,8 @@
  *                                                                   *
  \*******************************************************************/
 
+require_once dirname(__FILE__) . '/../vendor/autoload.php';
+
 header('Content-Type: text/plain');
 register_shutdown_function('_test_end');
 
@@ -56,7 +58,6 @@ function plan($plan) {
      */
 
     global $_no_plan;
-    global $_skip_all;
 
     switch ($plan) {
     case 'no_plan':
@@ -124,7 +125,6 @@ function ok($pass, $test_name = '') {
     }
 
     $origin = get_origin();
-    $file = $origin['file'];
     $line = $origin['line'];
 
     if ($pass) {
