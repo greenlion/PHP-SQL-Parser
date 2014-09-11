@@ -59,6 +59,11 @@ class FromProcessor extends AbstractProcessor {
         return $processor->process($unparsed);
     }
     
+    protected function processColumnList($unparsed) {
+        $processor = new ColumnListProcessor();
+        return $processor->process($unparsed);
+    }
+    
     protected function processSQLDefault($unparsed) {
         $processor = new DefaultProcessor();
         return $processor->process($unparsed);
@@ -93,7 +98,13 @@ class FromProcessor extends AbstractProcessor {
                     $unparsed[$k] = "";
                 }
             }
-            $ref = $this->processExpressionList($unparsed);
+            if ($parseInfo['ref_type'] === 'USING') {
+            	// unparsed has only one entry, the column list
+            	$ref = $this->processColumnList($this->removeParenthesisFromStart($unparsed[0]));
+            	$ref = array(array('expr_type' => ExpressionType::COLUMN_LIST, 'base_expr' => $unparsed[0], 'sub_tree' => $ref));
+            } else {
+            	$ref = $this->processExpressionList($unparsed);
+            }
             $parseInfo['ref_expr'] = (empty($ref) ? false : $ref);
         }
 
