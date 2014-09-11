@@ -42,9 +42,8 @@ namespace PHPSQLParser;
 require_once dirname(__FILE__) . '/../../test-more.php';
 
 $sql = "SELECT REPLACE(NOW(), '-', '')";
-$parser = new PHPSQLParser($sql, false);
+$parser = new PHPSQLParser($sql, true);
 $p = $parser->parsed;
-print_r($p);
 $expected = getExpectedValue(dirname(__FILE__), 'issue148.serialized');
 eq_array($p, $expected, 'REPLACE prevents position calculation');
 
