@@ -257,14 +257,14 @@ class SQLProcessor extends SQLChunkProcessor {
                 continue 2;
 
             case 'REPLACE':
-                if ($prev_category === 'TABLE') {
-                    // part of the CREATE TABLE statement
-                    $out[$prev_category][] = $trim;
-                    continue 2;
-                }
-                // set the category in case these get subclauses in a future version of MySQL
-                $token_category = $upper;
-                $out[$upper][0] = $trim;
+            	if ($prev_category === '') {
+            		// set the category in case these get subclauses in a future version of MySQL
+            		$token_category = $upper;
+            		$out[$upper][0] = $trim;
+            		continue 2;
+            	}
+                // part of the CREATE TABLE statement or a function
+                $out[$prev_category][] = $trim;
                 continue 2;
 
             case 'IGNORE':
