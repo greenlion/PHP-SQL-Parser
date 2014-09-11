@@ -12,6 +12,7 @@ require_once dirname(__FILE__) . '/cases/creator/delete.php';
 require_once dirname(__FILE__) . '/cases/creator/function.php';
 require_once dirname(__FILE__) . '/cases/creator/inlist.php';
 require_once dirname(__FILE__) . '/cases/creator/insert.php';
+require_once dirname(__FILE__) . '/cases/creator/issue_git10.php';
 require_once dirname(__FILE__) . '/cases/creator/issue33.php';
 require_once dirname(__FILE__) . '/cases/creator/issue57.php';
 require_once dirname(__FILE__) . '/cases/creator/issue58.php';
