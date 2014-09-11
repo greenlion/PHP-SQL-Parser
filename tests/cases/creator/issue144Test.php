@@ -1,6 +1,6 @@
 <?php
 /**
- * issue147.php
+ * issue144Test.php
  *
  * Test case for PHPSQLCreator.
  *
@@ -38,15 +38,22 @@
  * @version   SVN: $Id$
  * 
  */
-namespace PHPSQLParser;
-require_once dirname(__FILE__) . '/../../test-more.php';
+namespace PHPSQLParser\Test\Creator;
 
-$query = "SELECT f FROM t WHERE x in (Select x from y)";
-$parser = new PHPSQLParser();
-$p = $parser->parse($query);
-$creator = new PHPSQLCreator();
-$created = $creator->create($p);
-$expected = getExpectedValue(dirname(__FILE__), 'issue147.sql', false);
-ok($created === $expected, 'subqueries within WHERE clause');
+use PHPSQLParser\PHPSQLParser;
+use PHPSQLParser\PHPSQLCreator;
+
+class Issue144Test extends \PHPUnit_Framework_TestCase {
+
+	public function testIssue144() {
+		$query = "SELECT * FROM TableA JOIN TableB USING(Col1, Col2)";
+		$parser = new PHPSQLParser();
+		$p = $parser->parse($query);
+		$creator = new PHPSQLCreator();
+		$created = $creator->create($p);
+		$expected = getExpectedValue(dirname(__FILE__), 'issue144.sql', false);
+		$this->assertSame($expected, $created, 'missing commas in Ref clause');
+	}
+}
 
 ?>
