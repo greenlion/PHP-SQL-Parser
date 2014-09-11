@@ -1,8 +1,8 @@
 <?php
 /**
- * HavingBuilder.php
+ * AliasReferenceBuilder.php
  *
- * Builds the HAVING part.
+ * Builds Alias references.
  *
  * PHP version 5
  *
@@ -40,58 +40,24 @@
  */
 
 namespace PHPSQLParser\builders;
-use PHPSQLParser\exceptions\UnableToCreateSQLException;
+use PHPSQLParser\utils\ExpressionType;
 
 /**
- * This class implements the builder for the HAVING part. 
+ * This class implements the builder for alias references. 
  * You can overwrite all functions to achieve another handling.
  *
- * @author  Ian Barker <ian@theorganicagency.com>
  * @author  André Rothe <andre.rothe@phosco.info>
  * @license http://www.debian.org/misc/bsd.license  BSD License (3 Clause)
  *  
  */
-class HavingBuilder extends WhereBuilder {
-
-    protected function buildAliasReference($parsed) {
-        $builder = new AliasReferenceBuilder();
-        return $builder->build($parsed);
-    }
-	
-	protected function buildHavingExpression($parsed) {
-        $builder = new HavingExpressionBuilder();
-        return $builder->build($parsed);
-    }
-
-    protected function buildHavingBracketExpression($parsed) {
-        $builder = new HavingBracketExpressionBuilder();
-        return $builder->build($parsed);
-    }
+class AliasReferenceBuilder implements Builder {
 
     public function build(array $parsed) {
-        $sql = "HAVING ";
-        foreach ($parsed as $k => $v) {
-            $len = strlen($sql);
-
-            $sql .= $this->buildAliasReference($v);
-            $sql .= $this->buildOperator($v);
-            $sql .= $this->buildConstant($v);
-            $sql .= $this->buildColRef($v);
-            $sql .= $this->buildSubQuery($v);
-            $sql .= $this->buildInList($v);
-            $sql .= $this->buildFunction($v);
-            $sql .= $this->buildHavingExpression($v);
-            $sql .= $this->buildHavingBracketExpression($v);
-            $sql .= $this->buildUserVariable($v);
-
-            if (strlen($sql) == $len) {
-                throw new UnableToCreateSQLException('HAVING', $k, $v, 'expr_type');
-            }
-
-            $sql .= " ";
+        if ($parsed['expr_type'] !== ExpressionType::ALIAS) {
+            return "";
         }
-        return substr($sql, 0, -1);
+        $sql = $parsed['base_expr'];
+        return $sql;
     }
-
 }
 ?>
