@@ -7,7 +7,7 @@
  */
 
 namespace PHPSQLParser;
-require_once dirname(__FILE__) . '/../src/PHPSQLParser/PHPSQLParser.php';
+require_once dirname(__FILE__) . '/../vendor/autoload.php';
 
 $sql = 'SELECT 1';
 echo $sql . "\n";
