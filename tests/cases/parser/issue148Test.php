@@ -1,6 +1,6 @@
 <?php
 /**
- * issue149.php
+ * issue148Test.php
  *
  * Test case for PHPSQLParser.
  *
@@ -38,13 +38,17 @@
  * @version   SVN: $Id$
  * 
  */
-namespace PHPSQLParser;
-require_once dirname(__FILE__) . '/../../test-more.php';
+namespace PHPSQLParser\Test\Parser;
+use PHPSQLParser\PHPSQLParser;
 
-$sql = "SELECT * from tab where ifnull(col_name,'') <> ''";
-$parser = new PHPSQLParser($sql, true);
-$p = $parser->parsed;
-$expected = getExpectedValue(dirname(__FILE__), 'issue149.serialized');
-eq_array($p, $expected, "ifnull() doesn't parse properly");
-
+class Issue148Test extends \PHPUnit_Framework_TestCase {
+	
+    public function testIssue148() {
+		$sql = "SELECT REPLACE(NOW(), '-', '')";
+		$parser = new PHPSQLParser($sql, true);
+		$p = $parser->parsed;
+		$expected = getExpectedValue(dirname(__FILE__), 'issue148.serialized');
+		$this->assertEquals($expected, $p, 'REPLACE prevents position calculation');
+    }
+}
 ?>
