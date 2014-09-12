@@ -44,23 +44,25 @@ use PHPSQLParser\PHPSQLCreator;
 
 class issue63Test extends \PHPUnit_Framework_TestCase {
 	
-    public function testIssue63() {
+    public function testIssue63a() {
         $sql = "SELECT col FROM table1 GROUP BY col";
         $parser = new PHPSQLParser($sql);
         $creator = new PHPSQLCreator($parser->parsed);
         $created = $creator->created;
         $expected = getExpectedValue(dirname(__FILE__), 'issue63a.sql', false);
         $this->assertSame($expected, $created, 'group by with colref fails.');
-
-
+    }
+    
+    public function testIssue63b() {
         $sql = "SELECT col AS somealias FROM table ORDER BY somealias LIMIT 1";
         $parser = new PHPSQLParser($sql);
         $creator = new PHPSQLCreator($parser->parsed);
         $created = $creator->created;
         $expected = getExpectedValue(dirname(__FILE__), 'issue63b.sql', false);
         $this->assertSame($expected, $created, 'ORDER BY alias fails.');
-
-
+    }
+    
+    public function testIssue63c() {
         $sql = "SELECT * FROM table LIMIT 1";
         $parser = new PHPSQLParser($sql);
         $creator = new PHPSQLCreator($parser->parsed);

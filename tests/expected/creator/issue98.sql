@@ -1,1 +1,1 @@
-SELECT mn as `next_month` FROM DateAndTime `dt`
+SELECT mn AS `next_month` FROM DateAndTime `dt`
