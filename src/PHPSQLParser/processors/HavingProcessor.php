@@ -58,7 +58,7 @@ class HavingProcessor extends ExpressionListProcessor {
         foreach ($parsed as $k => $v) {
             if ($v['expr_type'] === ExpressionType::COLREF) {
                 foreach ($select as $clause) {
-                    if (!$clause['alias']) {
+                    if (empty($clause['alias'])) {
                         continue;
                     }
 
