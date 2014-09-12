@@ -1,6 +1,7 @@
 <?php
+
 /**
- * issue_git10.php
+ * issue_git10Test.php
  *
  * Test case for PHPSQLParser from issue #10 of GitHub.
  *
@@ -38,22 +39,29 @@
  * @version   SVN: $Id$
  * 
  */
-namespace PHPSQLParser;
-require_once dirname(__FILE__) . '/../../test-more.php';
+namespace PHPSQLParser\Test\Creator;
 
-$query  = "SELECT
+use PHPSQLParser\PHPSQLParser;
+use PHPSQLParser\PHPSQLCreator;
+
+class Issue_Git10Test extends \PHPUnit_Framework_TestCase {
+	
+	public function testIssueGit10() {
+		$query = "SELECT
 REPLACE( f.web_program,'\n', '' ) AS web_program,
 id AS change_id
 FROM
 file f
 HAVING
 change_id > :change_id";
- 
-$parser = new PHPSQLParser();
-$p = $parser->parse($query);
-$creator = new PHPSQLCreator();
-$created = $creator->create($p);
-$expected = getExpectedValue(dirname(__FILE__), 'issue_git10.sql', false);
-ok($created === $expected, 'alias references should work in HAVING clauses');
+		
+		$parser = new PHPSQLParser ();
+		$p = $parser->parse ( $query );
+		$creator = new PHPSQLCreator ();
+		$created = $creator->create ( $p );
+		$expected = getExpectedValue ( dirname ( __FILE__ ), 'issue_git10.sql', false );
+		$this->assertSame ( $expected, $created, 'alias references should work in HAVING clauses' );
+	}
+}
 
 ?>
