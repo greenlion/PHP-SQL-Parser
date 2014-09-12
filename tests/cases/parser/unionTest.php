@@ -1,6 +1,6 @@
 <?php
 /**
- * union.php
+ * unionTest.php
  *
  * Test case for PHPSQLParser.
  *
@@ -41,10 +41,11 @@
 namespace PHPSQLParser\Test\Parser;
 use PHPSQLParser\PHPSQLParser;
 use PHPSQLParser\PHPSQLCreator;
+use Analog\Analog;
 
-class unionTest extends \PHPUnit_Framework_TestCase {
+class UnionTest extends \PHPUnit_Framework_TestCase {
 	
-    public function testUnion() {
+    public function testUnion1() {
         $parser = new PHPSQLParser();
 
         $sql = 'SELECT colA From test a
@@ -52,18 +53,20 @@ class unionTest extends \PHPUnit_Framework_TestCase {
         SELECT colB from test 
         as b';
         $p = $parser->parse($sql, true);
+        Analog::log(serialize($p));
         $expected = getExpectedValue(dirname(__FILE__), 'union1.serialized');
         $this->assertEquals($expected, $p, 'simple union');
-
-
+    }
+    
+    public function testUnion2() {
         // TODO: the order-by clause has not been parsed
-        $sql = '(SELECT colA From test a)
+    	$parser = new PHPSQLParser();
+    	$sql = '(SELECT colA From test a)
                 union all
                 (SELECT colB from test b) order by 1';
         $p = $parser->parse($sql, true);
         $expected = getExpectedValue(dirname(__FILE__), 'union2.serialized');
         $this->assertEquals($expected, $p, 'mysql union with order-by');
-
     }
 }
-
+?>

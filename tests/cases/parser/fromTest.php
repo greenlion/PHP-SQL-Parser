@@ -1,6 +1,6 @@
 <?php
 /**
- * from.php
+ * fromTest.php
  *
  * Test case for PHPSQLParser.
  *
@@ -42,9 +42,9 @@ namespace PHPSQLParser\Test\Parser;
 use PHPSQLParser\PHPSQLParser;
 use PHPSQLParser\PHPSQLCreator;
 
-class fromTest extends \PHPUnit_Framework_TestCase {
+class FromTest extends \PHPUnit_Framework_TestCase {
 	
-    public function testFrom() {
+    public function testFrom1() {
         $parser = new PHPSQLParser();
 
         $sql = 'SELECT c1
@@ -56,8 +56,9 @@ class fromTest extends \PHPUnit_Framework_TestCase {
         $this->assertEquals(3, count($p));
         $this->assertEquals(1, count($p['FROM']));
         $this->assertEquals('an_alias', $p['FROM'][0]['alias']['name']);
-
-
+    }
+    
+    public function testFrom2() {
         $sql = 'select DISTINCT 1+2   c1, 1+ 2 as 
         `c2`, sum(c2),sum(c3) as sum_c3,"Status" = CASE
                 WHEN quantity > 0 THEN \'in stock\'
@@ -72,12 +73,11 @@ class fromTest extends \PHPUnit_Framework_TestCase {
         $this->assertEquals('DISTINCT', $p['SELECT'][0]['base_expr']);
         $this->assertEquals('c1', $p['SELECT'][1]['alias']['name']);
         $this->assertEquals('`c2`', $p['SELECT'][2]['alias']['name']);
-        $this->assertEquals('', 'no alias on sum(c2)', $p['SELECT'][3]['alias']['name']);
+        $this->assertEquals('', $p['SELECT'][3]['alias']['name'], 'no alias on sum(c2)');
         $this->assertEquals('sum_c3', $p['SELECT'][4]['alias']['name']);
-        $this->assertEquals('case_statement', 'case statement', $p['SELECT'][5]['alias']['name']);
-        $this->assertEquals('', 'no alias on t4.c1', $p['SELECT'][6]['alias']['name']);
+        $this->assertEquals('case_statement', $p['SELECT'][5]['alias']['name'], 'case statement');
+        $this->assertEquals('', $p['SELECT'][6]['alias']['name'], 'no alias on t4.c1');
         $this->assertEquals('subquery', $p['SELECT'][7]['alias']['name']);
-
     }
 }
-
+?>

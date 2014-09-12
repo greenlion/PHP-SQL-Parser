@@ -1,6 +1,6 @@
 <?php
 /**
- * left.php
+ * leftTest.php
  *
  * Test case for PHPSQLParser.
  *
@@ -42,9 +42,9 @@ namespace PHPSQLParser\Test\Parser;
 use PHPSQLParser\PHPSQLParser;
 use PHPSQLParser\PHPSQLCreator;
 
-class leftTest extends \PHPUnit_Framework_TestCase {
+class LeftTest extends \PHPUnit_Framework_TestCase {
 	
-    public function testLeft() {
+    public function testLeft1() {
         $parser = new PHPSQLParser();
 
         $sql = 'SELECT a.field1, b.field1, c.field1
@@ -56,8 +56,9 @@ class leftTest extends \PHPUnit_Framework_TestCase {
         $p = $parser->parsed;
         $expected = getExpectedValue(dirname(__FILE__), 'left1.serialized');
         $this->assertEquals($expected, $p, 'left join with alias');
-
-
+    }
+    
+    public function testLeft2() {
         $sql = 'SELECT a.field1, b.field1, c.field1
           FROM tablea a 
           LEFT OUTER JOIN tableb b ON b.ida = a.id
@@ -66,12 +67,11 @@ class leftTest extends \PHPUnit_Framework_TestCase {
           right outer join e on e.id = a.e_id
           left join e e2 using (e_id)
           join e e3 on (e3.e_id = e2.e_id)';
-
+        $parser = new PHPSQLParser();
         $parser->parse($sql);
         $p = $parser->parsed;
         $expected = getExpectedValue(dirname(__FILE__), 'left2.serialized');
         $this->assertEquals($expected, $p, 'right and left outer joins');
-
     }
 }
-
+?>

@@ -1,6 +1,6 @@
 <?php
 /**
- * allcolumns.php
+ * allcolumnsTest.php
  *
  * Test case for PHPSQLParser.
  *
@@ -41,40 +41,51 @@
 namespace PHPSQLParser\Test\Parser;
 use PHPSQLParser\PHPSQLParser;
 
-class allcolumnsTest extends \PHPUnit_Framework_TestCase {
+class AllColumnsTest extends \PHPUnit_Framework_TestCase {
 	
-    public function testAllcolumns() {
-        $parser = new PHPSQLParser();
-
+	protected $parser;
+	
+	/**
+	 * @before
+	 * Executed before each test
+	 */
+	protected function setup() {
+		$this->parser = new PHPSQLParser();
+	}
+	
+    public function testAllColumns1() {
         $sql="SELECT * FROM FAILED_LOGIN_ATTEMPTS WHERE ip='192.168.50.5'";
-        $p = $parser->parse($sql);
+        $p = $this->parser->parse($sql);
         $expected = getExpectedValue(dirname(__FILE__), 'allcolumns1.serialized');
         $this->assertEquals($expected, $p, 'single all column alias');
-
-
+    }
+    
+    public function testAllColumns2() {
         $sql="SELECT a * b FROM tests";
-        $p = $parser->parse($sql);
+        $p = $this->parser->parse($sql);
         $expected = getExpectedValue(dirname(__FILE__), 'allcolumns2.serialized');
         $this->assertEquals($expected, $p, 'multiply two columns');
+    }
 
-
+    public function testAllColumns3() {
         $sql="SELECT count(*) FROM tests";
-        $p = $parser->parse($sql);
+        $p = $this->parser->parse($sql);
         $expected = getExpectedValue(dirname(__FILE__), 'allcolumns3.serialized');
         $this->assertEquals($expected, $p, 'special function count(*)');
+    }
 
-
+    public function testAllColumns4() {
         $sql="SELECT a.* FROM FAILED_LOGIN_ATTEMPTS a";
-        $p = $parser->parse($sql);
+        $p = $this->parser->parse($sql);
         $expected = getExpectedValue(dirname(__FILE__), 'allcolumns4.serialized');
         $this->assertEquals($expected, $p, 'single all column alias with table alias');
+    }
 
-
+    public function testAllColumns5() {
         $sql="SELECT a, * FROM tests";
-        $p = $parser->parse($sql);
+        $p = $this->parser->parse($sql);
         $expected = getExpectedValue(dirname(__FILE__), 'allcolumns5.serialized');
         $this->assertEquals($expected, $p, 'column reference and a single all column alias');
-
     }
 }
-
+?>

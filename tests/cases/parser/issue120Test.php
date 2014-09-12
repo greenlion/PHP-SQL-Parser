@@ -1,6 +1,6 @@
 <?php
 /**
- * issue120.php
+ * issue120Test.php
  *
  * Test case for PHPSQLParser.
  *
@@ -42,11 +42,9 @@ namespace PHPSQLParser\Test\Parser;
 use PHPSQLParser\PHPSQLParser;
 use PHPSQLParser\PHPSQLCreator;
 
-class issue120Test extends \PHPUnit_Framework_TestCase {
+class Issue120Test extends \PHPUnit_Framework_TestCase {
 	
     public function testIssue120() {
-
-
         $sql = "(
         SELECT CNAME
         FROM COCKTAIL
@@ -55,7 +53,6 @@ class issue120Test extends \PHPUnit_Framework_TestCase {
         $p = $parser->parsed;
         $expected = getExpectedValue(dirname(__FILE__), 'issue120.serialized');
         $this->assertEquals($expected, $p, 'parentheses around select');
-
     }
 }
-
+?>

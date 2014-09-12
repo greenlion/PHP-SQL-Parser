@@ -1,6 +1,6 @@
 <?php
 /**
- * issue117.php
+ * issue117Test.php
  *
  * Test case for PHPSQLParser.
  *
@@ -41,19 +41,22 @@
 namespace PHPSQLParser\Test\Parser;
 use PHPSQLParser\PHPSQLParser;
 use PHPSQLParser\PHPSQLCreator;
+use Analog\Analog;
 
-class issue117Test extends \PHPUnit_Framework_TestCase {
+class Issue117Test extends \PHPUnit_Framework_TestCase {
 	
     public function testIssue117() {
-
 
         // TODO: not solved, ORDER BY has been lost
         $sql = "(((SELECT x FROM table)) ORDER BY x)";
         $parser = new PHPSQLParser($sql, true);
         $p = $parser->parsed;
+        Analog::log(print_r($p, true));
         $expected = getExpectedValue(dirname(__FILE__), 'issue117.serialized');
         $this->assertEquals($expected, $p, 'parentheses on the first position of statement');
 
     }
 }
+
+?>
 

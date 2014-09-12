@@ -1,6 +1,6 @@
 <?php
 /**
- * issue31.php
+ * issue31Test.php
  *
  * Test case for PHPSQLParser.
  *
@@ -42,10 +42,9 @@ namespace PHPSQLParser\Test\Parser;
 use PHPSQLParser\PHPSQLParser;
 use PHPSQLParser\PHPSQLCreator;
 
-class issue31Test extends \PHPUnit_Framework_TestCase {
+class Issue31Test extends \PHPUnit_Framework_TestCase {
 	
     public function testIssue31() {
-
 
         $parser = new PHPSQLParser();
         $sql = "SELECT	sp.level,
@@ -80,7 +79,6 @@ class issue31Test extends \PHPUnit_Framework_TestCase {
         $p = $parser->parsed;
         $expected = getExpectedValue(dirname(__FILE__), 'issue31.serialized');
         $this->assertEquals($expected, $p, 'very complex statement with keyword view as alias');
-
     }
 }
-
+?>

@@ -1,6 +1,6 @@
 <?php
 /**
- * aliases.php
+ * aliasesTest.php
  *
  * Test case for PHPSQLParser.
  *
@@ -41,31 +41,44 @@
 namespace PHPSQLParser\Test\Parser;
 use PHPSQLParser\PHPSQLParser;
 
-class aliasesTest extends \PHPUnit_Framework_TestCase {
+class AliasesTest extends \PHPUnit_Framework_TestCase {
 	
-    public function testAliases() {
-        $parser = new PHPSQLParser();
+	protected $parser;
+	
+	/**
+	 * @before
+	 * Executed before each test
+	 */
+	protected function setup() {
+		$this->parser = new PHPSQLParser();
+	}
 
+    public function testAlias1() {
         $sql = 'SELECT colA * colB From test t';
-        $p = $parser->parse($sql);
+        $p = $this->parser->parse($sql);
         $expected = getExpectedValue(dirname(__FILE__), 'alias1.serialized');
         $this->assertEquals($expected, $p, 'multiply columns with table alias');
-
+    }
+    
+    public function testAlias2() {
         $sql = 'select colA colA from test';
-        $p = $parser->parse($sql);
+        $p = $this->parser->parse($sql);
         $expected = getExpectedValue(dirname(__FILE__), 'alias2.serialized');
         $this->assertEquals($expected, $p, 'alias named like the column');
-
+    }
+    
+    public function testAlias3() {
         $sql = 'SELECT (select colA AS a from test t) colA From example as b';
-        $p = $parser->parse($sql);
+        $p = $this->parser->parse($sql);
         $expected = getExpectedValue(dirname(__FILE__), 'alias3.serialized');
         $this->assertEquals($expected, $p, 'sub-query within selection with alias');
-
+    }
+    
+    public function testAlias4() {
         $sql = 'SELECT (select colA AS a from testA) + (select colB b from testB) From tableC x';
-        $p = $parser->parse($sql, true);
+        $p = $this->parser->parse($sql, true);
         $expected = getExpectedValue(dirname(__FILE__), 'alias4.serialized');
         $this->assertEquals($expected, $p, 'add two sub-query results');
-
     }
 }
-
+?>

@@ -1,6 +1,6 @@
 <?php
 /**
- * issue44.php
+ * issue44Test.php
  *
  * Test case for PHPSQLParser.
  *
@@ -40,13 +40,11 @@
  */
 namespace PHPSQLParser\Test\Parser;
 use PHPSQLParser\PHPSQLParser;
-use PHPSQLParser\PHPSQLCreator;
+use Analog\Analog;
 
-class issue44Test extends \PHPUnit_Framework_TestCase {
+class Issue44Test extends \PHPUnit_Framework_TestCase {
 	
     public function testIssue44() {
-
-
         $parser = new PHPSQLParser();
 
         $sql = "SELECT m.id, m.title, m.module, m.position, m.content, m.showtitle, m.params, mm.menuid
@@ -57,9 +55,9 @@ class issue44Test extends \PHPUnit_Framework_TestCase {
         ORDER BY m.position, m.ordering";
         $parser->parse($sql, true);
         $p = $parser->parsed;
+        Analog::log(serialize($p));
         $expected = getExpectedValue(dirname(__FILE__), 'issue44.serialized');
         $this->assertEquals($expected, $p, 'issue 44 position problem');
-
     }
 }
-
+?>

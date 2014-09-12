@@ -1,6 +1,6 @@
 <?php
 /**
- * nested.php
+ * nestedTest.php
  *
  * Test case for PHPSQLParser.
  *
@@ -42,9 +42,9 @@ namespace PHPSQLParser\Test\Parser;
 use PHPSQLParser\PHPSQLParser;
 use PHPSQLParser\PHPSQLCreator;
 
-class nestedTest extends \PHPUnit_Framework_TestCase {
+class NestedTest extends \PHPUnit_Framework_TestCase {
 	
-    public function testNested() {
+    public function testNested1() {
         $parser = new PHPSQLParser();
 
         $sql = 'SELECT *
@@ -55,8 +55,10 @@ class nestedTest extends \PHPUnit_Framework_TestCase {
         $p = $parser->parsed;
         $expected = getExpectedValue(dirname(__FILE__), 'nested1.serialized');
         $this->assertEquals($expected, $p, 'nested left joins');
-
-
+    }
+    
+    public function testNested2() {
+    	$parser = new PHPSQLParser();
         $sql = "SELECT * FROM t1 LEFT JOIN (t2, t3, t4)
                          ON (t2.a=t1.a AND t3.b=t1.b AND t4.c=t1.c)";
         $parser->parse($sql);
@@ -66,4 +68,4 @@ class nestedTest extends \PHPUnit_Framework_TestCase {
 
     }
 }
-
+?>
