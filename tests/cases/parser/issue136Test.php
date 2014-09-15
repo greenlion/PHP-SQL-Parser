@@ -44,14 +44,27 @@ use PHPSQLParser\utils\ExpressionType;
 
 class Issue136Test extends \PHPUnit_Framework_TestCase {
 	
-    public function testIssue136() {
+    public function testIssue136a() {
         $sql = "WITH myTableName AS (
                 select firstname, lastname from employee where lastname = 'test'
                 )
                 SELECT firstname FROM myTableName";
-        $parser = new PHPSQLParser($sql);
+        $parser = new PHPSQLParser($sql, true);
         $p = $parser->parsed;
-        $expected = getExpectedValue(dirname(__FILE__), 'issue136.serialized');
+        $expected = getExpectedValue(dirname(__FILE__), 'issue136a.serialized');
+        $this->assertEquals($expected, $p, 'ORACLE\'s WITH statement');
+    }
+
+    public function testIssue136b() {
+        $sql = "WITH myTableName AS (
+                select firstname, lastname from employee where lastname = 'test'
+                ), another_table AS (
+        		select x,y FROM z
+        		)
+                SELECT firstname FROM myTableName, another_table";
+        $parser = new PHPSQLParser($sql, true);
+        $p = $parser->parsed;
+        $expected = getExpectedValue(dirname(__FILE__), 'issue136b.serialized');
         $this->assertEquals($expected, $p, 'ORACLE\'s WITH statement');
     }
 }
