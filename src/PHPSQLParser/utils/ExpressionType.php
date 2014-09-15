@@ -148,5 +148,6 @@ class ExpressionType {
     const SUBPARTITION_KEY_ALGORITHM = 'sub-partition-key-algorithm';
     
     const QUERY = 'query';
+    const SUBQUERY_FACTORING = 'subquery-factoring';
 }
 ?>
