@@ -472,6 +472,9 @@ class SQLProcessor extends SQLChunkProcessor {
                     $out['OPTIONS'][] = 'WITH ROLLUP'; // TODO: this could be generate problems within the position calculator
                     continue 2;
                 }
+                if ($token_category === '') {
+                	$token_category = $upper;
+                }
                 break;
 
             case 'AS':
