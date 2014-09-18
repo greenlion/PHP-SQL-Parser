@@ -61,7 +61,7 @@ class AliasBuilder implements Builder {
         }
         $sql = "";
         if ($parsed['alias']['as']) {
-            $sql .= " as";
+            $sql .= " AS";
         }
         $sql .= " " . $parsed['alias']['name'];
         return $sql;

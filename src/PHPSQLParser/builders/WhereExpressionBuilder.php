@@ -92,6 +92,11 @@ class WhereExpressionBuilder implements Builder {
         return $builder->build($parsed);
     }
     
+    protected function buildSubQuery($parsed) {
+        $builder = new SubQueryBuilder();
+        return $builder->build($parsed);
+    }
+    
     public function build(array $parsed) {
         if ($parsed['expr_type'] !== ExpressionType::EXPRESSION) {
             return "";
@@ -107,6 +112,7 @@ class WhereExpressionBuilder implements Builder {
             $sql .= $this->buildWhereExpression($v);
             $sql .= $this->buildWhereBracketExpression($v);
             $sql .= $this->buildUserVariable($v);
+            $sql .= $this->buildSubQuery($v);
 
             if ($len == strlen($sql)) {
                 throw new UnableToCreateSQLException('WHERE expression subtree', $k, $v, 'expr_type');

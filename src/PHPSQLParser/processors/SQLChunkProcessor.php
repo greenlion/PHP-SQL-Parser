@@ -176,6 +176,10 @@ class SQLChunkProcessor extends AbstractProcessor {
             $processor = new OptionsProcessor();
             $out['OPTIONS'] = $processor->process($out['OPTIONS']);
         }
+        if (!empty($out['WITH'])) {
+        	$processor = new WithProcessor();
+        	$out['WITH'] = $processor->process($out['WITH']);
+        }
         return $out;
     }
 }

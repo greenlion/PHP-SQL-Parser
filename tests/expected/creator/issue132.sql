@@ -1,1 +1,1 @@
-SELECT (c1 - c2) as c3 FROM t1
+SELECT (c1 - c2) AS c3 FROM t1

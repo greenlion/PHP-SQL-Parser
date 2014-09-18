@@ -53,7 +53,12 @@ use PHPSQLParser\exceptions\UnableToCreateSQLException;
  */
 class HavingBuilder extends WhereBuilder {
 
-    protected function buildHavingExpression($parsed) {
+    protected function buildAliasReference($parsed) {
+        $builder = new AliasReferenceBuilder();
+        return $builder->build($parsed);
+    }
+	
+	protected function buildHavingExpression($parsed) {
         $builder = new HavingExpressionBuilder();
         return $builder->build($parsed);
     }
@@ -68,6 +73,7 @@ class HavingBuilder extends WhereBuilder {
         foreach ($parsed as $k => $v) {
             $len = strlen($sql);
 
+            $sql .= $this->buildAliasReference($v);
             $sql .= $this->buildOperator($v);
             $sql .= $this->buildConstant($v);
             $sql .= $this->buildColRef($v);

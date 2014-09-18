@@ -59,6 +59,11 @@ class FromProcessor extends AbstractProcessor {
         return $processor->process($unparsed);
     }
     
+    protected function processColumnList($unparsed) {
+        $processor = new ColumnListProcessor();
+        return $processor->process($unparsed);
+    }
+    
     protected function processSQLDefault($unparsed) {
         $processor = new DefaultProcessor();
         return $processor->process($unparsed);
@@ -93,7 +98,13 @@ class FromProcessor extends AbstractProcessor {
                     $unparsed[$k] = "";
                 }
             }
-            $ref = $this->processExpressionList($unparsed);
+            if ($parseInfo['ref_type'] === 'USING') {
+            	// unparsed has only one entry, the column list
+            	$ref = $this->processColumnList($this->removeParenthesisFromStart($unparsed[0]));
+            	$ref = array(array('expr_type' => ExpressionType::COLUMN_LIST, 'base_expr' => $unparsed[0], 'sub_tree' => $ref));
+            } else {
+            	$ref = $this->processExpressionList($unparsed);
+            }
             $parseInfo['ref_expr'] = (empty($ref) ? false : $ref);
         }
 
@@ -148,7 +159,6 @@ class FromProcessor extends AbstractProcessor {
             }
 
             switch ($upper) {
-            case 'NATURAL':
             case 'CROSS':
             case ',':
             case 'INNER':
@@ -157,7 +167,7 @@ class FromProcessor extends AbstractProcessor {
 
             case 'OUTER':
             case 'JOIN':
-                if ($token_category === 'LEFT' || $token_category === 'RIGHT') {
+                if ($token_category === 'LEFT' || $token_category === 'RIGHT' || $token_category === 'NATURAL') {
                     $token_category = '';
                     $parseInfo['next_join_type'] = strtoupper(trim($prevToken)); // it seems to be a join
                 }
@@ -165,6 +175,7 @@ class FromProcessor extends AbstractProcessor {
 
             case 'LEFT':
             case 'RIGHT':
+            case 'NATURAL':            	
                 $token_category = $upper;
                 $prevToken = $token;
                 $i++;
@@ -202,7 +213,7 @@ class FromProcessor extends AbstractProcessor {
                 $parseInfo['token_count']++;
                 $n = 1;
                 $str = "";
-                while ($str === "") {
+                while ($str === "" && isset($tokens[$i + $n])) {
                     $parseInfo['alias']['base_expr'] .= ($tokens[$i + $n] === "" ? " " : $tokens[$i + $n]);
                     $str = trim($tokens[$i + $n]);
                     ++$n;
@@ -240,6 +251,7 @@ class FromProcessor extends AbstractProcessor {
             case 'CROSS':
             case 'INNER':
             case 'OUTER':
+            case 'NATURAL':
                 $parseInfo['token_count']++;
                 continue;
 

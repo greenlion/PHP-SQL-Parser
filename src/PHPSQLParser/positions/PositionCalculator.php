@@ -89,7 +89,9 @@ class PositionCalculator {
                                                 ExpressionType::SUBPARTITION_MIN_ROWS, ExpressionType::SUBPARTITION,
                                                 ExpressionType::SUBPARTITION_HASH, ExpressionType::SUBPARTITION_COUNT,
                                                 ExpressionType::CHARSET, ExpressionType::ENGINE, ExpressionType::QUERY,
-                                                ExpressionType::INDEX_ALGORITHM, ExpressionType::INDEX_LOCK);
+                                                ExpressionType::INDEX_ALGORITHM, ExpressionType::INDEX_LOCK,
+    											ExpressionType::SUBQUERY_FACTORING
+    );
 
     /**
      * Constructor.
