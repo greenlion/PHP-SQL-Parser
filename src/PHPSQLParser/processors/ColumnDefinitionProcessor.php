@@ -148,6 +148,7 @@ class ColumnDefinitionProcessor extends AbstractProcessor {
 
             case 'BIT':
             case 'TINYBIT':
+            case 'TINYINT':
             case 'SMALLINT':
             case 'MEDIUMINT':
             case 'INT':
