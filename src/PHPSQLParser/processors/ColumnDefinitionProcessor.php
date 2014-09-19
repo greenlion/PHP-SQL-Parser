@@ -251,6 +251,7 @@ class ColumnDefinitionProcessor extends AbstractProcessor {
                 break;
 
             case 'SET':
+            case 'CHARSET':
                 if ($currCategory === 'CHARSET') {
                     // TODO: is it necessary to set special properties like the name or collation?
                     $parsed = array('expr_type' => ExpressionType::RESERVED, 'base_expr' => $trim);
