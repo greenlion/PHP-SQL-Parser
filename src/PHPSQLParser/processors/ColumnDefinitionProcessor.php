@@ -196,11 +196,16 @@ class ColumnDefinitionProcessor extends AbstractProcessor {
                 $prevCategory = $upper;
                 continue 2;
 
+            case 'YEAR':
+                $expr[] = array('expr_type' => ExpressionType::DATA_TYPE, 'base_expr' => $trim, 'length' => false);
+                $currCategory = 'SINGLE_PARAM_PARENTHESIS';
+                $prevCategory = $upper;
+                continue 2;
+
             case 'DATE':
             case 'TIME':
             case 'TIMESTAMP':
             case 'DATETIME':
-            case 'YEAR':
             case 'TINYBLOB':
             case 'BLOB':
             case 'MEDIUMBLOB':
