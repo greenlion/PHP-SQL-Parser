@@ -32,7 +32,7 @@
 		}
 	},
 	"autoload-dev" : {
-		"psr-0" : {
+		"psr-4" : {
 			"PHPSQLParser\\Test\\" : "tests/cases/"
 		}
 	},
