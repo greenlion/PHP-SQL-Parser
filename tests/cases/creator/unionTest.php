@@ -43,7 +43,7 @@ use PHPSQLParser\PHPSQLCreator;
 use Analog\Analog;
 
 class UnionTest extends \PHPUnit_Framework_TestCase {
-	
+
     public function testUnion1() {
         $parser = new PHPSQLParser();
 
@@ -59,8 +59,8 @@ class UnionTest extends \PHPUnit_Framework_TestCase {
     
     public function testUnion2() {
         // TODO: the order-by clause has not been parsed
-    	$parser = new PHPSQLParser();
-    	$sql = '(SELECT colA From test a)
+        $parser = new PHPSQLParser();
+        $sql = '(SELECT colA From test a)
                 union all
                 (SELECT colB from test b) order by 1';
         $parser = new PHPSQLParser($sql);
