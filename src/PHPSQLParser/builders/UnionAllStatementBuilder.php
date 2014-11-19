@@ -39,7 +39,6 @@ class UnionAllStatementBuilder implements Builder {
 				}
 			}
 		}
-		var_dump($sql);
 		return $sql;
 	}
 }
