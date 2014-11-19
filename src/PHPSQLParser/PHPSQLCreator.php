@@ -77,9 +77,9 @@ class PHPSQLCreator {
 			$this->created = $builder->build($parsed);
 			break;
         case 'UNION ALL':
-			$builder = new UnionAllStatementBuilder();
-			$this->created = $builder->build($parsed);
-			break;
+            $builder = new UnionAllStatementBuilder();
+            $this->created = $builder->build($parsed);
+            break;
         case 'SELECT':
             $builder = new SelectStatementBuilder();
             $this->created = $builder->build($parsed);
