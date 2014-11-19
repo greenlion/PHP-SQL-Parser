@@ -14,8 +14,7 @@ class UnionStatementBuilder implements Builder {
 	public function build(array $parsed)
 	{
 		$sql = '';
-		$select_builder = new SelectBuilder();
-		$from_builder = new FromBuilder();
+		$select_builder = new SelectStatementBuilder();
 		$first = true;
 		foreach ($parsed['UNION'] as $clause) {
 			if (!$first) {
@@ -25,17 +24,7 @@ class UnionStatementBuilder implements Builder {
 				$first = false;
 			}
 
-			foreach ($clause as $k => $v) {
-				if ($k === 'SELECT') {
-					$sql .= $select_builder->build($v) . " ";
-				}
-				elseif ($k === 'FROM') {
-					$sql .= $from_builder->build($v) . " ";
-				}
-				else {
-					throw new \Exception("Unexpected key found: $k");
-				}
-			}
+			$sql .= $select_builder->build($clause);
 		}
 		return $sql;
 	}

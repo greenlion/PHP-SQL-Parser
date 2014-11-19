@@ -1,1 +1,1 @@
-SELECT colA FROM test a  UNION ALL SELECT colB FROM test b 
+SELECT colA FROM test a UNION ALL SELECT colB FROM test b
