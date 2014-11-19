@@ -53,7 +53,7 @@ class UnionTest extends \PHPUnit_Framework_TestCase {
         as b';
         $parser = new PHPSQLParser($sql);
 	$creator = new PHPSQLCreator($parser->parsed);
-        $expected = getExpectedValue(dirname(__FILE__), 'union1.sql');
+        $expected = getExpectedValue(dirname(__FILE__), 'union1.sql', false);
         $this->assertEquals($expected, $creator->created, 'simple union');
     }
     
@@ -65,7 +65,7 @@ class UnionTest extends \PHPUnit_Framework_TestCase {
                 (SELECT colB from test b) order by 1';
         $parser = new PHPSQLParser($sql);
 	$creator = new PHPSQLCreator($parser->parsed);
-        $expected = getExpectedValue(dirname(__FILE__), 'union2.sql');
+        $expected = getExpectedValue(dirname(__FILE__), 'union2.sql', false);
         $this->assertEquals($expected, $creator->created, 'mysql union with order-by');
     }
 }
