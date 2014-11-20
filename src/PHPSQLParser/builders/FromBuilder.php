@@ -69,14 +69,39 @@ class FromBuilder implements Builder {
 
     public function build(array $parsed) {
         $sql = "";
-        foreach ($parsed as $k => $v) {
-            $len = strlen($sql);
-            $sql .= $this->buildTable($v, $k);
-            $sql .= $this->buildTableExpression($v, $k);
-            $sql .= $this->buildSubquery($v, $k);
+        if (array_key_exists("UNION ALL", $parsed) || array_key_exists("UNION", $parsed)) {
+            foreach ($parsed as $union_type => $outer_v) {
+                $first = true;
 
-            if ($len == strlen($sql)) {
-                throw new UnableToCreateSQLException('FROM', $k, $v, 'expr_type');
+                foreach ($outer_v as $item) {
+                    if (!$first) {
+                        $sql .= " $union_type ";
+                    }
+                    else {
+                        $first = false;
+                    }
+
+                    $select_builder = new SelectStatementBuilder();
+
+                    $len = strlen($sql);
+                    $sql .= $select_builder->build($item);
+
+                    if ($len === strlen($sql)) {
+                        throw new UnableToCreateSQLException('FROM', $union_type, $outer_v, 'expr_type');
+                    }
+                }
+            }
+        }
+        else {
+            foreach ($parsed as $k => $v) {
+                $len = strlen($sql);
+                $sql .= $this->buildTable($v, $k);
+                $sql .= $this->buildTableExpression($v, $k);
+                $sql .= $this->buildSubquery($v, $k);
+
+                if ($len == strlen($sql)) {
+                    throw new UnableToCreateSQLException('FROM', $k, $v, 'expr_type');
+                }
             }
         }
         return "FROM " . $sql;
