@@ -85,6 +85,16 @@ class SelectStatementBuilder implements Builder {
         $builder = new LimitBuilder();
         return $builder->build($parsed);
     }
+    
+    protected function buildUNION($parsed) {
+    	$builder = new UnionStatementBuilder();
+    	return $builder->build($parsed);
+    }
+    
+    protected function buildUNIONALL($parsed) {
+    	$builder = new UnionAllStatementBuilder();
+    	return $builder->build($parsed);
+    }
 
     public function build(array $parsed) {
         $sql = "";
@@ -108,6 +118,12 @@ class SelectStatementBuilder implements Builder {
         }
         if (isset($parsed['LIMIT'])) {
             $sql .= " " . $this->buildLIMIT($parsed['LIMIT']);
+        }       
+        if (isset($parsed['UNION'])) {
+            $sql .= " " . $this->buildUNION($parsed);
+        }
+        if (isset($parsed['UNION ALL'])) {
+        	$sql .= " " . $this->buildUNIONALL($parsed);
         }
         return $sql;
     }
