@@ -56,8 +56,6 @@ class IssueGit185TestTest extends \PHPSQLParser\Test\AbstractTestCase {
 		$p = $this->parser->parse($query, true);
 		$created = $this->creator->create($p);
 	
-		$this->log($created);
-		
 		$expected = getExpectedValue ( dirname ( __FILE__ ), 'issue_git185.sql', false );
 		$this->assertEquals ( $expected, $created, 'haha' );
 	}
