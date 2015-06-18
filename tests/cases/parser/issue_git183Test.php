@@ -1,9 +1,9 @@
 <?php
 
 /**
- * issue_git11Test.php
+ * issue_git183Test.php
  *
- * Test case for PHPSQLParser from issue #11 of GitHub.
+ * Test case for PHPSQLParser from issue #183 of GitHub.
  *
  * PHP version 5
  *
@@ -34,7 +34,7 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * 
  * @author    André Rothe <andre.rothe@phosco.info>
- * @copyright 2010-2014 Justin Swanhart and André Rothe
+ * @copyright 2010-2015 Justin Swanhart and André Rothe
  * @license   http://www.debian.org/misc/bsd.license  BSD License (3 Clause)
  * @version   SVN: $Id$
  * 
@@ -53,7 +53,7 @@ ON to_number( CD.STYLE ) = to_number( IL.SKU_NUM )
 				";
 		$parser = new PHPSQLParser ();
 		$parser->addCustomFunction("to_number");
-		$p = $parser->parse ( $query );
+		$p = $parser->parse ( $query, true );
 		$expected = getExpectedValue ( dirname ( __FILE__ ), 'issue_git183.serialized' );
 		$this->assertEquals ( $expected, $p, "Oracle\'s to_number");
 	}

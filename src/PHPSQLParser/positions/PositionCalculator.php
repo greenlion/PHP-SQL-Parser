@@ -34,7 +34,7 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * 
  * @author    André Rothe <andre.rothe@phosco.info>
- * @copyright 2010-2014 Justin Swanhart and André Rothe
+ * @copyright 2010-2015 Justin Swanhart and André Rothe
  * @license   http://www.debian.org/misc/bsd.license  BSD License (3 Clause)
  * @version   SVN: $Id$
  * 
@@ -90,7 +90,7 @@ class PositionCalculator {
                                                 ExpressionType::SUBPARTITION_HASH, ExpressionType::SUBPARTITION_COUNT,
                                                 ExpressionType::CHARSET, ExpressionType::ENGINE, ExpressionType::QUERY,
                                                 ExpressionType::INDEX_ALGORITHM, ExpressionType::INDEX_LOCK,
-    											ExpressionType::SUBQUERY_FACTORING
+    											ExpressionType::SUBQUERY_FACTORING, ExpressionType::CUSTOM_FUNCTION
     );
 
     /**
@@ -103,7 +103,7 @@ class PositionCalculator {
     }
 
     protected function printPos($text, $sql, $charPos, $key, $parsed, $backtracking) {
-        if (!isset($_ENV['DEBUG'])) {
+        if (!isset($_SERVER['DEBUG'])) {
             return;
         }
 
