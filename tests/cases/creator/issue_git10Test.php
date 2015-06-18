@@ -44,7 +44,7 @@ namespace PHPSQLParser\Test\Creator;
 use PHPSQLParser\PHPSQLParser;
 use PHPSQLParser\PHPSQLCreator;
 
-class Issue_Git10Test extends \PHPUnit_Framework_TestCase {
+class Issue_Git10Test extends \PHPSQLParser\Test\AbstractTestCase {
 	
 	public function testIssueGit10() {
 		$query = "SELECT
@@ -55,10 +55,8 @@ file f
 HAVING
 change_id > :change_id";
 		
-		$parser = new PHPSQLParser ();
-		$p = $parser->parse ( $query );
-		$creator = new PHPSQLCreator ();
-		$created = $creator->create ( $p );
+		$p = $this->parser->parse ( $query );
+		$created = $this->creator->create ( $p );
 		$expected = getExpectedValue ( dirname ( __FILE__ ), 'issue_git10.sql', false );
 		$this->assertSame ( $expected, $created, 'alias references should work in HAVING clauses' );
 	}
