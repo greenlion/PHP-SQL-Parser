@@ -1,14 +1,14 @@
 <?php
 
 /**
- * issue_git183Test.php
+ * issue_git181Test.php
  *
- * Test case for PHPSQLParser from issue #183 of GitHub.
+ * Test case for PHPSQLParser from issue #181 of GitHub.
  *
  * PHP version 5
  *
  * LICENSE:
- * Copyright (c) 2010-2014 Justin Swanhart and André Rothe
+ * Copyright (c) 2010-2015 Justin Swanhart and André Rothe
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -39,23 +39,23 @@
  * @version   SVN: $Id$
  * 
  */
-namespace PHPSQLParser\Test\Parser;
+namespace PHPSQLParser\Test\Creator;
 
 use PHPSQLParser\PHPSQLParser;
+use PHPSQLParser\PHPSQLCreator;
 
-class IssueGit183TestTest extends \PHPSQLParser\Test\AbstractTestCase {
+class IssueGit181TestTest extends \PHPSQLParser\Test\AbstractTestCase {
 	
-	public function testIssueGit183() {
-		$query = "SELECT *
-FROM SC_CATALOG_DETAIL_REG CD
-INNER JOIN MASTER_ITEM_LOOKUP IL
-ON to_number( CD.STYLE ) = to_number( IL.SKU_NUM )
-				";
-		$parser = new PHPSQLParser ();
-		$parser->addCustomFunction("to_number");
-		$p = $parser->parse ( $query, true );
-		$expected = getExpectedValue ( dirname ( __FILE__ ), 'issue_git183.serialized' );
-		$this->assertEquals ( $expected, $p, "Oracle\'s to_number");
+	public function testIssueGit181() {
+		$query = "
+		SELECT NOW() AS today
+		";
+
+		$p = $this->parser->parse($query, true);
+		$created = $this->creator->create($p);
+		
+		$expected = getExpectedValue ( dirname ( __FILE__ ), 'issue_git181.sql', false );
+		$this->assertEquals ( $expected, $created, 'no alias after functions without parameters' );
 	}
 }
 ?>
