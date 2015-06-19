@@ -1,8 +1,8 @@
 <?php
 /**
- * InsertStatement.php
+ * TruncateStatementBuilder.php
  *
- * Builds the INSERT statement
+ * Builds the TRUNCATE statement
  *
  * PHP version 5
  *
@@ -42,48 +42,31 @@
 namespace PHPSQLParser\builders;
 
 /**
- * This class implements the builder for the whole Insert statement. You can overwrite
+ * This class implements the builder for the whole Truncate statement. You can overwrite
  * all functions to achieve another handling.
  *
  * @author  André Rothe <andre.rothe@phosco.info>
  * @license http://www.debian.org/misc/bsd.license  BSD License (3 Clause)
  *  
  */
-class InsertStatementBuilder implements Builder {
+class TruncateStatementBuilder implements Builder {
 
-    protected function buildVALUES($parsed) {
-        $builder = new ValuesBuilder();
+    protected function buildTRUNCATE($parsed) {
+        $builder = new TruncateBuilder();
         return $builder->build($parsed);
     }
 
-    protected function buildINSERT($parsed) {
-        $builder = new InsertBuilder();
-        return $builder->build($parsed);
-    }
-
-    protected function buildSELECT($parsed) {
-        $builder = new SelectStatementBuilder();
-        return $builder->build($parsed);
-    }
-    
-    protected function buildSET($parsed) {
-        $builder = new SetBuilder();
+    protected function buildFROM($parsed) {
+        $builder = new FromBuilder();
         return $builder->build($parsed);
     }
     
     public function build(array $parsed) {
-        // TODO: are there more than one tables possible (like [INSERT][1])
-        $sql = $this->buildINSERT($parsed['INSERT']);
-        if (isset($parsed['VALUES'])) {
-            $sql .= ' ' . $this->buildVALUES($parsed['VALUES']);
-        }
-        if (isset($parsed['SET'])) {
-            $sql .= ' ' . $this->buildSET($parsed['SET']);
-        }
-        if (isset($parsed['SELECT'])) {
-            $sql .= ' ' . $this->buildSELECT($parsed);
-        }
+        $sql = $this->buildTRUNCATE($parsed);
+        // $sql .= " " . $this->buildTRUNCATE($parsed) // Uncomment when parser fills in expr_type=table
+        
         return $sql;
     }
+
 }
 ?>

@@ -43,11 +43,13 @@ namespace PHPSQLParser;
 use PHPSQLParser\exceptions\UnsupportedFeatureException;
 use PHPSQLParser\builders\SelectStatementBuilder;
 use PHPSQLParser\builders\DeleteStatementBuilder;
+use PHPSQLParser\builders\TruncateStatementBuilder;
 use PHPSQLParser\builders\UpdateStatementBuilder;
 use PHPSQLParser\builders\InsertStatementBuilder;
 use PHPSQLParser\builders\CreateStatementBuilder;
 use PHPSQLParser\builders\DropStatementBuilder;
 use PHPSQLParser\builders\RenameStatementBuilder;
+use PHPSQLParser\builders\ReplaceStatementBuilder;
 use PHPSQLParser\builders\ShowStatementBuilder;
 use PHPSQLParser\builders\BracketStatementBuilder;
 use PHPSQLParser\builders\UnionStatementBuilder;
@@ -88,8 +90,16 @@ class PHPSQLCreator {
             $builder = new InsertStatementBuilder();
             $this->created = $builder->build($parsed);
             break;
+        case 'REPLACE':
+            $builder = new ReplaceStatementBuilder();
+            $this->created = $builder->build($parsed);
+            break;
         case 'DELETE':
             $builder = new DeleteStatementBuilder();
+            $this->created = $builder->build($parsed);
+            break;
+        case 'TRUNCATE':
+            $builder = new TruncateStatementBuilder();
             $this->created = $builder->build($parsed);
             break;
         case 'UPDATE':

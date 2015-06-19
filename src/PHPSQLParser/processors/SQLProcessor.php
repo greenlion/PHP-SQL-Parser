@@ -309,6 +309,10 @@ class SQLProcessor extends SQLChunkProcessor {
                     $out[$prev_category][] = $trim;
                     $token_category = $upper;
                 }
+                if ($prev_category === 'TRUNCATE') {
+                    $out[$prev_category][] = $trim;
+                    $token_category = $upper;
+                }
                 break;
 
             case 'TEMPORARY':

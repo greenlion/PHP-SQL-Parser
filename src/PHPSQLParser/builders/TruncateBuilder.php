@@ -1,8 +1,8 @@
 <?php
 /**
- * InsertStatement.php
+ * TruncateBuilder.php
  *
- * Builds the INSERT statement
+ * Builds the TRUNCATE statement
  *
  * PHP version 5
  *
@@ -42,48 +42,30 @@
 namespace PHPSQLParser\builders;
 
 /**
- * This class implements the builder for the whole Insert statement. You can overwrite
+ * This class implements the builder for the [TRUNCATE] part. You can overwrite
  * all functions to achieve another handling.
  *
  * @author  André Rothe <andre.rothe@phosco.info>
  * @license http://www.debian.org/misc/bsd.license  BSD License (3 Clause)
  *  
  */
-class InsertStatementBuilder implements Builder {
+class TruncateBuilder implements Builder {
 
-    protected function buildVALUES($parsed) {
-        $builder = new ValuesBuilder();
-        return $builder->build($parsed);
-    }
-
-    protected function buildINSERT($parsed) {
-        $builder = new InsertBuilder();
-        return $builder->build($parsed);
-    }
-
-    protected function buildSELECT($parsed) {
-        $builder = new SelectStatementBuilder();
-        return $builder->build($parsed);
-    }
-    
-    protected function buildSET($parsed) {
-        $builder = new SetBuilder();
-        return $builder->build($parsed);
-    }
-    
     public function build(array $parsed) {
-        // TODO: are there more than one tables possible (like [INSERT][1])
-        $sql = $this->buildINSERT($parsed['INSERT']);
-        if (isset($parsed['VALUES'])) {
-            $sql .= ' ' . $this->buildVALUES($parsed['VALUES']);
+        $sql = "TRUNCATE TABLE ";
+        $right = -1;
+
+        // works for one table only
+        $parsed['tables'] = array($parsed['TABLE']['base_expr']);
+
+        if ($parsed['tables'] !== false) {
+            foreach ($parsed['tables'] as $k => $v) {
+                $sql .= $v . ", ";
+                $right = -2;
+            }
         }
-        if (isset($parsed['SET'])) {
-            $sql .= ' ' . $this->buildSET($parsed['SET']);
-        }
-        if (isset($parsed['SELECT'])) {
-            $sql .= ' ' . $this->buildSELECT($parsed);
-        }
-        return $sql;
+
+        return substr($sql, 0, $right);
     }
 }
 ?>

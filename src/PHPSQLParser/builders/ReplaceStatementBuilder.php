@@ -1,8 +1,8 @@
 <?php
 /**
- * InsertStatement.php
+ * ReplaceStatement.php
  *
- * Builds the INSERT statement
+ * Builds the REPLACE statement
  *
  * PHP version 5
  *
@@ -42,22 +42,22 @@
 namespace PHPSQLParser\builders;
 
 /**
- * This class implements the builder for the whole Insert statement. You can overwrite
+ * This class implements the builder for the whole Replace statement. You can overwrite
  * all functions to achieve another handling.
  *
  * @author  André Rothe <andre.rothe@phosco.info>
  * @license http://www.debian.org/misc/bsd.license  BSD License (3 Clause)
  *  
  */
-class InsertStatementBuilder implements Builder {
+class ReplaceStatementBuilder implements Builder {
 
     protected function buildVALUES($parsed) {
         $builder = new ValuesBuilder();
         return $builder->build($parsed);
     }
 
-    protected function buildINSERT($parsed) {
-        $builder = new InsertBuilder();
+    protected function buildREPLACE($parsed) {
+        $builder = new ReplaceBuilder();
         return $builder->build($parsed);
     }
 
@@ -72,8 +72,8 @@ class InsertStatementBuilder implements Builder {
     }
     
     public function build(array $parsed) {
-        // TODO: are there more than one tables possible (like [INSERT][1])
-        $sql = $this->buildINSERT($parsed['INSERT']);
+        // TODO: are there more than one tables possible (like [REPLACE][1])
+        $sql = $this->buildREPLACE($parsed['REPLACE']);
         if (isset($parsed['VALUES'])) {
             $sql .= ' ' . $this->buildVALUES($parsed['VALUES']);
         }

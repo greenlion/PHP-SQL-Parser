@@ -1,8 +1,8 @@
 <?php
 /**
- * FunctionBuilder.php
+ * ReplaceBuilder.php
  *
- * Builds function statements.
+ * Builds the [REPLACE] statement part.
  *
  * PHP version 5
  *
@@ -41,31 +41,25 @@
 
 namespace PHPSQLParser\builders;
 use PHPSQLParser\exceptions\UnableToCreateSQLException;
-use PHPSQLParser\utils\ExpressionType;
 
 /**
- * This class implements the builder for function calls. 
+ * This class implements the builder for the [REPLACE] statement parts. 
  * You can overwrite all functions to achieve another handling.
  *
  * @author  André Rothe <andre.rothe@phosco.info>
  * @license http://www.debian.org/misc/bsd.license  BSD License (3 Clause)
  *  
  */
-class FunctionBuilder implements Builder {
+class ReplaceBuilder implements Builder {
 
-    protected function buildAlias($parsed) {
-        $builder = new AliasBuilder();
-        return $builder->build($parsed);
+    protected function buildTable($parsed) {
+        $builder = new TableBuilder();
+        return $builder->build($parsed, 0);
     }
 
-    protected function buildColRef($parsed) {
-        $builder = new ColumnReferenceBuilder();
-        return $builder->build($parsed);
-    }
-
-    protected function buildConstant($parsed) {
-        $builder = new ConstantBuilder();
-        return $builder->build($parsed);
+    protected function buildSubQuery($parsed) {
+        $builder = new SubQueryBuilder();
+        return $builder->build($parsed, 0);
     }
 
     protected function buildReserved($parsed) {
@@ -73,55 +67,33 @@ class FunctionBuilder implements Builder {
         return $builder->build($parsed);
     }
 
-    protected function isReserved($parsed) {
-        $builder = new ReservedBuilder();
-        return $builder->isReserved($parsed);
-    }
-    
-    protected function buildSelectExpression($parsed) {
-        $builder = new SelectExpressionBuilder();
-        return $builder->build($parsed);
-    }
-
-    protected function buildSelectBracketExpression($parsed) {
+    protected function buildBracketExpression($parsed) {
         $builder = new SelectBracketExpressionBuilder();
         return $builder->build($parsed);
     }
-    
-    protected function buildSubQuery($parsed) {
-        $builder = new SubQueryBuilder();
-        return $builder->build($parsed);
+
+    protected function buildColumnList($parsed) {
+        $builder = new ReplaceColumnListBuilder();
+        return $builder->build($parsed, 0);
     }
-    
+
     public function build(array $parsed) {
-        if (($parsed['expr_type'] !== ExpressionType::AGGREGATE_FUNCTION)
-            && ($parsed['expr_type'] !== ExpressionType::SIMPLE_FUNCTION)
-            && ($parsed['expr_type'] !== ExpressionType::CUSTOM_FUNCTION)) {
-            return "";
-        }
-
-        if ($parsed['sub_tree'] === false) {
-            return $parsed['base_expr'] . "()";
-        }
-
-        $sql = "";
-        foreach ($parsed['sub_tree'] as $k => $v) {
+        $sql = '';
+        foreach ($parsed as $k => $v) {
             $len = strlen($sql);
-            $sql .= $this->build($v);
-            $sql .= $this->buildConstant($v);
+            $sql .= $this->buildTable($v);
             $sql .= $this->buildSubQuery($v);
-            $sql .= $this->buildColRef($v);
+            $sql .= $this->buildColumnList($v);
             $sql .= $this->buildReserved($v);
-            $sql .= $this->buildSelectBracketExpression($v);
-            $sql .= $this->buildSelectExpression($v);
+            $sql .= $this->buildBracketExpression($v);
 
             if ($len == strlen($sql)) {
-                throw new UnableToCreateSQLException('function subtree', $k, $v, 'expr_type');
+                throw new UnableToCreateSQLException('REPLACE', $k, $v, 'expr_type');
             }
 
-            $sql .= ($this->isReserved($v) ? " " : ",");
+            $sql .= " ";
         }
-        return $parsed['base_expr'] . "(" . substr($sql, 0, -1) . ")" . $this->buildAlias($parsed);
+        return 'REPLACE ' . substr($sql, 0, -1);
     }
 
 }
