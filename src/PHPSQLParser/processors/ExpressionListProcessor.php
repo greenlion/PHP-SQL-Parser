@@ -335,6 +335,7 @@ class ExpressionListProcessor extends AbstractProcessor {
                 case 'SOUNDS':
                 case 'XOR':
                 case 'IN':
+                case 'EXISTS':
                     $curr->setSubTree(false);
                     $curr->setTokenType(ExpressionType::OPERATOR);
                     break;
