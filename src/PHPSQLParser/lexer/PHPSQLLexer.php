@@ -126,9 +126,48 @@ class PHPSQLLexer {
         $tokens = $this->concatComments($tokens);
         $tokens = $this->concatUserDefinedVariables($tokens);
         $tokens = $this->concatScientificNotations($tokens);
+        $tokens = $this->concatNegativeNumbers($tokens);
         return $tokens;
     }
 
+    protected function concatNegativeNumbers($tokens) {
+    	
+    	$i = 0;
+    	$cnt = count($tokens);
+    	$possibleSign = true;
+    	
+    	while ($i < $cnt) {
+    		 
+    		if (!isset($tokens[$i])) {
+    			$i++;
+    			continue;
+    		}
+    		
+    		$token = $tokens[$i];
+    		
+    		// a sign is also possible on the first position of the tokenlist
+    		if ($possibleSign === true) {
+				if ($token === '-' || $token === '+') {
+					if (is_numeric($tokens[$i + 1])) {
+						$tokens[$i + 1] = $token . $tokens[$i + 1]; 
+						unset($tokens[$i]);
+					}
+				}
+				$possibleSign = false;
+				continue;
+    		}
+			
+    		// TODO: we can have sign of a number after "(" and ",", are others possible?
+    		if (substr($token, -1, 1) === "," || substr($token, -1, 1) === "(") {
+    			$possibleSign = true;
+    		}
+    		
+    		$i++;
+   		}
+    		
+   		return array_values($tokens);
+    }
+    
     protected function concatScientificNotations($tokens) {
 
         $i = 0;

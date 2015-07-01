@@ -1,9 +1,9 @@
 <?php
 
 /**
- * issue_git10Test.php
+ * issue_git185Test.php
  *
- * Test case for PHPSQLParser from issue #10 of GitHub.
+ * Test case for PHPSQLParser from issue #185 of GitHub.
  *
  * PHP version 5
  *
@@ -34,7 +34,7 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * 
  * @author    André Rothe <andre.rothe@phosco.info>
- * @copyright 2010-2014 Justin Swanhart and André Rothe
+ * @copyright 2010-2015 Justin Swanhart and André Rothe
  * @license   http://www.debian.org/misc/bsd.license  BSD License (3 Clause)
  * @version   SVN: $Id$
  * 
@@ -44,22 +44,20 @@ namespace PHPSQLParser\Test\Creator;
 use PHPSQLParser\PHPSQLParser;
 use PHPSQLParser\PHPSQLCreator;
 
-class Issue_Git10Test extends \PHPSQLParser\Test\AbstractTestCase {
+class IssueGit185TestTest extends \PHPSQLParser\Test\AbstractTestCase {
 	
-	public function testIssueGit10() {
-		$query = "SELECT
-REPLACE( f.web_program,'\n', '' ) AS web_program,
-id AS change_id
-FROM
-file f
-HAVING
-change_id > :change_id";
-		
-		$p = $this->parser->parse ( $query );
-		$created = $this->creator->create ( $p );
-		$expected = getExpectedValue ( dirname ( __FILE__ ), 'issue_git10.sql', false );
-		$this->assertSame ( $expected, $created, 'alias references should work in HAVING clauses' );
+	public function testIssueGit185() {
+		$query = "
+		SELECT seen, id, name, cep, date_format(created,'%d/%m/%Y %h:%i:%s') as created
+        FROM user
+        WHERE approved = 0 and canceled = 0
+		";
+
+		$p = $this->parser->parse($query, true);
+		$created = $this->creator->create($p);
+	
+		$expected = getExpectedValue ( dirname ( __FILE__ ), 'issue_git185.sql', false );
+		$this->assertEquals ( $expected, $created, 'haha' );
 	}
 }
-
 ?>

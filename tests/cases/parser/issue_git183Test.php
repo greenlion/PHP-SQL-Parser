@@ -1,9 +1,9 @@
 <?php
 
 /**
- * issue_git10Test.php
+ * issue_git183Test.php
  *
- * Test case for PHPSQLParser from issue #10 of GitHub.
+ * Test case for PHPSQLParser from issue #183 of GitHub.
  *
  * PHP version 5
  *
@@ -34,32 +34,28 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * 
  * @author    André Rothe <andre.rothe@phosco.info>
- * @copyright 2010-2014 Justin Swanhart and André Rothe
+ * @copyright 2010-2015 Justin Swanhart and André Rothe
  * @license   http://www.debian.org/misc/bsd.license  BSD License (3 Clause)
  * @version   SVN: $Id$
  * 
  */
-namespace PHPSQLParser\Test\Creator;
+namespace PHPSQLParser\Test\Parser;
 
 use PHPSQLParser\PHPSQLParser;
-use PHPSQLParser\PHPSQLCreator;
 
-class Issue_Git10Test extends \PHPSQLParser\Test\AbstractTestCase {
+class IssueGit183TestTest extends \PHPSQLParser\Test\AbstractTestCase {
 	
-	public function testIssueGit10() {
-		$query = "SELECT
-REPLACE( f.web_program,'\n', '' ) AS web_program,
-id AS change_id
-FROM
-file f
-HAVING
-change_id > :change_id";
-		
-		$p = $this->parser->parse ( $query );
-		$created = $this->creator->create ( $p );
-		$expected = getExpectedValue ( dirname ( __FILE__ ), 'issue_git10.sql', false );
-		$this->assertSame ( $expected, $created, 'alias references should work in HAVING clauses' );
+	public function testIssueGit183() {
+		$query = "SELECT *
+FROM SC_CATALOG_DETAIL_REG CD
+INNER JOIN MASTER_ITEM_LOOKUP IL
+ON to_number( CD.STYLE ) = to_number( IL.SKU_NUM )
+				";
+		$parser = new PHPSQLParser ();
+		$parser->addCustomFunction("to_number");
+		$p = $parser->parse ( $query, true );
+		$expected = getExpectedValue ( dirname ( __FILE__ ), 'issue_git183.serialized' );
+		$this->assertEquals ( $expected, $p, "Oracle\'s to_number");
 	}
 }
-
 ?>

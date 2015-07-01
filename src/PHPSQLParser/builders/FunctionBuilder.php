@@ -7,7 +7,7 @@
  * PHP version 5
  *
  * LICENSE:
- * Copyright (c) 2010-2014 Justin Swanhart and André Rothe
+ * Copyright (c) 2010-2015 Justin Swanhart and André Rothe
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -33,7 +33,7 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * 
  * @author    André Rothe <andre.rothe@phosco.info>
- * @copyright 2010-2014 Justin Swanhart and André Rothe
+ * @copyright 2010-2015 Justin Swanhart and André Rothe
  * @license   http://www.debian.org/misc/bsd.license  BSD License (3 Clause)
  * @version   SVN: $Id$
  * 
@@ -96,7 +96,7 @@ class FunctionBuilder implements Builder {
         }
 
         if ($parsed['sub_tree'] === false) {
-            return $parsed['base_expr'] . "()";
+            return $parsed['base_expr'] . "()" . $this->buildAlias($parsed);
         }
 
         $sql = "";
