@@ -50,6 +50,7 @@ use PHPSQLParser\builders\DropStatementBuilder;
 use PHPSQLParser\builders\RenameStatementBuilder;
 use PHPSQLParser\builders\ShowStatementBuilder;
 use PHPSQLParser\builders\BracketStatementBuilder;
+use PHPSQLParser\builders\UnionStatementBuilder;
 
 /**
  * This class generates SQL from the output of the PHPSQLParser. 
@@ -72,7 +73,8 @@ class PHPSQLCreator {
 
         case 'UNION':
         case 'UNION ALL':
-            throw new UnsupportedFeatureException($k);
+            $builder = new UnionStatementBuilder();
+            $this->created = $builder->build($parsed);
             break;
         case 'SELECT':
             $builder = new SelectStatementBuilder();
