@@ -257,15 +257,25 @@ class SQLProcessor extends SQLChunkProcessor {
                 continue 2;
 
             case 'REPLACE':
-            	if ($prev_category === '') {
-            		// set the category in case these get subclauses in a future version of MySQL
-            		$token_category = $upper;
-            		$out[$upper][0] = $trim;
-            		continue 2;
-            	}
-                // part of the CREATE TABLE statement or a function
-                $out[$prev_category][] = $trim;
-                continue 2;
+                // REPLACE can be found in 3 places:
+                // 1. In a REPLACE statement (REPLACE INTO ...)
+                // 2. In a TABLE context (CREATE TABLE AS REPLACE SELECT ...)
+                // 3. As a string function ( REPLACE(str,from_str,to_str) )
+
+                if ($prev_category === '') {
+                  // This is a REPLACE statement (similar to INSERT)
+                  $token_category = $upper;
+                  $out[$upper][0] = $trim;
+                  continue 2;
+                } else if ($prev_category === 'TABLE') {
+                  // Part of the CREATE TABLE statement
+                  $out[$prev_category][] = $trim;
+                  continue 2;
+                } else if ($prev_category === 'SELECT') {
+                  // A function as part of the SELECT clause
+                  $out[$upper][0] = $trim;
+                }
+                break;
 
             case 'IGNORE':
                 if ($prev_category === 'TABLE') {
