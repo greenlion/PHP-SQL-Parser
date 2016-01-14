@@ -45,6 +45,7 @@ use PHPSQLParser\builders\SelectStatementBuilder;
 use PHPSQLParser\builders\DeleteStatementBuilder;
 use PHPSQLParser\builders\UpdateStatementBuilder;
 use PHPSQLParser\builders\InsertStatementBuilder;
+use PHPSQLParser\builders\ReplaceStatementBuilder;
 use PHPSQLParser\builders\CreateStatementBuilder;
 use PHPSQLParser\builders\DropStatementBuilder;
 use PHPSQLParser\builders\RenameStatementBuilder;
@@ -80,6 +81,10 @@ class PHPSQLCreator {
             break;
         case 'INSERT':
             $builder = new InsertStatementBuilder();
+            $this->created = $builder->build($parsed);
+            break;
+        case 'REPLACE':
+            $builder = new ReplaceStatementBuilder();
             $this->created = $builder->build($parsed);
             break;
         case 'DELETE':
