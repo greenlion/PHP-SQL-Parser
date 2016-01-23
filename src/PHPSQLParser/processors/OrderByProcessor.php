@@ -126,6 +126,11 @@ class OrderByProcessor extends AbstractProcessor {
                 break;
 
             default:
+                if ($this->isCommentToken($token)) {
+                    $out[] = parent::processComment($token);
+                    break;
+                }
+                
                 $parseInfo['base_expr'] .= $token;
             }
         }

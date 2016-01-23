@@ -264,6 +264,17 @@ abstract class AbstractProcessor {
     protected function isSubQuery($out) {
         return (isset($out['expr_type']) && $out['expr_type'] === ExpressionType::SUBQUERY);
     }
+    
+    protected function isComment($out) {
+        return (isset($out['expr_type']) && $out['expr_type'] === ExpressionType::COMMENT);
+    }
+    
+    public function processComment($expression) {
+        $result = array();
+        $result['expr_type'] = ExpressionType::COMMENT;
+        $result['value'] = $expression;
+        return $result;
+    }
 
     /**
      * translates an array of objects into an associative array
@@ -271,7 +282,11 @@ abstract class AbstractProcessor {
     public function toArray($tokenList) {
         $expr = array();
         foreach ($tokenList as $token) {
-            $expr[] = $token->toArray();
+            if ($token instanceof \PHPSQLParser\utils\ExpressionToken) {
+                $expr[] = $token->toArray();
+            } else {
+                $expr[] = $token;
+            }
         }
         return $expr;
     }

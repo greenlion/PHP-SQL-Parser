@@ -68,12 +68,17 @@ class ValuesProcessor extends AbstractProcessor {
         $base_expr = '';
 
         foreach ($tokens['VALUES'] as $k => $v) {
-            $base_expr .= $v;
-            $trim = trim($v);
-
             if ($this->isWhitespaceToken($v)) {
                 continue;
             }
+            
+            if ($this->isCommentToken($v)) {
+                 $parsed[] = parent::processComment($v);
+                 continue;
+            }
+            
+            $base_expr .= $v;
+            $trim = trim($v);
 
             $upper = strtoupper($trim);
             switch ($upper) {

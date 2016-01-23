@@ -50,6 +50,8 @@ class SelectProcessor extends SelectExpressionProcessor {
                 $expression['delim'] = ',';
                 $expressionList[] = $expression;
                 $expression = "";
+            } else if ($this->isCommentToken($token)) {
+                $expressionList[] = parent::processComment($token);
             } else {
                 switch (strtoupper($token)) {
 

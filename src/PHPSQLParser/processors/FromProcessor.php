@@ -103,7 +103,7 @@ class FromProcessor extends AbstractProcessor {
             	$ref = $this->processColumnList($this->removeParenthesisFromStart($unparsed[0]));
             	$ref = array(array('expr_type' => ExpressionType::COLUMN_LIST, 'base_expr' => $unparsed[0], 'sub_tree' => $ref));
             } else {
-            	$ref = $this->processExpressionList($unparsed);
+                $ref = $this->processExpressionList($unparsed);
             }
             $parseInfo['ref_expr'] = (empty($ref) ? false : $ref);
         }
@@ -157,7 +157,12 @@ class FromProcessor extends AbstractProcessor {
                     continue;
                 }
             }
-
+            
+            if ($this->isCommentToken($token)) {
+                $expr[] = parent::processComment($token);
+                continue;
+            }
+            
             switch ($upper) {
             case 'CROSS':
             case ',':
@@ -285,8 +290,8 @@ class FromProcessor extends AbstractProcessor {
                 break;
 
             default:
-            // TODO: enhance it, so we can have base_expr to calculate the position of the keywords
-            // build a subtree under "hints"
+                // TODO: enhance it, so we can have base_expr to calculate the position of the keywords
+                // build a subtree under "hints"
                 if ($token_category === 'IDX_HINT') {
                     $token_category = '';
                     $cur_hint = (count($parseInfo['hints']) - 1);

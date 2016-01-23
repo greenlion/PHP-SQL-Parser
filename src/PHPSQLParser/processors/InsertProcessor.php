@@ -86,7 +86,7 @@ class InsertProcessor extends AbstractProcessor {
 
             case 'INSERT':
                 continue;
-
+                
             default:
                 if ($table === '') {
                     $table = $trim;
@@ -127,7 +127,20 @@ class InsertProcessor extends AbstractProcessor {
     public function process($tokenList, $token_category = 'INSERT') {
         $table = '';
         $cols = false;
-
+        $comments = array();
+        
+        foreach ($tokenList as $key => &$token) {
+            if ($key == 'VALUES') {
+                continue;
+            }
+            foreach ($token as &$value) {
+                if ($this->isCommentToken($value)) {
+                     $comments[] = parent::processComment($value);
+                     $value = '';
+                }
+            }
+        }
+        
         $parsed = $this->processOptions($tokenList);
         unset($tokenList['OPTIONS']);
 
@@ -146,7 +159,9 @@ class InsertProcessor extends AbstractProcessor {
         if ($cols !== false) {
             $parsed[] = $cols;
         }
-
+        
+        $parsed = array_merge($parsed, $comments);
+        
         $tokenList[$token_category] = $parsed;
         return $tokenList;
     }

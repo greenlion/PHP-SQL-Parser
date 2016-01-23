@@ -59,6 +59,12 @@ class ExpressionListProcessor extends AbstractProcessor {
         $prev = new ExpressionToken();
 
         foreach ($tokens as $k => $v) {
+            
+            
+            if ($this->isCommentToken($v)) {
+                $resultList[] = parent::processComment($v);
+                continue;
+            }
 
             $curr = new ExpressionToken($k, $v);
 
