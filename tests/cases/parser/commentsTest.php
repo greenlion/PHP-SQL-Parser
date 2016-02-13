@@ -12,7 +12,7 @@ class CommentsTest extends \PHPUnit_Framework_TestCase {
 	 * Executed before each test
 	 */
 	protected function setup() {
-		$this->parser = new PHPSQLParser();
+		$this->parser = new PHPSQLParser(false, true);
 	}
         
         public function testComments1() {
