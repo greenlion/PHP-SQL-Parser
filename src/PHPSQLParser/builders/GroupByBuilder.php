@@ -71,6 +71,11 @@ class GroupByBuilder implements Builder {
         $builder = new GroupByAliasBuilder();
         return $builder->build($parsed);
     }
+    
+    protected function buildGroupByExpression($parsed) {
+    	$builder = new GroupByExpressionBuilder();
+        return $builder->build($parsed);
+    }
 
     public function build(array $parsed) {
         $sql = "";
@@ -79,8 +84,9 @@ class GroupByBuilder implements Builder {
             $sql .= $this->buildColRef($v);
             $sql .= $this->buildPosition($v);
             $sql .= $this->buildFunction($v);
+            $sql .= $this->buildGroupByExpression($v);
             $sql .= $this->buildGroupByAlias($v);
-
+            
             if ($len == strlen($sql)) {
                 throw new UnableToCreateSQLException('GROUP', $k, $v, 'expr_type');
             }
