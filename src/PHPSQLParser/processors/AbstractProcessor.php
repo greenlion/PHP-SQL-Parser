@@ -166,6 +166,8 @@ abstract class AbstractProcessor {
         $parenthesis = $parenthesisRemoved;
         $i = 0;
         $string = 0;
+        // Whether a string was opened or not, and with which character it was open (' or ")
+        $stringOpened = '';
         while ($i < strlen($trim)) {
 
             if ($trim[$i] === "\\") {
@@ -173,15 +175,27 @@ abstract class AbstractProcessor {
                 continue;
             }
 
-            if ($trim[$i] === "'" || $trim[$i] === '"') {
-                $string++;
+            if ($trim[$i] === "'") {
+                if ($stringOpened === '') {
+                    $stringOpened = "'";
+                } elseif ($stringOpened === "'") {
+                    $stringOpened = '';
+                }
             }
 
-            if (($string % 2 === 0) && ($trim[$i] === '(')) {
+            if ($trim[$i] === '"') {
+                if ($stringOpened === '') {
+                    $stringOpened = '"';
+                } elseif ($stringOpened === '"') {
+                    $stringOpened = '';
+                }
+            }
+
+            if (($stringOpened === '') && ($trim[$i] === '(')) {
                 $parenthesis++;
             }
 
-            if (($string % 2 === 0) && ($trim[$i] === ')')) {
+            if (($stringOpened === '') && ($trim[$i] === ')')) {
                 if ($parenthesis == $parenthesisRemoved) {
                     $trim[$i] = ' ';
                     $parenthesisRemoved--;
