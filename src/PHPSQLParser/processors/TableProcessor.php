@@ -155,6 +155,7 @@ class TableProcessor extends AbstractProcessor {
                 break;
 
             case 'SET':
+            case 'CHARSET':
                 if ($prevCategory === 'TABLE_OPTION') {
                     // add it to a previous CHARACTER
                     $expr[] = $this->getReservedType($trim);
