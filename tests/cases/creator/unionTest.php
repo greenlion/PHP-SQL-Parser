@@ -2,7 +2,7 @@
 /**
  * unionTest.php
  *
- * Test case for PHPSQLParser.
+ * Test case for PHPSQLCreator.
  *
  * PHP version 5
  *
@@ -32,8 +32,7 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * 
- * @author    André Rothe <andre.rothe@phosco.info>
- * @copyright 2010-2014 Justin Swanhart and André Rothe
+ * @author    George Schneeloch <george_schneeloch@hms.harvard.edu>
  * @license   http://www.debian.org/misc/bsd.license  BSD License (3 Clause)
  * @version   SVN: $Id$
  * 
@@ -44,6 +43,7 @@ use PHPSQLParser\PHPSQLCreator;
 use Analog\Analog;
 
 class UnionTest extends \PHPUnit_Framework_TestCase {
+
     public function testUnion1() {
         $parser = new PHPSQLParser();
 
@@ -51,28 +51,31 @@ class UnionTest extends \PHPUnit_Framework_TestCase {
         union
         SELECT colB from test 
         as b';
-        $p = $parser->parse($sql, true);
-        Analog::log(serialize($p));
-        $expected = getExpectedValue(dirname(__FILE__), 'union1.serialized');
-        $this->assertEquals($expected, $p, 'simple union');
+        $parser = new PHPSQLParser($sql);
+        $creator = new PHPSQLCreator($parser->parsed);
+        $expected = getExpectedValue(dirname(__FILE__), 'union1.sql', false);
+        $this->assertEquals($expected, $creator->created, 'simple union');
     }
     
     public function testUnion2() {
         // TODO: the order-by clause has not been parsed
-    	$parser = new PHPSQLParser();
-    	$sql = '(SELECT colA From test a)
+        $parser = new PHPSQLParser();
+        $sql = '(SELECT colA From test a)
                 union all
                 (SELECT colB from test b) order by 1';
-        $p = $parser->parse($sql, true);
-        $expected = getExpectedValue(dirname(__FILE__), 'union2.serialized');
-        $this->assertEquals($expected, $p, 'mysql union with order-by');
+        $parser = new PHPSQLParser($sql);
+        $creator = new PHPSQLCreator($parser->parsed);
+        $expected = getExpectedValue(dirname(__FILE__), 'union2.sql', false);
+        $this->assertEquals($expected, $creator->created, 'mysql union with order-by');
     }
     public function testUnion3() {
         $sql = "SELECT x FROM ((SELECT y FROM  z  WHERE (y > 2) ) UNION ALL (SELECT a FROM z WHERE (y < 2))) as f ";
         $parser = new PHPSQLParser();
-        $p = $parser->parse($sql, true);
-        $expected = getExpectedValue(dirname(__FILE__), 'union3.serialized');
-        $this->assertEquals($expected, $p, 'complicated mysql union');
+	$creator = new PHPSQLCreator();
+        $parsed = $parser->parse($sql);
+	$created = $creator->create($parsed);
+        $expected = getExpectedValue(dirname(__FILE__), 'union3.sql', false);
+        $this->assertEquals($expected, $created, 'complicated mysql union');
     }
 }
 ?>

@@ -1,8 +1,8 @@
 <?php
 /**
- * unionTest.php
+ * TruncateBuilder.php
  *
- * Test case for PHPSQLParser.
+ * Builds the TRUNCATE statement
  *
  * PHP version 5
  *
@@ -38,41 +38,34 @@
  * @version   SVN: $Id$
  * 
  */
-namespace PHPSQLParser\Test\Parser;
-use PHPSQLParser\PHPSQLParser;
-use PHPSQLParser\PHPSQLCreator;
-use Analog\Analog;
 
-class UnionTest extends \PHPUnit_Framework_TestCase {
-    public function testUnion1() {
-        $parser = new PHPSQLParser();
+namespace PHPSQLParser\builders;
 
-        $sql = 'SELECT colA From test a
-        union
-        SELECT colB from test 
-        as b';
-        $p = $parser->parse($sql, true);
-        Analog::log(serialize($p));
-        $expected = getExpectedValue(dirname(__FILE__), 'union1.serialized');
-        $this->assertEquals($expected, $p, 'simple union');
-    }
-    
-    public function testUnion2() {
-        // TODO: the order-by clause has not been parsed
-    	$parser = new PHPSQLParser();
-    	$sql = '(SELECT colA From test a)
-                union all
-                (SELECT colB from test b) order by 1';
-        $p = $parser->parse($sql, true);
-        $expected = getExpectedValue(dirname(__FILE__), 'union2.serialized');
-        $this->assertEquals($expected, $p, 'mysql union with order-by');
-    }
-    public function testUnion3() {
-        $sql = "SELECT x FROM ((SELECT y FROM  z  WHERE (y > 2) ) UNION ALL (SELECT a FROM z WHERE (y < 2))) as f ";
-        $parser = new PHPSQLParser();
-        $p = $parser->parse($sql, true);
-        $expected = getExpectedValue(dirname(__FILE__), 'union3.serialized');
-        $this->assertEquals($expected, $p, 'complicated mysql union');
+/**
+ * This class implements the builder for the [TRUNCATE] part. You can overwrite
+ * all functions to achieve another handling.
+ *
+ * @author  André Rothe <andre.rothe@phosco.info>
+ * @license http://www.debian.org/misc/bsd.license  BSD License (3 Clause)
+ *  
+ */
+class TruncateBuilder implements Builder {
+
+    public function build(array $parsed) {
+        $sql = "TRUNCATE TABLE ";
+        $right = -1;
+
+        // works for one table only
+        $parsed['tables'] = array($parsed['TABLE']['base_expr']);
+
+        if ($parsed['tables'] !== false) {
+            foreach ($parsed['tables'] as $k => $v) {
+                $sql .= $v . ", ";
+                $right = -2;
+            }
+        }
+
+        return substr($sql, 0, $right);
     }
 }
 ?>

@@ -133,6 +133,8 @@ class PositionCalculator {
         while (true) {
 
             $pos = strpos($sql, $value, $offset);
+            // error_log("pos:$pos value:$value sql:$sql");
+            
             if ($pos === false) {
                 break;
             }

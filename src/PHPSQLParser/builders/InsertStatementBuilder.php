@@ -65,12 +65,20 @@ class InsertStatementBuilder implements Builder {
         $builder = new SelectStatementBuilder();
         return $builder->build($parsed);
     }
-
+    
+    protected function buildSET($parsed) {
+        $builder = new SetBuilder();
+        return $builder->build($parsed);
+    }
+    
     public function build(array $parsed) {
         // TODO: are there more than one tables possible (like [INSERT][1])
         $sql = $this->buildINSERT($parsed['INSERT']);
         if (isset($parsed['VALUES'])) {
             $sql .= ' ' . $this->buildVALUES($parsed['VALUES']);
+        }
+        if (isset($parsed['SET'])) {
+            $sql .= ' ' . $this->buildSET($parsed['SET']);
         }
         if (isset($parsed['SELECT'])) {
             $sql .= ' ' . $this->buildSELECT($parsed);

@@ -1,8 +1,8 @@
 <?php
 /**
- * SelectStatement.php
+ * ReplaceStatement.php
  *
- * Builds the SELECT statement
+ * Builds the REPLACE statement
  *
  * PHP version 5
  *
@@ -42,91 +42,48 @@
 namespace PHPSQLParser\builders;
 
 /**
- * This class implements the builder for the whole Select statement. You can overwrite
+ * This class implements the builder for the whole Replace statement. You can overwrite
  * all functions to achieve another handling.
  *
  * @author  André Rothe <andre.rothe@phosco.info>
  * @license http://www.debian.org/misc/bsd.license  BSD License (3 Clause)
  *  
  */
-class SelectStatementBuilder implements Builder {
+class ReplaceStatementBuilder implements Builder {
+
+    protected function buildVALUES($parsed) {
+        $builder = new ValuesBuilder();
+        return $builder->build($parsed);
+    }
+
+    protected function buildREPLACE($parsed) {
+        $builder = new ReplaceBuilder();
+        return $builder->build($parsed);
+    }
 
     protected function buildSELECT($parsed) {
-        $builder = new SelectBuilder();
-        return $builder->build($parsed);
-    }
-
-    protected function buildFROM($parsed) {
-        $builder = new FromBuilder();
-        return $builder->build($parsed);
-    }
-
-    protected function buildWHERE($parsed) {
-        $builder = new WhereBuilder();
-        return $builder->build($parsed);
-    }
-
-    protected function buildGROUP($parsed) {
-        $builder = new GroupByBuilder();
-        return $builder->build($parsed);
-    }
-
-    protected function buildHAVING($parsed) {
-        $builder = new HavingBuilder();
-        return $builder->build($parsed);
-    }
-
-    protected function buildORDER($parsed) {
-        $builder = new OrderByBuilder();
-        return $builder->build($parsed);
-    }
-
-    protected function buildLIMIT($parsed) {
-        $builder = new LimitBuilder();
+        $builder = new SelectStatementBuilder();
         return $builder->build($parsed);
     }
     
-    protected function buildUNION($parsed) {
-    	$builder = new UnionStatementBuilder();
-    	return $builder->build($parsed);
+    protected function buildSET($parsed) {
+        $builder = new SetBuilder();
+        return $builder->build($parsed);
     }
     
-    protected function buildUNIONALL($parsed) {
-    	$builder = new UnionAllStatementBuilder();
-    	return $builder->build($parsed);
-    }
-
     public function build(array $parsed) {
-        $sql = "";
+        // TODO: are there more than one tables possible (like [REPLACE][1])
+        $sql = $this->buildREPLACE($parsed['REPLACE']);
+        if (isset($parsed['VALUES'])) {
+            $sql .= ' ' . $this->buildVALUES($parsed['VALUES']);
+        }
+        if (isset($parsed['SET'])) {
+            $sql .= ' ' . $this->buildSET($parsed['SET']);
+        }
         if (isset($parsed['SELECT'])) {
-            $sql .= $this->buildSELECT($parsed['SELECT']);
-        }
-        if (isset($parsed['FROM'])) {
-            $sql .= " " . $this->buildFROM($parsed['FROM']);
-        }
-        if (isset($parsed['WHERE'])) {
-            $sql .= " " . $this->buildWHERE($parsed['WHERE']);
-        }
-        if (isset($parsed['GROUP'])) {
-            $sql .= " " . $this->buildGROUP($parsed['GROUP']);
-        }
-        if (isset($parsed['HAVING'])) {
-            $sql .= " " . $this->buildHAVING($parsed['HAVING']);
-        }
-        if (isset($parsed['ORDER'])) {
-            $sql .= " " . $this->buildORDER($parsed['ORDER']);
-        }
-        if (isset($parsed['LIMIT'])) {
-            $sql .= " " . $this->buildLIMIT($parsed['LIMIT']);
-        }       
-        if (isset($parsed['UNION'])) {
-            $sql .= " " . $this->buildUNION($parsed);
-        }
-        if (isset($parsed['UNION ALL'])) {
-        	$sql .= " " . $this->buildUNIONALL($parsed);
+            $sql .= ' ' . $this->buildSELECT($parsed);
         }
         return $sql;
     }
-
 }
 ?>
