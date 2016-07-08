@@ -394,13 +394,8 @@ class ColumnDefinitionProcessor extends AbstractProcessor {
                     $parsed = $this->processExpressionList($trim);
 
                     $last = array_pop($expr);
-                    $last['sub_tree'] = array(
-                                            array(
-                                                'expr_type' => ExpressionType::BRACKET_EXPRESSION,
-                                                'base_expr' => $trim,
-                                                'sub_tree' => $parsed
-                                            )
-                                        );
+                    $last['sub_tree'] = array('expr_type' => ExpressionType::BRACKET_EXPRESSION, 'base_expr' => $trim,
+                                              'sub_tree' => $parsed);
                     $expr[] = $last;
                     $currCategory = $prevCategory;
                     break;
