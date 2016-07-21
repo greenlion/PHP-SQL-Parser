@@ -55,20 +55,20 @@ use PHPSQLParser\utils\ExpressionType;
 class FromProcessor extends AbstractProcessor {
 
     protected function processExpressionList($unparsed) {
-        $processor = new ExpressionListProcessor();
+        $processor = new ExpressionListProcessor($this->options);
         return $processor->process($unparsed);
     }
-    
+
     protected function processColumnList($unparsed) {
-        $processor = new ColumnListProcessor();
+        $processor = new ColumnListProcessor($this->options);
         return $processor->process($unparsed);
     }
-    
+
     protected function processSQLDefault($unparsed) {
-        $processor = new DefaultProcessor();
+        $processor = new DefaultProcessor($this->options);
         return $processor->process($unparsed);
     }
-    
+
     protected function initParseInfo($parseInfo = false) {
         // first init
         if ($parseInfo === false) {
@@ -168,12 +168,12 @@ class FromProcessor extends AbstractProcessor {
                     continue;
                 }
             }
-            
+
             if ($this->isCommentToken($token)) {
                 $expr[] = parent::processComment($token);
                 continue;
             }
-            
+
             switch ($upper) {
             case 'CROSS':
             case ',':
@@ -191,12 +191,12 @@ class FromProcessor extends AbstractProcessor {
 
             case 'LEFT':
             case 'RIGHT':
-            case 'NATURAL':            	
+            case 'NATURAL':
                 $token_category = $upper;
                 $prevToken = $token;
                 $i++;
                 continue 2;
-                
+
             default:
                 if ($token_category === 'LEFT' || $token_category === 'RIGHT') {
                     if ($upper === '') {

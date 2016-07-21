@@ -47,7 +47,7 @@ use PHPSQLParser\utils\ExpressionType;
  *
  * @author  André Rothe <andre.rothe@phosco.info>
  * @license http://www.debian.org/misc/bsd.license  BSD License (3 Clause)
- *  
+ *
  */
 class IndexProcessor extends AbstractProcessor {
 
@@ -64,7 +64,7 @@ class IndexProcessor extends AbstractProcessor {
     }
 
     protected function processIndexColumnList($parsed) {
-        $processor = new IndexColumnListProcessor();
+        $processor = new IndexColumnListProcessor($this->options);
         return $processor->process($parsed);
     }
 

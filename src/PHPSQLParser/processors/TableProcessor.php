@@ -47,7 +47,7 @@ use PHPSQLParser\utils\ExpressionType;
  *
  * @author  André Rothe <andre.rothe@phosco.info>
  * @license http://www.debian.org/misc/bsd.license  BSD License (3 Clause)
- *  
+ *
  */
 class TableProcessor extends AbstractProcessor {
 
@@ -64,12 +64,12 @@ class TableProcessor extends AbstractProcessor {
     }
 
     protected function processPartitionOptions($tokens) {
-        $processor = new PartitionOptionsProcessor();
+        $processor = new PartitionOptionsProcessor($this->options);
         return $processor->process($tokens);
     }
 
     protected function processCreateDefinition($tokens) {
-        $processor = new CreateDefinitionProcessor();
+        $processor = new CreateDefinitionProcessor($this->options);
         return $processor->process($tokens);
     }
 

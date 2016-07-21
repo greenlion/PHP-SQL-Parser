@@ -34,24 +34,24 @@ namespace PHPSQLParser\processors;
 use PHPSQLParser\utils\ExpressionType;
 
 /**
- * 
+ *
  * This class processes Oracle's WITH statements.
- * 
+ *
  * @author  André Rothe <andre.rothe@phosco.info>
  * @license http://www.debian.org/misc/bsd.license  BSD License (3 Clause)
- * 
+ *
  */
 class WithProcessor extends AbstractProcessor {
 
     protected function processTopLevel($sql) {
-    	$processor = new DefaultProcessor();
+    	$processor = new DefaultProcessor($this->options);
     	return $processor->process($sql);
     }
-    
+
     protected function buildTableName($token) {
     	return array('expr_type' => ExpressionType::TEMPORARY_TABLE, 'name'=>$token, 'base_expr' => $token, 'no_quotes' => $this->revokeQuotation($token));
     }
-    
+
     public function process($tokens) {
     	$out = array();
         $resultList = array();
@@ -62,7 +62,7 @@ class WithProcessor extends AbstractProcessor {
         foreach ($tokens as $token) {
         	$base_expr .= $token;
             $upper = strtoupper(trim($token));
-			
+
             if ($this->isWhitespaceToken($token)) {
                 continue;
             }
@@ -77,7 +77,7 @@ class WithProcessor extends AbstractProcessor {
             		$category = 'TABLENAME';
             		break;
             	}
-            	
+
             	$resultList[] = array('expr_type' => ExpressionType::RESERVED, 'base_expr' => $trim);
             	$category = $upper;
                 break;
@@ -85,26 +85,26 @@ class WithProcessor extends AbstractProcessor {
             case ',':
             	// ignore
             	$base_expr = '';
-            	break;    
-                
+            	break;
+
             default:
                 switch ($prev) {
                 	case 'AS':
-                		// it follows a parentheses pair	
+                		// it follows a parentheses pair
                 		$subtree = $this->processTopLevel($this->removeParenthesisFromStart($token));
                 		$resultList[] = array('expr_type' => ExpressionType::BRACKET_EXPRESSION, 'base_expr' => $trim, 'sub_tree' => $subtree);
-                		
+
                 		$out[] = array('expr_type' => ExpressionType::SUBQUERY_FACTORING, 'base_expr' => trim($base_expr), 'sub_tree' => $resultList);
                 		$resultList = array();
                 		$category = '';
                 	break;
-                	
+
                 	case '':
                 		// we have the name of the table
                 		$resultList[] = $this->buildTableName($trim);
                 		$category = 'TABLENAME';
                 		break;
-                		
+
                 default:
                 // ignore
                     break;

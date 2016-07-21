@@ -2,7 +2,7 @@
 /**
  * RecordProcessor.php
  *
- * This file implements a processor, which processes records of data 
+ * This file implements a processor, which processes records of data
  * for an INSERT statement.
  *
  * PHP version 5
@@ -47,12 +47,12 @@ namespace PHPSQLParser\processors;
  *
  * @author  André Rothe <andre.rothe@phosco.info>
  * @license http://www.debian.org/misc/bsd.license  BSD License (3 Clause)
- *  
+ *
  */
 class RecordProcessor extends AbstractProcessor {
 
     protected function processExpressionList($unparsed) {
-        $processor = new ExpressionListProcessor();
+        $processor = new ExpressionListProcessor($this->options);
         return $processor->process($unparsed);
     }
 

@@ -57,12 +57,12 @@ class DefaultProcessor extends AbstractProcessor {
     protected function processUnion($tokens) {
         // this is the highest level lexical analysis. This is the part of the
         // code which finds UNION and UNION ALL query parts
-        $processor = new UnionProcessor();
+        $processor = new UnionProcessor($this->options);
         return $processor->process($tokens);
     }
 
     protected function processSQL($tokens) {
-        $processor = new SQLProcessor();
+        $processor = new SQLProcessor($this->options);
         return $processor->process($tokens);
     }
 

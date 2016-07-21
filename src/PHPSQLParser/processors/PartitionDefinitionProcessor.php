@@ -2,7 +2,7 @@
 /**
  * PartitionDefinitionProcessor.php
  *
- * This file implements the processor for the PARTITION statements 
+ * This file implements the processor for the PARTITION statements
  * within CREATE TABLE.
  *
  * PHP version 5
@@ -48,19 +48,19 @@ use PHPSQLParser\utils\ExpressionType;
  *
  * @author  André Rothe <andre.rothe@phosco.info>
  * @license http://www.debian.org/misc/bsd.license  BSD License (3 Clause)
- *  
+ *
  */
 class PartitionDefinitionProcessor extends AbstractProcessor {
 
     protected function processExpressionList($unparsed) {
-        $processor = new ExpressionListProcessor();
+        $processor = new ExpressionListProcessor($this->options);
         $expr = $this->removeParenthesisFromStart($unparsed);
         $expr = $this->splitSQLIntoTokens($expr);
         return $processor->process($expr);
     }
 
     protected function processSubpartitionDefinition($unparsed) {
-        $processor = new SubpartitionDefinitionProcessor();
+        $processor = new SubpartitionDefinitionProcessor($this->options);
         $expr = $this->removeParenthesisFromStart($unparsed);
         $expr = $this->splitSQLIntoTokens($expr);
         return $processor->process($expr);
@@ -167,7 +167,7 @@ class PartitionDefinitionProcessor extends AbstractProcessor {
                     unset($last['storage']);
                     $parsed['sub_tree'][] = $last;
                     $parsed['base_expr'] = trim($base_expr);
-                    
+
                     $expr = $parsed['sub_tree'];
                     unset($last);
                     $currCategory = $prevCategory;
@@ -227,7 +227,7 @@ class PartitionDefinitionProcessor extends AbstractProcessor {
                     $parsed['sub_tree'] = $expr;
                     $base_expr = $token;
                     $expr = array($this->getReservedType($trim));
-                    
+
                     $currCategory = $upper;
                     continue 2;
                 }
@@ -314,7 +314,7 @@ class PartitionDefinitionProcessor extends AbstractProcessor {
 
                     $parsed['sub_tree'][] = $last;
                     $parsed['base_expr'] = trim($base_expr);
-                    
+
                     $expr = $parsed['sub_tree'];
                     unset($last);
 
@@ -334,9 +334,9 @@ class PartitionDefinitionProcessor extends AbstractProcessor {
                 case 'VALUES':
                 // we have parenthesis and have to process an expression/in-list
                     $last = $this->getBracketExpressionType($trim);
-                    
+
                     $res = $this->processExpressionList($trim);
-                    $last['sub_tree'] = (empty($res) ? false : $res); 
+                    $last['sub_tree'] = (empty($res) ? false : $res);
                     $expr[] = $last;
 
                     $last = array_pop($parsed['sub_tree']);
@@ -347,7 +347,7 @@ class PartitionDefinitionProcessor extends AbstractProcessor {
                     unset($last['storage']);
                     $parsed['sub_tree'][] = $last;
                     $parsed['base_expr'] = trim($base_expr);
-                    
+
                     $expr = $parsed['sub_tree'];
                     unset($last);
 
@@ -370,7 +370,7 @@ class PartitionDefinitionProcessor extends AbstractProcessor {
                             break;
                         }
                     }
-                    // else ?                    
+                    // else ?
                     break;
 
                 default:

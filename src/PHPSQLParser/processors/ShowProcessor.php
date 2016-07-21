@@ -31,22 +31,24 @@
  */
 
 namespace PHPSQLParser\processors;
+use PHPSQLParser\Options;
 use PHPSQLParser\utils\ExpressionType;
 use PHPSQLParser\utils\PHPSQLParserConstants;
 
 /**
- * 
+ *
  * This class processes the SHOW statements.
- * 
+ *
  * @author arothe
- * 
+ *
  */
 class ShowProcessor extends AbstractProcessor {
 
     private $limitProcessor;
 
-    public function __construct() {
-        $this->limitProcessor = new LimitProcessor();
+    public function __construct(Options $options) {
+        parent::__construct($options);
+        $this->limitProcessor = new LimitProcessor($options);
     }
 
     public function process($tokens) {
