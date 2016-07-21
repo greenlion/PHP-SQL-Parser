@@ -32,7 +32,7 @@
  * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  * @author    André Rothe <andre.rothe@phosco.info>
  * @copyright 2010-2014 Justin Swanhart and André Rothe
  * @license   http://www.debian.org/misc/bsd.license  BSD License (3 Clause)
@@ -56,34 +56,42 @@ class PHPSQLParser {
     public $parsed;
 
     /**
-     * Constructor. It simply calls the parse() function. 
-     * Use the public variable $parsed to get the output.
-     * 
-     * @param String  $sql           The SQL statement.
-     * @param boolean $calcPositions True, if the output should contain [position], false otherwise.
+     * @var Options
      */
-    public function __construct($sql = false, $calcPositions = false) {
+    private $options;
+
+    /**
+     * Constructor. It simply calls the parse() function.
+     * Use the public variable $parsed to get the output.
+     *
+     * @param String|bool  $sql           The SQL statement.
+     * @param bool $calcPositions True, if the output should contain [position], false otherwise.
+     * @param array $options
+     */
+    public function __construct($sql = false, $calcPositions = false, array $options = []) {
+        $this->options = new Options($options);
+
         if ($sql) {
             $this->parse($sql, $calcPositions);
         }
     }
 
     /**
-     * It parses the given SQL statement and generates a detailled 
-     * output array for every part of the statement. The method can 
-     * also generate [position] fields within the output, which hold 
-     * the character position for every statement part. The calculation 
+     * It parses the given SQL statement and generates a detailled
+     * output array for every part of the statement. The method can
+     * also generate [position] fields within the output, which hold
+     * the character position for every statement part. The calculation
      * of the positions needs some time, if you don't need positions in
      * your application, set the parameter to false.
-     * 
+     *
      * @param String  $sql           The SQL statement.
      * @param boolean $calcPositions True, if the output should contain [position], false otherwise.
-     * 
+     *
      * @return array An associative array with all meta information about the SQL statement.
      */
     public function parse($sql, $calcPositions = false) {
 
-        $processor = new DefaultProcessor();
+        $processor = new DefaultProcessor($this->options);
         $queries = $processor->process($sql);
 
         // calc the positions of some important tokens
@@ -99,9 +107,9 @@ class PHPSQLParser {
 
     /**
      * Add a custom function to the parser.  no return value
-     * 
+     *
      * @param String $token The name of the function to add
-     * 
+     *
      * @return null
      */
     public function addCustomFunction($token) {
@@ -110,9 +118,9 @@ class PHPSQLParser {
 
     /**
      * Remove a custom function from the parser.  no return value
-     * 
+     *
      * @param String $token The name of the function to remove
-     * 
+     *
      * @return null
      */
     public function removeCustomFunction($token) {
@@ -121,8 +129,8 @@ class PHPSQLParser {
 
     /**
      * Returns the list of custom functions
-     * 
-     * @return array Returns an array of all custom functions 
+     *
+     * @return array Returns an array of all custom functions
      */
     public function getCustomFunctions() {
         return PHPSQLParserConstants::getInstance()->getCustomFunctions();

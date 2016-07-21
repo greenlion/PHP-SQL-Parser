@@ -40,24 +40,23 @@
  */
 
 namespace PHPSQLParser\processors;
-use PHPSQLParser\utils\ExpressionType;
 
 /**
  * This class processes the UNION statements.
  *
  * @author  André Rothe <andre.rothe@phosco.info>
  * @license http://www.debian.org/misc/bsd.license  BSD License (3 Clause)
- *  
+ *
  */
 class UnionProcessor extends AbstractProcessor {
 
     protected function processDefault($token) {
-        $processor = new DefaultProcessor();
+        $processor = new DefaultProcessor($this->options);
         return $processor->process($token);
     }
 
     protected function processSQL($token) {
-        $processor = new SQLProcessor();
+        $processor = new SQLProcessor($this->options);
         return $processor->process($token);
     }
 

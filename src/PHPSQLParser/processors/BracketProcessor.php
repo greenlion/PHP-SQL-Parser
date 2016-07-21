@@ -3,7 +3,7 @@
  * BracketProcessor.php
  *
  * This file implements the processor for the parentheses around the statements.
- * 
+ *
  * PHP version 5
  *
  * LICENSE:
@@ -44,15 +44,15 @@ use PHPSQLParser\utils\ExpressionType;
 
 /**
  * This class processes the parentheses around the statement.
- * 
+ *
  * @author  André Rothe <andre.rothe@phosco.info>
  * @license http://www.debian.org/misc/bsd.license  BSD License (3 Clause)
- * 
+ *
  */
 class BracketProcessor extends AbstractProcessor {
 
     protected function processTopLevel($sql) {
-        $processor = new DefaultProcessor();
+        $processor = new DefaultProcessor($this->options);
         return $processor->process($sql);
     }
 

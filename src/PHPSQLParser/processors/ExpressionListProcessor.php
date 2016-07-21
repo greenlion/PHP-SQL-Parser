@@ -59,8 +59,8 @@ class ExpressionListProcessor extends AbstractProcessor {
         $prev = new ExpressionToken();
 
         foreach ($tokens as $k => $v) {
-            
-            
+
+
             if ($this->isCommentToken($v)) {
                 $resultList[] = parent::processComment($v);
                 continue;
@@ -81,7 +81,7 @@ class ExpressionListProcessor extends AbstractProcessor {
             /* is it a subquery? */
             if ($curr->isSubQueryToken()) {
 
-                $processor = new DefaultProcessor();
+                $processor = new DefaultProcessor($this->options);
                 $curr->setSubTree($processor->process($this->removeParenthesisFromStart($curr->getTrim())));
                 $curr->setTokenType(ExpressionType::SUBQUERY);
 
@@ -208,7 +208,7 @@ class ExpressionListProcessor extends AbstractProcessor {
                         } else {
                             $prev->setTokenType(ExpressionType::SIMPLE_FUNCTION);
                         }
-                        $prev->setNoQuotes(null);
+                        $prev->setNoQuotes(null, null, $this->options);
                     }
 
                     array_pop($resultList);
@@ -275,7 +275,7 @@ class ExpressionListProcessor extends AbstractProcessor {
 
                 $curr->setTokenType($this->getVariableType($curr->getUpper()));
                 $curr->setSubTree(false);
-                $curr->setNoQuotes(trim(trim($curr->getToken()), '@'), "`'\"");
+                $curr->setNoQuotes(trim(trim($curr->getToken()), '@'), "`'\"", $this->options);
 
             } else {
                 /* it is either an operator, a colref or a constant */
@@ -376,7 +376,7 @@ class ExpressionListProcessor extends AbstractProcessor {
                     case '`':
                     // it is an escaped colum name
                         $curr->setTokenType(ExpressionType::COLREF);
-                        $curr->setNoQuotes($curr->getToken());
+                        $curr->setNoQuotes($curr->getToken(), null, $this->options);
                         break;
 
                     default:
@@ -392,7 +392,7 @@ class ExpressionListProcessor extends AbstractProcessor {
                             }
                         } else {
                             $curr->setTokenType(ExpressionType::COLREF);
-                            $curr->setNoQuotes($curr->getToken());
+                            $curr->setNoQuotes($curr->getToken(), null, $this->options);
                         }
                         break;
                     }
@@ -405,11 +405,11 @@ class ExpressionListProcessor extends AbstractProcessor {
 
                 if (PHPSQLParserConstants::getInstance()->isCustomFunction($curr->getUpper())) {
                     $curr->setTokenType(ExpressionType::CUSTOM_FUNCTION);
-                    $curr->setNoQuotes(null);
+                    $curr->setNoQuotes(null, null, $this->options);
 
                 } elseif (PHPSQLParserConstants::getInstance()->isAggregateFunction($curr->getUpper())) {
                     $curr->setTokenType(ExpressionType::AGGREGATE_FUNCTION);
-                    $curr->setNoQuotes(null);
+                    $curr->setNoQuotes(null, null, $this->options);
 
                 } elseif ($curr->getUpper() === 'NULL') {
                     // it is a reserved word, but we would like to set it as constant
@@ -424,11 +424,11 @@ class ExpressionListProcessor extends AbstractProcessor {
 
                     } elseif (PHPSQLParserConstants::getInstance()->isFunction($curr->getUpper())) {
                         $curr->setTokenType(ExpressionType::SIMPLE_FUNCTION);
-                        $curr->setNoQuotes(null);
+                        $curr->setNoQuotes(null, null, $this->options);
 
                     } else {
                         $curr->setTokenType(ExpressionType::RESERVED);
-                        $curr->setNoQuotes(null);
+                        $curr->setNoQuotes(null, null, $this->options);
                     }
                 }
             }
@@ -436,17 +436,17 @@ class ExpressionListProcessor extends AbstractProcessor {
             // issue 94, INTERVAL 1 MONTH
             if ($curr->isConstant() && PHPSQLParserConstants::getInstance()->isParameterizedFunction($prev->getUpper())) {
                 $prev->setTokenType(ExpressionType::RESERVED);
-                $prev->setNoQuotes(null);
+                $prev->setNoQuotes(null, null, $this->options);
             }
 
             if ($prev->isConstant() && PHPSQLParserConstants::getInstance()->isParameterizedFunction($curr->getUpper())) {
                 $curr->setTokenType(ExpressionType::RESERVED);
-                $curr->setNoQuotes(null);
+                $curr->setNoQuotes(null, null, $this->options);
             }
 
             if ($curr->isUnspecified()) {
                 $curr->setTokenType(ExpressionType::EXPRESSION);
-                $curr->setNoQuotes(null);
+                $curr->setNoQuotes(null, null, $this->options);
                 $curr->setSubTree($this->process($this->splitSQLIntoTokens($curr->getTrim())));
             }
 

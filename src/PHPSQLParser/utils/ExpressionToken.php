@@ -2,6 +2,7 @@
 
 namespace PHPSQLParser\utils;
 
+use PHPSQLParser\Options;
 use PHPSQLParser\processors\DefaultProcessor;
 
 class ExpressionToken {
@@ -55,10 +56,10 @@ class ExpressionToken {
         return $idx !== false ? $this->token[$idx] : $this->token;
     }
 
-    public function setNoQuotes($token, $qchars = null) {
-        $this->noQuotes = ($token === null) ? null : $this->revokeQuotation($token);
+    public function setNoQuotes($token, $qchars = null, Options $options) {
+        $this->noQuotes = ($token === null) ? null : $this->revokeQuotation($token, $options);
     }
-    
+
     public function setTokenType($type) {
         $this->tokenType = $type;
     }
@@ -116,7 +117,7 @@ class ExpressionToken {
     public function isVariable() {
         return $this->tokenType === ExpressionType::GLOBAL_VARIABLE || $this->tokenType === ExpressionType::LOCAL_VARIABLE || $this->tokenType === ExpressionType::USER_VARIABLE;
     }
-    
+
     public function isAggregateFunction() {
         return $this->tokenType === ExpressionType::AGGREGATE_FUNCTION;
     }
@@ -141,17 +142,17 @@ class ExpressionToken {
         return $this->tokenType === ExpressionType::SUBQUERY;
     }
 
-    private function revokeQuotation($token) {
-        $defProc = new DefaultProcessor();
+    private function revokeQuotation($token, Options $options) {
+        $defProc = new DefaultProcessor($options);
         return $defProc->revokeQuotation($token);
     }
-    
+
     public function toArray() {
         $result = array();
         $result['expr_type'] = $this->tokenType;
         $result['base_expr'] = $this->token;
         if (!empty($this->noQuotes)) {
-            $result['no_quotes'] = $this->noQuotes;   
+            $result['no_quotes'] = $this->noQuotes;
         }
         $result['sub_tree'] = $this->subTree;
         return $result;

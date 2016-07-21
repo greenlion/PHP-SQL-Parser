@@ -47,27 +47,27 @@ use PHPSQLParser\utils\ExpressionType;
  *
  * @author  André Rothe <andre.rothe@phosco.info>
  * @license http://www.debian.org/misc/bsd.license  BSD License (3 Clause)
- *  
+ *
  */
 class CreateDefinitionProcessor extends AbstractProcessor {
 
     protected function processExpressionList($parsed) {
-        $processor = new ExpressionListProcessor();
+        $processor = new ExpressionListProcessor($this->options);
         return $processor->process($parsed);
     }
 
     protected function processIndexColumnList($parsed) {
-        $processor = new IndexColumnListProcessor();
+        $processor = new IndexColumnListProcessor($this->options);
         return $processor->process($parsed);
     }
 
     protected function processColumnDefinition($parsed) {
-        $processor = new ColumnDefinitionProcessor();
+        $processor = new ColumnDefinitionProcessor($this->options);
         return $processor->process($parsed);
     }
 
     protected function processReferenceDefinition($parsed) {
-        $processor = new ReferenceDefinitionProcessor();
+        $processor = new ReferenceDefinitionProcessor($this->options);
         return $processor->process($parsed);
     }
 

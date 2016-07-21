@@ -47,15 +47,15 @@ use PHPSQLParser\utils\ExpressionType;
  *
  * @author  André Rothe <andre.rothe@phosco.info>
  * @license http://www.debian.org/misc/bsd.license  BSD License (3 Clause)
- *  
+ *
  */
 class OrderByProcessor extends AbstractProcessor {
 
     protected function processSelectExpression($unparsed) {
-        $processor = new SelectExpressionProcessor();
+        $processor = new SelectExpressionProcessor($this->options);
         return $processor->process($unparsed);
-    } 
-    
+    }
+
     protected function initParseInfo() {
         return array('base_expr' => "", 'dir' => "ASC", 'expr_type' => ExpressionType::EXPRESSION);
     }
@@ -130,7 +130,7 @@ class OrderByProcessor extends AbstractProcessor {
                     $out[] = parent::processComment($token);
                     break;
                 }
-                
+
                 $parseInfo['base_expr'] .= $token;
             }
         }

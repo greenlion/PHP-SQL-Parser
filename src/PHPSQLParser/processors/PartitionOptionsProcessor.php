@@ -2,7 +2,7 @@
 /**
  * PartitionOptionsProcessor.php
  *
- * This file implements the processor for the PARTITION BY statements 
+ * This file implements the processor for the PARTITION BY statements
  * within CREATE TABLE.
  *
  * PHP version 5
@@ -48,25 +48,25 @@ use PHPSQLParser\utils\ExpressionType;
  *
  * @author  André Rothe <andre.rothe@phosco.info>
  * @license http://www.debian.org/misc/bsd.license  BSD License (3 Clause)
- *  
+ *
  */
 class PartitionOptionsProcessor extends AbstractProcessor {
 
     protected function processExpressionList($unparsed) {
-        $processor = new ExpressionListProcessor();
+        $processor = new ExpressionListProcessor($this->options);
         $expr = $this->removeParenthesisFromStart($unparsed);
         $expr = $this->splitSQLIntoTokens($expr);
         return $processor->process($expr);
     }
 
     protected function processColumnList($unparsed) {
-        $processor = new ColumnListProcessor();
+        $processor = new ColumnListProcessor($this->options);
         $expr = $this->removeParenthesisFromStart($unparsed);
         return $processor->process($expr);
     }
 
     protected function processPartitionDefinition($unparsed) {
-        $processor = new PartitionDefinitionProcessor();
+        $processor = new PartitionDefinitionProcessor($this->options);
         $expr = $this->removeParenthesisFromStart($unparsed);
         $expr = $this->splitSQLIntoTokens($expr);
         return $processor->process($expr);
@@ -162,7 +162,7 @@ class PartitionOptionsProcessor extends AbstractProcessor {
                                 'storage' => substr($base_expr, 0, -strlen($token)));
 
                 $last = array_pop($parsed);
-                $last['by'] = trim($currCategory . ' ' . $upper); // $currCategory will be empty or LINEAR! 
+                $last['by'] = trim($currCategory . ' ' . $upper); // $currCategory will be empty or LINEAR!
                 $last['sub_tree'] = $expr;
                 $parsed[] = $last;
 
@@ -306,7 +306,7 @@ class PartitionOptionsProcessor extends AbstractProcessor {
                 case 'LIST_COLUMNS':
                 case 'RANGE_COLUMNS':
                 case 'KEY':
-                // the columnlist 
+                // the columnlist
                     $expr[] = array('expr_type' => ExpressionType::COLUMN_LIST, 'base_expr' => $trim,
                                     'sub_tree' => $this->processColumnList($trim));
 
@@ -338,7 +338,7 @@ class PartitionOptionsProcessor extends AbstractProcessor {
                             break;
                         }
                     }
-                    // else ?                    
+                    // else ?
                     break;
 
                 default:

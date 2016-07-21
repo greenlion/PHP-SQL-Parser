@@ -43,7 +43,7 @@ use PHPSQLParser\utils\ExpressionType;
 class ColumnDefinitionProcessor extends AbstractProcessor {
 
     protected function processExpressionList($parsed) {
-        $processor = new ExpressionListProcessor();
+        $processor = new ExpressionListProcessor($this->options);
         $expr = $this->removeParenthesisFromStart($parsed);
         $expr = $this->splitSQLIntoTokens($expr);
         $expr = $this->removeComma($expr);
@@ -51,7 +51,7 @@ class ColumnDefinitionProcessor extends AbstractProcessor {
     }
 
     protected function processReferenceDefinition($parsed) {
-        $processor = new ReferenceDefinitionProcessor();
+        $processor = new ReferenceDefinitionProcessor($this->options);
         return $processor->process($parsed);
     }
 
@@ -394,8 +394,14 @@ class ColumnDefinitionProcessor extends AbstractProcessor {
                     $parsed = $this->processExpressionList($trim);
 
                     $last = array_pop($expr);
-                    $last['sub_tree'] = array('expr_type' => ExpressionType::BRACKET_EXPRESSION, 'base_expr' => $trim,
-                                              'sub_tree' => $parsed);
+                    $subTree = array('expr_type' => ExpressionType::BRACKET_EXPRESSION, 'base_expr' => $trim,
+                                     'sub_tree' => $parsed);
+
+                    if ($this->options->getConsistentSubtrees()) {
+                        $subTree = array($subTree);
+                    }
+
+                    $last['sub_tree'] = $subTree;
                     $expr[] = $last;
                     $currCategory = $prevCategory;
                     break;
