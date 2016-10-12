@@ -85,6 +85,7 @@ class InsertProcessor extends AbstractProcessor {
                 continue;
 
             case 'INSERT':
+            case 'REPLACE':
                 continue;
 
             default:
@@ -148,8 +149,8 @@ class InsertProcessor extends AbstractProcessor {
         $parsed = array_merge($parsed, $key);
         unset($tokenList['INTO']);
 
-        if ($table === '' && $token_category === 'INSERT') {
-            list($table, $cols, $key) = $this->processKeyword('INSERT', $tokenList);
+        if ($table === '' && in_array($token_category, array('INSERT', 'REPLACE'))) {
+            list($table, $cols, $key) = $this->processKeyword($token_category, $tokenList);
         }
 
         $parsed[] = array('expr_type' => ExpressionType::TABLE, 'table' => $table,
