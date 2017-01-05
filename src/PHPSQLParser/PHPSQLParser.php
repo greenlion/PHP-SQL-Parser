@@ -68,7 +68,7 @@ class PHPSQLParser {
      * @param bool $calcPositions True, if the output should contain [position], false otherwise.
      * @param array $options
      */
-    public function __construct($sql = false, $calcPositions = false, array $options = []) {
+    public function __construct($sql = false, $calcPositions = false, array $options = array()) {
         $this->options = new Options($options);
 
         if ($sql) {
