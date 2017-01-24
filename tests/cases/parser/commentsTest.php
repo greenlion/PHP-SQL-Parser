@@ -32,7 +32,7 @@ class CommentsTest extends \PHPUnit_Framework_TestCase {
                         b 
                     FROM test';
             $p = $this->parser->parse($sql);
-            $expected = getExpectedValue(dirname(__FILE__), 'comment2.serialized');
+            $expected = getExpectedValueFromPhpFile(dirname(__FILE__), 'comment2.php');
             $this->assertEquals($expected, $p, 'multi line comment');
         }
 
