@@ -66,7 +66,18 @@ class SQLChunkProcessor extends AbstractProcessor {
             // TODO: this field should be a global STATEMENT field within the output
             // we could add all other categories as sub_tree, it could also work with multipe UNIONs
             $processor = new BracketProcessor($this->options);
-            $out['BRACKET'] = $processor->process($out['BRACKET']);
+            $processedBracket = $processor->process($out['BRACKET']);
+            $remainingExpressions = $processedBracket[0]['remaining_expressions'];
+
+            unset($processedBracket[0]['remaining_expressions']);
+
+            if(!empty($remainingExpressions)) {
+                foreach($remainingExpressions as $key=>$expression) {
+                    $processedBracket[][$key] = $expression;
+                }
+            }
+
+            $out['BRACKET'] = $processedBracket;
         }
         if (!empty($out['CREATE'])) {
             $processor = new CreateProcessor($this->options);
@@ -180,6 +191,7 @@ class SQLChunkProcessor extends AbstractProcessor {
         	$processor = new WithProcessor($this->options);
         	$out['WITH'] = $processor->process($out['WITH']);
         }
+
         return $out;
     }
 }
