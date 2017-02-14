@@ -37,7 +37,7 @@
  * @version   SVN: $Id$
  * 
  */
-namespace PHPSQLParser\Test\Parser;
+namespace PHPSQLParser\Test\Creator;
 use PHPSQLParser\PHPSQLParser;
 use PHPSQLParser\PHPSQLCreator;
 use Analog\Analog;
