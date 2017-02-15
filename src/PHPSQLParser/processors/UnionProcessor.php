@@ -100,12 +100,12 @@ class UnionProcessor extends AbstractProcessor {
                         $queries[$unionType][$key] = $this->processDefault($this->removeParenthesisFromStart($token));
                         break;
                     }
-
                     $queries[$unionType][$key] = $this->processSQL($queries[$unionType][$key]);
                     break;
                 }
             }
         }
+
         // it can be parsed or not
         return $queries;
     }
@@ -140,7 +140,7 @@ class UnionProcessor extends AbstractProcessor {
         if (!empty($finalQuery) && $finalQueryString != '') {
             $queries[$unionType][] = $finalQuery;
         }
-
+            
         $defaultProcessor = new DefaultProcessor($this->options);
         $rePrepareSqlString = trim(implode($outputArray));
 
@@ -211,7 +211,7 @@ class UnionProcessor extends AbstractProcessor {
         // or we don't have an UNION/UNION ALL
         if (!empty($outputArray)) {
             if ($unionType) {
-                $queries[$unionType][] = $outputArray;
+                $queries = $this->splitUnionRemainder($queries, $unionType, $outputArray);
             } else {
                 $queries[] = $outputArray;
             }
@@ -219,6 +219,5 @@ class UnionProcessor extends AbstractProcessor {
 
         return $this->processMySQLUnion($queries);
     }
-
 }
 ?>

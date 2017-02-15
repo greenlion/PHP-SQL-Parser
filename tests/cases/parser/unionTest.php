@@ -39,12 +39,15 @@
  * 
  */
 namespace PHPSQLParser\Test\Parser;
+use PHPUnit_Framework_TestCase;
 use PHPSQLParser\PHPSQLParser;
 use PHPSQLParser\PHPSQLCreator;
 use Analog\Analog;
 
-class UnionTest extends \PHPUnit_Framework_TestCase {
-    public function testUnion1() {
+class UnionTest extends PHPUnit_Framework_TestCase
+{
+    public function testUnion1()
+    {
         $parser = new PHPSQLParser();
 
         $sql = 'SELECT colA From test a
@@ -54,13 +57,14 @@ class UnionTest extends \PHPUnit_Framework_TestCase {
         $p = $parser->parse($sql, true);
         Analog::log(serialize($p));
         $expected = getExpectedValue(dirname(__FILE__), 'union1.serialized');
+        //var_export($p);die();
         $this->assertEquals($expected, $p, 'simple union');
     }
     
-    public function testUnion2() {
-        // TODO: the order-by clause has not been parsed
+    public function testUnion2()
+    {
     	$parser = new PHPSQLParser();
-    	$sql = '(SELECT colA From test a)
+        $sql = '(SELECT colA From test a)
                 union all
                 (SELECT colB from test b) order by 1';
         $p = $parser->parse($sql, true);
@@ -68,7 +72,9 @@ class UnionTest extends \PHPUnit_Framework_TestCase {
 
         $this->assertEquals($expected, $p, 'mysql union with order-by');
     }
-    public function testUnion3() {
+
+    public function testUnion3()
+    {
         $sql = "SELECT x FROM ((SELECT y FROM  z  WHERE (y > 2) ) UNION ALL (SELECT a FROM z WHERE (y < 2))) as f ";
         $parser = new PHPSQLParser();
         $p = $parser->parse($sql, true);
