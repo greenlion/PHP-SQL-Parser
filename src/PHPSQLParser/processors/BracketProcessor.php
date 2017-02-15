@@ -63,7 +63,6 @@ class BracketProcessor extends AbstractProcessor {
         $remainingExpressions = $this->getRemainingNotBracketExpression($subtree);
 
         if (isset($subtree['BRACKET'])) {
-            // TODO: here we lose some other parts of a statement like ORDER BY
             $subtree = $subtree['BRACKET'];
         }
 
