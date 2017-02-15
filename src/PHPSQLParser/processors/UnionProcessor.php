@@ -100,13 +100,56 @@ class UnionProcessor extends AbstractProcessor {
                         $queries[$unionType][$key] = $this->processDefault($this->removeParenthesisFromStart($token));
                         break;
                     }
-
                     $queries[$unionType][$key] = $this->processSQL($queries[$unionType][$key]);
                     break;
                 }
             }
         }
+
         // it can be parsed or not
+        return $queries;
+    }
+
+    /**
+     * Moves the final union query into a separate output, so the remainder (such as ORDER BY) can
+     * be processed separately.
+     */
+    protected function splitUnionRemainder($queries, $unionType, $outputArray)
+    {
+        foreach ($outputArray as $key => $token) {
+            //If this token contains a matching pair of brackets at the start and end, use it as the final query
+            $tokenAsArray = str_split(trim($token));
+            $keyCount = max(array_keys($tokenAsArray));
+
+            if (($tokenAsArray[0] == '(' && $tokenAsArray[$keyCount] == ')')) {
+                $queries[$unionType][] = $outputArray;
+                unset($outputArray[$key]);
+                break;
+            }
+        }
+
+        $finalQuery = [];
+
+        //Unbracketed final statement, ORDER BY must be UNION level
+        foreach ($outputArray as $key => $token) {
+            if (strtoupper($token) == 'ORDER') {
+                break;
+            }
+
+            $finalQuery[] = $token;
+            unset($outputArray[$key]);
+        }
+
+        $queries[$unionType][] = $finalQuery;
+
+        $defaultProcessor = new DefaultProcessor($this->options);
+        $rePrepareSqlString = trim(implode($outputArray));
+
+        if (!empty($rePrepareSqlString)) {
+            $remainingQueries = $defaultProcessor->process($rePrepareSqlString);
+            $queries[] = $remainingQueries;
+        }
+
         return $queries;
     }
 
@@ -169,7 +212,7 @@ class UnionProcessor extends AbstractProcessor {
         // or we don't have an UNION/UNION ALL
         if (!empty($outputArray)) {
             if ($unionType) {
-                $queries[$unionType][] = $outputArray;
+                $queries = $this->splitUnionRemainder($queries, $unionType, $outputArray);
             } else {
                 $queries[] = $outputArray;
             }
@@ -177,6 +220,5 @@ class UnionProcessor extends AbstractProcessor {
 
         return $this->processMySQLUnion($queries);
     }
-
 }
 ?>
