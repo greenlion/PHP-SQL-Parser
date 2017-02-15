@@ -14,9 +14,3 @@ function getExpectedValue($path, $filename, $unserialize = true) {
 	$content = file_get_contents(dirname(__FILE__) . "/expected/" . array_pop($path) . "/" . $filename);
 	return ($unserialize ? unserialize($content) : $content);
 }
-
-function getExpectedValueFromPhpFile($path, $filename) {
-    $path = explode(DIRECTORY_SEPARATOR, $path);
-    return include(dirname(__FILE__) . "/expected/" . array_pop($path) . "/" . $filename);
-}
-?>
