@@ -57,7 +57,6 @@ class UnionTest extends PHPUnit_Framework_TestCase
         $p = $parser->parse($sql, true);
         Analog::log(serialize($p));
         $expected = getExpectedValue(dirname(__FILE__), 'union1.serialized');
-        //var_export($p);die();
         $this->assertEquals($expected, $p, 'simple union');
     }
     

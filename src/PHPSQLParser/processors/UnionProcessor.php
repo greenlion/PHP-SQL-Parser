@@ -140,7 +140,7 @@ class UnionProcessor extends AbstractProcessor {
         if (!empty($finalQuery) && $finalQueryString != '') {
             $queries[$unionType][] = $finalQuery;
         }
-            
+
         $defaultProcessor = new DefaultProcessor($this->options);
         $rePrepareSqlString = trim(implode($outputArray));
 
