@@ -57,7 +57,6 @@ class UnionTest extends PHPUnit_Framework_TestCase
         $p = $parser->parse($sql, true);
         Analog::log(serialize($p));
         $expected = getExpectedValue(dirname(__FILE__), 'union1.serialized');
-        //var_export($p);die();
         $this->assertEquals($expected, $p, 'simple union');
     }
     
@@ -69,6 +68,7 @@ class UnionTest extends PHPUnit_Framework_TestCase
                 (SELECT colB from test b) order by 1';
         $p = $parser->parse($sql, true);
         $expected = getExpectedValue(dirname(__FILE__), 'union2.serialized');
+
         $this->assertEquals($expected, $p, 'mysql union with order-by');
     }
 
@@ -95,7 +95,7 @@ class UnionTest extends PHPUnit_Framework_TestCase
         $expectedSerialized = getExpectedValue(dirname(__FILE__), 'union4.serialized', false);
         $expected = unserialize(base64_decode($expectedSerialized));
 
-        $this->assertEquals($expected, $p, 'simple union');
+        $this->assertEquals($expected, $p, 'simple union with order by and no brackets');
     }
 }
 ?>
