@@ -116,8 +116,10 @@ class UnionProcessor extends AbstractProcessor {
      */
     protected function splitUnionRemainder($queries, $unionType, $outputArray)
     {
+        $finalQuery = [];
+
+        //If this token contains a matching pair of brackets at the start and end, use it as the final query
         foreach ($outputArray as $key => $token) {
-            //If this token contains a matching pair of brackets at the start and end, use it as the final query
             $tokenAsArray = str_split(trim($token));
             $keyCount = max(array_keys($tokenAsArray));
 
@@ -125,22 +127,19 @@ class UnionProcessor extends AbstractProcessor {
                 $queries[$unionType][] = $outputArray;
                 unset($outputArray[$key]);
                 break;
-            }
-        }
-
-        $finalQuery = [];
-
-        //Unbracketed final statement, ORDER BY must be UNION level
-        foreach ($outputArray as $key => $token) {
-            if (strtoupper($token) == 'ORDER') {
+            } elseif (strtoupper($token) == 'ORDER') {
                 break;
+            } else {
+                $finalQuery[] = $token;
+                unset($outputArray[$key]);
             }
-
-            $finalQuery[] = $token;
-            unset($outputArray[$key]);
         }
 
-        $queries[$unionType][] = $finalQuery;
+        $finalQueryString = trim(implode($finalQuery));
+
+        if (!empty($finalQuery) && $finalQueryString != '') {
+            $queries[$unionType][] = $finalQuery;
+        }
 
         $defaultProcessor = new DefaultProcessor($this->options);
         $rePrepareSqlString = trim(implode($outputArray));
