@@ -39,15 +39,14 @@
  * 
  */
 namespace PHPSQLParser\Test\Parser;
+
+use PHPUnit_Framework_TestCase;
 use PHPSQLParser\PHPSQLParser;
-use PHPSQLParser\PHPSQLCreator;
 
-class issue95Test extends \PHPUnit_Framework_TestCase {
-	
-    public function testIssue95() {
-
-
-        // TODO: not solved, the parser doesn't recognize the UNION
+class issue95Test extends PHPUnit_Framework_TestCase
+{
+    public function testIssue95()
+    {
         $sql="SELECT * FROM ((SELECT 1 AS `ID`) UNION (SELECT 2 AS `ID`)) AS `Tmp`";
 
         try {
@@ -56,8 +55,8 @@ class issue95Test extends \PHPUnit_Framework_TestCase {
 
         $p = $parser->parsed;
         $expected = getExpectedValue(dirname(__FILE__), 'issue95.serialized');
-        $this->assertEquals($expected, $p, 'union within the from clause');
 
+        $this->assertEquals($expected, $p, 'union within the from clause');
     }
 }
 
