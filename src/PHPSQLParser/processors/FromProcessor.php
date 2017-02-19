@@ -117,7 +117,7 @@ class FromProcessor extends AbstractProcessor {
                 $res['expr_type'] = ExpressionType::SUBQUERY;
             } else {
                 $tmp = $this->splitSQLIntoTokens($parseInfo['expression']);
-                $unionProcessor = new UnionProcessor();
+                $unionProcessor = new UnionProcessor($this->options);
                 $unionQueries = $unionProcessor->process($tmp);
 
                 // If there was no UNION or UNION ALL in the query, then the query is
