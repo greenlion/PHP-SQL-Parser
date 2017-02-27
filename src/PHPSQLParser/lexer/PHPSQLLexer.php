@@ -85,7 +85,7 @@ class PHPSQLLexer {
             throw new InvalidParameterException($sql);
         }
 
-	    $tokens = preg_split($this->splitters->getSplittersRegexPattern(), $sql, null, PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_NO_EMPTY );
+        $tokens = preg_split($this->splitters->getSplittersRegexPattern(), $sql, null, PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_NO_EMPTY);
 
         $tokens = $this->concatEscapeSequences($tokens);
         $tokens = $this->balanceBackticks($tokens);
