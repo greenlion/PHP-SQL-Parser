@@ -54,7 +54,7 @@ class CreateIndexTableBuilder implements Builder {
 
     protected function buildColumnList($parsed) {
         $builder = new ColumnListBuilder();
-        return $builder->build($parsed, ', ');
+        return $builder->build($parsed);
     }
 
     public function build(array $parsed) {

@@ -63,7 +63,7 @@ class ColumnListBuilder implements Builder {
         return $builder->build($parsed);
     }
     
-    public function build(array $parsed, $delim = ' ') {
+    public function build(array $parsed, $delim = ', ') {
         if ($parsed['expr_type'] !== ExpressionType::COLUMN_LIST) {
             return '';
         }
