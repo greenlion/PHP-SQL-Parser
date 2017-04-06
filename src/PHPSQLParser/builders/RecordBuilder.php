@@ -75,7 +75,7 @@ class RecordBuilder implements Builder {
     
     public function build(array $parsed) {
         if ($parsed['expr_type'] !== ExpressionType::RECORD) {
-            return "";
+            return isset($parsed['base_expr']) ? $parsed['base_expr'] : '';
         }
         $sql = "";
         foreach ($parsed['data'] as $k => $v) {
