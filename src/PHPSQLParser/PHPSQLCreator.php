@@ -54,6 +54,7 @@ use PHPSQLParser\builders\ShowStatementBuilder;
 use PHPSQLParser\builders\BracketStatementBuilder;
 use PHPSQLParser\builders\UnionStatementBuilder;
 use PHPSQLParser\builders\UnionAllStatementBuilder;
+use PHPSQLParser\builders\AlterStatementBuilder;
 
 /**
  * This class generates SQL from the output of the PHPSQLParser. 
@@ -124,6 +125,10 @@ class PHPSQLCreator {
             break;
         case 'DROP':
             $builder = new DropStatementBuilder();
+            $this->created = $builder->build($parsed);
+            break;
+        case 'ALTER':
+            $builder = new AlterStatementBuilder();
             $this->created = $builder->build($parsed);
             break;
         default:
