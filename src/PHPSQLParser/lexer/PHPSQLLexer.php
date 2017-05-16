@@ -85,39 +85,7 @@ class PHPSQLLexer {
             throw new InvalidParameterException($sql);
         }
 
-        $tokens = array();
-        $token = "";
-
-        $splitLen = $this->splitters->getMaxLengthOfSplitter();
-        $found = false;
-        $len = strlen($sql);
-        $pos = 0;
-
-        while ($pos < $len) {
-
-            for ($i = $splitLen; $i > 0; $i--) {
-                $substr = substr($sql, $pos, $i);
-                if ($this->splitters->isSplitter($substr)) {
-
-                    if ($token !== "") {
-                        $tokens[] = $token;
-                    }
-
-                    $tokens[] = $substr;
-                    $pos += $i;
-                    $token = "";
-
-                    continue 2;
-                }
-            }
-
-            $token .= $sql[$pos];
-            $pos++;
-        }
-
-        if ($token !== "") {
-            $tokens[] = $token;
-        }
+        $tokens = preg_split($this->splitters->getSplittersRegexPattern(), $sql, null, PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_NO_EMPTY);
 
         $tokens = $this->concatEscapeSequences($tokens);
         $tokens = $this->balanceBackticks($tokens);
