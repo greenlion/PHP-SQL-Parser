@@ -67,10 +67,13 @@ class ValuesBuilder implements Builder {
                 throw new UnableToCreateSQLException('VALUES', $k, $v, 'expr_type');
             }
 
-            $sql .= ", ";
+            $sql .= $this->getRecordDelimiter($v);
         }
-        $sql = substr($sql, 0, -2);
-        return "VALUES " . $sql;
+        return "VALUES " . trim($sql);
+    }
+
+    protected function getRecordDelimiter($parsed) {
+        return empty($parsed['delim']) ? ' ' : $parsed['delim'] . ' ';
     }
 }
 ?>
