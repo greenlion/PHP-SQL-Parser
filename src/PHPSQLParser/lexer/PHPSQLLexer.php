@@ -87,11 +87,11 @@ class PHPSQLLexer {
 
         $tokens = preg_split($this->splitters->getSplittersRegexPattern(), $sql, null, PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_NO_EMPTY);
 
+        $tokens = $this->concatComments($tokens);
         $tokens = $this->concatEscapeSequences($tokens);
         $tokens = $this->balanceBackticks($tokens);
         $tokens = $this->concatColReferences($tokens);
         $tokens = $this->balanceParenthesis($tokens);
-        $tokens = $this->concatComments($tokens);
         $tokens = $this->concatUserDefinedVariables($tokens);
         $tokens = $this->concatScientificNotations($tokens);
         $tokens = $this->concatNegativeNumbers($tokens);
@@ -236,6 +236,11 @@ class PHPSQLLexer {
             }
 
             if (($comment === false) && ($token === "--")) {
+                $comment = $i;
+                $inline = true;
+            }
+
+            if (($comment === false) && (substr($token, 0, 1) === "#")) {
                 $comment = $i;
                 $inline = true;
             }
