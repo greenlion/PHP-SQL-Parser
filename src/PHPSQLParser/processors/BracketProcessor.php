@@ -57,12 +57,12 @@ class BracketProcessor extends AbstractProcessor {
     }
 
     public function process($tokens) {
-
         $token = $this->removeParenthesisFromStart($tokens[0]);
         $subtree = $this->processTopLevel($token);
 
+        $remainingExpressions = $this->getRemainingNotBracketExpression($subtree);
+
         if (isset($subtree['BRACKET'])) {
-            // TODO: here we lose some other parts of a statement like ORDER BY
             $subtree = $subtree['BRACKET'];
         }
 
@@ -73,7 +73,22 @@ class BracketProcessor extends AbstractProcessor {
 
         return array(
                 array('expr_type' => ExpressionType::BRACKET_EXPRESSION, 'base_expr' => trim($tokens[0]),
-                        'sub_tree' => $subtree));
+                        'sub_tree' => $subtree, 'remaining_expressions' => $remainingExpressions));
+    }
+
+    private function getRemainingNotBracketExpression($subtree)
+    {
+        $remainingExpressions = array();
+        $ignoredKeys = array('BRACKET', 'SELECT', 'FROM');
+        $subtreeKeys = array_keys($subtree);
+
+        foreach($subtreeKeys as $key) {
+            if(!in_array($key, $ignoredKeys)) {
+                $remainingExpressions[$key] = $subtree[$key];
+            }
+        }
+
+        return $remainingExpressions;
     }
 
 }
