@@ -17,7 +17,7 @@ class Issue248Test extends \PHPUnit_Framework_TestCase {
     	 * https://github.com/greenlion/PHP-SQL-Parser/issues/248
     	 * DROP INDEX doesn't get created.
     	 */
-		$sql     = "DROP INDEX test";
+		$sql     = "DROP INDEX test ON wp_posts";
 		$parser  = new PHPSQLParser( $sql );
 		$creator = new PHPSQLCreator( $parser->parsed );
 		$this->assertEquals( $creator->created, $sql, 'drop index statement' );

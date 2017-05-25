@@ -1,8 +1,8 @@
 <?php
 /**
- * DropIndexBuilder.php
+ * DropIndexTable.php
  *
- * Builds the CREATE INDEX statement
+ * Builds the table part of a CREATE INDEX statement
  *
  * PHP version 5
  *
@@ -31,32 +31,36 @@
  * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
+ * 
  * @author    André Rothe <andre.rothe@phosco.info>
  * @copyright 2010-2014 Justin Swanhart and André Rothe
  * @license   http://www.debian.org/misc/bsd.license  BSD License (3 Clause)
  * @version   SVN: $Id$
- *
+ * 
  */
 
 namespace PHPSQLParser\builders;
+use PHPSQLParser\utils\ExpressionType;
 
 /**
- * This class implements the builder for the DROP INDEX statement. You can overwrite
- * all functions to achieve another handling.
+ * This class implements the builder for the table part of a DROP INDEX statement.
+ * You can overwrite all functions to achieve another handling.
+ *
+ * @author  André Rothe <andre.rothe@phosco.info>
+ * @license http://www.debian.org/misc/bsd.license  BSD License (3 Clause)
+ *  
  */
-class DropIndexBuilder implements Builder {
-
-	protected function buildIndexTable($parsed) {
-		$builder = new DropIndexTableBuilder();
-		return $builder->build($parsed);
-	}
+class DropIndexTableBuilder implements Builder {
 
     public function build(array $parsed) {
-        $sql = $parsed['name'];
-	    $sql = trim($sql);
-	    $sql .= ' ' . $this->buildIndexTable($parsed);
-        return trim($sql);
+        if (!isset($parsed['on']) || $parsed['on'] === false) {
+            return '';
+        }
+        $table = $parsed['on'];
+        if ($table['expr_type'] !== ExpressionType::TABLE) {
+            return '';
+        }
+        return 'ON ' . $table['name'];
     }
 
 }
