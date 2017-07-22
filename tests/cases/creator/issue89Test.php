@@ -54,7 +54,6 @@ class issue89Test extends \PHPUnit_Framework_TestCase {
         $parser = new PHPSQLParser($sql, true);
         $creator = new PHPSQLCreator($parser->parsed);
         $created = $creator->created;
-        print_r($created);
         $expected = getExpectedValue(dirname(__FILE__), 'issue89.sql', false);
         $this->assertSame($expected, $created, 'functions');
 
