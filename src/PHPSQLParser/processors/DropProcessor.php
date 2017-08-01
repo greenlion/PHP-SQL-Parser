@@ -77,7 +77,12 @@ class DropProcessor extends AbstractProcessor {
                 }
                 $base_expr = '';
                 break;
-
+            case 'INDEX':
+	            if ( $objectType === '' ) {
+		            $objectType = constant( 'PHPSQLParser\utils\ExpressionType::' . $upper );
+	            }
+	            $base_expr = '';
+	            break;
             case 'IF':
             case 'EXISTS':
                 $exists = true;

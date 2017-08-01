@@ -298,11 +298,11 @@ class SQLProcessor extends SQLChunkProcessor {
                 break;
 
             case 'INDEX':
-                if ($prev_category === 'CREATE') {
-                    $out[$prev_category][] = $trim;
-                    $token_category = $upper;
-                }
-                break;
+	            if ( in_array( $prev_category, array( 'CREATE', 'DROP' ) ) ) {
+		            $out[ $prev_category ][] = $trim;
+		            $token_category          = $upper;
+	            }
+	            break;
 
             case 'TABLE':
                 if ($prev_category === 'CREATE') {
