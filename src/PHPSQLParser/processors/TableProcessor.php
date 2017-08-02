@@ -165,7 +165,7 @@ class TableProcessor extends AbstractProcessor {
                 break;
 
             case 'COLLATE':
-                if ($prevCategory === 'TABLE_OPTION') {
+                if ($prevCategory === 'TABLE_OPTION' || $prevCategory === 'CREATE_DEF') {
                     // add it to the previous DEFAULT
                     $expr[] = $this->getReservedType($trim);
                     $currCategory = 'COLLATE';
