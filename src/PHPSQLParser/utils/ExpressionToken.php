@@ -33,7 +33,7 @@ class ExpressionToken {
     }
 
     public function isEnclosedWithinParenthesis() {
-        return ($this->upper[0] === '(' && substr($this->upper, -1) === ')');
+        return (!empty( $this->upper ) && $this->upper[0] === '(' && substr($this->upper, -1) === ')');
     }
 
     public function setSubTree($tree) {
