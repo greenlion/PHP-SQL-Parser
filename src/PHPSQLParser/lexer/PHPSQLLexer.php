@@ -85,7 +85,6 @@ class PHPSQLLexer {
             throw new InvalidParameterException($sql);
         }
         $tokens = preg_split($this->splitters->getSplittersRegexPattern(), $sql, null, PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_NO_EMPTY);
-        echo "After split:" . print_r($tokens,true);
         $tokens = $this->concatComments($tokens);
         $tokens = $this->concatEscapeSequences($tokens);
         $tokens = $this->balanceBackticks($tokens);
@@ -212,7 +211,7 @@ class PHPSQLLexer {
         $i = 0;
         $cnt = count($tokens);
         $comment = false;
-
+        $in_string = false;
         while ($i < $cnt) {
 
             if (!isset($tokens[$i])) {
@@ -221,32 +220,36 @@ class PHPSQLLexer {
             }
 
             $token = $tokens[$i];
-
-            if ($comment !== false) {
-                if ($inline === true && ($token === "\n" || $token === "\r\n")) {
-                    $comment = false;
-                } else {
-                    unset($tokens[$i]);
-                    $tokens[$comment] .= $token;
-                }
-                if ($inline === false && ($token === "*/")) {
-                    $comment = false;
-                }
+            if($token == "\"" || $token == "'") {
+                $in_string = !$in_string;
             }
+            if(!$in_string) {
+                if ($comment !== false) {
+                    if ($inline === true && ($token === "\n" || $token === "\r\n")) {
+                        $comment = false;
+                    } else {
+                        unset($tokens[$i]);
+                        $tokens[$comment] .= $token;
+                    }
+                    if ($inline === false && ($token === "*/")) {
+                        $comment = false;
+                    }
+                }
 
-            if (($comment === false) && ($token === "--")) {
-                $comment = $i;
-                $inline = true;
-            }
+                if (($comment === false) && ($token === "--")) {
+                    $comment = $i;
+                    $inline = true;
+                }
 
-            /*if (($comment === false) && (substr($token, 0, 1) === "#")) {
-                $comment = $i;
-                $inline = true;
-            }*/
+                if (($comment === false) && (substr($token, 0, 1) === "#")) {
+                    $comment = $i;
+                    $inline = true;
+                }
 
-            if (($comment === false) && ($token === "/*")) {
-                $comment = $i;
-                $inline = false;
+                if (($comment === false) && ($token === "/*")) {
+                    $comment = $i;
+                    $inline = false;
+                }
             }
 
             $i++;
