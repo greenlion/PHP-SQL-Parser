@@ -84,9 +84,8 @@ class PHPSQLLexer {
         if (!is_string($sql)) {
             throw new InvalidParameterException($sql);
         }
-
         $tokens = preg_split($this->splitters->getSplittersRegexPattern(), $sql, null, PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_NO_EMPTY);
-
+        echo "After split:" . print_r($tokens,true);
         $tokens = $this->concatComments($tokens);
         $tokens = $this->concatEscapeSequences($tokens);
         $tokens = $this->balanceBackticks($tokens);
@@ -240,10 +239,10 @@ class PHPSQLLexer {
                 $inline = true;
             }
 
-            if (($comment === false) && (substr($token, 0, 1) === "#")) {
+            /*if (($comment === false) && (substr($token, 0, 1) === "#")) {
                 $comment = $i;
                 $inline = true;
-            }
+            }*/
 
             if (($comment === false) && ($token === "/*")) {
                 $comment = $i;
