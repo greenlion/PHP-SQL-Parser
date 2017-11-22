@@ -122,7 +122,7 @@ class UnionProcessor extends AbstractProcessor {
         $finalQueryFound = false;
         if (count($outputArray) === 1) {
             $tokenAsArray = str_split(trim($outputArray[0]));
-            if ($tokenAsArray[0] == '(' && $tokenAsArray[$keyCount] == ')') {
+            if ($tokenAsArray[0] == '(' && $tokenAsArray[count($tokenAsArray)-1] == ')') {
                 $queries[$unionType][] = $outputArray;
                 $finalQueryFound = true;
             }
