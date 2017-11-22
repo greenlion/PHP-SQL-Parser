@@ -1,8 +1,8 @@
 <?php
 /**
- * DropStatement.php
+ * DropIndexTable.php
  *
- * Builds the DROP statement
+ * Builds the table part of a CREATE INDEX statement
  *
  * PHP version 5
  *
@@ -40,24 +40,28 @@
  */
 
 namespace PHPSQLParser\builders;
+use PHPSQLParser\utils\ExpressionType;
 
 /**
- * This class implements the builder for the whole DROP TABLE statement. 
+ * This class implements the builder for the table part of a DROP INDEX statement.
  * You can overwrite all functions to achieve another handling.
  *
  * @author  André Rothe <andre.rothe@phosco.info>
  * @license http://www.debian.org/misc/bsd.license  BSD License (3 Clause)
  *  
  */
-class DropStatementBuilder implements Builder {
+class DropIndexTableBuilder implements Builder {
 
-	protected function buildDROP( $parsed ) {
-		$builder = new DropBuilder();
-		return $builder->build( $parsed );
-	}
+    public function build(array $parsed) {
+        if (!isset($parsed['on']) || $parsed['on'] === false) {
+            return '';
+        }
+        $table = $parsed['on'];
+        if ($table['expr_type'] !== ExpressionType::TABLE) {
+            return '';
+        }
+        return 'ON ' . $table['name'];
+    }
 
-	public function build( array $parsed ) {
-		return $this->buildDROP( $parsed );
-	}
 }
 ?>

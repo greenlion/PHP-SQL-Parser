@@ -23,7 +23,7 @@ class Issue242Test extends \PHPUnit_Framework_TestCase {
 	}
 
     public function testOnDuplicateKeyAbsValues() {
-        $sql = "INSERT INTO wp_dh_wfConfig (name, val, autoload) values ('totalAlertsSent', '16', 'yes') ON DUPLICATE KEY UPDATE val = '16', autoload = 'yes';";
+        $sql = "INSERT INTO wp_dh_wfConfig (name, val, autoload) VALUES ('totalAlertsSent', '16', 'yes') ON DUPLICATE KEY UPDATE val = '16', autoload = 'yes'";
 
         $parser = new PHPSQLParser();
         $parser->parse($sql);
