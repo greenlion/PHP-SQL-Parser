@@ -225,7 +225,7 @@ class PHPSQLLexer {
 
             /*
              * Check to see if we're inside a value (i.e. back ticks).
-             * If so inline # comments are not valid.
+             * If so inline comments are not valid.
              */
             if ($comment === false && $this->isBacktick($token)) {
                 if (!empty($backTicks)) {
@@ -255,7 +255,7 @@ class PHPSQLLexer {
                     }
                 }
 
-                if (($comment === false) && ($token === "--")) {
+                if (($comment === false) && ($token === "--") && empty($backTicks)) {
                     $comment = $i;
                     $inline = true;
                 }
