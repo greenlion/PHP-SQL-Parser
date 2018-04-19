@@ -92,6 +92,11 @@ class SubTreeBuilder implements Builder {
         return $builder->build($parsed);
     }
 
+    protected function buildInList($parsed) {
+        $builder = new InListBuilder();
+        return $builder->build($parsed);
+    }
+
     public function build(array $parsed, $delim = " ") {
         if ($parsed['sub_tree'] === '') {
             return "";
@@ -107,6 +112,7 @@ class SubTreeBuilder implements Builder {
             $sql .= $this->buildSelectBracketExpression($v);
             $sql .= $this->buildReserved($v);
             $sql .= $this->buildQuery($v);
+            $sql .= $this->buildInList($v);
 
             if ($len == strlen($sql)) {
                 throw new UnableToCreateSQLException('expression subtree', $k, $v, 'expr_type');
