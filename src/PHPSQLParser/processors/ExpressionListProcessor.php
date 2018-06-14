@@ -369,10 +369,16 @@ class ExpressionListProcessor extends AbstractProcessor {
 
                     switch ($curr->getToken(0)) {
                     case "'":
-                    case '"':
                     // it is a string literal
                         $curr->setTokenType(ExpressionType::CONSTANT);
                         break;
+                    case '"':
+                        if (!$this->options->getANSIQuotes()) {
+                        // If we're not using ANSI quotes, this is a string literal.
+                            $curr->setTokenType(ExpressionType::CONSTANT);
+                            break;
+                        }
+                        // Otherwise continue to the next case
                     case '`':
                     // it is an escaped colum name
                         $curr->setTokenType(ExpressionType::COLREF);
