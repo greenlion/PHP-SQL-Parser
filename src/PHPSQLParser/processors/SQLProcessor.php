@@ -62,7 +62,8 @@ class SQLProcessor extends SQLChunkProcessor {
         $out = false;
 
 	// $tokens may come as a numeric indexed array starting with an index greater than 0 (or as a boolean)
-        if ( $tokenCount = count($tokens) ){
+	$tokenCount = count($tokens);
+        if ( is_array($tokens) ){
           $tokens = array_values($tokens);
         }
         for ($tokenNumber = 0; $tokenNumber < $tokenCount; ++$tokenNumber) {
