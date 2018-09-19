@@ -212,6 +212,7 @@ class PHPSQLLexer {
         $cnt = count($tokens);
         $comment = false;
         $in_string = false;
+        $inline = false;
         while ($i < $cnt) {
 
             if (!isset($tokens[$i])) {
@@ -220,7 +221,7 @@ class PHPSQLLexer {
             }
 
             $token = $tokens[$i];
-            if($token == "\"" || $token == "'") {
+            if($comment === false && ($token == "\"" || $token == "'")) {
                 $in_string = !$in_string;
             }
             if(!$in_string) {
