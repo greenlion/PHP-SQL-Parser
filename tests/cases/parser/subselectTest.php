@@ -58,6 +58,10 @@ class subselectTest extends \PHPUnit_Framework_TestCase {
         $expected = getExpectedValue(dirname(__FILE__), 'subselect2.serialized');
         $this->assertEquals($expected, $p, 'sub-select as table replacement with alias');
 
+		$sql = "SELECT (-- comment\nselect colA FRom TableA) as b From test t";
+		$p = $parser->parse($sql);
+		$expected = getExpectedValue(dirname(__FILE__), 'subselect3.serialized');
+		$this->assertEquals($expected, $p, 'sub-select starting with a comment');
     }
 }
 
