@@ -55,6 +55,8 @@ class issue51Test extends \PHPUnit_Framework_TestCase {
         $expected = getExpectedValue(dirname(__FILE__), 'issue51.serialized');
         $this->assertEquals($expected, $p, 'should not die if query contains cast expression');
 
+        $creator = new PHPSQLCreator($p);
+        $this->assertEquals('SELECT CAST(12 AS decimal (9,3))', $creator->created);
     }
 }
 
