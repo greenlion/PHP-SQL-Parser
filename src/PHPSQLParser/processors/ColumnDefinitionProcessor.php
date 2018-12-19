@@ -138,12 +138,14 @@ class ColumnDefinitionProcessor extends AbstractProcessor {
                 $last = array_pop($expr);
                 $last['unsigned'] = true;
                 $expr[] = $last;
+	            $options['sub_tree'][] = array('expr_type' => ExpressionType::RESERVED, 'base_expr' => $trim);
                 continue 2;
 
             case 'ZEROFILL':
                 $last = array_pop($expr);
                 $last['zerofill'] = true;
                 $expr[] = $last;
+	            $options['sub_tree'][] = array('expr_type' => ExpressionType::RESERVED, 'base_expr' => $trim);
                 continue 2;
 
             case 'BIT':
