@@ -154,6 +154,8 @@ class ColumnDefinitionProcessor extends AbstractProcessor {
             case 'INT':
             case 'INTEGER':
             case 'BIGINT':
+            case 'BOOL':
+            case 'BOOLEAN':
                 $expr[] = array('expr_type' => ExpressionType::DATA_TYPE, 'base_expr' => $trim, 'unsigned' => false,
                                 'zerofill' => false, 'length' => false);
                 $currCategory = 'SINGLE_PARAM_PARENTHESIS';
