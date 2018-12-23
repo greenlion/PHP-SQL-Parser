@@ -18,7 +18,7 @@ class Issue252Test extends \PHPUnit_Framework_TestCase {
 	}
 
 	public function testIssue252_Bool() {
-		$sql    = "CREATE TABLE IF NOT EXISTS wp_feedback_responses (id bigint NOT NULL AUTO_INCREMENT, response_id varchar (50) NOT NULL, response_public boolean NOT NULL, response_public_bc bool NOT NULL,PRIMARY KEY (id))";
+		$sql    = "CREATE TABLE IF NOT EXISTS wp_feedback_responses (id bigint NOT NULL AUTO_INCREMENT, response_id varchar (50) NOT NULL, response_public boolean NOT NULL, response_public_bc bool NOT NULL, PRIMARY KEY (id))";
 		$this->_test( $sql, '');
 	}
 }

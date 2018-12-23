@@ -213,6 +213,7 @@ class PHPSQLLexer {
         $comment = false;
         $backTicks = [];
         $in_string = false;
+        $inline = false;
 
         while ($i < $cnt) {
 
@@ -239,7 +240,7 @@ class PHPSQLLexer {
                 }
             }
 
-            if($token == "\"" || $token == "'") {
+            if($comment === false && ($token == "\"" || $token == "'")) {
                 $in_string = !$in_string;
             }
             if(!$in_string) {
