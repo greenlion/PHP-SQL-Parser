@@ -248,6 +248,7 @@ class ExpressionListProcessor extends AbstractProcessor {
                                 $tmpExprList = $curr->getSubTree();
                                 $curr->setSubTree(array_merge($tmpExprList, $localExprList));
                             }
+                            $curr->setDelim(',');
 
                             $tmpExprList = array();
                             $localExpr = new ExpressionToken();
