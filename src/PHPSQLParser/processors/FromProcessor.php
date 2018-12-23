@@ -112,7 +112,7 @@ class FromProcessor extends AbstractProcessor {
         if (substr(trim($parseInfo['table']), 0, 1) == '(') {
             $parseInfo['expression'] = $this->removeParenthesisFromStart($parseInfo['table']);
 
-            if (preg_match("/^\\s*select/i", $parseInfo['expression'])) {
+            if (preg_match("/^\\s*(-- [\\w\\s]+\\n)?\\s*SELECT/i", $parseInfo['expression'])) {
                 $parseInfo['sub_tree'] = $this->processSQLDefault($parseInfo['expression']);
                 $res['expr_type'] = ExpressionType::SUBQUERY;
             } else {

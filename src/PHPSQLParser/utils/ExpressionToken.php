@@ -92,7 +92,7 @@ class ExpressionToken {
     }
 
     public function isSubQueryToken() {
-        return preg_match("/^\\(\\s*SELECT/i", $this->trim);
+        return preg_match("/^\\(\\s*(-- [\\w\\s]+\\n)?\\s*SELECT/i", $this->trim);
     }
 
     public function isExpression() {
