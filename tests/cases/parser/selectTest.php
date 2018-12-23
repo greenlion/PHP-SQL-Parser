@@ -74,7 +74,7 @@ class selectTest extends \PHPUnit_Framework_TestCase {
         $this->assertEquals(1, count($p['FROM']));
         $this->assertEquals(3, count($p['WHERE']));
 
-        $parser->parse('SELECT NOW( ),now(),sysdate( ),sysdate () as now');
+        $parser->parse('SELECT NOW( ),now(),sysdate( ),sysdate() as now');
         $this->assertEquals('sysdate', $parser->parsed['SELECT'][3]['base_expr']);
 
 

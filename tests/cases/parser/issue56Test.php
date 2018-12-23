@@ -55,14 +55,13 @@ class issue56Test extends \PHPUnit_Framework_TestCase {
         $p = $parser->parsed;
         $expected = getExpectedValue(dirname(__FILE__), 'issue56a.serialized');
         $this->assertEquals($expected, $p, 'optimizer hint within INSERT');
-
         // optimizer/index hints
         // TODO: not solved
         $parser = new PHPSQLParser();
         $sql = "insert /* a comment -- haha */ into TableName (Col1,col2) values(1,'pol')";
         $parser->parse($sql, true);
         $p = $parser->parsed;
-        $expected = getExpectedValue(dirname(__FILE__), 'issue56a.serialized');
+        $expected = getExpectedValue(dirname(__FILE__), 'issue56a1.serialized');
         $this->assertEquals($expected, $p, 'multiline comment with inline comment inside');
 
         // inline comment
@@ -84,7 +83,7 @@ class issue56Test extends \PHPUnit_Framework_TestCase {
         WHERE x = 1";
         $parser->parse($sql, true);
         $p = $parser->parsed;
-        $expected = getExpectedValue(dirname(__FILE__), 'issue56b.serialized');
+        $expected = getExpectedValue(dirname(__FILE__), 'issue56b1.serialized');
         $this->assertEquals($expected, $p, 'inline comment with multiline comment inside');
 
     }

@@ -83,6 +83,11 @@ class OrderByBuilder implements Builder {
         return $builder->build($parsed);
     }
     
+    protected function buildPosition($parsed) {
+        $builder = new PositionBuilder();
+        return $builder->build($parsed);
+    }
+
     public function build(array $parsed) {
         $sql = "";
         foreach ($parsed as $k => $v) {
@@ -93,6 +98,7 @@ class OrderByBuilder implements Builder {
             $sql .= $this->buildExpression($v);
             $sql .= $this->buildBracketExpression($v);
             $sql .= $this->buildReserved($v);
+            $sql .= $this->buildPosition($v);
             
             if ($len == strlen($sql)) {
                 throw new UnableToCreateSQLException('ORDER', $k, $v, 'expr_type');

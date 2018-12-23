@@ -119,21 +119,26 @@ class UnionProcessor extends AbstractProcessor {
         $finalQuery = [];
 
         //If this token contains a matching pair of brackets at the start and end, use it as the final query
-        foreach ($outputArray as $key => $token) {
-            $tokenAsArray = str_split(trim($token));
-            $keyCount = max(array_keys($tokenAsArray));
-
-            if (($tokenAsArray[0] == '(' && $tokenAsArray[$keyCount] == ')')) {
+        $finalQueryFound = false;
+        if (count($outputArray) === 1) {
+            $tokenAsArray = str_split(trim($outputArray[0]));
+            if ($tokenAsArray[0] == '(' && $tokenAsArray[count($tokenAsArray)-1] == ')') {
                 $queries[$unionType][] = $outputArray;
-                unset($outputArray[$key]);
-                break;
-            } elseif (strtoupper($token) == 'ORDER') {
-                break;
-            } else {
-                $finalQuery[] = $token;
-                unset($outputArray[$key]);
+                $finalQueryFound = true;
             }
         }
+
+        if (!$finalQueryFound) {
+            foreach ($outputArray as $key => $token) {
+                if (strtoupper($token) == 'ORDER') {
+                    break;
+                } else {
+                    $finalQuery[] = $token;
+                    unset($outputArray[$key]);
+                }
+            }
+        }
+
 
         $finalQueryString = trim(implode($finalQuery));
 
