@@ -126,19 +126,25 @@ class UnionProcessor extends AbstractProcessor {
 
             if ($tokenAsArray[0] == '(' && $tokenAsArray[$keyCount] == ')' && $firstTime) {
                 $queries[$unionType][] = $outputArray;
-                unset($outputArray[$key]);
-                break;
-            } elseif (strtoupper($token) == 'ORDER') {
-                break;
-            } else {
-                $finalQuery[] = $token;
-                unset($outputArray[$key]);
+                $finalQueryFound = true;
+            }
+        }
+
+        if (!$finalQueryFound) {
+            foreach ($outputArray as $key => $token) {
+                if (strtoupper($token) == 'ORDER') {
+                    break;
+                } else {
+                    $finalQuery[] = $token;
+                    unset($outputArray[$key]);
+                }
             }
 
             if ($firstTime && !empty($token)) {
                 $firstTime = false;
             }
         }
+
 
         $finalQueryString = trim(implode($finalQuery));
 

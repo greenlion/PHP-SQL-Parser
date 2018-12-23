@@ -1,8 +1,8 @@
 <?php
 /**
- * LimitBuilder.php
+ * unionWithParenthesisTest.php
  *
- * Builds the LIMIT statement.
+ * Test case for PHPSQLParser.
  *
  * PHP version 5
  *
@@ -38,26 +38,17 @@
  * @version   SVN: $Id$
  * 
  */
+namespace PHPSQLParser\Test\Parser;
+use PHPSQLParser\PHPSQLParser;
+use PHPSQLParser\PHPSQLCreator;
 
-namespace PHPSQLParser\builders;
-use PHPSQLParser\exceptions\UnableToCreateSQLException;
-
-/**
- * This class implements the builder LIMIT statement. 
- * You can overwrite all functions to achieve another handling.
- *
- * @author  André Rothe <andre.rothe@phosco.info>
- * @license http://www.debian.org/misc/bsd.license  BSD License (3 Clause)
- *  
- */
-class LimitBuilder implements Builder {
-
-    public function build(array $parsed) {
-        $sql = ($parsed['rowcount']) . ($parsed['offset'] ? " OFFSET " . $parsed['offset'] : "");
-        if ($sql === "") {
-            throw new UnableToCreateSQLException('LIMIT', 'rowcount', $parsed, 'rowcount');
-        }
-        return "LIMIT " . $sql;
+class unionWithParenthesisTest extends \PHPUnit_Framework_TestCase {
+	
+    public function testZero() {
+        $parser = new PHPSQLParser();
+        $sql = 'SELECT a FROM b UNION SELECT a FROM b WHERE (foo IS NOT NULL)';
+        $parser->parse($sql);
+        $this->assertEquals('(foo IS NOT NULL)', $parser->parsed['UNION'][1]['WHERE'][0]['base_expr']);
     }
 }
-?>
+

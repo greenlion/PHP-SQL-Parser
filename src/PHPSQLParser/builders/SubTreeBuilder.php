@@ -92,6 +92,11 @@ class SubTreeBuilder implements Builder {
         return $builder->build($parsed);
     }
 
+    protected function buildSign($parsed) {
+        $builder = new SignBuilder();
+        return $builder->build($parsed);
+    }
+
     public function build(array $parsed, $delim = " ") {
         if ($parsed['sub_tree'] === '') {
             return "";
@@ -107,12 +112,17 @@ class SubTreeBuilder implements Builder {
             $sql .= $this->buildSelectBracketExpression($v);
             $sql .= $this->buildReserved($v);
             $sql .= $this->buildQuery($v);
+            $sign = $this->buildSign($v);
+            $sql .= $sign;
 
             if ($len == strlen($sql)) {
                 throw new UnableToCreateSQLException('expression subtree', $k, $v, 'expr_type');
             }
 
-            $sql .= $delim;
+            // We don't need whitespace between a sign and the following part.
+            if ($sign === '') {
+                $sql .= $delim;
+            }
         }
         return substr($sql, 0, -strlen($delim));
     }
