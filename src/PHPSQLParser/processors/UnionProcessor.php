@@ -118,7 +118,7 @@ class UnionProcessor extends AbstractProcessor {
     {
         $finalQuery = [];
         $firstTime = true;
-
+        $finalQueryFound = false;
         //If this token contains a matching pair of brackets at the start and end, use it as the final query
         foreach ($outputArray as $key => $token) {
             $tokenAsArray = str_split(trim($token));
