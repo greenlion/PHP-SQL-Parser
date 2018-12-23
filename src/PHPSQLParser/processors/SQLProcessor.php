@@ -64,6 +64,10 @@ class SQLProcessor extends SQLChunkProcessor {
         $tokenCount = count($tokens);
         for ($tokenNumber = 0; $tokenNumber < $tokenCount; ++$tokenNumber) {
 
+            // https://github.com/greenlion/PHP-SQL-Parser/issues/279
+            // https://github.com/sinri/PHP-SQL-Parser/commit/eac592a0e19f1df6f420af3777a6d5504837faa7
+            // as there is no pull request for 279 by the user. His solution works and tested.
+            if (!isset($tokens[$tokenNumber])) continue;// as a fix by Sinri 20180528
             $token = $tokens[$tokenNumber];
             $trim = trim($token); // this removes also \n and \t!
 
