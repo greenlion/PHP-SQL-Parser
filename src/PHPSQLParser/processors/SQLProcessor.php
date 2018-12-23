@@ -61,7 +61,11 @@ class SQLProcessor extends SQLChunkProcessor {
         $skip_next = 0;
         $out = false;
 
-        $tokenCount = count($tokens);
+	// $tokens may come as a numeric indexed array starting with an index greater than 0 (or as a boolean)
+	$tokenCount = count($tokens);
+        if ( is_array($tokens) ){
+          $tokens = array_values($tokens);
+        }
         for ($tokenNumber = 0; $tokenNumber < $tokenCount; ++$tokenNumber) {
 
             // https://github.com/greenlion/PHP-SQL-Parser/issues/279
