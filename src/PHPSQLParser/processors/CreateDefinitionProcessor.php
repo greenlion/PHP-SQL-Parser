@@ -155,7 +155,7 @@ class CreateDefinitionProcessor extends AbstractProcessor {
                 break;
 
             case 'UNIQUE':
-                if ($prevCategory === '' || $prevCategory === 'CONSTRAINT') {
+                if ($prevCategory === '' || $prevCategory === 'CONSTRAINT' || $prevCategory === 'INDEX_COL_LIST') {
                     // next one is KEY
                     $expr[] = array('expr_type' => ExpressionType::UNIQUE_IDX, 'base_expr' => $trim);
                     $currCategory = $upper;
