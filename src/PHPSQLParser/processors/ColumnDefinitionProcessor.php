@@ -135,9 +135,12 @@ class ColumnDefinitionProcessor extends AbstractProcessor {
                 continue 2;
 
             case 'UNSIGNED':
-                $last = array_pop($expr);
-                $last['unsigned'] = true;
-                $expr[] = $last;
+                foreach (array_reverse(array_keys($expr)) as $i) {
+                    if (isset($expr[$i]['expr_type']) && (ExpressionType::DATA_TYPE === $expr[$i]['expr_type'])) {
+                        $expr[$i]['unsigned'] = true;
+                        break;
+                    }
+                }
 	            $options['sub_tree'][] = array('expr_type' => ExpressionType::RESERVED, 'base_expr' => $trim);
                 continue 2;
 
