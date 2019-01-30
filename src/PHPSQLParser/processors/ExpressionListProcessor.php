@@ -312,7 +312,6 @@ class ExpressionListProcessor extends AbstractProcessor {
                 case 'AND':
                 case '&&':
                 case 'BETWEEN':
-                case 'AND':
                 case 'BINARY':
                 case '&':
                 case '~':
