@@ -153,7 +153,7 @@ class SQLProcessor extends SQLChunkProcessor {
             case 'PLUGIN':
             // no separate section
                 if ($token_category === 'SHOW') {
-                    continue;
+                    break;
                 }
                 $token_category = $upper;
                 break;
@@ -165,7 +165,7 @@ class SQLProcessor extends SQLChunkProcessor {
                 }
                 // no separate section
                 if ($token_category === 'SHOW') {
-                    continue;
+                    break;
                 }
                 $token_category = $upper;
                 break;
@@ -191,10 +191,10 @@ class SQLProcessor extends SQLChunkProcessor {
             case 'DATABASE':
             case 'SCHEMA':
                 if ($prev_category === 'DROP') {
-                    continue;
+                    break;
                 }
                 if ($prev_category === 'SHOW') {
-                    continue;
+                    break;
                 }
                 $token_category = $upper;
                 break;
@@ -300,7 +300,7 @@ class SQLProcessor extends SQLChunkProcessor {
 
             case 'CREATE':
                 if ($prev_category === 'SHOW') {
-                    continue;
+                    break;
                 }
                 $token_category = $upper;
                 break;
@@ -401,7 +401,7 @@ class SQLProcessor extends SQLChunkProcessor {
 
             case 'FOR':
                 if ($prev_category === 'SHOW') {
-                    continue;
+                    break;
                 }
                 $skip_next = 1;
                 $out['OPTIONS'][] = 'FOR UPDATE'; // TODO: this could be generate problems within the position calculator
