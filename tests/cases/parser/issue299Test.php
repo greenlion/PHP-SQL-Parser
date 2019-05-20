@@ -1,8 +1,8 @@
 <?php
 /**
- * SelectBracketExpressionBuilder.php
+ * issue299.php
  *
- * Builds the bracket expressions within a SELECT statement.
+ * Test case for PHPSQLParser.
  *
  * PHP version 5
  *
@@ -31,43 +31,28 @@
  * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  * @author    André Rothe <andre.rothe@phosco.info>
  * @copyright 2010-2014 Justin Swanhart and André Rothe
  * @license   http://www.debian.org/misc/bsd.license  BSD License (3 Clause)
  * @version   SVN: $Id$
- * 
- */
-
-namespace PHPSQLParser\builders;
-use PHPSQLParser\utils\ExpressionType;
-
-/**
- * This class implements the builder for bracket expressions within a SELECT statement. 
- * You can overwrite all functions to achieve another handling.
  *
- * @author  André Rothe <andre.rothe@phosco.info>
- * @license http://www.debian.org/misc/bsd.license  BSD License (3 Clause)
- *  
  */
-class SelectBracketExpressionBuilder implements Builder {
+namespace PHPSQLParser\Test\Parser;
+use PHPSQLParser\PHPSQLParser;
+use PHPSQLParser\PHPSQLCreator;
 
-    protected function buildSubTree($parsed, $delim) {
-        $builder = new SubTreeBuilder();
-        return $builder->build($parsed, $delim);
-    }
-
-    protected function buildAlias($parsed) {
-        $builder = new AliasBuilder();
-        return $builder->build($parsed);
-    }
-
-    public function build(array $parsed) {
-        if ($parsed['expr_type'] !== ExpressionType::BRACKET_EXPRESSION) {
-            return "";
-        }
-        return '(' . $this->buildSubTree($parsed, ' ') . ')'
-            . $this->buildAlias($parsed);
+class issue299Test extends \PHPUnit_Framework_TestCase
+{
+    public function testIssue299()
+    {
+        $parser = new PHPSQLParser();
+        $sql = 'SELECT (1 + 2) AS THREE, (1 + 3) AS FOUR';
+        $parser->parse($sql, true);
+        $creator = new PHPSQLCreator($parser->parsed);
+        $this->assertEquals(
+            'SELECT (1 + 2) AS THREE, (1 + 3) AS FOUR',
+            $creator->created
+        );
     }
 }
-?>
