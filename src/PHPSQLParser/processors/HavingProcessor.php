@@ -41,7 +41,6 @@
 
 namespace PHPSQLParser\processors;
 use PHPSQLParser\utils\ExpressionType;
-use Analog\Analog;
 
 /**
  * This class implements the processor for the HAVING statement. 
