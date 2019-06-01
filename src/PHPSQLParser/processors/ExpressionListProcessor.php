@@ -217,45 +217,7 @@ class ExpressionListProcessor extends AbstractProcessor {
 
                 // we have parenthesis, but it seems to be an expression
                 if ($curr->isUnspecified()) {
-
-                    $localExpr = new ExpressionToken();
-                    $tmpExprList = array();
-
-                    foreach ($localTokenList as $k => $v) {
-                        $tmpToken = new ExpressionToken($k, $v);
-                        if (!$tmpToken->isCommaToken()) {
-                            $localExpr->addToken($v);
-                            $tmpExprList[] = $v;
-                        } else {
-                            // an expression could have multiple parts split by operands
-                            // if we have a comma, it is a split-point for expressions
-                            $tmpExprList = array_values($tmpExprList);
-                            $localExprList = $this->process($tmpExprList);
-
-                            if (count($localExprList) > 1) {
-                                $localExpr->setSubTree($localExprList);
-                                $localExpr->setTokenType(ExpressionType::EXPRESSION);
-                                $localExprList = $localExpr->toArray();
-                                $localExprList['alias'] = false;
-                                $localExprList = array($localExprList);
-                            }
-
-                            if (!$curr->getSubTree()) {
-                                if (!empty($localExprList)) {
-                                    $curr->setSubTree($localExprList);
-                                }
-                            } else {
-                                $tmpExprList = $curr->getSubTree();
-                                $curr->setSubTree(array_merge($tmpExprList, $localExprList));
-                            }
-                            $curr->setDelim(',');
-
-                            $tmpExprList = array();
-                            $localExpr = new ExpressionToken();
-                        }
-                    }
-
-                    $tmpExprList = array_values($tmpExprList);
+                    $tmpExprList = array_values($localTokenList);
                     $localExprList = $this->process($tmpExprList);
 
                     $curr->setTokenType(ExpressionType::BRACKET_EXPRESSION);

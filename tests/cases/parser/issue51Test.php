@@ -56,7 +56,7 @@ class issue51Test extends \PHPUnit_Framework_TestCase {
         $this->assertEquals($expected, $p, 'should not die if query contains cast expression');
 
         $creator = new PHPSQLCreator($p);
-        $this->assertEquals('SELECT CAST(12 AS decimal (9,3))', $creator->created);
+        $this->assertEquals('SELECT CAST(12 AS decimal (9 , 3))', $creator->created);
     }
 }
 

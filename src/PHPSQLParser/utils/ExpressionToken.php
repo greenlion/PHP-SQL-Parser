@@ -15,7 +15,6 @@ class ExpressionToken {
     private $trim;
     private $upper;
     private $noQuotes;
-    private $delim;
 
     public function __construct($key = "", $token = "") {
         $this->subTree = false;
@@ -63,10 +62,6 @@ class ExpressionToken {
 
     public function setTokenType($type) {
         $this->tokenType = $type;
-    }
-
-    public function setDelim($delim) {
-        $this->delim = $delim;
     }
 
     public function endsWith($needle) {
@@ -160,9 +155,6 @@ class ExpressionToken {
             $result['no_quotes'] = $this->noQuotes;
         }
         $result['sub_tree'] = $this->subTree;
-        if ($this->delim) {
-            $result['delim'] = $this->delim;
-        }
         return $result;
     }
 }
