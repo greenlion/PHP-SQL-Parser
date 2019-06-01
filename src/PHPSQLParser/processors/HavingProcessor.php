@@ -41,7 +41,6 @@
 
 namespace PHPSQLParser\processors;
 use PHPSQLParser\utils\ExpressionType;
-use Analog\Analog;
 
 /**
  * This class implements the processor for the HAVING statement. 
@@ -52,13 +51,6 @@ use Analog\Analog;
  *  
  */
 class HavingProcessor extends ExpressionListProcessor {
-
-	// helper function to find an example for issue 10 on GitHub.com
-	protected function logError($sql) {
-		Analog::log("The alias clause of a colref is empty, this should not occur.", Analog::ALERT);
-		Analog::log("Please create an issue on GitHub or GoogleCode with your SQL statement.", Analog::ALERT);
-		Analog::log(print_r($sql, true), Analog::ALERT);
-	}
 	
     public function process($tokens, $select = array()) {
         $parsed = parent::process($tokens);
@@ -67,7 +59,6 @@ class HavingProcessor extends ExpressionListProcessor {
             if ($v['expr_type'] === ExpressionType::COLREF) {
                 foreach ($select as $clause) {
                     if (!isset($clause['alias'])) {
-						$this->logError($select);
                     	continue;
                     }
                     if (!$clause['alias']) {
