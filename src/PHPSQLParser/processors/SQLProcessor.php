@@ -494,7 +494,6 @@ class SQLProcessor extends SQLChunkProcessor {
 
             case '':
             case ',':
-            case ';':
                 break;
 
             default:
