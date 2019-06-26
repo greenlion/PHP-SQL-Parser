@@ -2,9 +2,9 @@
 /**
  * PHPSQLLexer.php
  *
- * This file contains the lexer, which splits and recombines parts of the 
+ * This file contains the lexer, which splits and recombines parts of the
  * SQL statement just before parsing.
- * 
+ *
  * PHP version 5
  *
  * LICENSE:
@@ -32,12 +32,12 @@
  * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  * @author    André Rothe <andre.rothe@phosco.info>
  * @copyright 2010-2014 Justin Swanhart and André Rothe
  * @license   http://www.debian.org/misc/bsd.license  BSD License (3 Clause)
  * @version   SVN: $Id$
- * 
+ *
  */
 
 namespace PHPSQLParser\lexer;
@@ -46,7 +46,7 @@ use PHPSQLParser\exceptions\InvalidParameterException;
 /**
  * This class splits the SQL string into little parts, which the parser can
  * use to build the result array.
- * 
+ *
  * @author  André Rothe <andre.rothe@phosco.info>
  * @license http://www.debian.org/misc/bsd.license  BSD License (3 Clause)
  *
@@ -56,8 +56,8 @@ class PHPSQLLexer {
     protected $splitters;
 
     /**
-     * Constructor. 
-     * 
+     * Constructor.
+     *
      * It initializes some fields.
      */
     public function __construct() {
@@ -66,10 +66,10 @@ class PHPSQLLexer {
 
     /**
      * Ends the given string $haystack with the string $needle?
-     * 
+     *
      * @param string $haystack
      * @param string $needle
-     * 
+     *
      * @return boolean true, if the parameter $haystack ends with the character sequences $needle, false otherwise
      */
     protected function endsWith($haystack, $needle) {
@@ -97,43 +97,43 @@ class PHPSQLLexer {
     }
 
     protected function concatNegativeNumbers($tokens) {
-    	
+
     	$i = 0;
     	$cnt = count($tokens);
     	$possibleSign = true;
-    	
+
     	while ($i < $cnt) {
-    		 
+
     		if (!isset($tokens[$i])) {
     			$i++;
     			continue;
     		}
-    		
+
     		$token = $tokens[$i];
-    		
+
     		// a sign is also possible on the first position of the tokenlist
     		if ($possibleSign === true) {
 				if ($token === '-' || $token === '+') {
 					if (is_numeric($tokens[$i + 1])) {
-						$tokens[$i + 1] = $token . $tokens[$i + 1]; 
+						$tokens[$i + 1] = $token . $tokens[$i + 1];
 						unset($tokens[$i]);
 					}
 				}
 				$possibleSign = false;
 				continue;
     		}
-			
+
     		// TODO: we can have sign of a number after "(" and ",", are others possible?
     		if (substr($token, -1, 1) === "," || substr($token, -1, 1) === "(") {
     			$possibleSign = true;
     		}
-    		
+
     		$i++;
    		}
-    		
+
    		return array_values($tokens);
     }
-    
+
     protected function concatScientificNotations($tokens) {
 
         $i = 0;
@@ -211,7 +211,10 @@ class PHPSQLLexer {
         $i = 0;
         $cnt = count($tokens);
         $comment = false;
+        $backTicks = [];
         $in_string = false;
+        $inline = false;
+
         while ($i < $cnt) {
 
             if (!isset($tokens[$i])) {
@@ -220,7 +223,24 @@ class PHPSQLLexer {
             }
 
             $token = $tokens[$i];
-            if($token == "\"" || $token == "'") {
+
+            /*
+             * Check to see if we're inside a value (i.e. back ticks).
+             * If so inline comments are not valid.
+             */
+            if ($comment === false && $this->isBacktick($token)) {
+                if (!empty($backTicks)) {
+                    $lastBacktick = array_pop($backTicks);
+                    if ($lastBacktick != $token) {
+                        $backTicks[] = $lastBacktick; // Re-add last back tick
+                        $backTicks[] = $token;
+                    }
+                } else {
+                    $backTicks[] = $token;
+                }
+            }
+
+            if($comment === false && ($token == "\"" || $token == "'")) {
                 $in_string = !$in_string;
             }
             if(!$in_string) {
@@ -236,12 +256,12 @@ class PHPSQLLexer {
                     }
                 }
 
-                if (($comment === false) && ($token === "--")) {
+                if (($comment === false) && ($token === "--") && empty($backTicks)) {
                     $comment = $i;
                     $inline = true;
                 }
 
-                if (($comment === false) && (substr($token, 0, 1) === "#")) {
+                if (($comment === false) && (substr($token, 0, 1) === "#") && empty($backTicks)) {
                     $comment = $i;
                     $inline = true;
                 }
@@ -313,9 +333,9 @@ class PHPSQLLexer {
     /**
      * This function concats some tokens to a column reference.
      * There are two different cases:
-     * 
+     *
      * 1. If the current token ends with a dot, we will add the next token
-     * 2. If the next token starts with a dot, we will add it to the previous token 
+     * 2. If the next token starts with a dot, we will add it to the previous token
      *
      */
     protected function concatColReferences($tokens) {

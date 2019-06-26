@@ -82,16 +82,16 @@ class InsertProcessor extends AbstractProcessor {
             switch ($upper) {
             case 'INTO':
                 $result[] = array('expr_type' => ExpressionType::RESERVED, 'base_expr' => $trim);
-                continue;
+                break;
 
             case 'INSERT':
             case 'REPLACE':
-                continue;
+                break;
 
             default:
                 if ($table === '') {
                     $table = $trim;
-                    continue;
+                    break;
                 }
 
                 if ($cols === false) {

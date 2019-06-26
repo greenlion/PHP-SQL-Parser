@@ -66,7 +66,8 @@ class SelectBracketExpressionBuilder implements Builder {
         if ($parsed['expr_type'] !== ExpressionType::BRACKET_EXPRESSION) {
             return "";
         }
-        return "(" . $this->buildSubTree($parsed, " ") . ")" . $this->buildAlias($parsed);
+        return '(' . $this->buildSubTree($parsed, ' ') . ')'
+            . $this->buildAlias($parsed);
     }
 }
 ?>

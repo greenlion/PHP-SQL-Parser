@@ -1,8 +1,8 @@
 <?php
 /**
- * HavingProcessor.php
+ * unionWithParenthesisTest.php
  *
- * Parses the HAVING statements.
+ * Test case for PHPSQLParser.
  *
  * PHP version 5
  *
@@ -38,42 +38,17 @@
  * @version   SVN: $Id$
  * 
  */
+namespace PHPSQLParser\Test\Parser;
+use PHPSQLParser\PHPSQLParser;
+use PHPSQLParser\PHPSQLCreator;
 
-namespace PHPSQLParser\processors;
-use PHPSQLParser\utils\ExpressionType;
-
-/**
- * This class implements the processor for the HAVING statement. 
- * You can overwrite all functions to achieve another handling.
- *
- * @author  André Rothe <andre.rothe@phosco.info>
- * @license http://www.debian.org/misc/bsd.license  BSD License (3 Clause)
- *  
- */
-class HavingProcessor extends ExpressionListProcessor {
+class unionWithParenthesisTest extends \PHPUnit_Framework_TestCase {
 	
-    public function process($tokens, $select = array()) {
-        $parsed = parent::process($tokens);
-
-        foreach ($parsed as $k => $v) {
-            if ($v['expr_type'] === ExpressionType::COLREF) {
-                foreach ($select as $clause) {
-                    if (!isset($clause['alias'])) {
-                    	continue;
-                    }
-                    if (!$clause['alias']) {
-                        continue;
-                    }
-                    if ($clause['alias']['no_quotes'] === $v['no_quotes']) {
-                        $parsed[$k]['expr_type'] = ExpressionType::ALIAS;
-                        break;
-                    }
-                }
-            }
-        }
-
-        return $parsed;
+    public function testZero() {
+        $parser = new PHPSQLParser();
+        $sql = 'SELECT a FROM b UNION SELECT a FROM b WHERE (foo IS NOT NULL)';
+        $parser->parse($sql);
+        $this->assertEquals('(foo IS NOT NULL)', $parser->parsed['UNION'][1]['WHERE'][0]['base_expr']);
     }
 }
 
-?>

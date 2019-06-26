@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/greenlion/PHP-SQL-Parser.svg?branch=master)](https://travis-ci.org/greenlion/PHP-SQL-Parser)
+
 PHP-SQL-Parser
 ==============
 
