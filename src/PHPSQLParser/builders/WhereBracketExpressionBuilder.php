@@ -88,6 +88,11 @@ class WhereBracketExpressionBuilder implements Builder {
         return $builder->build($parsed);
     }
 
+    protected function buildSubQuery($parsed) {
+        $builder = new SubQueryBuilder();
+        return $builder->build($parsed);
+    }
+
     protected function buildReserved($parsed) {
       $builder = new ReservedBuilder();
       return $builder->build($parsed);
@@ -108,6 +113,7 @@ class WhereBracketExpressionBuilder implements Builder {
             $sql .= $this->buildWhereExpression($v);
             $sql .= $this->build($v);
             $sql .= $this->buildUserVariable($v);
+            $sql .= $this->buildSubQuery($v);
             $sql .= $this->buildReserved($v);
             
             if ($len == strlen($sql)) {
