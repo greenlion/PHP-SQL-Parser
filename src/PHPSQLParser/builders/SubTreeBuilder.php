@@ -92,6 +92,11 @@ class SubTreeBuilder implements Builder {
         return $builder->build($parsed);
     }
 
+    protected function buildUserVariable($parsed) {
+        $builder = new UserVariableBuilder();
+        return $builder->build($parsed);
+    }
+
     protected function buildSign($parsed) {
         $builder = new SignBuilder();
         return $builder->build($parsed);
@@ -112,6 +117,7 @@ class SubTreeBuilder implements Builder {
             $sql .= $this->buildSelectBracketExpression($v);
             $sql .= $this->buildReserved($v);
             $sql .= $this->buildQuery($v);
+            $sql .= $this->buildUserVariable($v);
             $sign = $this->buildSign($v);
             $sql .= $sign;
 
