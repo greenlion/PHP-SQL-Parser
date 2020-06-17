@@ -127,6 +127,9 @@ class PositionCalculator {
     }
 
     protected function findPositionWithinString($sql, $value, $expr_type) {
+        if ($value === '') {
+            return false;
+        }
 
         $offset = 0;
         $ok = false;
