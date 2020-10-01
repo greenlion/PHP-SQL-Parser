@@ -113,7 +113,7 @@ class WhereBracketExpressionBuilder implements Builder {
             $sql .= $this->buildWhereExpression($v);
             $sql .= $this->build($v);
             $sql .= $this->buildUserVariable($v);
-            $sql .= $this->buildSubQuery($v);
+           // $sql .= $this->buildSubQuery($v);
             $sql .= $this->buildReserved($v);
             $sql .= $this->buildSubQuery($v);
             
