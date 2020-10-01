@@ -53,11 +53,6 @@ use PHPSQLParser\utils\ExpressionType;
  */
 class WhereBracketExpressionBuilder implements Builder {
 
-    protected function buildSubQuery($parsed) {
-        $builder = new SubQueryBuilder();
-        return $builder->build($parsed);
-    }
-
     protected function buildColRef($parsed) {
         $builder = new ColumnReferenceBuilder();
         return $builder->build($parsed);
@@ -120,7 +115,6 @@ class WhereBracketExpressionBuilder implements Builder {
             $sql .= $this->buildUserVariable($v);
             $sql .= $this->buildSubQuery($v);
             $sql .= $this->buildReserved($v);
-            $sql .= $this->buildSubQuery($v);
             
             if ($len == strlen($sql)) {
                 throw new UnableToCreateSQLException('WHERE expression subtree', $k, $v, 'expr_type');
