@@ -119,7 +119,7 @@ class WhereExpressionBuilder implements Builder {
             $sql .= $this->buildUserVariable($v);
             $sql .= $this->buildSubQuery($v);
             $sql .= $this->buildReserved($v);
-            
+
             if ($len == strlen($sql)) {
                 throw new UnableToCreateSQLException('WHERE expression subtree', $k, $v, 'expr_type');
             }

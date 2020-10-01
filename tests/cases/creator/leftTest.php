@@ -31,19 +31,19 @@
  * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  * @author    André Rothe <andre.rothe@phosco.info>
  * @copyright 2010-2014 Justin Swanhart and André Rothe
  * @license   http://www.debian.org/misc/bsd.license  BSD License (3 Clause)
  * @version   SVN: $Id$
- * 
+ *
  */
 namespace PHPSQLParser\Test\Creator;
 use PHPSQLParser\PHPSQLParser;
 use PHPSQLParser\PHPSQLCreator;
 
 class leftTest extends \PHPUnit_Framework_TestCase {
-	
+
     public function testLeft() {
         $sql = 'SELECT *
             FROM (t1 LEFT JOIN t2 ON t1.a=t2.a)
@@ -55,6 +55,16 @@ class leftTest extends \PHPUnit_Framework_TestCase {
         $expected = getExpectedValue(dirname(__FILE__), 'left.sql', false);
         $this->assertSame($expected, $created, 'left joins and table-expression');
 
+    }
+
+    public function testLeftIn() {
+        $sql = 'SELECT *
+            FROM (t1 LEFT JOIN t2 ON t1.a=t2.a)
+                 LEFT JOIN t3
+                 ON t3.id IN (SELECT id FROM t4)';
+        $parser = new PHPSQLParser($sql);
+        $creator = new PHPSQLCreator($parser->parsed);
+        $created = $creator->created;
     }
 }
 
