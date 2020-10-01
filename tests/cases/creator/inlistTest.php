@@ -53,5 +53,15 @@ class inlistTest extends \PHPUnit_Framework_TestCase {
         $this->assertSame($expected, $created, 'a subquery and in-lists');
 
     }
-}
 
+    public function testInSubtree() {
+        $sql = 'SELECT CASE WHEN 2 IN (2, 3) THEN "yes" ELSE "no" END';
+        $parser = new PHPSQLParser($sql);
+        $creator = new PHPSQLCreator($parser->parsed);
+        $created = $creator->created;
+        $expected = getExpectedValue(dirname(__FILE__), 'insubtree.sql', false);
+        $this->assertSame($expected, $created, 'a IN list in a CASE WHEN subtree');
+
+    }
+
+}
