@@ -117,12 +117,14 @@ class UnionProcessor extends AbstractProcessor {
     protected function splitUnionRemainder($queries, $unionType, $outputArray)
     {
         $finalQuery = [];
-
-        //If this token contains a matching pair of brackets at the start and end, use it as the final query
+        $firstTime = true;
         $finalQueryFound = false;
-        if (count($outputArray) === 1) {
-            $tokenAsArray = str_split(trim($outputArray[0]));
-            if ($tokenAsArray[0] == '(' && $tokenAsArray[count($tokenAsArray)-1] == ')') {
+        //If this token contains a matching pair of brackets at the start and end, use it as the final query
+        foreach ($outputArray as $key => $token) {
+            $tokenAsArray = str_split(trim($token));
+            $keyCount = max(array_keys($tokenAsArray));
+
+            if ($tokenAsArray[0] == '(' && $tokenAsArray[$keyCount] == ')' && $firstTime) {
                 $queries[$unionType][] = $outputArray;
                 $finalQueryFound = true;
             }
@@ -136,6 +138,10 @@ class UnionProcessor extends AbstractProcessor {
                     $finalQuery[] = $token;
                     unset($outputArray[$key]);
                 }
+            }
+
+            if ($firstTime && !empty($token)) {
+                $firstTime = false;
             }
         }
 
