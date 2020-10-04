@@ -52,7 +52,7 @@ class issue320Test extends \PHPUnit_Framework_TestCase
         // but this query seems valid at least in mysql and mssql
         // so ideally PHPSQLParser would be able to parse it
         $this->setExpectedException(
-            \PHPSQLParser\exceptions\UnableToCalculatePositionException::class
+            '\PHPSQLParser\exceptions\UnableToCalculatePositionException'
         );
 
         $parser->parse($sql, true);
