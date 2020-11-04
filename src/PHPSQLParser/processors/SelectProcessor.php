@@ -33,11 +33,11 @@
 namespace PHPSQLParser\processors;
 
 /**
- * 
+ *
  * This class processes the SELECT statements.
- * 
+ *
  * @author arothe
- * 
+ *
  */
 class SelectProcessor extends SelectExpressionProcessor {
 
@@ -51,7 +51,9 @@ class SelectProcessor extends SelectExpressionProcessor {
                 $expressionList[] = $expression;
                 $expression = "";
             } else if ($this->isCommentToken($token)) {
-                $expressionList[] = parent::processComment($token);
+                if(!$this->options->getIgnoreComment()) {
+                    $expressionList[] = parent::processComment($token);
+                }
             } else {
                 switch (strtoupper($token)) {
 

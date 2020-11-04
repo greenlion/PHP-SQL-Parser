@@ -62,7 +62,10 @@ class ExpressionListProcessor extends AbstractProcessor {
 
 
             if ($this->isCommentToken($v)) {
-                $resultList[] = parent::processComment($v);
+                if(!$this->options->getIgnoreComment()) {
+                    $resultList[] = parent::processComment($v);
+                }
+
                 continue;
             }
 
