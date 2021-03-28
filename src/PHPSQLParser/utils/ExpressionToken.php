@@ -56,7 +56,7 @@ class ExpressionToken {
         return $idx !== false ? $this->token[$idx] : $this->token;
     }
 
-    public function setNoQuotes($token, $qchars = null, Options $options) {
+    public function setNoQuotes($token, $qchars, Options $options) {
         $this->noQuotes = ($token === null) ? null : $this->revokeQuotation($token, $options);
     }
 
