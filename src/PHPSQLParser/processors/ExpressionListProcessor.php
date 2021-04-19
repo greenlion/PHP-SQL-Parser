@@ -263,6 +263,7 @@ class ExpressionListProcessor extends AbstractProcessor {
                         && !$prev->isBracketExpression()
                         && !$prev->isAggregateFunction()
                         && !$prev->isVariable()
+                        && !$prev->isFunction()
                     ) {
                         $curr->setTokenType(ExpressionType::COLREF);
                         break;
