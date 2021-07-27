@@ -6,7 +6,7 @@ use PHPSQLParser\PHPSQLCreator;
 
 class issue342Test extends \PHPUnit_Framework_TestCase
 {
-    public function testIssue299()
+    public function testIssue342()
     {
         $sql = 'SELECT if(true,true,false) FROM t';
 
