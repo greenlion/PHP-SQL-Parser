@@ -8,7 +8,7 @@ class issue342Test extends \PHPUnit_Framework_TestCase
 {
     public function testIssue299()
     {
-        $sql = 'select if(true, true, false) from t';
+        $sql = 'SELECT if(true,true,false) FROM t';
 
         $parser = new PHPSQLParser();
         $creator = new PHPSQLCreator();
