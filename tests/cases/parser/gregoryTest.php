@@ -45,6 +45,9 @@ use PHPSQLParser\PHPSQLParser;
 
 class GregoryTest extends \PHPSQLParser\Test\AbstractTestCase {
 	
+    /**
+     * @doesNotPerformAssertions
+     */
 	public function testGregory() {
 /*
 		$query = "
