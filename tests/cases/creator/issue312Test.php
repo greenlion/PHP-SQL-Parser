@@ -17,7 +17,7 @@ class issue312Test extends TestCase
     /** @var PHPSQLCreator $creator */
     private $creator;
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 

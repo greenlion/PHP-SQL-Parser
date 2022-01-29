@@ -22,7 +22,7 @@ abstract class AbstractTestCase extends \PHPUnit\Framework\TestCase {
 	 * @before
 	 * Executed before each test
 	 */
-	protected function setup() {
+	protected function setup(): void {
 		$this->parser = new PHPSQLParser();
 		$this->creator = new PHPSQLCreator();
 	}

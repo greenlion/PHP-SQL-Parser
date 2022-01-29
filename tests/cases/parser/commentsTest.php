@@ -11,7 +11,7 @@ class CommentsTest extends \PHPUnit\Framework\TestCase {
 	 * @before
 	 * Executed before each test
 	 */
-	protected function setup() {
+	protected function setup(): void {
 		$this->parser = new PHPSQLParser(false, true);
 	}
         
