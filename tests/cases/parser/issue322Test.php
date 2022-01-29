@@ -54,7 +54,7 @@ class issue322Test extends \PHPUnit\Framework\TestCase
 		$parsed = $parser->parse($sql, true);
 		$creator = new PHPSQLCreator();
 		$sql = $creator->create($parsed);
-		echo $sql;
+		//echo $sql;
     }
 }
 
