@@ -42,7 +42,7 @@ namespace PHPSQLParser\Test\Parser;
 use PHPSQLParser\PHPSQLParser;
 use PHPSQLParser\PHPSQLCreator;
 
-class NestedTest extends \PHPUnit_Framework_TestCase {
+class NestedTest extends \PHPUnit\Framework\TestCase {
 	
     public function testNested1() {
         $parser = new PHPSQLParser();

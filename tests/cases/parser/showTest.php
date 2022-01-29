@@ -42,7 +42,7 @@ namespace PHPSQLParser\Test\Parser;
 use PHPSQLParser\PHPSQLParser;
 use PHPSQLParser\PHPSQLCreator;
 
-class showTest extends \PHPUnit_Framework_TestCase {
+class showTest extends \PHPUnit\Framework\TestCase {
 	
     public function testShow() {
         $sql = "show columns from `foo.bar`";

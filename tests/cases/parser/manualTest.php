@@ -43,7 +43,7 @@ use PHPSQLParser\PHPSQLParser;
 use PHPSQLParser\exceptions\UnableToCalculatePositionException;
 
 
-class manualTest extends \PHPUnit_Framework_TestCase {
+class manualTest extends \PHPUnit\Framework\TestCase {
 	
     public function testManual() {
         // that is an issue written as comment into the ParserManual...

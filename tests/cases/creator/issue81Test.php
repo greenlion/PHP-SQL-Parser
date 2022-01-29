@@ -42,7 +42,7 @@ namespace PHPSQLParser\Test\Creator;
 use PHPSQLParser\PHPSQLParser;
 use PHPSQLParser\PHPSQLCreator;
 
-class issue81Test extends \PHPUnit_Framework_TestCase {
+class issue81Test extends \PHPUnit\Framework\TestCase {
 	
     public function testIssue81() {
         $sql = "SELECT NOW()";

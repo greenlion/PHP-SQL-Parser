@@ -42,7 +42,7 @@ namespace PHPSQLParser\Test\Creator;
 use PHPSQLParser\PHPSQLParser;
 use PHPSQLParser\PHPSQLCreator;
 
-class magnusTest extends \PHPUnit_Framework_TestCase {
+class magnusTest extends \PHPUnit\Framework\TestCase {
 	
     public function testMagnus() {
         $sql = "SELECT

@@ -3,7 +3,7 @@
 namespace PHPSQLParser\Test\Parser;
 use PHPSQLParser\PHPSQLParser;
 
-class CommentsTest extends \PHPUnit_Framework_TestCase {
+class CommentsTest extends \PHPUnit\Framework\TestCase {
 	
 	protected $parser;
 	

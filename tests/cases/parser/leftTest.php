@@ -42,7 +42,7 @@ namespace PHPSQLParser\Test\Parser;
 use PHPSQLParser\PHPSQLParser;
 use PHPSQLParser\PHPSQLCreator;
 
-class LeftTest extends \PHPUnit_Framework_TestCase {
+class LeftTest extends \PHPUnit\Framework\TestCase {
 	
     public function testLeft1() {
         $parser = new PHPSQLParser();

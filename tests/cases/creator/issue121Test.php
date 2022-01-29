@@ -42,7 +42,7 @@ namespace PHPSQLParser\Test\Creator;
 use PHPSQLParser\PHPSQLParser;
 use PHPSQLParser\PHPSQLCreator;
 
-class issue121Test extends \PHPUnit_Framework_TestCase {
+class issue121Test extends \PHPUnit\Framework\TestCase {
 	
     public function testIssue121() {
         $query = "CREATE TABLE t (mv DECIMAL(3) DEFAULT 10)";

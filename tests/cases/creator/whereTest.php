@@ -42,7 +42,7 @@ namespace PHPSQLParser\Test\Creator;
 use PHPSQLParser\PHPSQLParser;
 use PHPSQLParser\PHPSQLCreator;
 
-class whereTest extends \PHPUnit_Framework_TestCase {
+class whereTest extends \PHPUnit\Framework\TestCase {
 	
     public function testWhere() {
         $sql = "SELECT * FROM `table` `t` WHERE ( ( UNIX_TIMESTAMP() + 3600 ) > `t`.`expires` ) ";

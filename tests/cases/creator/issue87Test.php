@@ -42,7 +42,7 @@ namespace PHPSQLParser\Test\Creator;
 use PHPSQLParser\PHPSQLParser;
 use PHPSQLParser\PHPSQLCreator;
 
-class issue87Test extends \PHPUnit_Framework_TestCase {
+class issue87Test extends \PHPUnit\Framework\TestCase {
 	
     public function testIssue87() {
         $sql = "RENAME TABLE a TO b, `c` to `a`, foo.bar to hello.world";

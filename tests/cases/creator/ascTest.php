@@ -42,7 +42,7 @@ namespace PHPSQLParser\Test\Creator;
 use PHPSQLParser\PHPSQLParser;
 use PHPSQLParser\PHPSQLCreator;
 
-class ascTest extends \PHPUnit_Framework_TestCase {
+class ascTest extends \PHPUnit\Framework\TestCase {
 	
     public function testAsc() {
         $sql = "SELECT qid FROM QUESTIONS WHERE gid='1' and language='de-informal' ORDER BY question_order, title ASC";

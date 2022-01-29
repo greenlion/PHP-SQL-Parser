@@ -42,7 +42,7 @@ namespace PHPSQLParser\Test\Creator;
 use PHPSQLParser\PHPSQLParser;
 use PHPSQLParser\PHPSQLCreator;
 
-class issue66Test extends \PHPUnit_Framework_TestCase {
+class issue66Test extends \PHPUnit\Framework\TestCase {
 	
     public function testIssue66() {
         $sql = "SELECT SUM(value)/(ABS(2)) as x FROM table";

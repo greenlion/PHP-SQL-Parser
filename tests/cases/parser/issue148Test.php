@@ -41,7 +41,7 @@
 namespace PHPSQLParser\Test\Parser;
 use PHPSQLParser\PHPSQLParser;
 
-class Issue148Test extends \PHPUnit_Framework_TestCase {
+class Issue148Test extends \PHPUnit\Framework\TestCase {
 	
     public function testIssue148() {
 		$sql = "SELECT REPLACE(NOW(), '-', '')";

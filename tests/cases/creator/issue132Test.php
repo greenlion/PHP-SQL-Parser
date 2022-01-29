@@ -42,7 +42,7 @@ namespace PHPSQLParser\Test\Creator;
 use PHPSQLParser\PHPSQLParser;
 use PHPSQLParser\PHPSQLCreator;
 
-class issue132Test extends \PHPUnit_Framework_TestCase {
+class issue132Test extends \PHPUnit\Framework\TestCase {
 	
     public function testIssue132() {
         $query = "select (c1 - c2) AS c3 from t1";

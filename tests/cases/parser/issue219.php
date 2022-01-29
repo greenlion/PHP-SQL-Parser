@@ -10,7 +10,7 @@ namespace PHPSQLParser\Test\Parser;
 
 use PHPSQLParser\PHPSQLParser;
 
-class issue219Test extends \PHPUnit_Framework_TestCase {
+class issue219Test extends \PHPUnit\Framework\TestCase {
 
 	/**
 	 * https://github.com/greenlion/PHP-SQL-Parser/issues/219

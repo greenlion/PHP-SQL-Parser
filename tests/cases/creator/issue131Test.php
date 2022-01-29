@@ -42,7 +42,7 @@ namespace PHPSQLParser\Test\Creator;
 use PHPSQLParser\PHPSQLParser;
 use PHPSQLParser\PHPSQLCreator;
 
-class issue131Test extends \PHPUnit_Framework_TestCase {
+class issue131Test extends \PHPUnit\Framework\TestCase {
 	
     public function testIssue131() {
         $query = "create unique index i1 using BTREE on t1 (c1(5) DESC, `col 2`(8) ASC) ALGORITHM=DEFAULT using hash LOCK=SHARED";

@@ -1,10 +1,10 @@
 <?php
 
 namespace PHPSQLParser\Test\Parser;
-use PHPUnit_Framework_TestCase;
+use PHPUnit\Framework\TestCase;
 use PHPSQLParser\PHPSQLParser;
 
-class issue233Test extends PHPUnit_Framework_TestCase
+class issue233Test extends TestCase
 {
     public function testIssue233()
     {

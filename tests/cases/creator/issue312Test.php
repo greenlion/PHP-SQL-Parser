@@ -5,12 +5,12 @@ namespace PHPSQLParser\Test\Creator;
 use PHPSQLParser\exceptions\UnsupportedFeatureException;
 use PHPSQLParser\PHPSQLCreator;
 use PHPSQLParser\PHPSQLParser;
-use PHPUnit_Framework_TestCase;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @see https://github.com/greenlion/PHP-SQL-Parser/issues/312
  */
-class issue312Test extends PHPUnit_Framework_TestCase
+class issue312Test extends TestCase
 {
     /** @var PHPSQLParser $parser */
     private $parser;

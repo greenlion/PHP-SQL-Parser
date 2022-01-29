@@ -41,7 +41,7 @@
 namespace PHPSQLParser\Test\Parser;
 use PHPSQLParser\PHPSQLParser;
 
-class AllColumnsTest extends \PHPUnit_Framework_TestCase {
+class AllColumnsTest extends \PHPUnit\Framework\TestCase {
 	
 	protected $parser;
 	

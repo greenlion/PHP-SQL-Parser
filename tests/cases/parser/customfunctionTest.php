@@ -43,7 +43,7 @@ use PHPSQLParser\PHPSQLParser;
 use PHPSQLParser\utils\ExpressionType;
 
 
-class customfunctionTest extends \PHPUnit_Framework_TestCase {
+class customfunctionTest extends \PHPUnit\Framework\TestCase {
 	
     public function testCustomfunction() {
         try {

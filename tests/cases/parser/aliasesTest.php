@@ -41,7 +41,7 @@
 namespace PHPSQLParser\Test\Parser;
 use PHPSQLParser\PHPSQLParser;
 
-class AliasesTest extends \PHPUnit_Framework_TestCase {
+class AliasesTest extends \PHPUnit\Framework\TestCase {
 	
 	protected $parser;
 	

@@ -9,7 +9,7 @@ namespace PHPSQLParser\Test\Creator;
 use PHPSQLParser\PHPSQLParser;
 use PHPSQLParser\PHPSQLCreator;
 
-class Issue242Test extends \PHPUnit_Framework_TestCase {
+class Issue242Test extends \PHPUnit\Framework\TestCase {
 	
 	public function testOnDuplicateKey() {
         $sql = "INSERT INTO `wp_options` (`option_name`, `option_value`, `autoload`) VALUES ('some_key', 'some_value', 'yes') ON DUPLICATE KEY UPDATE `option_name` = VALUES(`option_name`), `option_value` = VALUES(`option_value`), `autoload` = VALUES(`autoload`)";

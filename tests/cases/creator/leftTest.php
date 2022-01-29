@@ -42,7 +42,7 @@ namespace PHPSQLParser\Test\Creator;
 use PHPSQLParser\PHPSQLParser;
 use PHPSQLParser\PHPSQLCreator;
 
-class leftTest extends \PHPUnit_Framework_TestCase {
+class leftTest extends \PHPUnit\Framework\TestCase {
 
     public function testLeft() {
         $sql = 'SELECT *
