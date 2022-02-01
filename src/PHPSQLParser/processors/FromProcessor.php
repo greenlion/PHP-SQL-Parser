@@ -76,13 +76,17 @@ class FromProcessor extends AbstractProcessor {
         }
         // loop init
         return array('expression' => "", 'token_count' => 0, 'table' => "", 'no_quotes' => "", 'alias' => false,
-                     'hints' => false, 'join_type' => "", 'next_join_type' => "",
+                     'hints' => array(), 'join_type' => "", 'next_join_type' => "",
                      'saved_join_type' => $parseInfo['saved_join_type'], 'ref_type' => false, 'ref_expr' => false,
                      'base_expr' => false, 'sub_tree' => false, 'subquery' => "");
     }
 
     protected function processFromExpression(&$parseInfo) {
         $res = array();
+
+        if ($parseInfo['hints'] === array()) {
+            $parseInfo['hints'] = false;
+        }
 
         // exchange the join types (join_type is save now, saved_join_type holds the next one)
         $parseInfo['join_type'] = $parseInfo['saved_join_type']; // initialized with JOIN

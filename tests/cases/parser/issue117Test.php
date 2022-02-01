@@ -42,9 +42,9 @@ namespace PHPSQLParser\Test\Parser;
 
 use PHPSQLParser\PHPSQLParser;
 use Analog\Analog;
-use PHPUnit_Framework_TestCase;
+use PHPUnit\Framework\TestCase;
 
-class Issue117Test extends PHPUnit_Framework_TestCase
+class Issue117Test extends TestCase
 {
     public function testIssue117()
     {

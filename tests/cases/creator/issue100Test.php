@@ -42,7 +42,7 @@ namespace PHPSQLParser\Test\Creator;
 use PHPSQLParser\PHPSQLParser;
 use PHPSQLParser\PHPSQLCreator;
 
-class issue100Test extends \PHPUnit_Framework_TestCase {
+class issue100Test extends \PHPUnit\Framework\TestCase {
 	
     public function testIssue100() {
         $query  = "SELECT 0 AS Zero FROM table";

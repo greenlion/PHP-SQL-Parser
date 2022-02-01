@@ -41,14 +41,11 @@
 namespace PHPSQLParser\Test\Parser;
 use PHPSQLParser\PHPSQLParser;
 
-class issue46Test extends \PHPUnit_Framework_TestCase {
-
-	/**
-	 * @expectedException \PHPSQLParser\exceptions\UnableToCalculatePositionException
-	 */
+class issue46Test extends \PHPUnit\Framework\TestCase {
 	public function testIssue46() {
 		$parser = new PHPSQLParser();
 		$sql = "SELECT abc'haha'";
+        $this->expectException(\PHPSQLParser\exceptions\UnableToCalculatePositionException::class);
 		$parser->parse($sql, true);
     }
 }

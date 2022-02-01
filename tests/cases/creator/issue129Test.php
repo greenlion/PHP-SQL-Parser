@@ -42,7 +42,7 @@ namespace PHPSQLParser\Test\Creator;
 use PHPSQLParser\PHPSQLParser;
 use PHPSQLParser\PHPSQLCreator;
 
-class issue129Test extends \PHPUnit_Framework_TestCase {
+class issue129Test extends \PHPUnit\Framework\TestCase {
 	
     public function testIssue129() {
         $query  = "DROP TEMPORARY TABLE IF EXISTS t1, t2 CASCADE";

@@ -43,7 +43,7 @@ namespace PHPSQLParser\Test\Parser;
 
 use PHPSQLParser\PHPSQLParser;
 
-class IssueGit11TestTest extends \PHPUnit_Framework_TestCase {
+class IssueGit11TestTest extends \PHPUnit\Framework\TestCase {
 	
 	public function testIssueGit11() {
 		$query = "select column from table as ";

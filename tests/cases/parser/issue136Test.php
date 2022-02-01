@@ -42,7 +42,7 @@ namespace PHPSQLParser\Test\Parser;
 use PHPSQLParser\PHPSQLParser;
 use PHPSQLParser\utils\ExpressionType;
 
-class Issue136Test extends \PHPUnit_Framework_TestCase {
+class Issue136Test extends \PHPUnit\Framework\TestCase {
 	
     public function testIssue136a() {
         $sql = "WITH myTableName AS (

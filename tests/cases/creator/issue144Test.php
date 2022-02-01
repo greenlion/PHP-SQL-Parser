@@ -43,7 +43,7 @@ namespace PHPSQLParser\Test\Creator;
 use PHPSQLParser\PHPSQLParser;
 use PHPSQLParser\PHPSQLCreator;
 
-class Issue144Test extends \PHPUnit_Framework_TestCase {
+class Issue144Test extends \PHPUnit\Framework\TestCase {
 
 	public function testIssue144() {
 		$query = "SELECT * FROM TableA JOIN TableB USING(Col1, Col2)";

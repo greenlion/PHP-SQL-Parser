@@ -3,9 +3,8 @@ namespace PHPSQLParser\Test\Creator;
 
 use PHPSQLParser\PHPSQLParser;
 use PHPSQLParser\PHPSQLCreator;
-use PHPUnit_Framework_TestCase;
 
-class AlterTest extends PHPUnit_Framework_TestCase
+class AlterTest extends \PHPUnit\Framework\TestCase
 {
     public function testAlterChangeColumn()
     {

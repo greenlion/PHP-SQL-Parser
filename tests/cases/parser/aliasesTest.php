@@ -41,7 +41,7 @@
 namespace PHPSQLParser\Test\Parser;
 use PHPSQLParser\PHPSQLParser;
 
-class AliasesTest extends \PHPUnit_Framework_TestCase {
+class AliasesTest extends \PHPUnit\Framework\TestCase {
 	
 	protected $parser;
 	
@@ -49,7 +49,7 @@ class AliasesTest extends \PHPUnit_Framework_TestCase {
 	 * @before
 	 * Executed before each test
 	 */
-	protected function setup() {
+	protected function setup(): void {
 		$this->parser = new PHPSQLParser();
 	}
 

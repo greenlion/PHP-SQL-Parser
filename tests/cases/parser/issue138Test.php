@@ -42,7 +42,7 @@ namespace PHPSQLParser\Test\Parser;
 use PHPSQLParser\PHPSQLParser;
 use PHPSQLParser\utils\ExpressionType;
 
-class Issue138Test extends \PHPUnit_Framework_TestCase {
+class Issue138Test extends \PHPUnit\Framework\TestCase {
 	
     public function testIssue138() {
         $sql = "SELECT ivoid, access_url, name, ucd, description FROM rr.capability NATURAL JOIN rr.interface NATURAL JOIN rr.table_column NATURAL JOIN rr.res_table WHERE standard_id='ivo://ivoa.net/std/TAP' AND 1=ivo_hasword(table_description, 'quasar') AND ucd='phot.mag;em.opt.V'";

@@ -42,8 +42,11 @@ namespace PHPSQLParser\Test\Parser;
 use PHPSQLParser\PHPSQLParser;
 use PHPSQLParser\PHPSQLCreator;
 
-class issue322Test extends \PHPUnit_Framework_TestCase
+class issue322Test extends \PHPUnit\Framework\TestCase
 {
+    /**
+     * @doesNotPerformAssertions
+     */
 	public function testIssue322()
 	{
         $sql = "SELECT IF(createdAt >= CURRENT_DATE(), '1', '0') FROM f_another_table WHERE id in(SELECT id FROM f_table WHERE createdAt > NOW())";
@@ -51,7 +54,7 @@ class issue322Test extends \PHPUnit_Framework_TestCase
 		$parsed = $parser->parse($sql, true);
 		$creator = new PHPSQLCreator();
 		$sql = $creator->create($parsed);
-		echo $sql;
+		//echo $sql;
     }
 }
 

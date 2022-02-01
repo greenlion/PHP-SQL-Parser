@@ -42,7 +42,7 @@ namespace PHPSQLParser\Test\Creator;
 use PHPSQLParser\PHPSQLParser;
 use PHPSQLParser\PHPSQLCreator;
 
-class issue63Test extends \PHPUnit_Framework_TestCase {
+class issue63Test extends \PHPUnit\Framework\TestCase {
 	
     public function testIssue63a() {
         $sql = "SELECT col FROM table1 GROUP BY col";

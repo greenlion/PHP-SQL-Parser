@@ -42,7 +42,7 @@ namespace PHPSQLParser\Test\Creator;
 use PHPSQLParser\PHPSQLParser;
 use PHPSQLParser\PHPSQLCreator;
 
-class tableexprTest extends \PHPUnit_Framework_TestCase {
+class tableexprTest extends \PHPUnit\Framework\TestCase {
 	
     public function testTableexpr() {
         $sql = "SELECT * FROM t1 LEFT JOIN (t2, t3, t4)

@@ -42,7 +42,7 @@ namespace PHPSQLParser\Test\Parser;
 use PHPSQLParser\PHPSQLParser;
 use PHPSQLParser\PHPSQLCreator;
 
-class gtltopTest extends \PHPUnit_Framework_TestCase {
+class gtltopTest extends \PHPUnit\Framework\TestCase {
 	
     public function testGtltop() {
         $parser = new PHPSQLParser();

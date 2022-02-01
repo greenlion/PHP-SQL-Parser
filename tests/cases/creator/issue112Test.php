@@ -42,7 +42,7 @@ namespace PHPSQLParser\Test\Creator;
 use PHPSQLParser\PHPSQLParser;
 use PHPSQLParser\PHPSQLCreator;
 
-class issue112Test extends \PHPUnit_Framework_TestCase {
+class issue112Test extends \PHPUnit\Framework\TestCase {
 	
     public function testIssue112() {
         $sql = 'SELECT user, MAX(salary) FROM users GROUP BY user HAVING MAX(salary) > 10';

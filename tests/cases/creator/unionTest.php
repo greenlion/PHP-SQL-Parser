@@ -42,7 +42,7 @@ use PHPSQLParser\PHPSQLParser;
 use PHPSQLParser\PHPSQLCreator;
 use Analog\Analog;
 
-class UnionTest extends \PHPUnit_Framework_TestCase {
+class UnionTest extends \PHPUnit\Framework\TestCase {
 
     public function testUnion1() {
         $parser = new PHPSQLParser();

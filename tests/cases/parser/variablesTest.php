@@ -42,7 +42,7 @@ namespace PHPSQLParser\Test\Parser;
 use PHPSQLParser\PHPSQLParser;
 use PHPSQLParser\PHPSQLCreator;
 
-class variablesTest extends \PHPUnit_Framework_TestCase {
+class variablesTest extends \PHPUnit\Framework\TestCase {
 	
     public function testVariables() {
         $sql = "SELECT @t1, @`t2`, @t3, @t4 := @t1+@'t2'+@t3;";

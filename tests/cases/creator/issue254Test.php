@@ -8,7 +8,7 @@ use PHPSQLParser\PHPSQLCreator;
 /**
  * https://github.com/greenlion/PHP-SQL-Parser/issues/254
  */
-class Issue254Test extends \PHPUnit_Framework_TestCase {
+class Issue254Test extends \PHPUnit\Framework\TestCase {
 
 	protected function _test( $sql, $message ) {
 		$parser = new PHPSQLParser();

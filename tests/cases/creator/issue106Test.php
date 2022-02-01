@@ -42,7 +42,7 @@ namespace PHPSQLParser\Test\Creator;
 use PHPSQLParser\PHPSQLParser;
 use PHPSQLParser\PHPSQLCreator;
 
-class issue106Test extends \PHPUnit_Framework_TestCase {
+class issue106Test extends \PHPUnit\Framework\TestCase {
 	
     public function testIssue106() {
         $sql = "SELECT dbo.fn_GetDayOfWeekMonIs0(DATEADD(SECOND, -21600, calls_cstm.date_logged_c)) AS 'Date'

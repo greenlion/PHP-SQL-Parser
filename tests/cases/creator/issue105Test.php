@@ -42,7 +42,7 @@ namespace PHPSQLParser\Test\Creator;
 use PHPSQLParser\PHPSQLParser;
 use PHPSQLParser\PHPSQLCreator;
 
-class issue105Test extends \PHPUnit_Framework_TestCase {
+class issue105Test extends \PHPUnit\Framework\TestCase {
 	
     public function testIssue105() {
         $sql = "SELECT users0.user_name AS 'CIS UserName'
