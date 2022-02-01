@@ -1,8 +1,8 @@
 <?php
 /**
- * OrderByBuilder.php
+ * PositionBuilder.php
  *
- * Builds the ORDERBY clause.
+ * Builds positions of the GROUP BY clause.
  *
  * PHP version 5
  *
@@ -40,74 +40,27 @@
  */
 
 namespace PHPSQLParser\builders;
-use PHPSQLParser\exceptions\UnableToCreateSQLException;
 use PHPSQLParser\utils\ExpressionType;
 
 /**
- * This class implements the builder for the ORDER-BY clause. 
+ * This class implements the builder for positions of the GROUP-BY clause. 
  * You can overwrite all functions to achieve another handling.
  *
  * @author  André Rothe <andre.rothe@phosco.info>
  * @license http://www.debian.org/misc/bsd.license  BSD License (3 Clause)
  *  
  */
-class OrderByBuilder implements Builder {
-
-    protected function buildFunction($parsed) {
-        $builder = new OrderByFunctionBuilder();
-        return $builder->build($parsed);
-    }
-    
-    protected function buildReserved($parsed) {
-        $builder = new OrderByReservedBuilder();
-        return $builder->build($parsed);
-    }
-    
-    protected function buildColRef($parsed) {
-        $builder = new OrderByColumnReferenceBuilder();
-        return $builder->build($parsed);
-    }
-
-    protected function buildAlias($parsed) {
-        $builder = new OrderByAliasBuilder();
-        return $builder->build($parsed);
-    }
-
-    protected function buildExpression($parsed) {
-        $builder = new OrderByExpressionBuilder();
-        return $builder->build($parsed);
-    }
-    
-    protected function buildBracketExpression($parsed) {
-        $builder = new OrderByBracketExpressionBuilder();
-        return $builder->build($parsed);
-    }
-    
-    protected function buildPosition($parsed) {
-        $builder = new OrderByPositionBuilder();
+class OrderByPositionBuilder implements Builder {
+    protected function buildDirection($parsed) {
+        $builder = new DirectionBuilder();
         return $builder->build($parsed);
     }
 
     public function build(array $parsed) {
-        $sql = "";
-        foreach ($parsed as $k => $v) {
-            $len = strlen($sql);
-            $sql .= $this->buildAlias($v);
-            $sql .= $this->buildColRef($v);
-            $sql .= $this->buildFunction($v);
-            $sql .= $this->buildExpression($v);
-            $sql .= $this->buildBracketExpression($v);
-            $sql .= $this->buildReserved($v);
-            $sql .= $this->buildPosition($v);
-            
-            if ($len == strlen($sql)) {
-                throw new UnableToCreateSQLException('ORDER', $k, $v, 'expr_type');
-            }
-
-            $sql .= ", ";
+        if ($parsed['expr_type'] !== ExpressionType::POSITION) {
+            return "";
         }
-        $sql = substr($sql, 0, -2);
-        return "ORDER BY " . $sql;
+        return $parsed['base_expr'] . $this->buildDirection($parsed);
     }
 }
 ?>
