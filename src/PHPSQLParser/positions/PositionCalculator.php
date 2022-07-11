@@ -90,7 +90,8 @@ class PositionCalculator {
                                                 ExpressionType::SUBPARTITION_HASH, ExpressionType::SUBPARTITION_COUNT,
                                                 ExpressionType::CHARSET, ExpressionType::ENGINE, ExpressionType::QUERY,
                                                 ExpressionType::INDEX_ALGORITHM, ExpressionType::INDEX_LOCK,
-    											ExpressionType::SUBQUERY_FACTORING, ExpressionType::CUSTOM_FUNCTION
+    											ExpressionType::SUBQUERY_FACTORING, ExpressionType::CUSTOM_FUNCTION,
+                                                ExpressionType::SIMPLE_FUNCTION
     );
 
     /**
