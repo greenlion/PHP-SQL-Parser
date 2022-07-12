@@ -87,6 +87,13 @@ class ColumnTypeBuilder implements Builder {
         return $parsed['base_expr'];
     }
 
+    protected function buildComment($parsed) {
+        if ($parsed['expr_type'] !== ExpressionType::COMMENT) {
+            return "";
+        }
+        return $parsed['base_expr'];
+    }
+
     public function build(array $parsed) {
         if ($parsed['expr_type'] !== ExpressionType::COLUMN_TYPE) {
             return "";
@@ -100,6 +107,7 @@ class ColumnTypeBuilder implements Builder {
             $sql .= $this->buildDefaultValue($v);
             $sql .= $this->buildCharacterSet($v);
             $sql .= $this->buildCollation($v);
+            $sql .= $this->buildComment($v);
 
             if ($len == strlen($sql)) {
                 throw new UnableToCreateSQLException('CREATE TABLE column-type subtree', $k, $v, 'expr_type');
