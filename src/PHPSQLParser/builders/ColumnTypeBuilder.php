@@ -80,6 +80,13 @@ class ColumnTypeBuilder implements Builder {
         return $parsed['base_expr'];
     }
 
+    protected function buildCollation($parsed) {
+        if ($parsed['expr_type'] !== ExpressionType::COLLATE) {
+            return "";
+        }
+        return $parsed['base_expr'];
+    }
+
     public function build(array $parsed) {
         if ($parsed['expr_type'] !== ExpressionType::COLUMN_TYPE) {
             return "";
@@ -92,6 +99,7 @@ class ColumnTypeBuilder implements Builder {
             $sql .= $this->buildReserved($v);
             $sql .= $this->buildDefaultValue($v);
             $sql .= $this->buildCharacterSet($v);
+            $sql .= $this->buildCollation($v);
 
             if ($len == strlen($sql)) {
                 throw new UnableToCreateSQLException('CREATE TABLE column-type subtree', $k, $v, 'expr_type');
