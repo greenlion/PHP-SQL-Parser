@@ -1,8 +1,8 @@
 <?php
 /**
- * ColumnTypeBuilder.php
+ * IndexKeyBuilder.php
  *
- * Builds the column type statement part of CREATE TABLE.
+ * Builds index key part of a CREATE TABLE statement.
  *
  * PHP version 5
  *
@@ -44,80 +44,56 @@ use PHPSQLParser\exceptions\UnableToCreateSQLException;
 use PHPSQLParser\utils\ExpressionType;
 
 /**
- * This class implements the builder for the column type statement part of CREATE TABLE. 
+ * This class implements the builder for the index key part of a CREATE TABLE statement. 
  * You can overwrite all functions to achieve another handling.
  *
  * @author  André Rothe <andre.rothe@phosco.info>
  * @license http://www.debian.org/misc/bsd.license  BSD License (3 Clause)
  *  
  */
-class ColumnTypeBuilder implements Builder {
-
-    protected function buildColumnTypeBracketExpression($parsed) {
-        $builder = new ColumnTypeBracketExpressionBuilder();
-        return $builder->build($parsed);
-    }
+class FulltextIndexBuilder implements Builder {
 
     protected function buildReserved($parsed) {
         $builder = new ReservedBuilder();
         return $builder->build($parsed);
     }
 
-    protected function buildDataType($parsed) {
-        $builder = new DataTypeBuilder();
+    protected function buildConstant($parsed) {
+        $builder = new ConstantBuilder();
         return $builder->build($parsed);
     }
     
-    protected function buildDefaultValue($parsed) {
-        $builder = new DefaultValueBuilder();
+    protected function buildIndexKey($parsed) {
+        if ($parsed['expr_type'] !== ExpressionType::INDEX) {
+            return "";
+        }
+        return $parsed['base_expr'];
+    }
+    
+    protected function buildColumnList($parsed) {
+        $builder = new ColumnListBuilder();
         return $builder->build($parsed);
     }
-
-    protected function buildCharacterSet($parsed) {
-        if ($parsed['expr_type'] !== ExpressionType::CHARSET) {
-            return "";
-        }
-        return $parsed['base_expr'];
-    }
-
-    protected function buildCollation($parsed) {
-        if ($parsed['expr_type'] !== ExpressionType::COLLATE) {
-            return "";
-        }
-        return $parsed['base_expr'];
-    }
-
-    protected function buildComment($parsed) {
-        if ($parsed['expr_type'] !== ExpressionType::COMMENT) {
-            return "";
-        }
-        return $parsed['base_expr'];
-    }
-
+    
     public function build(array $parsed) {
-        if ($parsed['expr_type'] !== ExpressionType::COLUMN_TYPE) {
+        if ($parsed['expr_type'] !== ExpressionType::FULLTEXT_IDX) {
             return "";
         }
         $sql = "";
         foreach ($parsed['sub_tree'] as $k => $v) {
             $len = strlen($sql);
-            $sql .= $this->buildDataType($v);
-            $sql .= $this->buildColumnTypeBracketExpression($v);
             $sql .= $this->buildReserved($v);
-            $sql .= $this->buildDefaultValue($v);
-            $sql .= $this->buildCharacterSet($v);
-            $sql .= $this->buildCollation($v);
-            $sql .= $this->buildComment($v);
+            $sql .= $this->buildColumnList($v);
+            $sql .= $this->buildConstant($v);
+            $sql .= $this->buildIndexKey($v);
 
             if ($len == strlen($sql)) {
-                throw new UnableToCreateSQLException('CREATE TABLE column-type subtree', $k, $v, 'expr_type');
+                throw new UnableToCreateSQLException('CREATE TABLE fulltext-index key subtree', $k, $v, 'expr_type');
             }
-    
+
             $sql .= " ";
         }
-    
         return substr($sql, 0, -1);
     }
-    
 }
 ?>
