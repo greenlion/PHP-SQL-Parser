@@ -11,7 +11,6 @@ class issue355Test extends \PHPUnit\Framework\TestCase
         $sql = "
             CREATE TABLE `test_alias` (
               `a` INTEGER,
-              `b` CHARACTER(10),
               `c` VARCHARACTER(10),
               `d` INT2,
               `e` INT3,
@@ -24,9 +23,9 @@ class issue355Test extends \PHPUnit\Framework\TestCase
         ";
 		$parser = new PHPSQLParser();
         $parser->parse($sql, true);
-        // We expect to see 10 parsed columns
+        // We expect to see 9 parsed columns
         $this->assertEquals(
-            10,
+            9,
             count($parser->parsed['TABLE']['create-def']['sub_tree'])
         );
 

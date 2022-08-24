@@ -187,7 +187,6 @@ class ColumnDefinitionProcessor extends AbstractProcessor {
                 continue 2;
 
             case 'CHAR':
-            case 'CHARACTER':   // Alias for CHAR
                 $expr[] = array('expr_type' => ExpressionType::DATA_TYPE, 'base_expr' => $trim, 'length' => false);
                 $currCategory = 'SINGLE_PARAM_PARENTHESIS';
                 $prevCategory = 'TEXT';
