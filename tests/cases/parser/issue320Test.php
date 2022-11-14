@@ -39,9 +39,8 @@
  */
 namespace PHPSQLParser\Test\Parser;
 use PHPSQLParser\PHPSQLParser;
-use PHPSQLParser\PHPSQLCreator;
 
-class issue320Test extends \PHPUnit_Framework_TestCase
+class issue320Test extends \PHPUnit\Framework\TestCase
 {
     public function test_no_warning_is_issued_when_help_table_is_used()
     {
