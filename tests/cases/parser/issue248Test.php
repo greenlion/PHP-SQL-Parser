@@ -9,7 +9,7 @@ namespace PHPSQLParser\Test\Parser;
 
 use PHPSQLParser\PHPSQLParser;
 
-class issue248Test extends \PHPUnit_Framework_TestCase {
+class issue248Test extends \PHPUnit\Framework\TestCase {
 
 	public function testIssue248() {
 		/*

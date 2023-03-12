@@ -42,7 +42,7 @@ namespace PHPSQLParser\Test\Creator;
 use PHPSQLParser\PHPSQLParser;
 use PHPSQLParser\PHPSQLCreator;
 
-class leftTest extends \PHPUnit_Framework_TestCase {
+class leftTest extends \PHPUnit\Framework\TestCase {
 
     public function testLeft() {
         $sql = 'SELECT *
@@ -56,7 +56,9 @@ class leftTest extends \PHPUnit_Framework_TestCase {
         $this->assertSame($expected, $created, 'left joins and table-expression');
 
     }
-
+/**
+ * @doesNotPerformAssertions
+*/
     public function testLeftIn() {
         $sql = 'SELECT *
             FROM (t1 LEFT JOIN t2 ON t1.a=t2.a)

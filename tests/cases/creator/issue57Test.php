@@ -42,7 +42,7 @@ namespace PHPSQLParser\Test\Creator;
 use PHPSQLParser\PHPSQLParser;
 use PHPSQLParser\PHPSQLCreator;
 
-class issue57Test extends \PHPUnit_Framework_TestCase {
+class issue57Test extends \PHPUnit\Framework\TestCase {
 	
     public function testIssue57() {
         $sql = "SELECT a.*, SUM(b.home) AS home,b.language,l.image,l.sef,l.title_native

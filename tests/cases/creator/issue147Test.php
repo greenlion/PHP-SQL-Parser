@@ -43,7 +43,7 @@ namespace PHPSQLParser\Test\Creator;
 use PHPSQLParser\PHPSQLParser;
 use PHPSQLParser\PHPSQLCreator;
 
-class Issue147Test extends \PHPUnit_Framework_TestCase {
+class Issue147Test extends \PHPUnit\Framework\TestCase {
 	
 	public function testIssue147() {
 		$query = "SELECT f FROM t WHERE x in (Select x from y)";

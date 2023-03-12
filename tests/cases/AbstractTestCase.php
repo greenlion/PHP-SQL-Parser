@@ -5,7 +5,7 @@ use PHPSQLParser\PHPSQLParser;
 use PHPSQLParser\PHPSQLCreator;
 use Analog\Analog;
 
-abstract class AbstractTestCase extends \PHPUnit_Framework_TestCase {
+abstract class AbstractTestCase extends \PHPUnit\Framework\TestCase {
 
 	protected $parser;
 	protected $creator;
@@ -22,7 +22,7 @@ abstract class AbstractTestCase extends \PHPUnit_Framework_TestCase {
 	 * @before
 	 * Executed before each test
 	 */
-	protected function setup() {
+	protected function setup(): void {
 		$this->parser = new PHPSQLParser();
 		$this->creator = new PHPSQLCreator();
 	}

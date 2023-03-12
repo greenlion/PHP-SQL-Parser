@@ -42,7 +42,7 @@ namespace PHPSQLParser\Test\Creator;
 use PHPSQLParser\PHPSQLParser;
 use PHPSQLParser\PHPSQLCreator;
 
-class issue117Test extends \PHPUnit_Framework_TestCase {
+class issue117Test extends \PHPUnit\Framework\TestCase {
 	
     public function testIssue117() {
         $sql = "(SELECT x FROM table) ORDER BY x";

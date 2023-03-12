@@ -46,7 +46,7 @@ use PHPSQLParser\PHPSQLCreator;
 /**
  * https://github.com/greenlion/PHP-SQL-Parser/issues/22
  */
-class Issue22Test extends \PHPUnit_Framework_TestCase {
+class Issue22Test extends \PHPUnit\Framework\TestCase {
 
 	protected function _test( $sql, $message ) {
 		$parser = new PHPSQLParser();

@@ -42,7 +42,7 @@ namespace PHPSQLParser\Test\Parser;
 use PHPSQLParser\PHPSQLParser;
 use PHPSQLParser\PHPSQLCreator;
 
-class subselectTest extends \PHPUnit_Framework_TestCase {
+class subselectTest extends \PHPUnit\Framework\TestCase {
 	
     public function testSubselect() {
         $parser = new PHPSQLParser();

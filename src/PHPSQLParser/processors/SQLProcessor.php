@@ -59,7 +59,7 @@ class SQLProcessor extends SQLChunkProcessor {
         $prev_category = "";
         $token_category = "";
         $skip_next = 0;
-        $out = false;
+        $out = array();
 
 	// $tokens may come as a numeric indexed array starting with an index greater than 0 (or as a boolean)
 	$tokenCount = count($tokens);
@@ -410,7 +410,7 @@ class SQLProcessor extends SQLChunkProcessor {
                 break;
 
             case 'FOR':
-                if ($prev_category === 'SHOW') {
+                if ($prev_category === 'SHOW' || $token_category === 'FROM') {
                     break;
                 }
                 $skip_next = 1;
@@ -517,6 +517,10 @@ class SQLProcessor extends SQLChunkProcessor {
             }
 
             $prev_category = $token_category;
+        }
+
+        if (count($out) === 0) {
+            return false;
         }
 
         return parent::process($out);

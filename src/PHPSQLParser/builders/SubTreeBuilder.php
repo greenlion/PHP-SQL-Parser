@@ -72,6 +72,11 @@ class SubTreeBuilder implements Builder {
         return $builder->build($parsed);
     }
 
+    protected function buildInList($parsed) {
+        $builder = new InListBuilder();
+        return $builder->build($parsed);
+    }
+
     protected function buildReserved($parsed) {
         $builder = new ReservedBuilder();
         return $builder->build($parsed);
@@ -92,6 +97,11 @@ class SubTreeBuilder implements Builder {
         return $builder->build($parsed);
     }
 
+    protected function buildUserVariable($parsed) {
+        $builder = new UserVariableBuilder();
+        return $builder->build($parsed);
+    }
+
     protected function buildSign($parsed) {
         $builder = new SignBuilder();
         return $builder->build($parsed);
@@ -108,10 +118,12 @@ class SubTreeBuilder implements Builder {
             $sql .= $this->buildFunction($v);
             $sql .= $this->buildOperator($v);
             $sql .= $this->buildConstant($v);
+            $sql .= $this->buildInList($v);
             $sql .= $this->buildSubQuery($v);
             $sql .= $this->buildSelectBracketExpression($v);
             $sql .= $this->buildReserved($v);
             $sql .= $this->buildQuery($v);
+            $sql .= $this->buildUserVariable($v);
             $sign = $this->buildSign($v);
             $sql .= $sign;
 

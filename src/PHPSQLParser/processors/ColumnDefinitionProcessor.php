@@ -123,6 +123,7 @@ class ColumnDefinitionProcessor extends AbstractProcessor {
                 break 2;
 
             case 'VARCHAR':
+            case 'VARCHARACTER': // Alias for VARCHAR
                 $expr[] = array('expr_type' => ExpressionType::DATA_TYPE, 'base_expr' => $trim, 'length' => false);
                 $prevCategory = 'TEXT';
                 $currCategory = 'SINGLE_PARAM_PARENTHESIS';
@@ -135,9 +136,12 @@ class ColumnDefinitionProcessor extends AbstractProcessor {
                 continue 2;
 
             case 'UNSIGNED':
-                $last = array_pop($expr);
-                $last['unsigned'] = true;
-                $expr[] = $last;
+                foreach (array_reverse(array_keys($expr)) as $i) {
+                    if (isset($expr[$i]['expr_type']) && (ExpressionType::DATA_TYPE === $expr[$i]['expr_type'])) {
+                        $expr[$i]['unsigned'] = true;
+                        break;
+                    }
+                }
 	            $options['sub_tree'][] = array('expr_type' => ExpressionType::RESERVED, 'base_expr' => $trim);
                 continue 2;
 
@@ -152,10 +156,15 @@ class ColumnDefinitionProcessor extends AbstractProcessor {
             case 'TINYBIT':
             case 'TINYINT':
             case 'SMALLINT':
+            case 'INT2':        // Alias of SMALLINT
             case 'MEDIUMINT':
+            case 'INT3':        // Alias of MEDIUMINT
+            case 'MIDDLEINT':   // Alias of MEDIUMINT
             case 'INT':
             case 'INTEGER':
+            case 'INT4':        // Alias of INT
             case 'BIGINT':
+            case 'INT8':        // Alias of BIGINT
             case 'BOOL':
             case 'BOOLEAN':
                 $expr[] = array('expr_type' => ExpressionType::DATA_TYPE, 'base_expr' => $trim, 'unsigned' => false,
@@ -178,6 +187,7 @@ class ColumnDefinitionProcessor extends AbstractProcessor {
                 continue 2;
 
             case 'CHAR':
+            case 'CHARACTER':   // Alias for CHAR
                 $expr[] = array('expr_type' => ExpressionType::DATA_TYPE, 'base_expr' => $trim, 'length' => false);
                 $currCategory = 'SINGLE_PARAM_PARENTHESIS';
                 $prevCategory = 'TEXT';
@@ -185,7 +195,9 @@ class ColumnDefinitionProcessor extends AbstractProcessor {
 
             case 'REAL':
             case 'DOUBLE':
+            case 'FLOAT8':      // Alias for DOUBLE
             case 'FLOAT':
+            case 'FLOAT4':      // Alias for FLOAT
                 $expr[] = array('expr_type' => ExpressionType::DATA_TYPE, 'base_expr' => $trim, 'unsigned' => false,
                                 'zerofill' => false);
                 $currCategory = 'TWO_PARAM_PARENTHESIS';

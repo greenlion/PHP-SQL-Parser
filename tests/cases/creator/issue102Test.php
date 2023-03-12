@@ -42,7 +42,7 @@ namespace PHPSQLParser\Test\Creator;
 use PHPSQLParser\PHPSQLParser;
 use PHPSQLParser\PHPSQLCreator;
 
-class issue102Test extends \PHPUnit_Framework_TestCase {
+class issue102Test extends \PHPUnit\Framework\TestCase {
 	
     public function testIssue102() {
         $sql = "SELECT IF(f = 0 || f = 1, 1, 0) FROM tbl";

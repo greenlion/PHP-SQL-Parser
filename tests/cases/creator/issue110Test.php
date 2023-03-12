@@ -42,7 +42,7 @@ namespace PHPSQLParser\Test\Creator;
 use PHPSQLParser\PHPSQLParser;
 use PHPSQLParser\PHPSQLCreator;
 
-class issue110Test extends \PHPUnit_Framework_TestCase {
+class issue110Test extends \PHPUnit\Framework\TestCase {
 	
     public function testIssue110() {
         $sql = 'SELECT DISTINCT a FROM b';

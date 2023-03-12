@@ -42,7 +42,7 @@ namespace PHPSQLParser\Test\Parser;
 use PHPSQLParser\PHPSQLParser;
 use PHPSQLParser\PHPSQLCreator;
 
-class positionsTest extends \PHPUnit_Framework_TestCase {
+class positionsTest extends \PHPUnit\Framework\TestCase {
 	
     public function testPositions() {
         $parser = new PHPSQLParser();

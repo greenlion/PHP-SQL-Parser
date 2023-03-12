@@ -41,7 +41,7 @@
 namespace PHPSQLParser\Test\Parser;
 use PHPSQLParser\PHPSQLParser;
 
-class Issue149Test extends \PHPUnit_Framework_TestCase {
+class Issue149Test extends \PHPUnit\Framework\TestCase {
 	
     public function testIssue149() {
 		$sql = "SELECT * from tab where ifnull(col_name,'') <> ''";

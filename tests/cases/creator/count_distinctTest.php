@@ -42,7 +42,7 @@ namespace PHPSQLParser\Test\Creator;
 use PHPSQLParser\PHPSQLParser;
 use PHPSQLParser\PHPSQLCreator;
 
-class count_distinctTest extends \PHPUnit_Framework_TestCase {
+class count_distinctTest extends \PHPUnit\Framework\TestCase {
 	
     public function testCount_distinct() {
 

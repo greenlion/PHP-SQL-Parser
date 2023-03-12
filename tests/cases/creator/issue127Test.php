@@ -42,7 +42,7 @@ namespace PHPSQLParser\Test\Creator;
 use PHPSQLParser\PHPSQLParser;
 use PHPSQLParser\PHPSQLCreator;
 
-class issue127Test extends \PHPUnit_Framework_TestCase {
+class issue127Test extends \PHPUnit\Framework\TestCase {
 	
     public function testIssue127() {
         $query = "UPDATE t1 SET c1 = -c2";

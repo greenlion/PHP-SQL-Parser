@@ -42,7 +42,7 @@ namespace PHPSQLParser\Test\Creator;
 use PHPSQLParser\PHPSQLParser;
 use PHPSQLParser\PHPSQLCreator;
 
-class inlistTest extends \PHPUnit_Framework_TestCase {
+class inlistTest extends \PHPUnit\Framework\TestCase {
 	
     public function testInlist() {
         $sql = "SELECT * FROM contacts WHERE contacts.id IN (SELECT email_addr_bean_rel.bean_id FROM email_addr_bean_rel, email_addresses WHERE email_addresses.id = email_addr_bean_rel.email_address_id AND email_addr_bean_rel.deleted = 0 AND email_addr_bean_rel.bean_module = 'Contacts' AND email_addresses.email_address IN (\"test@example.com\"))";
@@ -53,5 +53,15 @@ class inlistTest extends \PHPUnit_Framework_TestCase {
         $this->assertSame($expected, $created, 'a subquery and in-lists');
 
     }
-}
 
+    public function testInSubtree() {
+        $sql = 'SELECT CASE WHEN 2 IN (2, 3) THEN "yes" ELSE "no" END';
+        $parser = new PHPSQLParser($sql);
+        $creator = new PHPSQLCreator($parser->parsed);
+        $created = $creator->created;
+        $expected = getExpectedValue(dirname(__FILE__), 'insubtree.sql', false);
+        $this->assertSame($expected, $created, 'a IN list in a CASE WHEN subtree');
+
+    }
+
+}

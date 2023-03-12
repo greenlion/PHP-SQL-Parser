@@ -39,12 +39,12 @@
  * 
  */
 namespace PHPSQLParser\Test\Parser;
-use PHPUnit_Framework_TestCase;
+use PHPUnit\Framework\TestCase;
 use PHPSQLParser\PHPSQLParser;
 use PHPSQLParser\PHPSQLCreator;
 use Analog\Analog;
 
-class UnionTest extends PHPUnit_Framework_TestCase
+class UnionTest extends TestCase
 {
     public function testUnion1()
     {

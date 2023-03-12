@@ -42,7 +42,7 @@ namespace PHPSQLParser\Test\Parser;
 use PHPSQLParser\PHPSQLParser;
 use PHPSQLParser\PHPSQLCreator;
 
-class deleteTest extends \PHPUnit_Framework_TestCase {
+class deleteTest extends \PHPUnit\Framework\TestCase {
 	
     public function testDelete() {
         $sql = "delete from testA as a where a.id = 1";
