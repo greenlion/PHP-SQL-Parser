@@ -4,7 +4,7 @@ namespace parser;
 
 use PHPSQLParser\PHPSQLParser;
 
-class issue338Test extends \PHPUnit_Framework_TestCase
+class issue338Test extends \PHPUnit\Framework\TestCase
 {
 	public function testIssue338() {
 		$sql = "SELECT id, date, type as type, libelle as libelle, TRUNCATE(debit, 2) as debit, ROUND(COALESCE(credit, 0) - COALESCE(debit, 0), 2) as solde FROM compte_cp";
