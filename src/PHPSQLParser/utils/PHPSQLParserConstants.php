@@ -129,7 +129,7 @@ class PHPSQLParserConstants {
                                  'BITLENGTH', 'CAST', 'CEILING', 'CHAR', 'CHAR_LENGTH', 'CHARACTER_LENGTH', 'CHARSET',
                                  'COALESCE', 'COERCIBILITY', 'COLLATION', 'COMPRESS', 'CONCAT', 'CONCAT_WS',
                                  'CONNECTION_ID', 'CONV', 'CONVERT', 'CONVERT_TZ', 'COS', 'COT', 'COUNT', 'CRC32',
-                                 'CURDATE', 'CURRENT_USER', 'CURRVAL', 'CURTIME', 'DATABASE', 'SCHEMA', 'DATE_ADD', 'DATE_DIFF',
+                                 'CURDATE', 'CURRENT_TIMESTAMP', 'CURRENT_USER', 'CURRVAL', 'CURTIME', 'DATABASE', 'SCHEMA', 'DATE_ADD', 'DATE_DIFF',
                                  'DATE_FORMAT', 'DATE_SUB', 'DAY', 'DAYNAME', 'DAYOFMONTH', 'DAYOFWEEK', 'DAYOFYEAR',
                                  'DECODE', 'DEFAULT', 'DEGREES', 'DES_DECRYPT', 'DES_ENCRYPT', 'ELT', 'ENCODE',
                                  'ENCRYPT', 'EXP', 'EXPORT_SET', 'EXTRACT', 'FIELD', 'FIND_IN_SET', 'FLOOR', 'FORMAT',

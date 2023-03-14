@@ -89,7 +89,9 @@ class SelectExpressionProcessor extends AbstractProcessor {
             // but also a comment!
             if ($capture) {
                 if (!$this->isWhitespaceToken($upper) && !$this->isCommentToken($upper)) {
-                    $alias['name'] .= $token;
+                    if ($alias) {
+                        $alias['name'] .= $token;
+                    }
                     array_pop($stripped);
                 }
                 $alias['base_expr'] .= $token;
