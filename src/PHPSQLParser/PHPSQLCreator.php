@@ -40,6 +40,7 @@
  */
 
 namespace PHPSQLParser;
+use PHPSQLParser\builders\Builder;
 use PHPSQLParser\exceptions\UnsupportedFeatureException;
 use PHPSQLParser\builders\SelectStatementBuilder;
 use PHPSQLParser\builders\DeleteStatementBuilder;
@@ -64,7 +65,8 @@ use PHPSQLParser\builders\AlterStatementBuilder;
  *  
  */
 class PHPSQLCreator {
-
+    private Builder $created;
+	
     public function __construct($parsed = false) {
         if ($parsed) {
             $this->create($parsed);
@@ -76,9 +78,9 @@ class PHPSQLCreator {
         switch ($k) {
 
         case 'UNION':
-			$builder = new UnionStatementBuilder();
-			$this->created = $builder->build($parsed);
-			break;
+	    $builder = new UnionStatementBuilder();
+	    $this->created = $builder->build($parsed);
+	    break;
         case 'UNION ALL':
             $builder = new UnionAllStatementBuilder();
             $this->created = $builder->build($parsed);
