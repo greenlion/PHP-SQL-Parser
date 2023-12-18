@@ -1,0 +1,41 @@
+name: CI
+
+on: [push]
+
+jobs:
+  build-test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        php-versions:
+          - 5.4
+          - 5.5
+          - 5.6
+          - 7.2
+          - 7.3
+          - 7.4
+          - 8.2
+          - 8.3
+          - nightly
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: php-actions/composer@v6
+
+      - name: PHPUnit Tests
+        uses: php-actions/phpunit@master
+        env:
+          XDEBUG_MODE: coverage
+        with:
+          php_extensions: "xdebug"
+          coverage_html: "coverage/html/"
+          version: 9.5
+          bootstrap: tests/bootstrap.php
+          configuration: phpunit.xml
+
+      - name: Archive code coverage results
+        uses: actions/upload-artifact@v3
+        with:
+          name: code-coverage-report
+          path: coverage/html
