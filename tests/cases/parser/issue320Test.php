@@ -51,7 +51,7 @@ class issue320Test extends \PHPUnit\Framework\TestCase
         // there currently is an exception because `HELP` is a keyword
         // but this query seems valid at least in mysql and mssql
         // so ideally PHPSQLParser would be able to parse it
-        $this->setExpectedException(
+        $this->expectException(
             '\PHPSQLParser\exceptions\UnableToCalculatePositionException'
         );
 
