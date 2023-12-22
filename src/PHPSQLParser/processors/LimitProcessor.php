@@ -61,8 +61,11 @@ class LimitProcessor extends AbstractProcessor {
         
         foreach ($tokens as &$token) {
             if ($this->isCommentToken($token)) {
-                 $comments[] = parent::processComment($token);
-                 $token = '';
+                if(!$this->options->getIgnoreComment()) {
+                    $comments[] = parent::processComment($token);
+                }
+
+                $token = '';
             }
         }
         
