@@ -41,6 +41,7 @@
  */
 
 namespace PHPSQLParser\builders;
+use PHPSQLParser\exceptions\UnsupportedFeatureException;
 
 /**
  * This class implements the builder for the JOIN statement parts (within FROM). 
