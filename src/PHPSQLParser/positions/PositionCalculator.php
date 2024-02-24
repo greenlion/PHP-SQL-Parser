@@ -91,7 +91,7 @@ class PositionCalculator {
                                                 ExpressionType::CHARSET, ExpressionType::ENGINE, ExpressionType::QUERY,
                                                 ExpressionType::INDEX_ALGORITHM, ExpressionType::INDEX_LOCK,
     											ExpressionType::SUBQUERY_FACTORING, ExpressionType::CUSTOM_FUNCTION,
-                                                ExpressionType::SIMPLE_FUNCTION
+                                                ExpressionType::SIMPLE_FUNCTION, ExpressionType::SOURCE
     );
 
     /**
@@ -221,7 +221,7 @@ class PositionCalculator {
                 for ($i = 1; $i < count($parsed); $i++) {
                     $backtracking[] = false;
                 }
-            } elseif (($key === 'TABLE') || ($key === 'create-def' && $parsed !== false)) {
+            } elseif (($key === 'TABLE' || $key === 'SOURCE') || ($key === 'create-def' && $parsed !== false)) {
                 // do nothing
             } else {
                 // move the current pos after the keyword
