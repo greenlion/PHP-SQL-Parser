@@ -85,6 +85,7 @@ class ExpressionType {
 
     const TEMPORARY_TABLE = 'temporary-table';
     const TABLE = 'table';
+    const SOURCE = 'source';
     const VIEW = 'view';
     const DATABASE = 'database';
     const SCHEMA = 'schema';
