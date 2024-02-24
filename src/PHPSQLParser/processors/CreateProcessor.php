@@ -81,6 +81,13 @@ class CreateProcessor extends AbstractProcessor {
                 $expr[] = array('expr_type' => ExpressionType::RESERVED, 'base_expr' => $trim);
                 break;
 
+            case 'SOURCE':
+                // CREATE SOURCE
+                $result['expr_type'] = ExpressionType::SOURCE;
+                $result['not-exists'] = false;
+                $expr[] = array('expr_type' => ExpressionType::RESERVED, 'base_expr' => $trim);
+                break;
+
             case 'INDEX':
                 // CREATE INDEX
                 $result['expr_type'] = ExpressionType::INDEX;
