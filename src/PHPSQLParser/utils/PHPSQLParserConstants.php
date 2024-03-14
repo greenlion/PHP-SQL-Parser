@@ -84,7 +84,7 @@ class PHPSQLParserConstants {
                                 'OUTER', 'OUTFILE', 'PRECISION', 'PRIMARY', 'PRIVILEGES', 'PROCEDURE', 'PURGE', 'READ',
                                 'REAL', 'REFERENCES', 'REGEXP', 'RENAME', 'REPEAT', 'REPLACE', 'REQUIRE', 'RESTRICT',
                                 'RETURN', 'REVOKE', 'RIGHT', 'RLIKE', 'SECOND_MICROSECOND', 'SELECT', 'SENSITIVE',
-                                'SEPARATOR', 'SET', 'SHOW', 'SMALLINT', 'SOME', 'SONAME', 'SOURCE', 'SPATIAL', 'SPECIFIC', 'SQL',
+                                'SEPARATOR', 'SET', 'SHOW', 'SMALLINT', 'SOME', 'SONAME', 'SOURCE', 'SOURCES', 'SPATIAL', 'SPECIFIC', 'SQL',
                                 'SQLEXCEPTION', 'SQLSTATE', 'SQLWARNING', 'SQL_BIG_RESULT', 'SQL_CALC_FOUND_ROWS',
                                 'SQL_SMALL_RESULT', 'SQL_TSI_DAY', 'SQL_TSI_FRAC_SECOND', 'SQL_TSI_HOUR',
                                 'SQL_TSI_MINUTE', 'SQL_TSI_MONTH', 'SQL_TSI_QUARTER', 'SQL_TSI_SECOND', 'SQL_TSI_WEEK',

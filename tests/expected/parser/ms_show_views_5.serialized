@@ -1,0 +1,1 @@
+a:1:{s:4:"SHOW";a:2:{i:0;a:2:{s:9:"expr_type";s:8:"reserved";s:9:"base_expr";s:12:"MATERIALIZED";}i:1;a:2:{s:9:"expr_type";s:8:"reserved";s:9:"base_expr";s:5:"VIEWS";}}}

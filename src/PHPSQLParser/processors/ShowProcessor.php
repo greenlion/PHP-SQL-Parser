@@ -80,6 +80,8 @@ class ShowProcessor extends AbstractProcessor {
             case 'PROCEDURE':
             case 'ENGINE':
             case 'TABLE':
+            case 'SOURCE':
+            case 'VIEW':
             case 'FOR':
             case 'LIKE':
             case 'INDEX':
@@ -104,10 +106,13 @@ class ShowProcessor extends AbstractProcessor {
             case 'SCHEMAS':
             case 'ERRORS':
             case 'TABLES':
+            case 'SOURCES':
+            case 'VIEWS';
             case 'WARNINGS':
             case 'CHARACTER':
             case 'SET':
             case 'COLLATION':
+            case 'MATERIALIZED':
                 $resultList[] = array('expr_type' => ExpressionType::RESERVED, 'base_expr' => trim($token));
                 $category = $upper;
                 break;
@@ -137,6 +142,16 @@ class ShowProcessor extends AbstractProcessor {
                 case 'TABLE':
                     $resultList[] = array('expr_type' => ExpressionType::TABLE, 'table' => $token,
                                           'no_quotes' => $this->revokeQuotation($token), 'base_expr' => $token);
+                    $category = "TABLENAME";
+                    break;
+                case 'SOURCE':
+                    $resultList[] = array('expr_type' => ExpressionType::SOURCE, 'source' => $token,
+                            'no_quotes' => $this->revokeQuotation($token), 'base_expr' => $token);
+                    $category = "TABLENAME";
+                    break;
+                case 'VIEW':
+                    $resultList[] = array('expr_type' => ExpressionType::VIEW, 'view' => $token,
+                            'no_quotes' => $this->revokeQuotation($token), 'base_expr' => $token);
                     $category = "TABLENAME";
                     break;
                 case 'FUNCTION':

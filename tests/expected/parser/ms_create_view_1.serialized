@@ -1,0 +1,1 @@
+a:2:{s:6:"CREATE";a:2:{s:9:"base_expr";s:4:"VIEW";s:8:"sub_tree";a:0:{}}s:4:"VIEW";a:5:{s:9:"base_expr";s:10:"view_table";s:4:"name";s:10:"view_table";s:9:"no_quotes";a:2:{s:5:"delim";b:0;s:5:"parts";a:1:{i:0;s:10:"view_table";}}s:10:"create-def";b:0;s:7:"options";b:0;}}

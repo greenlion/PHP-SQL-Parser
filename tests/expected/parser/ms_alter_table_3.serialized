@@ -1,0 +1,1 @@
+a:1:{s:5:"ALTER";a:12:{i:0;s:5:"ALTER";i:1;s:5:"TABLE";i:2;s:1:" ";i:3;s:3:"abc";i:4;s:1:" ";i:5;s:6:"MODIFY";i:6;s:1:" ";i:7;s:6:"COLUMN";i:8;s:1:" ";i:9;s:13:"string_column";i:10;s:1:" ";i:11;s:4:"text";}}

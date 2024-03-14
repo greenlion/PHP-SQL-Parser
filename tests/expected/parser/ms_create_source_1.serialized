@@ -1,0 +1,1 @@
+a:2:{s:6:"CREATE";a:4:{s:9:"expr_type";s:6:"source";s:10:"not-exists";b:0;s:9:"base_expr";s:6:"SOURCE";s:8:"sub_tree";a:1:{i:0;a:2:{s:9:"expr_type";s:8:"reserved";s:9:"base_expr";s:6:"SOURCE";}}}s:6:"SOURCE";a:5:{s:9:"base_expr";s:4:"test";s:4:"name";s:4:"test";s:9:"no_quotes";a:2:{s:5:"delim";b:0;s:5:"parts";a:1:{i:0;s:4:"test";}}s:10:"create-def";b:0;s:7:"options";b:0;}}

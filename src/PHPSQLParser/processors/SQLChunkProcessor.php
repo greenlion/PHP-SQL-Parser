@@ -79,13 +79,31 @@ class SQLChunkProcessor extends AbstractProcessor {
 
             $out['BRACKET'] = $processedBracket;
         }
+        if (!empty($out['ALTER'])) {
+            $processor = new AlterProcessor($this->options);
+            $out['ALTER'] = $processor->process($out['ALTER']);
+        }
+        if (!empty($out['ADD'])) {
+            $processor = new AddProcessor($this->options);
+            $out['ADD'] = $processor->process($out['ADD']);
+        }
         if (!empty($out['CREATE'])) {
             $processor = new CreateProcessor($this->options);
             $out['CREATE'] = $processor->process($out['CREATE']);
         }
+        if (!empty($out['VIEW'])) {
+            $processor = new SourceProcessor($this->options);
+            $out['VIEW'] = $processor->process($out['VIEW']);
+            $this->moveLIKE($out);
+        }
         if (!empty($out['SOURCE'])) {
             $processor = new SourceProcessor($this->options);
             $out['SOURCE'] = $processor->process($out['SOURCE']);
+            $this->moveLIKE($out);
+        }
+        if (!empty($out['SOURCES'])) {
+            $processor = new SourceProcessor($this->options);
+            $out['SOURCES'] = $processor->process($out['SOURCES']);
             $this->moveLIKE($out);
         }
         if (!empty($out['TABLE'])) {

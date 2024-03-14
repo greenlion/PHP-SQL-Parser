@@ -68,9 +68,12 @@ class DropProcessor extends AbstractProcessor {
 
             $upper = strtoupper($trim);
             switch ($upper) {
+            case 'MATERIALIZED':
+                break;
             case 'VIEW':
             case 'SCHEMA':
             case 'DATABASE':
+            case 'SOURCE':
             case 'TABLE':
                 if ($objectType === '') {
                     $objectType = constant('PHPSQLParser\utils\ExpressionType::' . $upper);
@@ -115,7 +118,10 @@ class DropProcessor extends AbstractProcessor {
             default:
                 $object = array();
                 $object['expr_type'] = $objectType;
-                if ($objectType === ExpressionType::TABLE || $objectType === ExpressionType::TEMPORARY_TABLE) {
+                if ($objectType === ExpressionType::TABLE
+                    || $objectType === ExpressionType::SOURCE
+                    || $objectType === ExpressionType::VIEW
+                    || $objectType === ExpressionType::TEMPORARY_TABLE) {
                     $object['table'] = $trim;
                     $object['no_quotes'] = false;
                     $object['alias'] = false;
