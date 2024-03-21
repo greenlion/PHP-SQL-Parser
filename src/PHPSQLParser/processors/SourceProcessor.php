@@ -95,6 +95,7 @@ class SourceProcessor extends AbstractProcessor
             'options' => array(), 'like' => false, 'select-option' => false);
         $expr = array();
         $base_expr = '';
+        $prevCategory = '';
         $skip = 0;
 
         foreach ($tokens as $tokenKey => $token) {
@@ -146,7 +147,14 @@ class SourceProcessor extends AbstractProcessor
                         continue 2;
                     }
                     break;
-
+                case 'SUSPENDED':
+                    // ALTER
+                    if ($prevCategory === 'TABLE_NAME') {
+                        $expr[] = $this->getReservedType($trim);
+                        $currCategory = $prevCategory = 'TABLE_OPTION';
+                        continue 2;
+                    }
+                    break;
                 case 'ENGINE':
                 case 'TYPE':
                 case 'BROKER_LIST':

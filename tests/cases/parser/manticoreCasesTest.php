@@ -111,7 +111,7 @@ class manticoreCasesTest extends \PHPUnit\Framework\TestCase
             ["ALTER SOURCE `abc` ADD column title int", 'ms_alter_source_1'],
             ["ALTER VIEW `abc` ADD column title int", 'ms_alter_view_1'],
             ["ALTER MATERIALIZED VIEW abc ADD column title int", 'ms_alter_view_2'],
-//            ["alter table rt charset_table='a,b,c,d'", 'ms_alter_table_3'],
+            ["ALTER MATERIALIZED VIEW view_name suspended=1", 'ms_alter_table_3'],
         ];
     }
 }
