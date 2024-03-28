@@ -112,6 +112,9 @@ class manticoreCasesTest extends \PHPUnit\Framework\TestCase
             ["ALTER VIEW `abc` ADD column title int", 'ms_alter_view_1'],
             ["ALTER MATERIALIZED VIEW abc ADD column title int", 'ms_alter_view_2'],
             ["ALTER MATERIALIZED VIEW view_name suspended=1", 'ms_alter_table_3'],
+            ["REPLACE INTO `abc` (id,t,values) VALUES (1,'123s123',(6,7,8))", 'ms_replace_1'],
+            ["REPLACE INTO abc SET `values` = (6,7,8) WHERE id =1", 'ms_replace_2'],
+            ["REPLACE INTO abc SET values = (6,7,8) WHERE id =1", 'ms_replace_3'],
         ];
     }
 }
