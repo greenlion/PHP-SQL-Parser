@@ -235,6 +235,38 @@ class SQLProcessor extends SQLChunkProcessor
                     }
                     break;
 
+                case 'MVS':
+
+                    if ($prev_category === 'SHOW') {
+                        $out[$prev_category][] = "MATERIALIZED";
+                        $out[$prev_category][] = " ";
+                        $out[$prev_category][] = "VIEWS";
+                        $token_category = "VIEWS";
+                        break;
+                    }
+                    break;
+                case 'MV':
+                    if ($prev_category === 'SHOW') {
+                        $out[$prev_category][] = "MATERIALIZED";
+                        $out[$prev_category][] = " ";
+                        $out[$prev_category][] = "VIEW";
+                        continue 2;
+                    }
+
+                    if ($prev_category === 'DROP') {
+                        $out[$prev_category][] = "MATERIALIZED";
+                        $out[$prev_category][] = " ";
+                        $out[$prev_category][] = "VIEW";
+                        continue 2;
+                    }
+
+                    if ($prev_category === 'CREATE' || $prev_category === 'ALTER') {
+                        $out[$prev_category][] = "MATERIALIZED";
+                        $out[$prev_category][] = " ";
+                        $out[$prev_category][] = "VIEW";
+                        $token_category = "VIEW";
+                    }
+                    break;
                 case 'VIEW':
                     if ($prev_category === 'SHOW') {
                         break;

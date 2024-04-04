@@ -157,6 +157,7 @@ class SourceProcessor extends AbstractProcessor
                     break;
                 case 'ENGINE':
                 case 'TYPE':
+                case 'BATCH':
                 case 'BROKER_LIST':
                 case 'TOPIC_LIST':
                 case 'CONSUMER_GROUP':

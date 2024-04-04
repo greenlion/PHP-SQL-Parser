@@ -78,7 +78,7 @@ class manticoreCasesTest extends \PHPUnit\Framework\TestCase
             ['CREATE SOURCE test', 'ms_create_source_1'],
             ['CREATE SOURCE `test`', 'ms_create_source_2'],
             ["CREATE SOURCE kafka (id bigint, term text, abbrev text, GlossDef json) type='kafka'
-		   broker_list='kafka:9092' topic_list='my-data' consumer_group='manticore' num_consumers='4' batch=50", 'ms_create_source_3'],
+		   broker_list='kafka:9092' topic_list='my-data' consumer_group='manticore' num_consumers='4' batch='50'", 'ms_create_source_3'],
             ['CREATE VIEW view_table', 'ms_create_view_1'],
             ["CREATE MATERIALIZED VIEW view_table TO destination_kafka AS SELECT id, term as name,
 		   abbrev as short_name, UTC_TIMESTAMP() as received_at, GlossDef.size as size FROM kafka", 'ms_create_view_2'],
@@ -115,6 +115,17 @@ class manticoreCasesTest extends \PHPUnit\Framework\TestCase
             ["REPLACE INTO `abc` (id,t,values) VALUES (1,'123s123',(6,7,8))", 'ms_replace_1'],
             ["REPLACE INTO abc SET `values` = (6,7,8) WHERE id =1", 'ms_replace_2'],
             ["REPLACE INTO abc SET values = (6,7,8) WHERE id =1", 'ms_replace_3'],
+
+            // Aliases. They should match with the same result as original queries
+            ["CREATE MV view_table TO destination_kafka AS SELECT id, term as name,
+		   abbrev as short_name, UTC_TIMESTAMP() as received_at, GlossDef.size as size FROM kafka", 'ms_create_view_2'],
+            ["SHOW MVS", 'ms_show_views_5'],
+            ["SHOW MV abc", 'ms_show_views_6'],
+            ["SHOW MV `abc`", 'ms_show_views_7'],
+            ["DROP MV abc", 'ms_drop_view_2'],
+            ["DROP MV IF EXIST `abc`", 'ms_drop_view_4'],
+            ["ALTER MV abc ADD column title int", 'ms_alter_view_2'],
+            ["ALTER MV view_name suspended=1", 'ms_alter_table_3'],
         ];
     }
 }
