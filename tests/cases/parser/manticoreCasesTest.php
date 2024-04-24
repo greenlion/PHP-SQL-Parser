@@ -83,6 +83,7 @@ class manticoreCasesTest extends \PHPUnit\Framework\TestCase
             ["CREATE MATERIALIZED VIEW view_table TO destination_kafka AS SELECT id, term as name,
 		   abbrev as short_name, UTC_TIMESTAMP() as received_at, GlossDef.size as size FROM kafka", 'ms_create_view_2'],
             ["CREATE TABLE destination_kafka (id bigint, name text, short_name text, received_at text, size multi) engine='columnar'", 'ms_create_table_1'],
+            ["CREATE TABLE new_table LIKE existing_table WITH DATA", 'ms_create_table_2'],
             ["SHOW TABLES", 'ms_show_tables_1'],
             ["SHOW TABLE abc", 'ms_show_tables_2'],
             ["SHOW TABLE `abc`", 'ms_show_tables_3'],
