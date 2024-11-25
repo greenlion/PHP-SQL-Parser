@@ -16,6 +16,7 @@ jobs:
           - 7.4
           - 8.2
           - 8.3
+          - 8.4
           - nightly
 
     steps:
