@@ -62,9 +62,9 @@ abstract class AbstractProcessor {
     /**
      * AbstractProcessor constructor.
      *
-     * @param Options $options
+     * @param Options|null $options
      */
-    public function __construct(Options $options = null)
+    public function __construct(?Options $options = null)
     {
         $this->options = $options;
     }
