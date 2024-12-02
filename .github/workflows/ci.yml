@@ -6,6 +6,7 @@ jobs:
   build-test:
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
         php-versions:
           - 5.4
@@ -14,9 +15,12 @@ jobs:
           - 7.2
           - 7.3
           - 7.4
+          - 8.0
+          - 8.1
           - 8.2
           - 8.3
-          - nightly
+          - 8.4
+
 
     steps:
       - uses: actions/checkout@v3
@@ -24,15 +28,16 @@ jobs:
       - uses: php-actions/composer@v6
 
       - name: PHPUnit Tests
-        uses: php-actions/phpunit@master
+        uses: php-actions/phpunit@v4
         env:
           XDEBUG_MODE: coverage
         with:
-          php_extensions: "xdebug"
+          php_extensions: xdebug
           coverage_html: "coverage/html/"
           version: 9.5
           bootstrap: tests/bootstrap.php
           configuration: phpunit.xml
+          php_version: ${{ matrix.php-versions }}
 
       - name: Archive code coverage results
         uses: actions/upload-artifact@v3
