@@ -40,7 +40,9 @@
  */
 
 namespace PHPSQLParser\builders;
+
 use PHPSQLParser\exceptions\UnableToCreateSQLException;
+use PHPSQLParser\utils\ExpressionType;
 
 /**
  * This class implements the builder for the [FROM] part. You can overwrite
@@ -93,11 +95,19 @@ class FromBuilder implements Builder {
             }
         }
         else {
+            $numberOfComments = 0;
+
             foreach ($parsed as $k => $v) {
+                $k -= $numberOfComments;
                 $len = strlen($sql);
                 $sql .= $this->buildTable($v, $k);
                 $sql .= $this->buildTableExpression($v, $k);
                 $sql .= $this->buildSubquery($v, $k);
+
+                if ($this->isComment($v)) {
+                    $sql .= $this->buildComment($v);
+                    $numberOfComments++;
+                }
 
                 if ($len == strlen($sql)) {
                     throw new UnableToCreateSQLException('FROM', $k, $v, 'expr_type');
@@ -106,5 +116,15 @@ class FromBuilder implements Builder {
         }
         return "FROM " . $sql;
     }
+
+    protected function isComment($parsed) {
+        return $parsed['expr_type'] === ExpressionType::COMMENT;
+    }
+
+    protected function buildComment($parsed) {
+        if (!$this->isComment($parsed)) {
+            return '';
+        }
+        return $parsed['value'] . ' ';
+    }
 }
-?>
