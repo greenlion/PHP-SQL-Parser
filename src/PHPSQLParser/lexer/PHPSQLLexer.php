@@ -283,25 +283,30 @@ class PHPSQLLexer {
     }
 
     protected function balanceBackticks($tokens) {
+        $result = [];
+        $n = count($tokens);
         $i = 0;
-        $cnt = count($tokens);
-        while ($i < $cnt) {
-
-            if (!isset($tokens[$i])) {
-                $i++;
-                continue;
-            }
-
+        while ($i < $n) {
             $token = $tokens[$i];
-
+            // 如果遇到一个反引号，则尝试合并直到找到匹配的结束符
             if ($this->isBacktick($token)) {
-                $tokens = $this->balanceCharacter($tokens, $i, $token);
+                $balanced = $token;
+                $i++;
+                while ($i < $n) {
+                    $balanced .= $tokens[$i];
+                    // 遇到匹配的结束符后退出内层循环
+                    if ($tokens[$i] === $token) {
+                        break;
+                    }
+                    $i++;
+                }
+                $result[] = $balanced;
+            } else {
+                $result[] = $token;
             }
-
             $i++;
         }
-
-        return $tokens;
+        return $result;
     }
 
     // backticks are not balanced within one token, so we have

@@ -63,5 +63,43 @@ class backtickTest extends \PHPUnit\Framework\TestCase {
         $this->assertEquals($expected, $p, "issue 35: ben's test");
 
     }
+    public function generateRandomString($length = 10)
+    {
+        $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+        $randomString = '';
+        for ($i = 0; $i < $length; $i++) {
+            $randomString .= $characters[rand(0, strlen($characters) - 1)];
+        }
+        return $randomString;
+    }
+
+    public function createInFilter($len)
+    {
+        $arr = [];
+        for ($i = 0; $i < $len; $i++) {
+            $arr[] = $this->generateRandomString();
+        }
+        return '("' . implode($arr, '","') . '")';
+    }
+
+    public function testOptimizeBalanceBackticks()
+    {
+        $parser = new PHPSQLParser();
+
+        // test backticks
+        $sql = 'SELECT id, name from test where `id map` in ("a b c 1-2_3")';
+        $obj = $parser->parse($sql);
+        $creator = new PHPSQLCreator($obj);
+        $sql2 = $creator->created;
+        $this->assertTrue(mb_strtolower($sql) === mb_strtolower($sql2));
+
+        // The more in conditions, the worse the performance
+        // The difference before and after optimization is 10 times
+        $sql = 'SELECT id,name from test where id in ' . $this->createInFilter(1024);
+        $start = microtime(true);
+        $parser->parse($sql);
+        $cost = intval((microtime(true) - $start) * 1000);
+        print_r('cost ' . $cost . PHP_EOL);
+    }
 }
 
