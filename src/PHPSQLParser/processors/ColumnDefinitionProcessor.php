@@ -356,6 +356,12 @@ class ColumnDefinitionProcessor extends AbstractProcessor {
                 // TODO: check this, we need the last comma
                 continue 2;
 
+            case 'CHECK':
+                $expr[] = array('expr_type' => ExpressionType::CHECK, 'base_expr' => $trim, 'length' => false);
+                $currCategory = 'MULTIPLE_PARAM_PARENTHESIS';
+                $prevCategory = $upper;
+                continue 2;
+
             default:
                 switch ($currCategory) {
 
