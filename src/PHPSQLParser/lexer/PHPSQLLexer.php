@@ -213,6 +213,7 @@ class PHPSQLLexer {
         $comment = false;
         $backTicks = [];
         $in_string = false;
+        $escaped = false;
         $inline = false;
 
         while ($i < $cnt) {
@@ -224,11 +225,15 @@ class PHPSQLLexer {
 
             $token = $tokens[$i];
 
+            // a backslash escapes the next character, so an escaped quote does not delimit a string
+            $escapedToken = $escaped;
+            $escaped = false;
+
             /*
              * Check to see if we're inside a value (i.e. back ticks).
              * If so inline comments are not valid.
              */
-            if ($comment === false && $this->isBacktick($token)) {
+            if ($comment === false && $escapedToken === false && $this->isBacktick($token)) {
                 if (!empty($backTicks)) {
                     $lastBacktick = array_pop($backTicks);
                     if ($lastBacktick != $token) {
@@ -240,8 +245,11 @@ class PHPSQLLexer {
                 }
             }
 
-            if($comment === false && ($token == "\"" || $token == "'")) {
+            if($comment === false && $escapedToken === false && ($token == "\"" || $token == "'")) {
                 $in_string = !$in_string;
+            }
+            if($in_string === true && $escapedToken === false && $token === "\\") {
+                $escaped = true;
             }
             if(!$in_string) {
                 if ($comment !== false) {
