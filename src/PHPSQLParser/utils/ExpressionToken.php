@@ -15,6 +15,7 @@ class ExpressionToken {
     private $trim;
     private $upper;
     private $noQuotes;
+    private $nullTreatment;
 
     public function __construct($key = "", $token = "") {
         $this->subTree = false;
@@ -25,6 +26,7 @@ class ExpressionToken {
         $this->trim = trim($token);
         $this->upper = strtoupper($this->trim);
         $this->noQuotes = null;
+        $this->nullTreatment = false;
     }
 
     # TODO: we could replace it with a constructor new ExpressionToken(this, "*")
@@ -44,6 +46,10 @@ class ExpressionToken {
         return $this->subTree;
     }
 
+    public function getKey() {
+        return $this->key;
+    }
+
     public function getUpper($idx = false) {
         return $idx !== false ? $this->upper[$idx] : $this->upper;
     }
@@ -58,6 +64,14 @@ class ExpressionToken {
 
     public function setNoQuotes($token, $qchars, Options $options) {
         $this->noQuotes = ($token === null) ? null : $this->revokeQuotation($token, $options);
+    }
+
+    public function setNullTreatment($nullTreatment) {
+        $this->nullTreatment = $nullTreatment;
+    }
+
+    public function getNullTreatment() {
+        return $this->nullTreatment;
     }
 
     public function setTokenType($type) {
@@ -110,6 +124,18 @@ class ExpressionToken {
         return $this->tokenType === ExpressionType::SIMPLE_FUNCTION;
     }
 
+    public function isWindowFunction() {
+        return $this->tokenType === ExpressionType::WINDOW_FUNCTION;
+    }
+
+    /**
+     * True, if the token can carry an OVER clause, that means it is
+     * a function call of any kind.
+     */
+    public function isAnyFunction() {
+        return $this->isFunction() || $this->isAggregateFunction() || $this->isCustomFunction();
+    }
+
     public function isUnspecified() {
         return ($this->tokenType === false);
     }
@@ -153,6 +179,9 @@ class ExpressionToken {
         $result['base_expr'] = $this->token;
         if (!empty($this->noQuotes)) {
             $result['no_quotes'] = $this->noQuotes;
+        }
+        if (!empty($this->nullTreatment)) {
+            $result['null_treatment'] = $this->nullTreatment;
         }
         $result['sub_tree'] = $this->subTree;
         return $result;

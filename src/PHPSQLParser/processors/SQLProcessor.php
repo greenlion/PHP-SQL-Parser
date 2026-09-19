@@ -52,6 +52,64 @@ namespace PHPSQLParser\processors;
 class SQLProcessor extends SQLChunkProcessor {
 
     /**
+     * IGNORE is a statement option, but "IGNORE NULLS" is the null treatment
+     * clause of a window function and belongs to the expression.
+     *
+     * @param array $tokens      the token list of the statement
+     * @param int   $tokenNumber the position of the IGNORE token
+     */
+    protected function isNullTreatment($tokens, $tokenNumber) {
+        $tokenCount = count($tokens);
+
+        for ($i = $tokenNumber + 1; $i < $tokenCount; ++$i) {
+            if (!isset($tokens[$i])) {
+                continue;
+            }
+            $trim = trim($tokens[$i]);
+            if ($trim === "") {
+                continue;
+            }
+            return (strtoupper($trim) === 'NULLS');
+        }
+        return false;
+    }
+
+    /**
+     * WINDOW is not a reserved word within this dialect, so a table or a column
+     * can be named WINDOW. We start a WINDOW clause only, if the keyword is
+     * followed by "<name> AS (...)", which cannot be anything else.
+     *
+     * @param array $tokens      the token list of the statement
+     * @param int   $tokenNumber the position of the WINDOW token
+     */
+    protected function isWindowClause($tokens, $tokenNumber) {
+        $found = 0;
+        $tokenCount = count($tokens);
+
+        for ($i = $tokenNumber + 1; $i < $tokenCount; ++$i) {
+            if (!isset($tokens[$i])) {
+                continue;
+            }
+            $trim = trim($tokens[$i]);
+            if ($trim === "") {
+                continue;
+            }
+
+            $found++;
+            if ($found === 1) {
+                continue; // the name of the window
+            }
+            if ($found === 2 && strtoupper($trim) !== 'AS') {
+                return false;
+            }
+            if ($found === 3) {
+                return ($trim[0] === '(' && substr($trim, -1) === ')');
+            }
+        }
+        return false;
+    }
+
+    /**
      * This function breaks up the SQL statement into logical sections. 
      * Some sections are delegated to specialized processors.
      */
@@ -296,6 +354,10 @@ class SQLProcessor extends SQLChunkProcessor {
                     $out[$token_category][] = $trim;
                     continue 2;
                 }
+                if ($this->isNullTreatment($tokens, $tokenNumber)) {
+                    // IGNORE NULLS of a window function
+                    break;
+                }
                 $out['OPTIONS'][] = $upper;
                 continue 2;
 
@@ -487,6 +549,17 @@ class SQLProcessor extends SQLChunkProcessor {
                 }
                 $out['OPTIONS'][] = $trim;
                 continue 2;
+
+            case 'WINDOW':
+                // the WINDOW clause of a SELECT statement, it follows the
+                // FROM, WHERE, GROUP BY or HAVING clause. WINDOW is not a
+                // reserved word, so we must not touch it anywhere else.
+                if (($token_category === 'SELECT' || $token_category === 'FROM' || $token_category === 'WHERE'
+                    || $token_category === 'GROUP' || $token_category === 'HAVING')
+                    && $this->isWindowClause($tokens, $tokenNumber)) {
+                    $token_category = $upper;
+                }
+                break;
 
             case 'WITH':
                 if ($token_category === 'GROUP') {

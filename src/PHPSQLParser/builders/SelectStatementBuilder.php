@@ -76,6 +76,11 @@ class SelectStatementBuilder implements Builder {
         return $builder->build($parsed);
     }
 
+    protected function buildWINDOW($parsed) {
+        $builder = new WindowBuilder();
+        return $builder->build($parsed);
+    }
+
     protected function buildORDER($parsed) {
         $builder = new OrderByBuilder();
         return $builder->build($parsed);
@@ -112,6 +117,9 @@ class SelectStatementBuilder implements Builder {
         }
         if (isset($parsed['HAVING'])) {
             $sql .= " " . $this->buildHAVING($parsed['HAVING']);
+        }
+        if (isset($parsed['WINDOW'])) {
+            $sql .= " " . $this->buildWINDOW($parsed['WINDOW']);
         }
         if (isset($parsed['ORDER'])) {
             $sql .= " " . $this->buildORDER($parsed['ORDER']);

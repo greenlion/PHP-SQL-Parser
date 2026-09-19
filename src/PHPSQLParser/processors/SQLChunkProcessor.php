@@ -130,6 +130,10 @@ class SQLChunkProcessor extends AbstractProcessor {
             $processor = new OrderByProcessor($this->options);
             $out['ORDER'] = $processor->process($out['ORDER'], isset($out['SELECT']) ? $out['SELECT'] : array());
         }
+        if (!empty($out['WINDOW'])) {
+            $processor = new WindowProcessor($this->options);
+            $out['WINDOW'] = $processor->process($out['WINDOW']);
+        }
         if (!empty($out['LIMIT'])) {
             $processor = new LimitProcessor($this->options);
             $out['LIMIT'] = $processor->process($out['LIMIT']);

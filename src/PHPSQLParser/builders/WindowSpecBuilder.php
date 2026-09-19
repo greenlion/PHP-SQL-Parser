@@ -1,8 +1,8 @@
 <?php
 /**
- * RefClauseBuilder.php
+ * WindowSpecBuilder.php
  *
- * Builds reference clauses within a JOIN.
+ * This file implements the builder for window specifications.
  *
  * PHP version 5
  *
@@ -35,92 +35,84 @@
  * @author    André Rothe <andre.rothe@phosco.info>
  * @copyright 2010-2014 Justin Swanhart and André Rothe
  * @license   http://www.debian.org/misc/bsd.license  BSD License (3 Clause)
- * @version   SVN: $Id$
  *
  */
 
 namespace PHPSQLParser\builders;
-use PHPSQLParser\exceptions\UnableToCreateSQLException;
+use PHPSQLParser\utils\ExpressionType;
 
 /**
- * This class implements the references clause within a JOIN.
+ * This class implements the builder for a window specification, that means the
+ * part of a window function, which follows the OVER keyword.
  * You can overwrite all functions to achieve another handling.
  *
  * @author  André Rothe <andre.rothe@phosco.info>
  * @license http://www.debian.org/misc/bsd.license  BSD License (3 Clause)
  *
  */
-class RefClauseBuilder implements Builder {
+class WindowSpecBuilder implements Builder {
 
-    protected function buildInList($parsed) {
-        $builder = new InListBuilder();
+    protected function buildPartitionBy($parsed) {
+        $builder = new WindowPartitionBuilder();
         return $builder->build($parsed);
     }
 
-    protected function buildColRef($parsed) {
-        $builder = new ColumnReferenceBuilder();
+    protected function buildOrderBy($parsed) {
+        $builder = new OrderByBuilder();
         return $builder->build($parsed);
     }
 
-    protected function buildOperator($parsed) {
-        $builder = new OperatorBuilder();
+    protected function buildFrame($parsed) {
+        $builder = new WindowFrameBuilder();
         return $builder->build($parsed);
     }
 
-    protected function buildWindowFunction($parsed) {
-        $builder = new WindowFunctionBuilder();
-        return $builder->build($parsed);
+    /**
+     * Returns the parts of the specification without the surrounding
+     * parenthesis.
+     */
+    protected function buildParts(array $parsed) {
+        $parts = array();
+
+        if (!empty($parsed['window_name'])) {
+            $parts[] = $parsed['window_name'];
+        }
+        if (!empty($parsed['partition'])) {
+            $parts[] = $this->buildPartitionBy($parsed['partition']);
+        }
+        if (!empty($parsed['order'])) {
+            $parts[] = $this->buildOrderBy($parsed['order']);
+        }
+        if (!empty($parsed['frame'])) {
+            $parts[] = $this->buildFrame($parsed['frame']);
+        }
+
+        return implode(" ", $parts);
     }
 
-    protected function buildFunction($parsed) {
-        $builder = new FunctionBuilder();
-        return $builder->build($parsed);
-    }
-
-    protected function buildConstant($parsed) {
-        $builder = new ConstantBuilder();
-        return $builder->build($parsed);
-    }
-
-    protected function buildBracketExpression($parsed) {
-        $builder = new SelectBracketExpressionBuilder();
-        return $builder->build($parsed);
-    }
-
-    protected function buildColumnList($parsed) {
-        $builder = new ColumnListBuilder();
-        return $builder->build($parsed);
-    }
-
-    protected function buildSubQuery($parsed) {
-        $builder = new SubQueryBuilder();
-        return $builder->build($parsed);
+    /**
+     * Within the WINDOW clause the specification always needs the parenthesis,
+     * also if it only inherits another window.
+     */
+    public function buildDefinition(array $parsed) {
+        if (!isset($parsed['expr_type']) || $parsed['expr_type'] !== ExpressionType::WINDOW_SPEC) {
+            return "";
+        }
+        return "(" . $this->buildParts($parsed) . ")";
     }
 
     public function build(array $parsed) {
-        if ($parsed === false) {
-            return '';
+        if (!isset($parsed['expr_type']) || $parsed['expr_type'] !== ExpressionType::WINDOW_SPEC) {
+            return "";
         }
-        $sql = '';
-        foreach ($parsed as $k => $v) {
-            $len = strlen($sql);
-            $sql .= $this->buildColRef($v);
-            $sql .= $this->buildOperator($v);
-            $sql .= $this->buildConstant($v);
-            $sql .= $this->buildWindowFunction($v);
-            $sql .= $this->buildFunction($v);
-            $sql .= $this->buildBracketExpression($v);
-            $sql .= $this->buildInList($v);
-            $sql .= $this->buildColumnList($v);
-            $sql .= $this->buildSubQuery($v);
 
-            if ($len == strlen($sql)) {
-                throw new UnableToCreateSQLException('expression ref_clause', $k, $v, 'expr_type');
-            }
-
-            $sql .= ' ';
+        // a plain reference to a named window needs no parenthesis
+        if (!empty($parsed['window_name']) && empty($parsed['partition']) && empty($parsed['order'])
+            && empty($parsed['frame'])) {
+            return $parsed['window_name'];
         }
-        return substr($sql, 0, -1);
+
+        return "(" . $this->buildParts($parsed) . ")";
     }
 }
 ?>

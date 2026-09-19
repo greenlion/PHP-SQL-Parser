@@ -1,8 +1,8 @@
 <?php
 /**
- * RefClauseBuilder.php
+ * WindowPartitionBuilder.php
  *
- * Builds reference clauses within a JOIN.
+ * This file implements the builder for the PARTITION-BY part of a window specification.
  *
  * PHP version 5
  *
@@ -35,7 +35,6 @@
  * @author    André Rothe <andre.rothe@phosco.info>
  * @copyright 2010-2014 Justin Swanhart and André Rothe
  * @license   http://www.debian.org/misc/bsd.license  BSD License (3 Clause)
- * @version   SVN: $Id$
  *
  */
 
@@ -43,37 +42,17 @@ namespace PHPSQLParser\builders;
 use PHPSQLParser\exceptions\UnableToCreateSQLException;
 
 /**
- * This class implements the references clause within a JOIN.
- * You can overwrite all functions to achieve another handling.
+ * This class implements the builder for the PARTITION-BY part of a window
+ * specification. You can overwrite all functions to achieve another handling.
  *
  * @author  André Rothe <andre.rothe@phosco.info>
  * @license http://www.debian.org/misc/bsd.license  BSD License (3 Clause)
  *
  */
-class RefClauseBuilder implements Builder {
-
-    protected function buildInList($parsed) {
-        $builder = new InListBuilder();
-        return $builder->build($parsed);
-    }
+class WindowPartitionBuilder implements Builder {
 
     protected function buildColRef($parsed) {
         $builder = new ColumnReferenceBuilder();
-        return $builder->build($parsed);
-    }
-
-    protected function buildOperator($parsed) {
-        $builder = new OperatorBuilder();
-        return $builder->build($parsed);
-    }
-
-    protected function buildWindowFunction($parsed) {
-        $builder = new WindowFunctionBuilder();
-        return $builder->build($parsed);
-    }
-
-    protected function buildFunction($parsed) {
-        $builder = new FunctionBuilder();
         return $builder->build($parsed);
     }
 
@@ -82,45 +61,44 @@ class RefClauseBuilder implements Builder {
         return $builder->build($parsed);
     }
 
-    protected function buildBracketExpression($parsed) {
+    protected function buildFunction($parsed) {
+        $builder = new FunctionBuilder();
+        return $builder->build($parsed);
+    }
+
+    protected function buildWindowFunction($parsed) {
+        $builder = new WindowFunctionBuilder();
+        return $builder->build($parsed);
+    }
+
+    protected function buildSelectBracketExpression($parsed) {
         $builder = new SelectBracketExpressionBuilder();
         return $builder->build($parsed);
     }
 
-    protected function buildColumnList($parsed) {
-        $builder = new ColumnListBuilder();
-        return $builder->build($parsed);
-    }
-
-    protected function buildSubQuery($parsed) {
-        $builder = new SubQueryBuilder();
+    protected function buildSelectExpression($parsed) {
+        $builder = new SelectExpressionBuilder();
         return $builder->build($parsed);
     }
 
     public function build(array $parsed) {
-        if ($parsed === false) {
-            return '';
-        }
-        $sql = '';
+        $sql = "";
         foreach ($parsed as $k => $v) {
             $len = strlen($sql);
             $sql .= $this->buildColRef($v);
-            $sql .= $this->buildOperator($v);
             $sql .= $this->buildConstant($v);
             $sql .= $this->buildWindowFunction($v);
             $sql .= $this->buildFunction($v);
-            $sql .= $this->buildBracketExpression($v);
-            $sql .= $this->buildInList($v);
-            $sql .= $this->buildColumnList($v);
-            $sql .= $this->buildSubQuery($v);
+            $sql .= $this->buildSelectBracketExpression($v);
+            $sql .= $this->buildSelectExpression($v);
 
             if ($len == strlen($sql)) {
-                throw new UnableToCreateSQLException('expression ref_clause', $k, $v, 'expr_type');
+                throw new UnableToCreateSQLException('PARTITION BY', $k, $v, 'expr_type');
             }
 
-            $sql .= ' ';
+            $sql .= ", ";
         }
-        return substr($sql, 0, -1);
+        return "PARTITION BY " . substr($sql, 0, -2);
     }
 }
 ?>

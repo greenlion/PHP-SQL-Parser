@@ -1,8 +1,8 @@
 <?php
 /**
- * RefClauseBuilder.php
+ * WindowFrameBuilder.php
  *
- * Builds reference clauses within a JOIN.
+ * This file implements the builder for the frame clause of a window specification.
  *
  * PHP version 5
  *
@@ -35,45 +35,25 @@
  * @author    André Rothe <andre.rothe@phosco.info>
  * @copyright 2010-2014 Justin Swanhart and André Rothe
  * @license   http://www.debian.org/misc/bsd.license  BSD License (3 Clause)
- * @version   SVN: $Id$
  *
  */
 
 namespace PHPSQLParser\builders;
-use PHPSQLParser\exceptions\UnableToCreateSQLException;
+use PHPSQLParser\utils\ExpressionType;
 
 /**
- * This class implements the references clause within a JOIN.
+ * This class implements the builder for the frame clause of a window
+ * specification, e.g. ROWS BETWEEN 2 PRECEDING AND CURRENT ROW.
  * You can overwrite all functions to achieve another handling.
  *
  * @author  André Rothe <andre.rothe@phosco.info>
  * @license http://www.debian.org/misc/bsd.license  BSD License (3 Clause)
  *
  */
-class RefClauseBuilder implements Builder {
-
-    protected function buildInList($parsed) {
-        $builder = new InListBuilder();
-        return $builder->build($parsed);
-    }
+class WindowFrameBuilder implements Builder {
 
     protected function buildColRef($parsed) {
         $builder = new ColumnReferenceBuilder();
-        return $builder->build($parsed);
-    }
-
-    protected function buildOperator($parsed) {
-        $builder = new OperatorBuilder();
-        return $builder->build($parsed);
-    }
-
-    protected function buildWindowFunction($parsed) {
-        $builder = new WindowFunctionBuilder();
-        return $builder->build($parsed);
-    }
-
-    protected function buildFunction($parsed) {
-        $builder = new FunctionBuilder();
         return $builder->build($parsed);
     }
 
@@ -82,45 +62,83 @@ class RefClauseBuilder implements Builder {
         return $builder->build($parsed);
     }
 
-    protected function buildBracketExpression($parsed) {
+    protected function buildFunction($parsed) {
+        $builder = new FunctionBuilder();
+        return $builder->build($parsed);
+    }
+
+    protected function buildSelectExpression($parsed) {
+        $builder = new SelectExpressionBuilder();
+        return $builder->build($parsed);
+    }
+
+    protected function buildSelectBracketExpression($parsed) {
         $builder = new SelectBracketExpressionBuilder();
         return $builder->build($parsed);
     }
 
-    protected function buildColumnList($parsed) {
-        $builder = new ColumnListBuilder();
-        return $builder->build($parsed);
+    /**
+     * The offset of a frame bound can be a literal, but also an expression
+     * such as INTERVAL 5 DAY.
+     */
+    protected function buildValue($parsed) {
+        if (empty($parsed)) {
+            return "";
+        }
+
+        $sql = $this->buildConstant($parsed);
+        $sql .= $this->buildColRef($parsed);
+        $sql .= $this->buildFunction($parsed);
+        $sql .= $this->buildSelectBracketExpression($parsed);
+        $sql .= $this->buildSelectExpression($parsed);
+
+        if ($sql === "" && isset($parsed['base_expr'])) {
+            $sql = $parsed['base_expr'];
+        }
+        return $sql;
     }
 
-    protected function buildSubQuery($parsed) {
-        $builder = new SubQueryBuilder();
-        return $builder->build($parsed);
+    public function buildBound($parsed) {
+        if (empty($parsed) || !isset($parsed['expr_type'])
+            || $parsed['expr_type'] !== ExpressionType::WINDOW_FRAME_BOUND) {
+            return "";
+        }
+
+        if ($parsed['direction'] === 'CURRENT ROW') {
+            return 'CURRENT ROW';
+        }
+
+        $sql = "";
+        if (!empty($parsed['unbounded'])) {
+            $sql = 'UNBOUNDED';
+        } elseif (!empty($parsed['value'])) {
+            $sql = $this->buildValue($parsed['value']);
+        }
+
+        if (!empty($parsed['direction'])) {
+            $sql .= ($sql === "" ? "" : " ") . $parsed['direction'];
+        }
+        return $sql;
     }
 
     public function build(array $parsed) {
-        if ($parsed === false) {
-            return '';
+        if (!isset($parsed['expr_type']) || $parsed['expr_type'] !== ExpressionType::WINDOW_FRAME) {
+            return "";
         }
-        $sql = '';
-        foreach ($parsed as $k => $v) {
-            $len = strlen($sql);
-            $sql .= $this->buildColRef($v);
-            $sql .= $this->buildOperator($v);
-            $sql .= $this->buildConstant($v);
-            $sql .= $this->buildWindowFunction($v);
-            $sql .= $this->buildFunction($v);
-            $sql .= $this->buildBracketExpression($v);
-            $sql .= $this->buildInList($v);
-            $sql .= $this->buildColumnList($v);
-            $sql .= $this->buildSubQuery($v);
 
-            if ($len == strlen($sql)) {
-                throw new UnableToCreateSQLException('expression ref_clause', $k, $v, 'expr_type');
-            }
+        $sql = $parsed['unit'];
 
-            $sql .= ' ';
+        if (!empty($parsed['end'])) {
+            $sql .= " BETWEEN " . $this->buildBound($parsed['start']);
+            $sql .= " AND " . $this->buildBound($parsed['end']);
+        } else {
+            $sql .= " " . $this->buildBound($parsed['start']);
         }
-        return substr($sql, 0, -1);
+
+        if (!empty($parsed['exclude'])) {
+            $sql .= " EXCLUDE " . $parsed['exclude'];
+        }
+        return $sql;
     }
 }
 ?>

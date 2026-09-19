@@ -1,8 +1,8 @@
 <?php
 /**
- * RefClauseBuilder.php
+ * WindowFunctionBuilder.php
  *
- * Builds reference clauses within a JOIN.
+ * This file implements the builder for window functions.
  *
  * PHP version 5
  *
@@ -35,40 +35,26 @@
  * @author    André Rothe <andre.rothe@phosco.info>
  * @copyright 2010-2014 Justin Swanhart and André Rothe
  * @license   http://www.debian.org/misc/bsd.license  BSD License (3 Clause)
- * @version   SVN: $Id$
  *
  */
 
 namespace PHPSQLParser\builders;
 use PHPSQLParser\exceptions\UnableToCreateSQLException;
+use PHPSQLParser\utils\ExpressionType;
 
 /**
- * This class implements the references clause within a JOIN.
+ * This class implements the builder for window functions, that means a
+ * function call followed by an OVER clause.
  * You can overwrite all functions to achieve another handling.
  *
  * @author  André Rothe <andre.rothe@phosco.info>
  * @license http://www.debian.org/misc/bsd.license  BSD License (3 Clause)
  *
  */
-class RefClauseBuilder implements Builder {
+class WindowFunctionBuilder implements Builder {
 
-    protected function buildInList($parsed) {
-        $builder = new InListBuilder();
-        return $builder->build($parsed);
-    }
-
-    protected function buildColRef($parsed) {
-        $builder = new ColumnReferenceBuilder();
-        return $builder->build($parsed);
-    }
-
-    protected function buildOperator($parsed) {
-        $builder = new OperatorBuilder();
-        return $builder->build($parsed);
-    }
-
-    protected function buildWindowFunction($parsed) {
-        $builder = new WindowFunctionBuilder();
+    protected function buildAlias($parsed) {
+        $builder = new AliasBuilder();
         return $builder->build($parsed);
     }
 
@@ -77,50 +63,42 @@ class RefClauseBuilder implements Builder {
         return $builder->build($parsed);
     }
 
-    protected function buildConstant($parsed) {
-        $builder = new ConstantBuilder();
+    protected function buildWindowSpec($parsed) {
+        $builder = new WindowSpecBuilder();
         return $builder->build($parsed);
     }
 
-    protected function buildBracketExpression($parsed) {
-        $builder = new SelectBracketExpressionBuilder();
-        return $builder->build($parsed);
-    }
-
-    protected function buildColumnList($parsed) {
-        $builder = new ColumnListBuilder();
-        return $builder->build($parsed);
-    }
-
-    protected function buildSubQuery($parsed) {
-        $builder = new SubQueryBuilder();
+    protected function buildDirection($parsed) {
+        $builder = new DirectionBuilder();
         return $builder->build($parsed);
     }
 
     public function build(array $parsed) {
-        if ($parsed === false) {
-            return '';
+        if (!isset($parsed['expr_type']) || $parsed['expr_type'] !== ExpressionType::WINDOW_FUNCTION) {
+            return "";
         }
-        $sql = '';
-        foreach ($parsed as $k => $v) {
-            $len = strlen($sql);
-            $sql .= $this->buildColRef($v);
-            $sql .= $this->buildOperator($v);
-            $sql .= $this->buildConstant($v);
-            $sql .= $this->buildWindowFunction($v);
-            $sql .= $this->buildFunction($v);
-            $sql .= $this->buildBracketExpression($v);
-            $sql .= $this->buildInList($v);
-            $sql .= $this->buildColumnList($v);
-            $sql .= $this->buildSubQuery($v);
 
-            if ($len == strlen($sql)) {
-                throw new UnableToCreateSQLException('expression ref_clause', $k, $v, 'expr_type');
+        $sql = "";
+        foreach ($parsed['sub_tree'] as $k => $v) {
+            $len = strlen($sql);
+
+            if (isset($v['expr_type']) && $v['expr_type'] === ExpressionType::WINDOW_SPEC) {
+                if (!empty($parsed['null_treatment'])) {
+                    $sql .= " " . $parsed['null_treatment'];
+                }
+                $sql .= " OVER " . $this->buildWindowSpec($v);
+            } else {
+                $sql .= $this->buildFunction($v);
             }
 
-            $sql .= ' ';
+            if ($len == strlen($sql)) {
+                throw new UnableToCreateSQLException('window function', $k, $v, 'expr_type');
+            }
         }
-        return substr($sql, 0, -1);
+
+        $sql .= $this->buildAlias($parsed);
+        $sql .= $this->buildDirection($parsed);
+        return $sql;
     }
 }
 ?>

@@ -53,6 +53,11 @@ use PHPSQLParser\utils\ExpressionType;
  */
 class OrderByBuilder implements Builder {
 
+    protected function buildWindowFunction($parsed) {
+        $builder = new WindowFunctionBuilder();
+        return $builder->build($parsed);
+    }
+
     protected function buildFunction($parsed) {
         $builder = new OrderByFunctionBuilder();
         return $builder->build($parsed);
@@ -94,6 +99,7 @@ class OrderByBuilder implements Builder {
             $len = strlen($sql);
             $sql .= $this->buildAlias($v);
             $sql .= $this->buildColRef($v);
+            $sql .= $this->buildWindowFunction($v);
             $sql .= $this->buildFunction($v);
             $sql .= $this->buildExpression($v);
             $sql .= $this->buildBracketExpression($v);

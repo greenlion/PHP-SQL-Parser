@@ -283,6 +283,10 @@ abstract class AbstractProcessor {
         return (isset($out['expr_type']) && $out['expr_type'] === ExpressionType::SIMPLE_FUNCTION);
     }
 
+    protected function isWindowFunction($out) {
+        return (isset($out['expr_type']) && $out['expr_type'] === ExpressionType::WINDOW_FUNCTION);
+    }
+
     protected function isExpression($out) {
         return (isset($out['expr_type']) && $out['expr_type'] === ExpressionType::EXPRESSION);
     }

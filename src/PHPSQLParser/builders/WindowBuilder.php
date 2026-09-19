@@ -1,8 +1,8 @@
 <?php
 /**
- * HavingBuilder.php
+ * WindowBuilder.php
  *
- * Builds the HAVING part.
+ * This file implements the builder for the WINDOW clause.
  *
  * PHP version 5
  *
@@ -31,68 +31,43 @@
  * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  * @author    André Rothe <andre.rothe@phosco.info>
  * @copyright 2010-2014 Justin Swanhart and André Rothe
  * @license   http://www.debian.org/misc/bsd.license  BSD License (3 Clause)
- * @version   SVN: $Id$
- * 
+ *
  */
 
 namespace PHPSQLParser\builders;
 use PHPSQLParser\exceptions\UnableToCreateSQLException;
+use PHPSQLParser\utils\ExpressionType;
 
 /**
- * This class implements the builder for the HAVING part. 
+ * This class implements the builder for the WINDOW clause, which defines the
+ * named windows of a statement.
  * You can overwrite all functions to achieve another handling.
  *
- * @author  Ian Barker <ian@theorganicagency.com>
  * @author  André Rothe <andre.rothe@phosco.info>
  * @license http://www.debian.org/misc/bsd.license  BSD License (3 Clause)
- *  
+ *
  */
-class HavingBuilder extends WhereBuilder {
+class WindowBuilder implements Builder {
 
-    protected function buildAliasReference($parsed) {
-        $builder = new AliasReferenceBuilder();
-        return $builder->build($parsed);
-    }
-	
-	protected function buildHavingExpression($parsed) {
-        $builder = new HavingExpressionBuilder();
-        return $builder->build($parsed);
-    }
-
-    protected function buildHavingBracketExpression($parsed) {
-        $builder = new HavingBracketExpressionBuilder();
-        return $builder->build($parsed);
+    protected function buildWindowSpec($parsed) {
+        $builder = new WindowSpecBuilder();
+        return $builder->buildDefinition($parsed);
     }
 
     public function build(array $parsed) {
-        $sql = "HAVING ";
+        $sql = "";
         foreach ($parsed as $k => $v) {
-            $len = strlen($sql);
-
-            $sql .= $this->buildAliasReference($v);
-            $sql .= $this->buildOperator($v);
-            $sql .= $this->buildConstant($v);
-            $sql .= $this->buildColRef($v);
-            $sql .= $this->buildSubQuery($v);
-            $sql .= $this->buildInList($v);
-            $sql .= $this->buildWindowFunction($v);
-            $sql .= $this->buildFunction($v);
-            $sql .= $this->buildHavingExpression($v);
-            $sql .= $this->buildHavingBracketExpression($v);
-            $sql .= $this->buildUserVariable($v);
-
-            if (strlen($sql) == $len) {
-                throw new UnableToCreateSQLException('HAVING', $k, $v, 'expr_type');
+            if (!isset($v['expr_type']) || $v['expr_type'] !== ExpressionType::WINDOW_DEF) {
+                throw new UnableToCreateSQLException('WINDOW', $k, $v, 'expr_type');
             }
 
-            $sql .= " ";
+            $sql .= $v['window_name'] . " AS " . $this->buildWindowSpec($v['spec']) . ", ";
         }
-        return substr($sql, 0, -1);
+        return "WINDOW " . substr($sql, 0, -2);
     }
-
 }
 ?>

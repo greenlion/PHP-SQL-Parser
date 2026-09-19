@@ -57,6 +57,11 @@ class SelectBuilder implements Builder {
         return $builder->build($parsed);
     }
 
+    protected function buildWindowFunction($parsed) {
+        $builder = new WindowFunctionBuilder();
+        return $builder->build($parsed);
+    }
+
     protected function buildFunction($parsed) {
         $builder = new FunctionBuilder();
         return $builder->build($parsed);
@@ -99,6 +104,7 @@ class SelectBuilder implements Builder {
             $sql .= $this->buildColRef($v);
             $sql .= $this->buildSelectBracketExpression($v);
             $sql .= $this->buildSelectExpression($v);
+            $sql .= $this->buildWindowFunction($v);
             $sql .= $this->buildFunction($v);
             $sql .= $this->buildConstant($v);
             $sql .= $this->buildReserved($v);

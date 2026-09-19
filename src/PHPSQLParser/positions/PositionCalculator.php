@@ -91,7 +91,10 @@ class PositionCalculator {
                                                 ExpressionType::CHARSET, ExpressionType::ENGINE, ExpressionType::QUERY,
                                                 ExpressionType::INDEX_ALGORITHM, ExpressionType::INDEX_LOCK,
     											ExpressionType::SUBQUERY_FACTORING, ExpressionType::CUSTOM_FUNCTION,
-                                                ExpressionType::SIMPLE_FUNCTION
+                                                ExpressionType::SIMPLE_FUNCTION,
+                                                ExpressionType::WINDOW_FUNCTION, ExpressionType::WINDOW_SPEC,
+                                                ExpressionType::WINDOW_DEF, ExpressionType::WINDOW_FRAME,
+                                                ExpressionType::WINDOW_FRAME_BOUND
     );
 
     /**

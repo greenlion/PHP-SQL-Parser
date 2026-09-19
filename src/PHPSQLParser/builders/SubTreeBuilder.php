@@ -57,6 +57,11 @@ class SubTreeBuilder implements Builder {
         return $builder->build($parsed);
     }
 
+    protected function buildWindowFunction($parsed) {
+        $builder = new WindowFunctionBuilder();
+        return $builder->build($parsed);
+    }
+
     protected function buildFunction($parsed) {
         $builder = new FunctionBuilder();
         return $builder->build($parsed);
@@ -115,6 +120,7 @@ class SubTreeBuilder implements Builder {
         foreach ($parsed['sub_tree'] as $k => $v) {
             $len = strlen($sql);
             $sql .= $this->buildColRef($v);
+            $sql .= $this->buildWindowFunction($v);
             $sql .= $this->buildFunction($v);
             $sql .= $this->buildOperator($v);
             $sql .= $this->buildConstant($v);

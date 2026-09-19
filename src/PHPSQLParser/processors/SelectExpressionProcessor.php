@@ -123,7 +123,8 @@ class SelectExpressionProcessor extends AbstractProcessor {
 
             if ($this->isReserved($prev) || $this->isConstant($prev) || $this->isAggregateFunction($prev)
                     || $this->isFunction($prev) || $this->isExpression($prev) || $this->isSubQuery($prev)
-                    || $this->isColumnReference($prev) || $this->isBracketExpression($prev)|| $this->isCustomFunction($prev)) {
+                    || $this->isColumnReference($prev) || $this->isBracketExpression($prev)|| $this->isCustomFunction($prev)
+                    || $this->isWindowFunction($prev)) {
 
                 $alias = array('as' => false, 'name' => trim($last['base_expr']),
                                'no_quotes' => $this->revokeQuotation($last['base_expr']),
@@ -146,6 +147,7 @@ class SelectExpressionProcessor extends AbstractProcessor {
                 $type = $processed[0]['expr_type'];
                 $base_expr = $processed[0]['base_expr'];
                 $no_quotes = isset($processed[0]['no_quotes']) ? $processed[0]['no_quotes'] : null;
+                $null_treatment = isset($processed[0]['null_treatment']) ? $processed[0]['null_treatment'] : null;
                 $processed = $processed[0]['sub_tree']; // it can be FALSE
             }
         }
@@ -156,6 +158,9 @@ class SelectExpressionProcessor extends AbstractProcessor {
         $result['base_expr'] = trim($base_expr);
         if (!empty($no_quotes)) {
             $result['no_quotes'] = $no_quotes;
+        }
+        if (!empty($null_treatment)) {
+            $result['null_treatment'] = $null_treatment;
         }
         $result['sub_tree'] = (empty($processed) ? false : $processed);
         return $result;

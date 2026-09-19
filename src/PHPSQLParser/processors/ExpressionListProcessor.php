@@ -53,9 +53,91 @@ use PHPSQLParser\utils\PHPSQLParserConstants;
  */
 class ExpressionListProcessor extends AbstractProcessor {
 
+    protected function processWindowSpec($token) {
+        $processor = new WindowSpecProcessor($this->options);
+        return $processor->process($token);
+    }
+
+    /**
+     * Builds a window function, if the token at the given position starts an
+     * OVER clause, which belongs to the preceding function call:
+     *
+     *   <function> [IGNORE NULLS | RESPECT NULLS] OVER <window spec>
+     *
+     * @param array           $tokens the token list
+     * @param int             $key    the position of the current token
+     * @param ExpressionToken $prev   the preceding function call
+     *
+     * @return array|bool false or the new token and the number of tokens to skip
+     */
+    protected function buildWindowFunction($tokens, $key, $prev) {
+        $upper = strtoupper(trim($tokens[$key]));
+        $nullTreatment = false;
+        $overKey = $key;
+
+        // the null treatment clause stands between the function and the OVER
+        if ($upper === 'IGNORE' || $upper === 'RESPECT') {
+            $nullsKey = $this->findNextTokenKey($tokens, $key);
+            if ($nullsKey === false || strtoupper(trim($tokens[$nullsKey])) !== 'NULLS') {
+                return false;
+            }
+            $overKey = $this->findNextTokenKey($tokens, $nullsKey);
+            if ($overKey === false || strtoupper(trim($tokens[$overKey])) !== 'OVER') {
+                return false;
+            }
+            $nullTreatment = $upper . ' NULLS';
+
+        } elseif ($upper !== 'OVER') {
+            return false;
+        }
+
+        $specKey = $this->findNextTokenKey($tokens, $overKey);
+        if ($specKey === false) {
+            return false;
+        }
+
+        $spec = $this->processWindowSpec($tokens[$specKey]);
+
+        // the base_expr covers the function call and the window spec,
+        // we take it from the original tokens to keep the whitespace
+        $fnKey = $prev->getKey();
+        if (is_int($fnKey) && $fnKey <= $key) {
+            $base_expr = implode('', array_slice($tokens, $fnKey, $specKey - $fnKey + 1));
+        } else {
+            $base_expr = $prev->getToken() . ($nullTreatment === false ? '' : ' ' . $nullTreatment) . ' OVER '
+                . trim($tokens[$specKey]);
+        }
+
+        $window = new ExpressionToken($fnKey, trim($base_expr));
+        $window->setTokenType(ExpressionType::WINDOW_FUNCTION);
+        $window->setNullTreatment($nullTreatment);
+        $window->setSubTree(array($prev->toArray(), $spec));
+
+        // every non-whitespace token up to the window spec is consumed
+        $skip = 1;
+        if ($nullTreatment !== false) {
+            $skip = 3; // NULLS, OVER and the spec
+        }
+        return array('token' => $window, 'skip' => $skip);
+    }
+
+    /**
+     * Returns the key of the next non-whitespace token or false, if there
+     * is no such token.
+     */
+    protected function findNextTokenKey($tokens, $key) {
+        $count = count($tokens);
+        for ($i = $key + 1; $i < $count; ++$i) {
+            if (isset($tokens[$i]) && !$this->isWhitespaceToken($tokens[$i])) {
+                return $i;
+            }
+        }
+        return false;
+    }
+
     public function process($tokens) {
         $resultList = array();
-        $skip_next = false;
+        $skip_next = 0;
         $prev = new ExpressionToken();
 
         foreach ($tokens as $k => $v) {
@@ -72,10 +154,23 @@ class ExpressionListProcessor extends AbstractProcessor {
                 continue;
             }
 
-            if ($skip_next) {
-                // skip the next non-whitespace token
-                $skip_next = false;
+            if ($skip_next > 0) {
+                // skip the next non-whitespace tokens, they are already processed
+                $skip_next--;
                 continue;
+            }
+
+            /* is it a window function? */
+            if ($prev->isAnyFunction() && !empty($resultList)) {
+                $window = $this->buildWindowFunction($tokens, $k, $prev);
+                if ($window !== false) {
+                    array_pop($resultList);
+                    $resultList[] = $window['token'];
+                    $prev = $window['token'];
+
+                    $skip_next = $window['skip']; // the OVER clause belongs to this expression
+                    continue;
+                }
             }
 
             /* is it a subquery? */

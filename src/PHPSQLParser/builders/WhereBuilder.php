@@ -67,6 +67,11 @@ class WhereBuilder implements Builder {
         return $builder->build($parsed);
     }
 
+    protected function buildWindowFunction($parsed) {
+        $builder = new WindowFunctionBuilder();
+        return $builder->build($parsed);
+    }
+
     protected function buildFunction($parsed) {
         $builder = new FunctionBuilder();
         return $builder->build($parsed);
@@ -112,6 +117,7 @@ class WhereBuilder implements Builder {
             $sql .= $this->buildColRef($v);
             $sql .= $this->buildSubQuery($v);
             $sql .= $this->buildInList($v);
+            $sql .= $this->buildWindowFunction($v);
             $sql .= $this->buildFunction($v);
             $sql .= $this->buildWhereExpression($v);
             $sql .= $this->buildWhereBracketExpression($v);

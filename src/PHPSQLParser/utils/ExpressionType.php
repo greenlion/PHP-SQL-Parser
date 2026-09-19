@@ -149,5 +149,11 @@ class ExpressionType {
     
     const QUERY = 'query';
     const SUBQUERY_FACTORING = 'subquery-factoring';
+
+    const WINDOW_FUNCTION = 'window_function';
+    const WINDOW_SPEC = 'window-spec';
+    const WINDOW_DEF = 'window-def';
+    const WINDOW_FRAME = 'window-frame';
+    const WINDOW_FRAME_BOUND = 'window-frame-bound';
 }
 ?>

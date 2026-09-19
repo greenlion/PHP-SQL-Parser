@@ -58,6 +58,11 @@ class FunctionBuilder implements Builder {
         return $builder->build($parsed);
     }
 
+    protected function buildWindowFunction($parsed) {
+        $builder = new WindowFunctionBuilder();
+        return $builder->build($parsed);
+    }
+
     protected function buildColRef($parsed) {
         $builder = new ColumnReferenceBuilder();
         return $builder->build($parsed);
@@ -113,6 +118,7 @@ class FunctionBuilder implements Builder {
         foreach ($parsed['sub_tree'] as $k => $v) {
             $len = strlen($sql);
             $sql .= $this->build($v);
+            $sql .= $this->buildWindowFunction($v);
             $sql .= $this->buildConstant($v);
             $sql .= $this->buildSubQuery($v);
             $sql .= $this->buildColRef($v);
