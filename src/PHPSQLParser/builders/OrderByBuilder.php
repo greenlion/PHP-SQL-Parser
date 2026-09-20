@@ -93,26 +93,40 @@ class OrderByBuilder implements Builder {
         return $builder->build($parsed);
     }
 
+    protected function buildComment($parsed) {
+        $builder = new CommentBuilder();
+        return $builder->build($parsed);
+    }
+
     public function build(array $parsed) {
         $sql = "";
+        $delim = "";
         foreach ($parsed as $k => $v) {
-            $len = strlen($sql);
-            $sql .= $this->buildAlias($v);
-            $sql .= $this->buildColRef($v);
-            $sql .= $this->buildWindowFunction($v);
-            $sql .= $this->buildFunction($v);
-            $sql .= $this->buildExpression($v);
-            $sql .= $this->buildBracketExpression($v);
-            $sql .= $this->buildReserved($v);
-            $sql .= $this->buildPosition($v);
-            
-            if ($len == strlen($sql)) {
+
+            // a comment is not an element of the order-by list, so it must not
+            // get a delimiter; it carries its own terminator instead
+            $comment = $this->buildComment($v);
+            if ($comment !== "") {
+                $sql .= ($sql === "" ? "" : " ") . $comment;
+                continue;
+            }
+
+            $expr = $this->buildAlias($v);
+            $expr .= $this->buildColRef($v);
+            $expr .= $this->buildWindowFunction($v);
+            $expr .= $this->buildFunction($v);
+            $expr .= $this->buildExpression($v);
+            $expr .= $this->buildBracketExpression($v);
+            $expr .= $this->buildReserved($v);
+            $expr .= $this->buildPosition($v);
+
+            if ($expr === "") {
                 throw new UnableToCreateSQLException('ORDER', $k, $v, 'expr_type');
             }
 
-            $sql .= ", ";
+            $sql .= $delim . $expr;
+            $delim = ", ";
         }
-        $sql = substr($sql, 0, -2);
         return "ORDER BY " . $sql;
     }
 }

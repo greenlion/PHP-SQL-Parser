@@ -93,6 +93,47 @@ class CommentsTest extends \PHPUnit\Framework\TestCase {
             $this->assertEquals($expected, $p, 'inline comment in VALUES section');
         }
 
+        public function testHashCommentWithoutWhitespace() {
+            $sql = "select 1#this is a comment\nfrom dual;";
+            $p = $this->parser->parse($sql);
+
+            $comments = array_values(array_filter($p['SELECT'], function ($v) {
+                return $v['expr_type'] === 'comment';
+            }));
+            $this->assertCount(1, $comments, 'the hash comment is recognised as a comment');
+            $this->assertSame('#this is a comment', $comments[0]['value'], 'the whole hash comment is captured');
+
+            $expressions = array_values(array_filter($p['SELECT'], function ($v) {
+                return $v['expr_type'] !== 'comment';
+            }));
+            $this->assertCount(1, $expressions, 'the hash comment does not add an expression');
+            $this->assertSame('1', $expressions[0]['base_expr'], 'the constant is not merged with the comment');
+            $this->assertSame(false, $expressions[0]['alias'], 'the hash comment is not taken as an alias');
+
+            $this->assertSame('dual', $p['FROM'][0]['table'], 'the hash comment does not swallow the FROM clause');
+        }
+
+        public function testHashCommentWithWhitespace() {
+            $sql = "select 1 #this is a comment\nfrom dual";
+            $p = $this->parser->parse($sql);
+
+            $comments = array_values(array_filter($p['SELECT'], function ($v) {
+                return $v['expr_type'] === 'comment';
+            }));
+            $this->assertCount(1, $comments, 'the hash comment is recognised as a comment');
+            $this->assertSame('#this is a comment', $comments[0]['value'], 'the whole hash comment is captured');
+            $this->assertSame('dual', $p['FROM'][0]['table'], 'the hash comment does not swallow the FROM clause');
+        }
+
+        public function testHashWithinQuotedStringIsNotAComment() {
+            $sql = "select 'a#b' as `c#d` from test where x = 'has # hash'";
+            $p = $this->parser->parse($sql);
+
+            $this->assertSame("'a#b'", $p['SELECT'][0]['base_expr'], 'a hash inside a string is not a comment');
+            $this->assertSame('`c#d`', $p['SELECT'][0]['alias']['name'], 'a hash inside a backquoted alias is not a comment');
+            $this->assertSame("'has # hash'", $p['WHERE'][2]['base_expr'], 'a hash inside a WHERE string is not a comment');
+        }
+
         public function testComments9() {
             $sql = 'INSERT INTO a (id) -- inline comment in INSERT section;
                     SELECT id -- inline comment in SELECT section

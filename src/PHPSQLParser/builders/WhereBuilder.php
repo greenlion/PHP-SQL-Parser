@@ -107,6 +107,13 @@ class WhereBuilder implements Builder {
       return $builder->build($parsed);
     }
 
+    protected function buildComment($parsed) {
+        $builder = new CommentBuilder();
+        // this builder separates all parts by a space on its own, a trailing
+        // newline of an inline comment must survive that
+        return rtrim($builder->build($parsed), ' ');
+    }
+
     public function build(array $parsed) {
         $sql = "WHERE ";
         foreach ($parsed as $k => $v) {
@@ -123,6 +130,7 @@ class WhereBuilder implements Builder {
             $sql .= $this->buildWhereBracketExpression($v);
             $sql .= $this->buildUserVariable($v);
             $sql .= $this->buildReserved($v);
+            $sql .= $this->buildComment($v);
             
             if (strlen($sql) == $len) {
                 throw new UnableToCreateSQLException('WHERE', $k, $v, 'expr_type');

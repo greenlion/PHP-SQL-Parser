@@ -86,6 +86,11 @@ class SelectBuilder implements Builder {
         $builder = new ReservedBuilder();
         return $builder->build($parsed);
     }
+
+    protected function buildComment($parsed) {
+        $builder = new CommentBuilder();
+        return $builder->build($parsed);
+    }
     /**
      * Returns a well-formatted delimiter string. If you don't need nice SQL,
      * you could simply return $parsed['delim'].
@@ -108,6 +113,7 @@ class SelectBuilder implements Builder {
             $sql .= $this->buildFunction($v);
             $sql .= $this->buildConstant($v);
             $sql .= $this->buildReserved($v);
+            $sql .= $this->buildComment($v);
 
             if ($len == strlen($sql)) {
                 throw new UnableToCreateSQLException('SELECT', $k, $v, 'expr_type');

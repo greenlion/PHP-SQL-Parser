@@ -122,9 +122,7 @@ class FromBuilder implements Builder {
     }
 
     protected function buildComment($parsed) {
-        if (!$this->isComment($parsed)) {
-            return '';
-        }
-        return $parsed['value'] . ' ';
+        $builder = new CommentBuilder();
+        return $builder->build($parsed);
     }
 }
