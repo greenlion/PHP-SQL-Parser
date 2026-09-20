@@ -56,6 +56,17 @@ class PartitionDefinitionProcessor extends AbstractProcessor {
         $processor = new ExpressionListProcessor($this->options);
         $expr = $this->removeParenthesisFromStart($unparsed);
         $expr = $this->splitSQLIntoTokens($expr);
+
+        // it is a comma-separated value list, e.g. VALUES LESS THAN (10,20)
+        // or VALUES IN (1,2,3); the commas are only separators and must not
+        // be parsed as a part of the expression (see RecordProcessor, which
+        // handles the value list of an INSERT statement the same way)
+        foreach ($expr as $k => $v) {
+            if ($this->isCommaToken($v)) {
+                $expr[$k] = "";
+            }
+        }
+
         return $processor->process($expr);
     }
 

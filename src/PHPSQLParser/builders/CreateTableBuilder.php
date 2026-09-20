@@ -61,6 +61,11 @@ class CreateTableBuilder implements Builder {
         return $builder->build($parsed);
     }
 
+    protected function buildPartitionOptions($parsed) {
+        $builder = new PartitionOptionsBuilder();
+        return $builder->build($parsed);
+    }
+
     protected function buildCreateTableSelectOption($parsed) {
         $builder = new CreateTableSelectOptionBuilder();
         return $builder->build($parsed);
@@ -70,6 +75,7 @@ class CreateTableBuilder implements Builder {
         $sql = $parsed['name'];
         $sql .= $this->buildCreateTableDefinition($parsed);
         $sql .= $this->buildCreateTableOptions($parsed);
+        $sql .= $this->buildPartitionOptions($parsed);
         $sql .= $this->buildCreateTableSelectOption($parsed);
         return $sql;
     }

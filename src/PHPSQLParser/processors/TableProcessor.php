@@ -79,9 +79,21 @@ class TableProcessor extends AbstractProcessor {
         $category = 'CREATE_DEF';
     }
 
+    /**
+     * The table options can follow the create definition, but they can also
+     * follow the table name directly, if there is no create definition at all,
+     * e.g. CREATE TABLE foo ENGINE=MyISAM SELECT * FROM bar.
+     *
+     * @param String $prevCategory the category of the previous token
+     */
+    protected function isTableOptionPosition($prevCategory) {
+        return ($prevCategory === 'CREATE_DEF' || $prevCategory === 'TABLE_NAME');
+    }
+
     public function process($tokens) {
 
         $currCategory = 'TABLE_NAME';
+        $prevCategory = '';
         $result = array('base_expr' => false, 'name' => false, 'no_quotes' => false, 'create-def' => false,
                         'options' => array(), 'like' => false, 'select-option' => false);
         $expr = array();
@@ -119,7 +131,7 @@ class TableProcessor extends AbstractProcessor {
                 continue 2;
 
             case 'UNION':
-                if ($prevCategory === 'CREATE_DEF') {
+                if ($this->isTableOptionPosition($prevCategory)) {
                     $expr[] = $this->getReservedType($trim);
                     $currCategory = 'UNION';
                     continue 2;
@@ -143,7 +155,7 @@ class TableProcessor extends AbstractProcessor {
                 break;
 
             case 'CHARACTER':
-                if ($prevCategory === 'CREATE_DEF') {
+                if ($this->isTableOptionPosition($prevCategory)) {
                     $expr[] = $this->getReservedType($trim);
                     $currCategory = 'TABLE_OPTION';
                 }
@@ -165,7 +177,7 @@ class TableProcessor extends AbstractProcessor {
                 break;
 
             case 'COLLATE':
-                if ($prevCategory === 'TABLE_OPTION' || $prevCategory === 'CREATE_DEF') {
+                if ($prevCategory === 'TABLE_OPTION' || $this->isTableOptionPosition($prevCategory)) {
                     // add it to the previous DEFAULT
                     $expr[] = $this->getReservedType($trim);
                     $currCategory = 'COLLATE';
@@ -182,7 +194,7 @@ class TableProcessor extends AbstractProcessor {
                 break;
 
             case 'INDEX':
-                if ($prevCategory === 'CREATE_DEF') {
+                if ($this->isTableOptionPosition($prevCategory)) {
                     $expr[] = $this->getReservedType($trim);
                     $currCategory = 'INDEX_DIRECTORY';
                     continue 2;
@@ -190,7 +202,7 @@ class TableProcessor extends AbstractProcessor {
                 break;
 
             case 'DATA':
-                if ($prevCategory === 'CREATE_DEF') {
+                if ($this->isTableOptionPosition($prevCategory)) {
                     $expr[] = $this->getReservedType($trim);
                     $currCategory = 'DATA_DIRECTORY';
                     continue 2;
@@ -214,7 +226,7 @@ class TableProcessor extends AbstractProcessor {
             case 'STATS_AUTO_RECALC':
             case 'STATS_PERSISTENT':
             case 'KEY_BLOCK_SIZE':
-                if ($prevCategory === 'CREATE_DEF') {
+                if ($this->isTableOptionPosition($prevCategory)) {
                     $expr[] = $this->getReservedType($trim);
                     $currCategory = $prevCategory = 'TABLE_OPTION';
                     continue 2;
@@ -230,7 +242,7 @@ class TableProcessor extends AbstractProcessor {
             case 'FIRST':
             case 'LAST':
             case 'DEFAULT':
-                if ($prevCategory === 'CREATE_DEF') {
+                if ($this->isTableOptionPosition($prevCategory)) {
                     // DEFAULT before CHARACTER SET and COLLATE
                     $expr[] = $this->getReservedType($trim);
                     $currCategory = 'TABLE_OPTION';
@@ -253,7 +265,10 @@ class TableProcessor extends AbstractProcessor {
 
             case 'AS':
                 $expr[] = $this->getReservedType($trim);
-                if (!isset($result['select-option']['duplicates'])) {
+                if ($result['select-option'] === false) {
+                    // there was no IGNORE or REPLACE before the AS keyword
+                    $result['select-option'] = array('duplicates' => false);
+                } elseif (!isset($result['select-option']['duplicates'])) {
                     $result['select-option']['duplicates'] = false;
                 }
                 $result['select-option']['as'] = true;
@@ -262,7 +277,7 @@ class TableProcessor extends AbstractProcessor {
                 continue 2;
 
             case 'PARTITION':
-                if ($prevCategory === 'CREATE_DEF') {
+                if ($this->isTableOptionPosition($prevCategory)) {
                     $part = $this->processPartitionOptions(array_slice($tokens, $tokenKey - 1, null, true));
                     $skip = $part['last-parsed'] - $tokenKey;
                     $result['partition-options'] = $part['partition-options'];
