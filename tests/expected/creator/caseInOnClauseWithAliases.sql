@@ -1,0 +1,1 @@
+SELECT a.id FROM table_a a LEFT JOIN table_b b ON b.label = CASE WHEN a.status = 'A' THEN 'Active' ELSE 'Inactive' END

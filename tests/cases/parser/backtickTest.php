@@ -79,7 +79,7 @@ class backtickTest extends \PHPUnit\Framework\TestCase {
         for ($i = 0; $i < $len; $i++) {
             $arr[] = $this->generateRandomString();
         }
-        return '("' . implode($arr, '","') . '")';
+        return '("' . implode('","', $arr) . '")';
     }
 
     public function testOptimizeBalanceBackticks()

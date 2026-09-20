@@ -56,6 +56,23 @@ class caseInOnClauseTest extends \PHPUnit\Framework\TestCase {
         $this->assertSame($expected, $created, 'searched CASE expression within an ON clause');
     }
 
+    public function testCaseInOnClauseWithAliases() {
+        $sql = "SELECT a.id
+FROM table_a a
+LEFT JOIN table_b b
+    ON b.label =
+       CASE
+           WHEN a.status = 'A' THEN 'Active'
+           ELSE 'Inactive'
+       END";
+        $parser = new PHPSQLParser();
+        $p = $parser->parse($sql);
+        $creator = new PHPSQLCreator();
+        $created = $creator->create($p);
+        $expected = getExpectedValue(dirname(__FILE__), 'caseInOnClauseWithAliases.sql', false);
+        $this->assertSame($expected, $created, 'multiline CASE expression within an ON clause of aliased tables');
+    }
+
     public function testSimpleCaseInOnClause() {
         $sql = "SELECT * FROM t1 LEFT JOIN t2 ON t2.id = CASE t1.flag WHEN 1 THEN 10 ELSE 20 END";
         $parser = new PHPSQLParser();
