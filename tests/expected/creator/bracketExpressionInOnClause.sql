@@ -1,0 +1,1 @@
+SELECT * FROM t1 INNER JOIN t2 ON t2.id = (t1.a + t1.b)
