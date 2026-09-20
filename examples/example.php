@@ -156,4 +156,33 @@ $parser = new PHPSQLParser($sql);
 $stop = microtime(true);
 echo "Parse time highly complex statement: " . ($stop - $start) . "\n";
 
+$sql = "WITH spend_2026 AS (
+  SELECT customer_id, SUM(amount) AS total_spend
+  FROM orders
+  WHERE created_at >= '2026-01-01'
+  GROUP BY customer_id
+),
+high_spend AS (
+  SELECT * FROM spend_2026 WHERE total_spend > 10000
+),
+first_order AS (
+  SELECT customer_id, MIN(created_at) AS first_order_at
+  FROM orders
+  GROUP BY customer_id
+)
+SELECT RANK() OVER (), ROW_NUMBER() OVER (PARTITION BY order_id ORDER BY order_id) window window_name, c.name, h.total_spend, f.first_order_at
+FROM customers c
+JOIN high_spend h ON c.id = h.customer_id
+JOIN first_order f ON c.id = f.customer_id;";
+$parser->parse($sql);
+
+$sql = "SELECT * FROM t1
+            LEFT JOIN t2
+            ON t2.id = CASE WHEN t1.flag = 1 THEN 10 ELSE 20 END";
+
+$parser = new PHPSQLParser();
+$parsed = $parser->parse($sql);
+
+$creator = new PHPSQLCreator($parsed);
+echo $creator->created;
 ?>

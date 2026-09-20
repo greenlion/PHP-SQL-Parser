@@ -97,6 +97,16 @@ class RefClauseBuilder implements Builder {
         return $builder->build($parsed);
     }
 
+    protected function buildReserved($parsed) {
+        $builder = new ReservedBuilder();
+        return $builder->build($parsed);
+    }
+
+    protected function buildUserVariable($parsed) {
+        $builder = new UserVariableBuilder();
+        return $builder->build($parsed);
+    }
+
     public function build(array $parsed) {
         if ($parsed === false) {
             return '';
@@ -113,6 +123,8 @@ class RefClauseBuilder implements Builder {
             $sql .= $this->buildInList($v);
             $sql .= $this->buildColumnList($v);
             $sql .= $this->buildSubQuery($v);
+            $sql .= $this->buildReserved($v);
+            $sql .= $this->buildUserVariable($v);
 
             if ($len == strlen($sql)) {
                 throw new UnableToCreateSQLException('expression ref_clause', $k, $v, 'expr_type');
