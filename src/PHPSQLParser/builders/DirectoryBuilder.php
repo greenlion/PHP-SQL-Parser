@@ -1,8 +1,8 @@
 <?php
 /**
- * CreateTableOptionsBuilder.php
+ * DirectoryBuilder.php
  *
- * Builds the table-options statement part of CREATE TABLE.
+ * Builds the DATA|INDEX DIRECTORY expression part of CREATE TABLE.
  *
  * PHP version 5
  *
@@ -41,68 +41,53 @@
 
 namespace PHPSQLParser\builders;
 use PHPSQLParser\exceptions\UnableToCreateSQLException;
+use PHPSQLParser\utils\ExpressionType;
+
 
 /**
- * This class implements the builder for the table-options statement part of CREATE TABLE. 
- * You can overwrite all functions to achieve another handling.
+ * This class implements the builder for the DATA DIRECTORY and INDEX DIRECTORY
+ * statement parts of CREATE TABLE. You can overwrite all functions to achieve
+ * another handling.
  *
  * @author  André Rothe <andre.rothe@phosco.info>
  * @license http://www.debian.org/misc/bsd.license  BSD License (3 Clause)
- *  
+ *
  */
-class CreateTableOptionsBuilder implements Builder {
+class DirectoryBuilder implements Builder {
 
-    protected function buildExpression($parsed) {
-        $builder = new SelectExpressionBuilder();
+    protected function buildOperator($parsed) {
+        $builder = new OperatorBuilder();
         return $builder->build($parsed);
     }
 
-    protected function buildCharacterSet($parsed) {
-        $builder = new CharacterSetBuilder();
+    protected function buildConstant($parsed) {
+        $builder = new ConstantBuilder();
         return $builder->build($parsed);
     }
 
-    protected function buildCollation($parsed) {
-        $builder = new CollationBuilder();
+    protected function buildReserved($parsed) {
+        $builder = new ReservedBuilder();
         return $builder->build($parsed);
-    }
-
-    protected function buildDirectory($parsed) {
-        $builder = new DirectoryBuilder();
-        return $builder->build($parsed);
-    }
-
-    /**
-     * Returns a well-formatted delimiter string. If you don't need nice SQL,
-     * you could simply return $parsed['delim'].
-     * 
-     * @param array $parsed The part of the output array, which contains the current expression.
-     * @return a string, which is added right after the expression
-     */
-    protected function getDelimiter($parsed) {
-        return ($parsed['delim'] === false ? '' : (trim($parsed['delim']) . ' '));
     }
 
     public function build(array $parsed) {
-        if (!isset($parsed['options']) || $parsed['options'] === false) {
+        if ($parsed['expr_type'] !== ExpressionType::DIRECTORY) {
             return "";
         }
-        $options = $parsed['options'];
         $sql = "";
-        foreach ($options as $k => $v) {
+        foreach ($parsed['sub_tree'] as $k => $v) {
             $len = strlen($sql);
-            $sql .= $this->buildExpression($v);
-            $sql .= $this->buildCharacterSet($v);
-            $sql .= $this->buildCollation($v);
-            $sql .= $this->buildDirectory($v);
+            $sql .= $this->buildReserved($v);
+            $sql .= $this->buildOperator($v);
+            $sql .= $this->buildConstant($v);
 
             if ($len == strlen($sql)) {
-                throw new UnableToCreateSQLException('CREATE TABLE options', $k, $v, 'expr_type');
+                throw new UnableToCreateSQLException('CREATE TABLE options directory subtree', $k, $v, 'expr_type');
             }
 
-            $sql .= $this->getDelimiter($v);
+            $sql .= " ";
         }
-        return " " . substr($sql, 0, -1);
+        return substr($sql, 0, -1);
     }
 }
 ?>

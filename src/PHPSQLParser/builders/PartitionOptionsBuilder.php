@@ -1,8 +1,8 @@
 <?php
 /**
- * CreateTableOptionsBuilder.php
+ * PartitionOptionsBuilder.php
  *
- * Builds the table-options statement part of CREATE TABLE.
+ * Builds the PARTITION BY statement part of CREATE TABLE.
  *
  * PHP version 5
  *
@@ -39,70 +39,37 @@
  * 
  */
 
+
 namespace PHPSQLParser\builders;
-use PHPSQLParser\exceptions\UnableToCreateSQLException;
 
 /**
- * This class implements the builder for the table-options statement part of CREATE TABLE. 
- * You can overwrite all functions to achieve another handling.
+ * This class implements the builder for the PARTITION BY / SUBPARTITION BY
+ * statement part of CREATE TABLE. You can overwrite all functions to
+ * achieve another handling.
+ *
+ * Every top-level element of [partition-options] already carries a complete,
+ * self-contained [base_expr] (the processor reconstructs it while parsing),
+ * so it is simply joined with the other top-level elements, similar to how
+ * ColumnReferenceBuilder or ConstantBuilder reuse [base_expr] directly for
+ * self-contained nodes.
  *
  * @author  André Rothe <andre.rothe@phosco.info>
  * @license http://www.debian.org/misc/bsd.license  BSD License (3 Clause)
- *  
+ *
  */
-class CreateTableOptionsBuilder implements Builder {
-
-    protected function buildExpression($parsed) {
-        $builder = new SelectExpressionBuilder();
-        return $builder->build($parsed);
-    }
-
-    protected function buildCharacterSet($parsed) {
-        $builder = new CharacterSetBuilder();
-        return $builder->build($parsed);
-    }
-
-    protected function buildCollation($parsed) {
-        $builder = new CollationBuilder();
-        return $builder->build($parsed);
-    }
-
-    protected function buildDirectory($parsed) {
-        $builder = new DirectoryBuilder();
-        return $builder->build($parsed);
-    }
-
-    /**
-     * Returns a well-formatted delimiter string. If you don't need nice SQL,
-     * you could simply return $parsed['delim'].
-     * 
-     * @param array $parsed The part of the output array, which contains the current expression.
-     * @return a string, which is added right after the expression
-     */
-    protected function getDelimiter($parsed) {
-        return ($parsed['delim'] === false ? '' : (trim($parsed['delim']) . ' '));
-    }
+class PartitionOptionsBuilder implements Builder {
 
     public function build(array $parsed) {
-        if (!isset($parsed['options']) || $parsed['options'] === false) {
+        if (!isset($parsed['partition-options']) || $parsed['partition-options'] === false
+            || $parsed['partition-options'] === array()) {
             return "";
         }
-        $options = $parsed['options'];
+
         $sql = "";
-        foreach ($options as $k => $v) {
-            $len = strlen($sql);
-            $sql .= $this->buildExpression($v);
-            $sql .= $this->buildCharacterSet($v);
-            $sql .= $this->buildCollation($v);
-            $sql .= $this->buildDirectory($v);
-
-            if ($len == strlen($sql)) {
-                throw new UnableToCreateSQLException('CREATE TABLE options', $k, $v, 'expr_type');
-            }
-
-            $sql .= $this->getDelimiter($v);
+        foreach ($parsed['partition-options'] as $option) {
+            $sql .= $option['base_expr'] . " ";
         }
-        return " " . substr($sql, 0, -1);
+        return " " . rtrim($sql);
     }
 }
 ?>
