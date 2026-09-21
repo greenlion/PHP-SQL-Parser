@@ -39,7 +39,6 @@
  */
 namespace PHPSQLParser\Test\Parser;
 use PHPSQLParser\PHPSQLParser;
-use PHPSQLParser\PHPSQLCreator;
 
 class issue320Test extends \PHPUnit\Framework\TestCase
 {
