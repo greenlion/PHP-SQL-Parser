@@ -136,8 +136,11 @@ class InsertProcessor extends AbstractProcessor {
             }
             foreach ($token as &$value) {
                 if ($this->isCommentToken($value)) {
-                     $comments[] = parent::processComment($value);
-                     $value = '';
+                    if(!$this->options->getIgnoreComment()) {
+                        $comments[] = parent::processComment($value);
+                    }
+
+                    $value = '';
                 }
             }
         }

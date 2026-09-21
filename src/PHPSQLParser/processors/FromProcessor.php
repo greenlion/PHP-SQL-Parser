@@ -174,7 +174,10 @@ class FromProcessor extends AbstractProcessor {
             }
 
             if ($this->isCommentToken($token)) {
-                $expr[] = parent::processComment($token);
+                if(!$this->options->getIgnoreComment()) {
+                    $expr[] = parent::processComment($token);
+                }
+
                 continue;
             }
 

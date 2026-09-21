@@ -29,6 +29,12 @@ final class Options
      */
     const ANSI_QUOTES = 'ansi_quotes';
 
+
+    /**
+     * @const string
+     */
+    const IGNORE_COMMENT = 'ignore_comment';
+
     /**
      * Options constructor.
      *
@@ -53,5 +59,13 @@ final class Options
     public function getANSIQuotes()
     {
         return (isset($this->options[self::ANSI_QUOTES]) && $this->options[self::ANSI_QUOTES]);
+    }
+
+    /**
+     * @return bool
+     */
+    public function getIgnoreComment()
+    {
+        return (isset($this->options[self::IGNORE_COMMENT]) && $this->options[self::IGNORE_COMMENT]);
     }
 }

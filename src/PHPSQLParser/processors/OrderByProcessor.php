@@ -127,7 +127,10 @@ class OrderByProcessor extends AbstractProcessor {
 
             default:
                 if ($this->isCommentToken($token)) {
-                    $out[] = parent::processComment($token);
+                    if(!$this->options->getIgnoreComment()) {
+                        $out[] = parent::processComment($token);
+                    }
+
                     break;
                 }
 
