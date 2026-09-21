@@ -67,6 +67,10 @@ class WithProcessor extends AbstractProcessor {
                 continue;
             }
 
+            if ($this->isCommentToken($token)) {
+                continue;
+            }
+
 			$trim = trim($token);
             switch ($upper) {
 

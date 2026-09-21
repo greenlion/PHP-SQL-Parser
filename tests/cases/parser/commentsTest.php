@@ -134,6 +134,20 @@ class CommentsTest extends \PHPUnit\Framework\TestCase {
             $this->assertSame("'has # hash'", $p['WHERE'][2]['base_expr'], 'a hash inside a WHERE string is not a comment');
         }
 
+        public function testCommentInWithClause() {
+            $sql = "WITH\n"
+                . "-- this is a comment\n"
+                . "TEMP_TABLE_NAME AS (SELECT 1);";
+            $p = $this->parser->parse($sql);
+
+            $this->assertSame('TEMP_TABLE_NAME', $p['WITH'][0]['sub_tree'][0]['name'], 'the comment is not taken as the CTE name');
+            $this->assertSame('temporary-table', $p['WITH'][0]['sub_tree'][0]['expr_type']);
+            $this->assertSame('reserved', $p['WITH'][0]['sub_tree'][1]['expr_type']);
+            $this->assertSame('AS', $p['WITH'][0]['sub_tree'][1]['base_expr']);
+            $this->assertSame('bracket_expression', $p['WITH'][0]['sub_tree'][2]['expr_type']);
+            $this->assertSame('1', $p['WITH'][0]['sub_tree'][2]['sub_tree']['SELECT'][0]['base_expr']);
+        }
+
         public function testComments9() {
             $sql = 'INSERT INTO a (id) -- inline comment in INSERT section;
                     SELECT id -- inline comment in SELECT section
