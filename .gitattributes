@@ -1,0 +1,16 @@
+# Keep development files out of the Composer dist archive
+/.github                     export-ignore
+/.settings                   export-ignore
+/examples                    export-ignore
+/libs                        export-ignore
+/tests                       export-ignore
+/wiki                        export-ignore
+/.buildpath                  export-ignore
+/.eclipse-PHP-formatter.xml  export-ignore
+/.gitignore                  export-ignore
+/.gitmodules                 export-ignore
+/.phpunit.result.cache       export-ignore
+/.project                    export-ignore
+/.travis.yml                 export-ignore
+/phpunit.xml                 export-ignore
+/runtest.sh                  export-ignore
