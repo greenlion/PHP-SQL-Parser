@@ -56,6 +56,7 @@ class RenameProcessor extends AbstractProcessor {
         $base_expr = "";
         $resultList = array();
         $tablePair = array();
+        $objectType = '';
 
         foreach ($tokenList as $k => $v) {
             $token = new ExpressionToken($k, $v);
